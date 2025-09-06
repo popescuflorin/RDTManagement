@@ -4,6 +4,7 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  role: string;
   lastLoginAt: string;
 }
 
@@ -19,13 +20,6 @@ export interface LoginResponse {
   user: User;
 }
 
-export interface RegisterRequest {
-  username: string;
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-}
 
 export interface DashboardData {
   welcomeMessage: string;
@@ -40,4 +34,13 @@ export interface UpdateProfileRequest {
   firstName: string;
   lastName: string;
   email: string;
+}
+
+export interface AdminRegisterRequest {
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  role: string;
 }

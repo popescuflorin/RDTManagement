@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { userApi, authApi } from '../services/api';
-import type { User, DashboardData } from '../types.js';
+import type { User, DashboardData } from '../types';
+import AdminRegister from './AdminRegister';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -9,6 +10,7 @@ const Dashboard: React.FC = () => {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showRegisterModal, setShowRegisterModal] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,6 +51,23 @@ const Dashboard: React.FC = () => {
     }
   };
 
+  const handleUserCreated = (newUser: User) => {
+    console.log('New user created:', newUser);
+    // Optionally refresh dashboard data or show success message
+  };
+
+  const handleDebugClaims = async () => {
+    try {
+      const response = await authApi.debugClaims();
+      console.log('JWT Claims:', response.data);
+      alert('Check console for JWT claims');
+    } catch (error) {
+      console.error('Error getting claims:', error);
+    }
+  };
+
+  const isAdmin = user?.role === 'Admin';
+
   if (isLoading) {
     return (
       <div className="dashboard-container">
@@ -71,7 +90,18 @@ const Dashboard: React.FC = () => {
         <div className="header-content">
           <h1>Dashboard</h1>
           <div className="user-info">
-            <span>Welcome, {user?.firstName} {user?.lastName}</span>
+            <span>Welcome, {user?.firstName} {user?.lastName} ({user?.role})</span>
+            {isAdmin && (
+              <button 
+                onClick={() => setShowRegisterModal(true)} 
+                className="create-user-button"
+              >
+                Create User
+              </button>
+            )}
+            <button onClick={handleDebugClaims} style={{marginLeft: '10px'}}>
+              Debug Claims
+            </button>
             <button onClick={handleLogout} className="logout-button">
               Logout
             </button>
@@ -130,6 +160,13 @@ const Dashboard: React.FC = () => {
           </div>
         </div>
       </main>
+
+      {showRegisterModal && (
+        <AdminRegister
+          onClose={() => setShowRegisterModal(false)}
+          onUserCreated={handleUserCreated}
+        />
+      )}
     </div>
   );
 };

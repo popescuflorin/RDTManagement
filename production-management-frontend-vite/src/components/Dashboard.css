@@ -41,6 +41,25 @@
   white-space: nowrap;
 }
 
+.create-user-button {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.create-user-button:hover {
+  background: linear-gradient(135deg, #218838 0%, #1fa085 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+}
+
 .logout-button {
   background-color: #dc3545;
   color: white;
@@ -81,6 +100,7 @@
     font-size: 0.85rem;
   }
   
+  .create-user-button,
   .logout-button {
     padding: 8px 16px;
     font-size: 0.85rem;

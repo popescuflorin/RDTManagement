@@ -20,6 +20,7 @@ namespace ProductionManagement.API.Controllers
                 PasswordHash = "hashedpassword",
                 FirstName = "Admin",
                 LastName = "User",
+                Role = "Admin",
                 CreatedAt = DateTime.Now.AddDays(-30),
                 LastLoginAt = DateTime.Now.AddDays(-1),
                 IsActive = true
@@ -32,6 +33,7 @@ namespace ProductionManagement.API.Controllers
                 PasswordHash = "hashedpassword",
                 FirstName = "Regular",
                 LastName = "User",
+                Role = "User",
                 CreatedAt = DateTime.Now.AddDays(-15),
                 LastLoginAt = DateTime.Now.AddDays(-2),
                 IsActive = true
@@ -60,6 +62,7 @@ namespace ProductionManagement.API.Controllers
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                Role = user.Role,
                 LastLoginAt = user.LastLoginAt
             };
 
@@ -93,6 +96,7 @@ namespace ProductionManagement.API.Controllers
                 Email = user.Email,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
+                Role = user.Role,
                 LastLoginAt = user.LastLoginAt
             };
 

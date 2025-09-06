@@ -94,14 +94,14 @@ const Login: React.FC = () => {
           </button>
         </form>
 
-        <div className="login-footer">
-          <p>Don't have an account? <a href="/register">Sign up</a></p>
-        </div>
 
         <div className="demo-credentials">
           <h3>Demo Credentials:</h3>
           <p><strong>Admin:</strong> admin / admin123</p>
           <p><strong>User:</strong> user / user123</p>
+          <div className="admin-note">
+            <p><small>Note: Only administrators can create new user accounts.</small></p>
+          </div>
         </div>
       </div>
     </div>

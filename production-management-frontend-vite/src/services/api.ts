@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { LoginRequest, LoginResponse, RegisterRequest, User, DashboardData, UpdateProfileRequest } from '../types';
+import type { LoginRequest, LoginResponse, User, DashboardData, UpdateProfileRequest, AdminRegisterRequest } from '../types';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -53,9 +53,10 @@ api.interceptors.response.use(
 // Auth API
 export const authApi = {
   login: (credentials: LoginRequest) => api.post<LoginResponse>('/auth/login', credentials),
-  register: (userData: RegisterRequest) => api.post<LoginResponse>('/auth/register', userData),
+  adminRegister: (userData: AdminRegisterRequest) => api.post<User>('/auth/admin/register', userData),
   logout: (refreshToken: string) => api.post('/auth/logout', refreshToken),
   refresh: (refreshToken: string) => api.post<LoginResponse>('/auth/refresh', refreshToken),
+  debugClaims: () => api.get('/auth/debug/claims'),
 };
 
 // User API

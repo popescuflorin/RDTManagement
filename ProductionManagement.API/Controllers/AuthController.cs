@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Services;
+using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -22,6 +23,7 @@ namespace ProductionManagement.API.Controllers
                 PasswordHash = HashPassword("admin123"),
                 FirstName = "Admin",
                 LastName = "User",
+                Role = "Admin",
                 CreatedAt = DateTime.Now.AddDays(-30),
                 LastLoginAt = DateTime.Now.AddDays(-1),
                 IsActive = true
@@ -34,6 +36,7 @@ namespace ProductionManagement.API.Controllers
                 PasswordHash = HashPassword("user123"),
                 FirstName = "Regular",
                 LastName = "User",
+                Role = "User",
                 CreatedAt = DateTime.Now.AddDays(-15),
                 LastLoginAt = DateTime.Now.AddDays(-2),
                 IsActive = true
@@ -76,6 +79,7 @@ namespace ProductionManagement.API.Controllers
                     Email = user.Email,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
+                    Role = user.Role,
                     LastLoginAt = user.LastLoginAt
                 }
             };
@@ -83,57 +87,6 @@ namespace ProductionManagement.API.Controllers
             return Ok(response);
         }
 
-        [HttpPost("register")]
-        public ActionResult<LoginResponse> Register(RegisterRequest request)
-        {
-            if (_users.Any(u => u.Username == request.Username))
-            {
-                return BadRequest(new { message = "Username already exists" });
-            }
-
-            if (_users.Any(u => u.Email == request.Email))
-            {
-                return BadRequest(new { message = "Email already exists" });
-            }
-
-            var user = new User
-            {
-                Id = _users.Count > 0 ? _users.Max(u => u.Id) + 1 : 1,
-                Username = request.Username,
-                Email = request.Email,
-                PasswordHash = HashPassword(request.Password),
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                CreatedAt = DateTime.UtcNow,
-                LastLoginAt = DateTime.UtcNow,
-                IsActive = true
-            };
-
-            _users.Add(user);
-
-            var token = _jwtService.GenerateToken(user);
-            var refreshToken = _jwtService.GenerateRefreshToken();
-            
-            _refreshTokens[refreshToken] = user.Username;
-
-            var response = new LoginResponse
-            {
-                Token = token,
-                RefreshToken = refreshToken,
-                ExpiresAt = DateTime.UtcNow.AddMinutes(60),
-                User = new UserInfo
-                {
-                    Id = user.Id,
-                    Username = user.Username,
-                    Email = user.Email,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    LastLoginAt = user.LastLoginAt
-                }
-            };
-
-            return Ok(response);
-        }
 
         [HttpPost("refresh")]
         public ActionResult<LoginResponse> RefreshToken([FromBody] string refreshToken)
@@ -167,6 +120,7 @@ namespace ProductionManagement.API.Controllers
                     Email = user.Email,
                     FirstName = user.FirstName,
                     LastName = user.LastName,
+                    Role = user.Role,
                     LastLoginAt = user.LastLoginAt
                 }
             };
@@ -180,6 +134,68 @@ namespace ProductionManagement.API.Controllers
         {
             _refreshTokens.Remove(refreshToken);
             return Ok(new { message = "Logged out successfully" });
+        }
+
+        [HttpGet("debug/claims")]
+        [Authorize]
+        public IActionResult GetClaims()
+        {
+            var claims = User.Claims.Select(c => new { Type = c.Type, Value = c.Value }).ToList();
+            var roleClaimStandard = User.FindFirst(ClaimTypes.Role)?.Value;
+            var roleClaimMicrosoft = User.FindFirst("http://schemas.microsoft.com/ws/2008/06/identity/claims/role")?.Value;
+            var roleClaimSimple = User.FindFirst("role")?.Value;
+            
+            return Ok(new { 
+                claims = claims, 
+                roleStandard = roleClaimStandard,
+                roleMicrosoft = roleClaimMicrosoft,
+                roleSimple = roleClaimSimple,
+                allRoleTypes = claims.Where(c => c.Type.Contains("role")).ToList()
+            });
+        }
+
+        [HttpPost("admin/register")]
+        [Authorize(Roles = "Admin")]
+        public ActionResult<UserInfo> AdminRegister(AdminRegisterRequest request)
+        {
+            if (_users.Any(u => u.Username == request.Username))
+            {
+                return BadRequest(new { message = "Username already exists" });
+            }
+
+            if (_users.Any(u => u.Email == request.Email))
+            {
+                return BadRequest(new { message = "Email already exists" });
+            }
+
+            var user = new User
+            {
+                Id = _users.Count > 0 ? _users.Max(u => u.Id) + 1 : 1,
+                Username = request.Username,
+                Email = request.Email,
+                PasswordHash = HashPassword(request.Password),
+                FirstName = request.FirstName,
+                LastName = request.LastName,
+                Role = request.Role,
+                CreatedAt = DateTime.UtcNow,
+                LastLoginAt = DateTime.UtcNow,
+                IsActive = true
+            };
+
+            _users.Add(user);
+
+            var userInfo = new UserInfo
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = user.Role,
+                LastLoginAt = user.LastLoginAt
+            };
+
+            return Ok(userInfo);
         }
 
         private static string HashPassword(string password)
