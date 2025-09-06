@@ -1,7 +1,25 @@
 .dashboard-container {
   min-height: 100vh;
   background-color: #f8f9fa;
+  display: flex;
+  position: relative;
   min-width: 100vw;
+}
+
+.dashboard-content {
+  flex: 1;
+  transition: margin-left 0.3s ease;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-content.sidebar-expanded {
+  margin-left: 280px;
+}
+
+.dashboard-content.sidebar-collapsed {
+  margin-left: 70px;
 }
 
 .dashboard-header {
@@ -111,6 +129,27 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: 30px 20px;
+  flex: 1;
+}
+
+.page-content {
+  background: white;
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.page-content h2 {
+  color: #333;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #667eea;
+}
+
+.page-content p {
+  color: #666;
+  line-height: 1.6;
 }
 
 .welcome-section {
@@ -482,5 +521,20 @@
   .loading, .error {
     padding: 30px 15px;
     font-size: 1rem;
+  }
+  
+  .dashboard-content.sidebar-expanded,
+  .dashboard-content.sidebar-collapsed {
+    margin-left: 0;
+  }
+}
+
+@media (min-width: 769px) {
+  .dashboard-content.sidebar-expanded {
+    margin-left: 280px;
+  }
+  
+  .dashboard-content.sidebar-collapsed {
+    margin-left: 70px;
   }
 }

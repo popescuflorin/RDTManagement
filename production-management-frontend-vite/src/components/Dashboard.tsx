@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { userApi, authApi } from '../services/api';
 import type { User, DashboardData } from '../types';
 import AdminRegister from './AdminRegister';
+import Sidebar from './Sidebar';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -11,6 +12,8 @@ const Dashboard: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [currentPage, setCurrentPage] = useState('dashboard');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -66,50 +69,44 @@ const Dashboard: React.FC = () => {
     }
   };
 
-  const isAdmin = user?.role === 'Admin';
+  const handleSidebarToggle = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
 
-  if (isLoading) {
+  const handleNavigate = (page: string) => {
+    setCurrentPage(page);
+    if (page === 'users') {
+      setShowRegisterModal(true);
+    }
+    // Handle other page navigation here
+  };
+
+  const renderPageContent = () => {
+    switch (currentPage) {
+      case 'dashboard':
+        return renderDashboardContent();
+      case 'users':
+        return <div className="page-content"><h2>User Management</h2><p>User management functionality will be implemented here.</p></div>;
+      case 'production':
+        return <div className="page-content"><h2>Production</h2><p>Production management functionality will be implemented here.</p></div>;
+      case 'inventory':
+        return <div className="page-content"><h2>Inventory</h2><p>Inventory management functionality will be implemented here.</p></div>;
+      case 'orders':
+        return <div className="page-content"><h2>Orders</h2><p>Order management functionality will be implemented here.</p></div>;
+      case 'reports':
+        return <div className="page-content"><h2>Reports</h2><p>Reports functionality will be implemented here.</p></div>;
+      case 'settings':
+        return <div className="page-content"><h2>Settings</h2><p>Settings functionality will be implemented here.</p></div>;
+      default:
+        return renderDashboardContent();
+    }
+  };
+
+  const renderDashboardContent = () => {
+    if (!dashboardData) return null;
+    
     return (
-      <div className="dashboard-container">
-        <div className="loading">Loading dashboard...</div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="dashboard-container">
-        <div className="error">Error: {error}</div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="dashboard-container">
-      <header className="dashboard-header">
-        <div className="header-content">
-          <h1>Dashboard</h1>
-          <div className="user-info">
-            <span>Welcome, {user?.firstName} {user?.lastName} ({user?.role})</span>
-            {isAdmin && (
-              <button 
-                onClick={() => setShowRegisterModal(true)} 
-                className="create-user-button"
-              >
-                Create User
-              </button>
-            )}
-            <button onClick={handleDebugClaims} style={{marginLeft: '10px'}}>
-              Debug Claims
-            </button>
-            <button onClick={handleLogout} className="logout-button">
-              Logout
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="dashboard-main">
+      <>
         <div className="welcome-section">
           <h2>{dashboardData?.welcomeMessage}</h2>
           <p>Last login: {new Date(user?.lastLoginAt || '').toLocaleString()}</p>
@@ -159,7 +156,66 @@ const Dashboard: React.FC = () => {
             </div>
           </div>
         </div>
-      </main>
+      </>
+    );
+  };
+
+  const isAdmin = user?.role === 'Admin';
+
+  if (isLoading) {
+    return (
+      <div className="dashboard-container">
+        <div className="loading">Loading dashboard...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard-container">
+        <div className="error">Error: {error}</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="dashboard-container">
+      <Sidebar
+        isCollapsed={sidebarCollapsed}
+        onToggle={handleSidebarToggle}
+        currentPage={currentPage}
+        onNavigate={handleNavigate}
+        userRole={user?.role || 'User'}
+      />
+      
+      <div className={`dashboard-content ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
+      <header className="dashboard-header">
+        <div className="header-content">
+          <h1>{currentPage === 'dashboard' ? 'Dashboard' : currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}</h1>
+          <div className="user-info">
+            <span>Welcome, {user?.firstName} {user?.lastName} ({user?.role})</span>
+            {isAdmin && currentPage === 'dashboard' && (
+              <button 
+                onClick={() => setShowRegisterModal(true)} 
+                className="create-user-button"
+              >
+                Create User
+              </button>
+            )}
+            <button onClick={handleDebugClaims} style={{marginLeft: '10px'}}>
+              Debug Claims
+            </button>
+            <button onClick={handleLogout} className="logout-button">
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+        <main className="dashboard-main">
+          {renderPageContent()}
+        </main>
+      </div>
 
       {showRegisterModal && (
         <AdminRegister

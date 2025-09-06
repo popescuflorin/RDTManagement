@@ -1,0 +1,244 @@
+/* Sidebar Container */
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transition: width 0.3s ease;
+  z-index: 1000;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar.expanded {
+  width: 280px;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+/* Sidebar Header */
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 60px;
+}
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.sidebar-toggle:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0;
+  margin-left: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Sidebar Navigation */
+.sidebar-nav {
+  flex: 1;
+  padding: 20px 0;
+  overflow-y: auto;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-menu-item {
+  margin-bottom: 5px;
+}
+
+.sidebar-menu-button {
+  width: 100%;
+  background: none;
+  border: none;
+  color: white;
+  padding: 15px 20px;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.2s ease;
+  border-radius: 0;
+  position: relative;
+}
+
+.sidebar.collapsed .sidebar-menu-button {
+  justify-content: center;
+  padding: 15px;
+}
+
+.sidebar-menu-button:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-menu-button.active {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-right: 4px solid #fff;
+}
+
+.sidebar-menu-button.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background-color: #fff;
+}
+
+.sidebar-icon {
+  font-size: 1.5rem;
+  margin-right: 15px;
+  flex-shrink: 0;
+  width: 24px;
+  text-align: center;
+}
+
+.sidebar.collapsed .sidebar-icon {
+  margin-right: 0;
+}
+
+.sidebar-label {
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Sidebar Footer */
+.sidebar-footer {
+  padding: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  margin-top: auto;
+}
+
+.sidebar-user-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-role-badge {
+  background-color: rgba(255, 255, 255, 0.2);
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .sidebar.expanded {
+    width: 100%;
+    position: fixed;
+    z-index: 9999;
+  }
+  
+  .sidebar.collapsed {
+    width: 0;
+    overflow: hidden;
+  }
+  
+  .sidebar-header {
+    padding: 15px;
+  }
+  
+  .sidebar-title {
+    font-size: 1.1rem;
+  }
+  
+  .sidebar-menu-button {
+    padding: 12px 15px;
+  }
+  
+  .sidebar-icon {
+    font-size: 1.3rem;
+    margin-right: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar-header {
+    padding: 10px;
+  }
+  
+  .sidebar-title {
+    font-size: 1rem;
+  }
+  
+  .sidebar-menu-button {
+    padding: 10px;
+  }
+  
+  .sidebar-icon {
+    font-size: 1.2rem;
+    margin-right: 10px;
+  }
+}
+
+/* Smooth animations */
+.sidebar-menu-button,
+.sidebar-toggle,
+.sidebar {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Tooltip for collapsed state */
+.sidebar.collapsed .sidebar-menu-button {
+  position: relative;
+}
+
+.sidebar.collapsed .sidebar-menu-button:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 70px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  z-index: 1001;
+  opacity: 0;
+  animation: tooltipFadeIn 0.2s ease forwards;
+}
+
+@keyframes tooltipFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50%) translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(-50%) translateX(0);
+  }
+}
