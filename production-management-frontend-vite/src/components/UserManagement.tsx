@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { userApi } from '../services/api';
 import type { User } from '../types';
 import AdminRegister from './AdminRegister';
+import EditUser from './EditUser';
+import DeleteConfirmation from './DeleteConfirmation';
 import './UserManagement.css';
 
 const UserManagement: React.FC = () => {
@@ -9,6 +11,9 @@ const UserManagement: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -33,6 +38,38 @@ const UserManagement: React.FC = () => {
     setUsers(prevUsers => [...prevUsers, newUser]);
     setShowAddModal(false);
     // Show success message or notification here if needed
+  };
+
+  const handleEditUser = (user: User) => {
+    setSelectedUser(user);
+    setShowEditModal(true);
+  };
+
+  const handleUserUpdated = (updatedUser: User) => {
+    setUsers(prevUsers => 
+      prevUsers.map(user => 
+        user.id === updatedUser.id ? updatedUser : user
+      )
+    );
+    setShowEditModal(false);
+    setSelectedUser(null);
+  };
+
+  const handleDeleteUser = (user: User) => {
+    setSelectedUser(user);
+    setShowDeleteModal(true);
+  };
+
+  const handleUserDeleted = (userId: number) => {
+    setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+    setShowDeleteModal(false);
+    setSelectedUser(null);
+  };
+
+  const closeModals = () => {
+    setShowEditModal(false);
+    setShowDeleteModal(false);
+    setSelectedUser(null);
   };
 
   const filteredUsers = users.filter(user =>
@@ -175,10 +212,18 @@ const UserManagement: React.FC = () => {
                 </td>
                 <td className="actions-cell">
                   <div className="action-buttons">
-                    <button className="action-button edit-button" title="Edit User">
+                    <button 
+                      className="action-button edit-button" 
+                      title="Edit User"
+                      onClick={() => handleEditUser(user)}
+                    >
                       ✏️
                     </button>
-                    <button className="action-button delete-button" title="Delete User">
+                    <button 
+                      className="action-button delete-button" 
+                      title="Delete User"
+                      onClick={() => handleDeleteUser(user)}
+                    >
                       🗑️
                     </button>
                     <button className="action-button view-button" title="View Details">
@@ -216,6 +261,22 @@ const UserManagement: React.FC = () => {
         <AdminRegister
           onClose={() => setShowAddModal(false)}
           onUserCreated={handleUserCreated}
+        />
+      )}
+
+      {showEditModal && selectedUser && (
+        <EditUser
+          user={selectedUser}
+          onClose={closeModals}
+          onUserUpdated={handleUserUpdated}
+        />
+      )}
+
+      {showDeleteModal && selectedUser && (
+        <DeleteConfirmation
+          user={selectedUser}
+          onClose={closeModals}
+          onUserDeleted={handleUserDeleted}
         />
       )}
     </div>

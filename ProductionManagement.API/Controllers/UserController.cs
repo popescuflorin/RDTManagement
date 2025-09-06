@@ -153,6 +153,73 @@ namespace ProductionManagement.API.Controllers
 
             return Ok(userInfos);
         }
+
+        [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
+        public ActionResult<UserInfo> UpdateUser(int id, [FromBody] AdminUpdateUserRequest request)
+        {
+            var user = _users.FirstOrDefault(u => u.Id == id);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            // Check if username already exists for another user
+            if (_users.Any(u => u.Username == request.Username && u.Id != id))
+            {
+                return BadRequest(new { message = "Username already exists" });
+            }
+
+            // Check if email already exists for another user
+            if (_users.Any(u => u.Email == request.Email && u.Id != id))
+            {
+                return BadRequest(new { message = "Email already exists" });
+            }
+
+            // Update user information
+            user.Username = request.Username;
+            user.Email = request.Email;
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.Role = request.Role;
+            user.IsActive = request.IsActive;
+
+            var userInfo = new UserInfo
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = user.Role,
+                LastLoginAt = user.LastLoginAt
+            };
+
+            return Ok(userInfo);
+        }
+
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public IActionResult DeleteUser(int id)
+        {
+            var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (currentUserIdClaim != null && int.TryParse(currentUserIdClaim, out var currentUserId))
+            {
+                if (currentUserId == id)
+                {
+                    return BadRequest(new { message = "You cannot delete your own account" });
+                }
+            }
+
+            var user = _users.FirstOrDefault(u => u.Id == id);
+            if (user == null)
+            {
+                return NotFound(new { message = "User not found" });
+            }
+
+            _users.Remove(user);
+            return Ok(new { message = "User deleted successfully" });
+        }
     }
 
     public class UpdateProfileRequest
@@ -170,5 +237,15 @@ namespace ProductionManagement.API.Controllers
         public DateTime LastLogin { get; set; }
         public string SystemStatus { get; set; } = string.Empty;
         public List<string> RecentActivity { get; set; } = new List<string>();
+    }
+
+    public class AdminUpdateUserRequest
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+        public bool IsActive { get; set; } = true;
     }
 }

@@ -44,3 +44,12 @@ export interface AdminRegisterRequest {
   lastName: string;
   role: string;
 }
+
+export interface AdminUpdateUserRequest {
+  username: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  isActive: boolean;
+}

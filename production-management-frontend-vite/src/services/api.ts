@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { LoginRequest, LoginResponse, User, DashboardData, UpdateProfileRequest, AdminRegisterRequest } from '../types';
+import type { LoginRequest, LoginResponse, User, DashboardData, UpdateProfileRequest, AdminRegisterRequest, AdminUpdateUserRequest } from '../types';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -65,6 +65,8 @@ export const userApi = {
   updateProfile: (userData: UpdateProfileRequest) => api.put<User>('/user/profile', userData),
   getDashboard: () => api.get<DashboardData>('/user/dashboard'),
   getAllUsers: () => api.get<User[]>('/user/all'),
+  updateUser: (id: number, userData: AdminUpdateUserRequest) => api.put<User>(`/user/${id}`, userData),
+  deleteUser: (id: number) => api.delete(`/user/${id}`),
 };
 
 export default api;
