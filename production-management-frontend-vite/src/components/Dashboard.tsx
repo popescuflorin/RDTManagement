@@ -4,6 +4,7 @@ import { userApi, authApi } from '../services/api';
 import type { User, DashboardData } from '../types';
 import AdminRegister from './AdminRegister';
 import Sidebar from './Sidebar';
+import UserManagement from './UserManagement';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -75,9 +76,6 @@ const Dashboard: React.FC = () => {
 
   const handleNavigate = (page: string) => {
     setCurrentPage(page);
-    if (page === 'users') {
-      setShowRegisterModal(true);
-    }
     // Handle other page navigation here
   };
 
@@ -86,7 +84,7 @@ const Dashboard: React.FC = () => {
       case 'dashboard':
         return renderDashboardContent();
       case 'users':
-        return <div className="page-content"><h2>User Management</h2><p>User management functionality will be implemented here.</p></div>;
+        return <UserManagement />;
       case 'production':
         return <div className="page-content"><h2>Production</h2><p>Production management functionality will be implemented here.</p></div>;
       case 'inventory':

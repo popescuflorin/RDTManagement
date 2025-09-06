@@ -64,6 +64,7 @@ export const userApi = {
   getProfile: () => api.get<User>('/user/profile'),
   updateProfile: (userData: UpdateProfileRequest) => api.put<User>('/user/profile', userData),
   getDashboard: () => api.get<DashboardData>('/user/dashboard'),
+  getAllUsers: () => api.get<User[]>('/user/all'),
 };
 
 export default api;

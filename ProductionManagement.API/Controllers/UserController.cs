@@ -135,6 +135,24 @@ namespace ProductionManagement.API.Controllers
 
             return Ok(dashboardData);
         }
+
+        [HttpGet("all")]
+        [Authorize(Roles = "Admin")]
+        public ActionResult<List<UserInfo>> GetAllUsers()
+        {
+            var userInfos = _users.Select(u => new UserInfo
+            {
+                Id = u.Id,
+                Username = u.Username,
+                Email = u.Email,
+                FirstName = u.FirstName,
+                LastName = u.LastName,
+                Role = u.Role,
+                LastLoginAt = u.LastLoginAt
+            }).ToList();
+
+            return Ok(userInfos);
+        }
     }
 
     public class UpdateProfileRequest
