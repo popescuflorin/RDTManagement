@@ -116,3 +116,105 @@ export interface InventoryStatistics {
     quantityType: string;
   }>;
 }
+
+// Production Management Types
+export interface Product {
+  id: number;
+  name: string;
+  description: string;
+  category: string;
+  sellingPrice: number;
+  estimatedProductionTimeMinutes: number;
+  createdAt: string;
+  updatedAt: string;
+  isActive: boolean;
+  requiredMaterials: ProductMaterial[];
+  estimatedCost: number;
+  estimatedProfit: number;
+  canProduce: boolean;
+  missingMaterials: string[];
+}
+
+export interface ProductMaterial {
+  id: number;
+  productId: number;
+  materialId: number;
+  requiredQuantity: number;
+  materialName: string;
+  materialColor: string;
+  quantityType: string;
+}
+
+export interface CreateProductRequest {
+  name: string;
+  description: string;
+  category: string;
+  sellingPrice: number;
+  estimatedProductionTimeMinutes: number;
+  requiredMaterials: CreateProductMaterialRequest[];
+}
+
+export interface CreateProductMaterialRequest {
+  materialId: number;
+  requiredQuantity: number;
+}
+
+export interface UpdateProductRequest {
+  name: string;
+  description: string;
+  category: string;
+  sellingPrice: number;
+  estimatedProductionTimeMinutes: number;
+  isActive: boolean;
+  requiredMaterials: CreateProductMaterialRequest[];
+}
+
+export interface ProduceProductRequest {
+  productId: number;
+  quantity: number;
+  notes?: string;
+}
+
+export interface ProductionResult {
+  success: boolean;
+  message: string;
+  productsProduced: number;
+  materialsConsumed: MaterialConsumption[];
+  totalCost: number;
+  productionDate: string;
+}
+
+export interface MaterialConsumption {
+  materialId: number;
+  materialName: string;
+  materialColor: string;
+  quantityConsumed: number;
+  quantityType: string;
+  cost: number;
+}
+
+export interface FinishedProduct {
+  id: number;
+  productId: number;
+  productName: string;
+  quantity: number;
+  productionCost: number;
+  producedAt: string;
+  notes?: string;
+  materialsUsed: MaterialConsumption[];
+}
+
+export interface ProductionStatistics {
+  totalProducts: number;
+  activeProducts: number;
+  productsCanProduce: number;
+  totalFinishedProducts: number;
+  totalProductionValue: number;
+  topProducts: TopProduct[];
+}
+
+export interface TopProduct {
+  name: string;
+  totalProduced: number;
+  totalValue: number;
+}

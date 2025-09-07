@@ -6,6 +6,7 @@ import AdminRegister from './AdminRegister';
 import Sidebar from './Sidebar';
 import UserManagement from './UserManagement';
 import Inventory from './Inventory';
+import Production from './Production';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -87,7 +88,7 @@ const Dashboard: React.FC = () => {
       case 'users':
         return <UserManagement />;
       case 'production':
-        return <div className="page-content"><h2>Production</h2><p>Production management functionality will be implemented here.</p></div>;
+        return <Production />;
       case 'inventory':
         return <Inventory />;
       case 'orders':

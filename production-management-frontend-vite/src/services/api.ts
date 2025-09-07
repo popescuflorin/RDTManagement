@@ -12,7 +12,14 @@ import type {
   UpdateRawMaterialRequest,
   AddToExistingMaterialRequest,
   MaterialType,
-  InventoryStatistics
+  InventoryStatistics,
+  Product,
+  CreateProductRequest,
+  UpdateProductRequest,
+  ProduceProductRequest,
+  ProductionResult,
+  FinishedProduct,
+  ProductionStatistics
 } from '../types';
 
 const API_BASE_URL = 'http://localhost:5000/api';
@@ -94,6 +101,18 @@ export const inventoryApi = {
   addToExisting: (addData: AddToExistingMaterialRequest) => api.post<RawMaterial>('/inventory/add-to-existing', addData),
   updateMaterial: (id: number, materialData: UpdateRawMaterialRequest) => api.put<RawMaterial>(`/inventory/${id}`, materialData),
   deleteMaterial: (id: number) => api.delete(`/inventory/${id}`),
+};
+
+// Production API
+export const productionApi = {
+  getAllProducts: () => api.get<Product[]>('/production'),
+  getProduct: (id: number) => api.get<Product>(`/production/${id}`),
+  getFinishedProducts: () => api.get<FinishedProduct[]>('/production/finished'),
+  getStatistics: () => api.get<ProductionStatistics>('/production/statistics'),
+  createProduct: (productData: CreateProductRequest) => api.post<Product>('/production', productData),
+  updateProduct: (id: number, productData: UpdateProductRequest) => api.put<Product>(`/production/${id}`, productData),
+  deleteProduct: (id: number) => api.delete(`/production/${id}`),
+  produceProduct: (productionData: ProduceProductRequest) => api.post<ProductionResult>('/production/produce', productionData),
 };
 
 export default api;
