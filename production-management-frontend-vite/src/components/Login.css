@@ -8,6 +8,7 @@
   padding: var(--space-xl);
   background: #ffffff;
   position: relative;
+  width: 100vw;
 }
 
 .login-container::before {

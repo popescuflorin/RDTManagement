@@ -1,8 +1,7 @@
 /* Production Container */
 .production-container {
-  padding: var(--space-xl);
-  max-width: 100%;
-  margin: 0 auto;
+  padding: 0;
+  width: 100%;
   background: #ffffff;
   min-height: 100vh;
 }

@@ -1,6 +1,6 @@
 /* User Management Container */
 .user-management-container {
-  padding: var(--space-xl);
+  padding: 0;
   min-height: 100%;
   background: #ffffff;
 }
