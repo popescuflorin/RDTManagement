@@ -1,0 +1,528 @@
+/* Delete Material Confirmation Modal Overlay */
+.delete-material-confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(5px);
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Modal Container */
+.delete-material-confirmation-modal {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Modal Header */
+.delete-material-confirmation-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 30px;
+  border-bottom: 1px solid #fee;
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  border-radius: 16px 16px 0 0;
+}
+
+.warning-icon {
+  font-size: 2rem;
+  filter: brightness(0) invert(1);
+}
+
+.delete-material-confirmation-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+/* Modal Content */
+.delete-material-confirmation-content {
+  padding: 30px;
+}
+
+.confirmation-text {
+  font-size: 1.1rem;
+  color: #333;
+  margin: 0 0 24px 0;
+  line-height: 1.5;
+  text-align: center;
+}
+
+/* Material Details Card */
+.material-details-card {
+  background: #f8f9fa;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 20px;
+  margin: 24px 0;
+}
+
+.material-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.material-name-section {
+  flex: 1;
+}
+
+.material-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.material-color {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #666;
+  font-weight: 500;
+}
+
+.color-dot {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #dee2e6;
+  flex-shrink: 0;
+}
+
+.material-status {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+}
+
+.status-badge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.active {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-badge.inactive {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.low-stock-badge {
+  background-color: #fff3cd;
+  color: #856404;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* Material Info Grid */
+.material-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.info-item {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.info-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.info-value.total-value {
+  color: #28a745;
+  font-size: 1.1rem;
+}
+
+/* Material Description */
+.material-description {
+  background: white;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  margin-top: 16px;
+}
+
+.description-label {
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 4px;
+  font-weight: 500;
+}
+
+.description-text {
+  color: #333;
+  font-style: italic;
+  line-height: 1.4;
+}
+
+/* Warning Section */
+.warning-section {
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 24px 0;
+}
+
+.warning-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #856404;
+}
+
+.warning-icon-small {
+  font-size: 1.1rem;
+}
+
+.warning-list {
+  margin: 0;
+  padding-left: 20px;
+  color: #856404;
+}
+
+.warning-list li {
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.warning-highlight {
+  color: #dc3545 !important;
+  font-weight: 600;
+}
+
+/* Alternative Suggestion */
+.alternative-suggestion {
+  background: #d1ecf1;
+  border: 1px solid #bee5eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 24px 0;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.suggestion-icon {
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.suggestion-text {
+  color: #0c5460;
+  line-height: 1.4;
+}
+
+.suggestion-text strong {
+  color: #0a4952;
+}
+
+/* Error Message */
+.error-message {
+  background-color: #f8d7da;
+  color: #721c24;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid #f5c6cb;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.error-message::before {
+  content: "❌";
+  font-size: 1.1rem;
+}
+
+/* Form Actions */
+.delete-material-confirmation-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  padding: 0 30px 30px;
+  border-top: 1px solid #e9ecef;
+  margin-top: 20px;
+  padding-top: 24px;
+}
+
+.cancel-button,
+.delete-button {
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+  border: none;
+}
+
+.cancel-button {
+  background: #6c757d;
+  color: white;
+}
+
+.cancel-button:hover:not(:disabled) {
+  background: #5a6268;
+  transform: translateY(-1px);
+}
+
+.delete-button {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.delete-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+}
+
+.cancel-button:disabled,
+.delete-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Loading State */
+.delete-button:disabled {
+  position: relative;
+}
+
+.delete-button:disabled::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  margin: auto;
+  border: 2px solid transparent;
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .delete-material-confirmation-modal {
+    width: 95%;
+    margin: 20px;
+    max-height: calc(100vh - 40px);
+  }
+
+  .delete-material-confirmation-header {
+    padding: 20px;
+    gap: 12px;
+  }
+
+  .delete-material-confirmation-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .warning-icon {
+    font-size: 1.8rem;
+  }
+
+  .delete-material-confirmation-content {
+    padding: 20px;
+  }
+
+  .confirmation-text {
+    font-size: 1rem;
+  }
+
+  .material-details-card {
+    padding: 16px;
+  }
+
+  .material-header {
+    flex-direction: column;
+    gap: 12px;
+    align-items: stretch;
+  }
+
+  .material-status {
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .material-name {
+    font-size: 1.2rem;
+  }
+
+  .material-info-grid {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .info-item {
+    padding: 10px;
+  }
+
+  .info-label {
+    font-size: 0.85rem;
+  }
+
+  .info-value {
+    font-size: 0.95rem;
+  }
+
+  .warning-section,
+  .alternative-suggestion {
+    padding: 12px;
+    margin: 16px 0;
+  }
+
+  .alternative-suggestion {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .delete-material-confirmation-actions {
+    flex-direction: column-reverse;
+    gap: 12px;
+    padding: 0 20px 20px;
+  }
+
+  .cancel-button,
+  .delete-button {
+    width: 100%;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .delete-material-confirmation-modal {
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    margin: 0;
+  }
+
+  .delete-material-confirmation-header {
+    padding: 16px 20px;
+    border-radius: 0;
+  }
+
+  .delete-material-confirmation-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .delete-material-confirmation-content {
+    padding: 16px 20px;
+  }
+
+  .material-details-card {
+    padding: 12px;
+  }
+
+  .material-name {
+    font-size: 1.1rem;
+  }
+
+  .material-info-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .info-item {
+    padding: 8px;
+  }
+
+  .warning-section,
+  .alternative-suggestion {
+    padding: 10px;
+    margin: 12px 0;
+  }
+
+  .warning-list {
+    padding-left: 16px;
+  }
+
+  .delete-material-confirmation-actions {
+    padding: 0 20px 20px;
+    margin-top: 16px;
+    padding-top: 16px;
+  }
+}

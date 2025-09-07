@@ -1,5 +1,19 @@
 import axios from 'axios';
-import type { LoginRequest, LoginResponse, User, DashboardData, UpdateProfileRequest, AdminRegisterRequest, AdminUpdateUserRequest } from '../types';
+import type { 
+  LoginRequest, 
+  LoginResponse, 
+  User, 
+  DashboardData, 
+  UpdateProfileRequest, 
+  AdminRegisterRequest, 
+  AdminUpdateUserRequest,
+  RawMaterial,
+  CreateRawMaterialRequest,
+  UpdateRawMaterialRequest,
+  AddToExistingMaterialRequest,
+  MaterialType,
+  InventoryStatistics
+} from '../types';
 
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -67,6 +81,19 @@ export const userApi = {
   getAllUsers: () => api.get<User[]>('/user/all'),
   updateUser: (id: number, userData: AdminUpdateUserRequest) => api.put<User>(`/user/${id}`, userData),
   deleteUser: (id: number) => api.delete(`/user/${id}`),
+};
+
+// Inventory API
+export const inventoryApi = {
+  getAllMaterials: () => api.get<RawMaterial[]>('/inventory'),
+  getMaterial: (id: number) => api.get<RawMaterial>(`/inventory/${id}`),
+  getMaterialTypes: () => api.get<MaterialType[]>('/inventory/types'),
+  getLowStockMaterials: () => api.get<RawMaterial[]>('/inventory/low-stock'),
+  getStatistics: () => api.get<InventoryStatistics>('/inventory/statistics'),
+  createMaterial: (materialData: CreateRawMaterialRequest) => api.post<RawMaterial>('/inventory', materialData),
+  addToExisting: (addData: AddToExistingMaterialRequest) => api.post<RawMaterial>('/inventory/add-to-existing', addData),
+  updateMaterial: (id: number, materialData: UpdateRawMaterialRequest) => api.put<RawMaterial>(`/inventory/${id}`, materialData),
+  deleteMaterial: (id: number) => api.delete(`/inventory/${id}`),
 };
 
 export default api;

@@ -5,6 +5,7 @@ import type { User, DashboardData } from '../types';
 import AdminRegister from './AdminRegister';
 import Sidebar from './Sidebar';
 import UserManagement from './UserManagement';
+import Inventory from './Inventory';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -88,7 +89,7 @@ const Dashboard: React.FC = () => {
       case 'production':
         return <div className="page-content"><h2>Production</h2><p>Production management functionality will be implemented here.</p></div>;
       case 'inventory':
-        return <div className="page-content"><h2>Inventory</h2><p>Inventory management functionality will be implemented here.</p></div>;
+        return <Inventory />;
       case 'orders':
         return <div className="page-content"><h2>Orders</h2><p>Order management functionality will be implemented here.</p></div>;
       case 'reports':
