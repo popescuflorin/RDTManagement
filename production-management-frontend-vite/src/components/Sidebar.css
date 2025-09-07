@@ -4,11 +4,12 @@
   top: 0;
   left: 0;
   height: 100vh;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  background: #ffffff;
+  color: var(--text-primary);
   transition: width 0.3s ease;
   z-index: 1000;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+  border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
 }
@@ -24,7 +25,7 @@
 /* Sidebar Header */
 .sidebar-header {
   padding: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -34,7 +35,7 @@
 .sidebar-toggle {
   background: none;
   border: none;
-  color: white;
+  color: var(--text-primary);
   font-size: 1.2rem;
   cursor: pointer;
   padding: 8px;
@@ -44,7 +45,7 @@
 }
 
 .sidebar-toggle:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--surface-hover);
 }
 
 .sidebar-title {
@@ -77,7 +78,7 @@
   width: 100%;
   background: none;
   border: none;
-  color: white;
+  color: var(--text-primary);
   padding: 15px 20px;
   text-align: left;
   cursor: pointer;
@@ -94,12 +95,13 @@
 }
 
 .sidebar-menu-button:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: var(--surface-hover);
 }
 
 .sidebar-menu-button.active {
-  background-color: rgba(255, 255, 255, 0.2);
-  border-right: 4px solid #fff;
+  background-color: var(--primary-50);
+  border-right: 4px solid var(--primary-500);
+  color: var(--primary-600);
 }
 
 .sidebar-menu-button.active::before {
@@ -109,7 +111,7 @@
   top: 0;
   bottom: 0;
   width: 4px;
-  background-color: #fff;
+  background-color: var(--primary-500);
 }
 
 .sidebar-icon {
