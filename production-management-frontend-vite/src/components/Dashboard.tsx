@@ -229,7 +229,7 @@ const Dashboard: React.FC = () => {
             {isAdmin && currentPage === 'dashboard' && (
               <button 
                 onClick={() => setShowRegisterModal(true)} 
-                className="create-user-button"
+                className="btn btn-primary"
               >
                 <UserPlus size={16} />
                 Create User
@@ -237,12 +237,12 @@ const Dashboard: React.FC = () => {
             )}
             <button 
               onClick={handleDebugClaims} 
-              className="debug-button"
+              className="btn btn-secondary"
             >
               <Bug size={16} />
               Debug Claims
             </button>
-            <button onClick={handleLogout} className="logout-button">
+            <button onClick={handleLogout} className="btn btn-danger">
               <LogOut size={16} />
               Logout
             </button>

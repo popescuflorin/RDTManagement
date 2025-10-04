@@ -204,7 +204,7 @@ const Production: React.FC = () => {
           Production Management
         </h1>
         <button 
-          className="add-product-button"
+          className="btn btn-primary"
           onClick={() => setShowAddModal(true)}
         >
           <Plus size={16} />
@@ -397,21 +397,21 @@ const Production: React.FC = () => {
                   <td className="actions-cell">
                     <div className="action-buttons">
                       <button 
-                        className="action-button edit-button" 
+                        className="btn btn-sm btn-warning" 
                         title="Edit Product"
                         onClick={() => handleEditProduct(product)}
                       >
                         <Edit size={16} />
                       </button>
                       <button 
-                        className="action-button delete-button" 
+                        className="btn btn-sm btn-danger" 
                         title="Delete Product"
                         onClick={() => handleDeleteProduct(product)}
                       >
                         <Trash2 size={16} />
                       </button>
                       <button 
-                        className={`action-button produce-button ${!product.canProduce ? 'disabled' : ''}`}
+                        className={`btn btn-sm btn-success ${!product.canProduce ? 'disabled' : ''}`}
                         title={product.canProduce ? "Produce Product" : "Cannot produce - missing materials"}
                         onClick={() => product.canProduce && handleProduceProduct(product)}
                         disabled={!product.canProduce}

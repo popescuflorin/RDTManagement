@@ -49,7 +49,7 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
       <div className="admin-register-modal">
         <div className="admin-register-header">
           <h2>Create New User Account</h2>
-          <button className="close-button" onClick={onClose}>×</button>
+          <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="admin-register-form">
@@ -142,12 +142,12 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
           </div>
 
           <div className="form-actions">
-            <button type="button" className="cancel-button" onClick={onClose}>
+            <button type="button" className="btn btn-secondary" onClick={onClose}>
               Cancel
             </button>
             <button
               type="submit"
-              className="submit-button"
+              className="btn btn-primary"
               disabled={isLoading}
             >
               {isLoading ? 'Creating...' : 'Create User'}

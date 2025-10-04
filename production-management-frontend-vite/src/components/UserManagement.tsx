@@ -129,7 +129,7 @@ const UserManagement: React.FC = () => {
         <div className="error-state">
           <AlertTriangle size={32} className="error-icon" />
           <p>{error}</p>
-          <button onClick={loadUsers} className="retry-button">
+          <button onClick={loadUsers} className="btn btn-primary">
             <RotateCcw size={16} />
             Try Again
           </button>
@@ -148,7 +148,7 @@ const UserManagement: React.FC = () => {
         <div className="header-right">
           <button
             onClick={() => setShowAddModal(true)}
-            className="add-user-button"
+            className="btn btn-primary"
           >
             <UserPlus size={16} />
             Add New User
@@ -225,20 +225,20 @@ const UserManagement: React.FC = () => {
                 <td className="actions-cell">
                   <div className="action-buttons">
                     <button 
-                      className="action-button edit-button" 
+                      className="btn btn-sm btn-warning" 
                       title="Edit User"
                       onClick={() => handleEditUser(user)}
                     >
                       <Edit size={16} />
                     </button>
                     <button 
-                      className="action-button delete-button" 
+                      className="btn btn-sm btn-danger" 
                       title="Delete User"
                       onClick={() => handleDeleteUser(user)}
                     >
                       <Trash2 size={16} />
                     </button>
-                    <button className="action-button view-button" title="View Details">
+                    <button className="btn btn-sm btn-secondary" title="View Details">
                       <Eye size={16} />
                     </button>
                   </div>
@@ -260,7 +260,7 @@ const UserManagement: React.FC = () => {
             {!searchTerm && (
               <button
                 onClick={() => setShowAddModal(true)}
-                className="empty-add-button"
+                className="btn btn-primary"
               >
                 <UserPlus size={16} />
                 Add First User
