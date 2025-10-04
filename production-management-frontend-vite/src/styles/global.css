@@ -421,6 +421,97 @@ button {
   color: var(--primary-900);
 }
 
+/* Icon styles for modern look */
+.icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.icon-sm {
+  width: 16px;
+  height: 16px;
+}
+
+.icon-md {
+  width: 20px;
+  height: 20px;
+}
+
+.icon-lg {
+  width: 24px;
+  height: 24px;
+}
+
+.icon-xl {
+  width: 32px;
+  height: 32px;
+}
+
+/* Search icon positioning */
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.search-container {
+  position: relative;
+}
+
+.search-container .search-input {
+  padding-left: 40px;
+}
+
+/* Button icon spacing */
+button .icon,
+.button-icon {
+  margin-right: var(--space-sm);
+}
+
+button:only-child .icon,
+button:only-child .button-icon {
+  margin-right: 0;
+}
+
+/* Stat icon styling */
+.stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--primary-50);
+  color: var(--primary-600);
+  margin-bottom: var(--space-md);
+}
+
+.stat-card.warning .stat-icon {
+  background: var(--warning-50);
+  color: var(--warning-600);
+}
+
+/* Action button icons */
+.action-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+}
+
+.action-button:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
 /* Print styles */
 @media print {
   * {

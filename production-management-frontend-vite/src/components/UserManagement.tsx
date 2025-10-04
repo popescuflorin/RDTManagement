@@ -1,4 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { 
+  Users, 
+  UserPlus, 
+  Search, 
+  Edit, 
+  Trash2, 
+  Eye, 
+  AlertTriangle, 
+  Loader2,
+  RotateCcw
+} from 'lucide-react';
 import { userApi } from '../services/api';
 import type { User } from '../types';
 import AdminRegister from './AdminRegister';
@@ -105,7 +116,7 @@ const UserManagement: React.FC = () => {
     return (
       <div className="user-management-container">
         <div className="loading-state">
-          <div className="loading-spinner"></div>
+          <Loader2 size={32} className="animate-spin" />
           <p>Loading users...</p>
         </div>
       </div>
@@ -116,9 +127,10 @@ const UserManagement: React.FC = () => {
     return (
       <div className="user-management-container">
         <div className="error-state">
-          <div className="error-icon">⚠️</div>
+          <AlertTriangle size={32} className="error-icon" />
           <p>{error}</p>
           <button onClick={loadUsers} className="retry-button">
+            <RotateCcw size={16} />
             Try Again
           </button>
         </div>
@@ -138,7 +150,7 @@ const UserManagement: React.FC = () => {
             onClick={() => setShowAddModal(true)}
             className="add-user-button"
           >
-            <span className="button-icon">👤</span>
+            <UserPlus size={16} />
             Add New User
           </button>
         </div>
@@ -146,6 +158,7 @@ const UserManagement: React.FC = () => {
 
       <div className="user-management-controls">
         <div className="search-container">
+          <Search size={16} className="search-icon" />
           <input
             type="text"
             placeholder="Search users by name, email, username, or role..."
@@ -153,7 +166,6 @@ const UserManagement: React.FC = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
           />
-          <span className="search-icon">🔍</span>
         </div>
         <div className="users-count">
           <span className="count-badge">{filteredUsers.length}</span>
@@ -217,17 +229,17 @@ const UserManagement: React.FC = () => {
                       title="Edit User"
                       onClick={() => handleEditUser(user)}
                     >
-                      ✏️
+                      <Edit size={16} />
                     </button>
                     <button 
                       className="action-button delete-button" 
                       title="Delete User"
                       onClick={() => handleDeleteUser(user)}
                     >
-                      🗑️
+                      <Trash2 size={16} />
                     </button>
                     <button className="action-button view-button" title="View Details">
-                      👁️
+                      <Eye size={16} />
                     </button>
                   </div>
                 </td>
@@ -238,7 +250,7 @@ const UserManagement: React.FC = () => {
 
         {filteredUsers.length === 0 && !isLoading && (
           <div className="empty-state">
-            <div className="empty-icon">👥</div>
+            <Users size={48} className="empty-icon" />
             <h3>No users found</h3>
             <p>
               {searchTerm
@@ -250,6 +262,7 @@ const UserManagement: React.FC = () => {
                 onClick={() => setShowAddModal(true)}
                 className="empty-add-button"
               >
+                <UserPlus size={16} />
                 Add First User
               </button>
             )}

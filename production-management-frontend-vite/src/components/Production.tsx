@@ -1,4 +1,18 @@
 import React, { useState, useEffect } from 'react';
+import { 
+  Factory, 
+  Package, 
+  CheckCircle, 
+  Wrench, 
+  BarChart3, 
+  DollarSign, 
+  Plus, 
+  Search, 
+  Edit, 
+  Trash2,
+  Play,
+  Loader2
+} from 'lucide-react';
 import { productionApi } from '../services/api';
 import type { Product, ProductionStatistics } from '../types';
 import AddProduct from './AddProduct';
@@ -176,7 +190,7 @@ const Production: React.FC = () => {
   if (isLoading) {
     return (
       <div className="production-loading">
-        <div className="loading-spinner"></div>
+        <Loader2 size={32} className="animate-spin" />
         <p>Loading production data...</p>
       </div>
     );
@@ -185,12 +199,16 @@ const Production: React.FC = () => {
   return (
     <div className="production-container">
       <div className="production-header">
-        <h1>🏭 Production Management</h1>
+        <h1>
+          <Factory size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
+          Production Management
+        </h1>
         <button 
           className="add-product-button"
           onClick={() => setShowAddModal(true)}
         >
-          + Add Product
+          <Plus size={16} />
+          Add Product
         </button>
       </div>
 
@@ -198,35 +216,45 @@ const Production: React.FC = () => {
       {statistics && (
         <div className="production-stats">
           <div className="stat-card">
-            <div className="stat-icon">📦</div>
+            <div className="stat-icon">
+              <Package size={24} />
+            </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.totalProducts}</div>
               <div className="stat-label">Total Products</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">✅</div>
+            <div className="stat-icon">
+              <CheckCircle size={24} />
+            </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.activeProducts}</div>
               <div className="stat-label">Active Products</div>
             </div>
           </div>
           <div className={`stat-card ${statistics.productsCanProduce < statistics.activeProducts ? 'warning' : ''}`}>
-            <div className="stat-icon">🔧</div>
+            <div className="stat-icon">
+              <Wrench size={24} />
+            </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.productsCanProduce}</div>
               <div className="stat-label">Can Produce</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">📊</div>
+            <div className="stat-icon">
+              <BarChart3 size={24} />
+            </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.totalFinishedProducts}</div>
               <div className="stat-label">Total Produced</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">💰</div>
+            <div className="stat-icon">
+              <DollarSign size={24} />
+            </div>
             <div className="stat-content">
               <div className="stat-number">{formatCurrency(statistics.totalProductionValue)}</div>
               <div className="stat-label">Production Value</div>
@@ -238,6 +266,7 @@ const Production: React.FC = () => {
       {/* Filters and Search */}
       <div className="production-controls">
         <div className="search-container">
+          <Search size={16} className="search-icon" />
           <input
             type="text"
             placeholder="Search products..."
@@ -372,14 +401,14 @@ const Production: React.FC = () => {
                         title="Edit Product"
                         onClick={() => handleEditProduct(product)}
                       >
-                        ✏️
+                        <Edit size={16} />
                       </button>
                       <button 
                         className="action-button delete-button" 
                         title="Delete Product"
                         onClick={() => handleDeleteProduct(product)}
                       >
-                        🗑️
+                        <Trash2 size={16} />
                       </button>
                       <button 
                         className={`action-button produce-button ${!product.canProduce ? 'disabled' : ''}`}
@@ -387,7 +416,7 @@ const Production: React.FC = () => {
                         onClick={() => product.canProduce && handleProduceProduct(product)}
                         disabled={!product.canProduce}
                       >
-                        🏭
+                        <Play size={16} />
                       </button>
                     </div>
                   </td>

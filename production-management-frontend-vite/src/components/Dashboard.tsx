@@ -1,5 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { 
+  Users, 
+  UserCheck, 
+  Activity, 
+  UserPlus, 
+  LogOut, 
+  Bug,
+  Clock,
+  Mail,
+  User as UserIcon
+} from 'lucide-react';
 import { userApi, authApi } from '../services/api';
 import type { User, DashboardData } from '../types';
 import AdminRegister from './AdminRegister';
@@ -109,19 +120,31 @@ const Dashboard: React.FC = () => {
       <>
         <div className="welcome-section">
           <h2>{dashboardData?.welcomeMessage}</h2>
-          <p>Last login: {new Date(user?.lastLoginAt || '').toLocaleString()}</p>
+          <p>
+            <Clock size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+            Last login: {new Date(user?.lastLoginAt || '').toLocaleString()}
+          </p>
         </div>
 
         <div className="stats-grid">
           <div className="stat-card">
+            <div className="stat-icon">
+              <Users size={24} />
+            </div>
             <h3>Total Users</h3>
             <div className="stat-value">{dashboardData?.totalUsers}</div>
           </div>
           <div className="stat-card">
+            <div className="stat-icon">
+              <UserCheck size={24} />
+            </div>
             <h3>Active Users</h3>
             <div className="stat-value">{dashboardData?.activeUsers}</div>
           </div>
           <div className="stat-card">
+            <div className="stat-icon">
+              <Activity size={24} />
+            </div>
             <h3>System Status</h3>
             <div className="stat-value status-ok">{dashboardData?.systemStatus}</div>
           </div>
@@ -143,15 +166,24 @@ const Dashboard: React.FC = () => {
           <h3>Profile Information</h3>
           <div className="profile-info">
             <div className="profile-item">
-              <label>Username:</label>
+              <label>
+                <UserIcon size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+                Username:
+              </label>
               <span>{user?.username}</span>
             </div>
             <div className="profile-item">
-              <label>Email:</label>
+              <label>
+                <Mail size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+                Email:
+              </label>
               <span>{user?.email}</span>
             </div>
             <div className="profile-item">
-              <label>Full Name:</label>
+              <label>
+                <UserIcon size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
+                Full Name:
+              </label>
               <span>{user?.firstName} {user?.lastName}</span>
             </div>
           </div>
@@ -199,13 +231,19 @@ const Dashboard: React.FC = () => {
                 onClick={() => setShowRegisterModal(true)} 
                 className="create-user-button"
               >
+                <UserPlus size={16} />
                 Create User
               </button>
             )}
-            <button onClick={handleDebugClaims} style={{marginLeft: '10px'}}>
+            <button 
+              onClick={handleDebugClaims} 
+              className="debug-button"
+            >
+              <Bug size={16} />
               Debug Claims
             </button>
             <button onClick={handleLogout} className="logout-button">
+              <LogOut size={16} />
               Logout
             </button>
           </div>

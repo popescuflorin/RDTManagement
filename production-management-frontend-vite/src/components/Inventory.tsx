@@ -1,4 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { 
+  Package, 
+  AlertTriangle, 
+  DollarSign, 
+  Plus, 
+  Search, 
+  Edit, 
+  Trash2,
+  Loader2
+} from 'lucide-react';
 import { inventoryApi } from '../services/api';
 import type { RawMaterial, InventoryStatistics } from '../types';
 import AddMaterial from './AddMaterial';
@@ -149,7 +159,7 @@ const Inventory: React.FC = () => {
   if (isLoading) {
     return (
       <div className="inventory-loading">
-        <div className="loading-spinner"></div>
+        <Loader2 size={32} className="animate-spin" />
         <p>Loading inventory...</p>
       </div>
     );
@@ -158,12 +168,16 @@ const Inventory: React.FC = () => {
   return (
     <div className="inventory-container">
       <div className="inventory-header">
-        <h1>📦 Inventory Management</h1>
+        <h1>
+          <Package size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
+          Inventory Management
+        </h1>
         <button 
           className="add-material-button"
           onClick={() => setShowAddModal(true)}
         >
-          + Add Material
+          <Plus size={16} />
+          Add Material
         </button>
       </div>
 
@@ -171,21 +185,27 @@ const Inventory: React.FC = () => {
       {statistics && (
         <div className="inventory-stats">
           <div className="stat-card">
-            <div className="stat-icon">📦</div>
+            <div className="stat-icon">
+              <Package size={24} />
+            </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.totalMaterials}</div>
               <div className="stat-label">Total Materials</div>
             </div>
           </div>
           <div className={`stat-card ${statistics.lowStockCount > 0 ? 'warning' : ''}`}>
-            <div className="stat-icon">⚠️</div>
+            <div className="stat-icon">
+              <AlertTriangle size={24} />
+            </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.lowStockCount}</div>
               <div className="stat-label">Low Stock</div>
             </div>
           </div>
           <div className="stat-card">
-            <div className="stat-icon">💰</div>
+            <div className="stat-icon">
+              <DollarSign size={24} />
+            </div>
             <div className="stat-content">
               <div className="stat-number">{formatCurrency(statistics.totalInventoryValue)}</div>
               <div className="stat-label">Total Value</div>
@@ -197,6 +217,7 @@ const Inventory: React.FC = () => {
       {/* Filters and Search */}
       <div className="inventory-controls">
         <div className="search-container">
+          <Search size={16} className="search-icon" />
           <input
             type="text"
             placeholder="Search materials..."
@@ -311,14 +332,14 @@ const Inventory: React.FC = () => {
                         title="Edit Material"
                         onClick={() => handleEditMaterial(material)}
                       >
-                        ✏️
+                        <Edit size={16} />
                       </button>
                       <button 
                         className="action-button delete-button" 
                         title="Delete Material"
                         onClick={() => handleDeleteMaterial(material)}
                       >
-                        🗑️
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </td>

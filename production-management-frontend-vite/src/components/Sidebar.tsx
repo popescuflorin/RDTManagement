@@ -1,4 +1,15 @@
 import React, { useState } from 'react';
+import { 
+  BarChart3, 
+  Users, 
+  Factory, 
+  Package, 
+  ClipboardList, 
+  TrendingUp, 
+  Settings, 
+  ChevronLeft, 
+  ChevronRight 
+} from 'lucide-react';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -12,7 +23,7 @@ interface SidebarProps {
 interface MenuItem {
   id: string;
   label: string;
-  icon: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
   requiredRole?: string;
 }
 
@@ -27,38 +38,38 @@ const Sidebar: React.FC<SidebarProps> = ({
     {
       id: 'dashboard',
       label: 'Dashboard',
-      icon: '📊'
+      icon: BarChart3
     },
     {
       id: 'users',
       label: 'User Management',
-      icon: '👥',
+      icon: Users,
       requiredRole: 'Admin'
     },
     {
       id: 'production',
       label: 'Production',
-      icon: '🏭'
+      icon: Factory
     },
     {
       id: 'inventory',
       label: 'Inventory',
-      icon: '📦'
+      icon: Package
     },
     {
       id: 'orders',
       label: 'Orders',
-      icon: '📋'
+      icon: ClipboardList
     },
     {
       id: 'reports',
       label: 'Reports',
-      icon: '📈'
+      icon: TrendingUp
     },
     {
       id: 'settings',
       label: 'Settings',
-      icon: '⚙️'
+      icon: Settings
     }
   ];
 
@@ -74,7 +85,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           onClick={onToggle}
           aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          {isCollapsed ? '▶️' : '◀️'}
+          {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
         </button>
         {!isCollapsed && (
           <h2 className="sidebar-title">Production Management</h2>
@@ -92,7 +103,9 @@ const Sidebar: React.FC<SidebarProps> = ({
                 onClick={() => onNavigate(item.id)}
                 title={isCollapsed ? item.label : undefined}
               >
-                <span className="sidebar-icon">{item.icon}</span>
+                <span className="sidebar-icon">
+                  <item.icon size={20} />
+                </span>
                 {!isCollapsed && (
                   <span className="sidebar-label">{item.label}</span>
                 )}
