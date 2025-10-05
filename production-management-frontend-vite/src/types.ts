@@ -218,3 +218,205 @@ export interface TopProduct {
   totalProduced: number;
   totalValue: number;
 }
+
+// Acquisition Types
+export const AcquisitionType = {
+  RawMaterials: 0,
+  RecyclableMaterials: 1
+} as const;
+
+export type AcquisitionType = typeof AcquisitionType[keyof typeof AcquisitionType];
+
+export const AcquisitionStatus = {
+  Draft: 0,
+  Received: 1,
+  Cancelled: 2
+} as const;
+
+export type AcquisitionStatus = typeof AcquisitionStatus[keyof typeof AcquisitionStatus];
+
+export interface Acquisition {
+  id: number;
+  title: string;
+  description: string;
+  type: AcquisitionType;
+  status: AcquisitionStatus;
+  createdAt: string;
+  updatedAt?: string;
+  receivedAt?: string;
+  createdByUserId: number;
+  createdByUserName: string;
+  receivedByUserId?: number;
+  receivedByUserName?: string;
+  supplierId?: number;
+  supplierName?: string;
+  supplierContact?: string;
+  notes?: string;
+  dueDate?: string;
+  // Transport details
+  transportCarName?: string;
+  transportPhoneNumber?: string;
+  transportDate?: string;
+  transportNotes?: string;
+  totalEstimatedCost: number;
+  totalActualCost: number;
+  totalItems: number;
+  totalQuantity: number;
+  canEdit: boolean;
+  canDelete: boolean;
+  canReceive: boolean;
+  items: AcquisitionItem[];
+}
+
+export interface AcquisitionItem {
+  id: number;
+  acquisitionId: number;
+  rawMaterialId: number;
+  rawMaterialName: string;
+  rawMaterialColor: string;
+  quantity: number;
+  quantityType: string;
+  actualUnitCost?: number;
+  notes?: string;
+  createdAt: string;
+  updatedAt?: string;
+  estimatedTotalCost: number;
+  actualTotalCost: number;
+}
+
+export interface CreateAcquisitionRequest {
+  title: string;
+  description: string;
+  type: AcquisitionType;
+  supplierId?: number;
+  supplierContact?: string;
+  notes?: string;
+  dueDate?: string;
+  // Transport details
+  transportCarName?: string;
+  transportPhoneNumber?: string;
+  transportDate?: string;
+  transportNotes?: string;
+  items: CreateAcquisitionItemRequest[];
+}
+
+export interface CreateAcquisitionItemRequest {
+  rawMaterialId: number;
+  name: string;
+  color: string;
+  quantity: number;
+  quantityType: string;
+  description?: string;
+  notes?: string;
+}
+
+export interface UpdateAcquisitionRequest {
+  title: string;
+  description: string;
+  supplierId?: number;
+  supplierContact?: string;
+  notes?: string;
+  dueDate?: string;
+  // Transport details
+  transportCarName?: string;
+  transportPhoneNumber?: string;
+  transportDate?: string;
+  transportNotes?: string;
+  items: UpdateAcquisitionItemRequest[];
+}
+
+export interface UpdateAcquisitionItemRequest {
+  id?: number; // null for new items
+  rawMaterialId: number;
+  name: string;
+  color: string;
+  quantity: number;
+  quantityType: string;
+  description?: string;
+  notes?: string;
+}
+
+export interface ReceiveAcquisitionRequest {
+  items: ReceiveAcquisitionItemRequest[];
+}
+
+export interface ReceiveAcquisitionItemRequest {
+  acquisitionItemId: number;
+  actualUnitCost?: number;
+}
+
+export interface AcquisitionStatistics {
+  totalAcquisitions: number;
+  draftAcquisitions: number;
+  receivedAcquisitions: number;
+  cancelledAcquisitions: number;
+  totalEstimatedCost: number;
+  totalActualCost: number;
+  totalItems: number;
+  totalQuantity: number;
+}
+
+// Supplier Types
+export interface Supplier {
+  id: number;
+  name: string;
+  description?: string;
+  contactPerson?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
+  taxId?: string;
+  registrationNumber?: string;
+  notes?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+  createdByUserName: string;
+  totalAcquisitions: number;
+  totalAcquisitionValue: number;
+  lastAcquisitionDate?: string;
+}
+
+export interface CreateSupplierRequest {
+  name: string;
+  description?: string;
+  contactPerson?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
+  taxId?: string;
+  registrationNumber?: string;
+  notes?: string;
+}
+
+export interface UpdateSupplierRequest {
+  name: string;
+  description?: string;
+  contactPerson?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
+  taxId?: string;
+  registrationNumber?: string;
+  notes?: string;
+  isActive: boolean;
+}
+
+export interface SupplierStatistics {
+  totalSuppliers: number;
+  activeSuppliers: number;
+  inactiveSuppliers: number;
+  totalAcquisitionValue: number;
+  totalAcquisitions: number;
+  topSupplierByValue?: Supplier;
+  topSupplierByCount?: Supplier;
+}

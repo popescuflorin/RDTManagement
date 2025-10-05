@@ -19,7 +19,16 @@ import type {
   ProduceProductRequest,
   ProductionResult,
   FinishedProduct,
-  ProductionStatistics
+  ProductionStatistics,
+  Acquisition,
+  AcquisitionStatistics,
+  CreateAcquisitionRequest,
+  UpdateAcquisitionRequest,
+  ReceiveAcquisitionRequest,
+  Supplier,
+  CreateSupplierRequest,
+  UpdateSupplierRequest,
+  SupplierStatistics
 } from '../types';
 
 const API_BASE_URL = 'http://localhost:5136/api';
@@ -113,6 +122,27 @@ export const productionApi = {
   updateProduct: (id: number, productData: UpdateProductRequest) => api.put<Product>(`/production/${id}`, productData),
   deleteProduct: (id: number) => api.delete(`/production/${id}`),
   produceProduct: (productionData: ProduceProductRequest) => api.post<ProductionResult>('/production/produce', productionData),
+};
+
+// Acquisition API
+export const acquisitionApi = {
+  getAllAcquisitions: () => api.get<Acquisition[]>('/acquisition'),
+  getAcquisition: (id: number) => api.get<Acquisition>(`/acquisition/${id}`),
+  getStatistics: () => api.get<AcquisitionStatistics>('/acquisition/statistics'),
+  createAcquisition: (acquisitionData: CreateAcquisitionRequest) => api.post<Acquisition>('/acquisition', acquisitionData),
+  updateAcquisition: (id: number, acquisitionData: UpdateAcquisitionRequest) => api.put<Acquisition>(`/acquisition/${id}`, acquisitionData),
+  deleteAcquisition: (id: number) => api.delete(`/acquisition/${id}`),
+  receiveAcquisition: (id: number, receiveData: ReceiveAcquisitionRequest) => api.post<Acquisition>(`/acquisition/${id}/receive`, receiveData),
+};
+
+// Supplier API
+export const supplierApi = {
+  getAllSuppliers: () => api.get<Supplier[]>('/supplier'),
+  getSupplier: (id: number) => api.get<Supplier>(`/supplier/${id}`),
+  getStatistics: () => api.get<SupplierStatistics>('/supplier/statistics'),
+  createSupplier: (supplierData: CreateSupplierRequest) => api.post<Supplier>('/supplier', supplierData),
+  updateSupplier: (id: number, supplierData: UpdateSupplierRequest) => api.put<Supplier>(`/supplier/${id}`, supplierData),
+  deleteSupplier: (id: number) => api.delete(`/supplier/${id}`),
 };
 
 export default api;

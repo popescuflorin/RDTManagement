@@ -350,5 +350,20 @@ namespace ProductionManagement.API.Controllers
                 MostStockedMaterials = mostUsedMaterials
             });
         }
+
+        public static RawMaterial? GetRawMaterialById(int id)
+        {
+            return _materials.FirstOrDefault(m => m.Id == id && m.IsActive);
+        }
+
+        public static int GetNextRawMaterialId()
+        {
+            return _nextId++;
+        }
+
+        public static void AddRawMaterial(RawMaterial material)
+        {
+            _materials.Add(material);
+        }
     }
 }

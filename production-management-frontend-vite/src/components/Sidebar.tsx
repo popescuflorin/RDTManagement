@@ -4,6 +4,7 @@ import {
   Users, 
   Factory, 
   Package, 
+  ShoppingCart,
   ClipboardList, 
   TrendingUp, 
   Settings, 
@@ -55,6 +56,11 @@ const Sidebar: React.FC<SidebarProps> = ({
       id: 'inventory',
       label: 'Inventory',
       icon: Package
+    },
+    {
+      id: 'acquisitions',
+      label: 'Acquisitions',
+      icon: ShoppingCart
     },
     {
       id: 'orders',

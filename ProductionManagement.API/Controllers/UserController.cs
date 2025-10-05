@@ -220,6 +220,11 @@ namespace ProductionManagement.API.Controllers
             _users.Remove(user);
             return Ok(new { message = "User deleted successfully" });
         }
+
+        public static User? GetUserById(int id)
+        {
+            return _users.FirstOrDefault(u => u.Id == id && u.IsActive);
+        }
     }
 
     public class UpdateProfileRequest
