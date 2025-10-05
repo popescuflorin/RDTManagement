@@ -18,7 +18,7 @@ const DeleteProductConfirmation: React.FC<DeleteProductConfirmationProps> = ({
       <div className="modal">
         <h2>Delete Product</h2>
         <p>Delete confirmation coming soon...</p>
-        <button onClick={onClose}>Close</button>
+        <button onClick={onClose} className="btn btn-secondary">Close</button>
       </div>
     </div>
   );

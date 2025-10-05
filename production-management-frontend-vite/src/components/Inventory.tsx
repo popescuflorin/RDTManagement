@@ -173,7 +173,7 @@ const Inventory: React.FC = () => {
           Inventory Management
         </h1>
         <button 
-          className="add-material-button"
+          className="btn btn-primary"
           onClick={() => setShowAddModal(true)}
         >
           <Plus size={16} />
@@ -328,14 +328,14 @@ const Inventory: React.FC = () => {
                   <td className="actions-cell">
                     <div className="action-buttons">
                       <button 
-                        className="action-button edit-button" 
+                        className="btn btn-sm btn-warning" 
                         title="Edit Material"
                         onClick={() => handleEditMaterial(material)}
                       >
                         <Edit size={16} />
                       </button>
                       <button 
-                        className="action-button delete-button" 
+                        className="btn btn-sm btn-danger" 
                         title="Delete Material"
                         onClick={() => handleDeleteMaterial(material)}
                       >

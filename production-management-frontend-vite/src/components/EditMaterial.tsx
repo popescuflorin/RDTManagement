@@ -68,7 +68,7 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
       <div className="edit-material-modal">
         <div className="edit-material-header">
           <h2>✏️ Edit Material</h2>
-          <button className="close-button" onClick={onClose}>×</button>
+          <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
         </div>
 
         <form onSubmit={handleSubmit} className="edit-material-form">
@@ -245,14 +245,14 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
             <button
               type="button"
               onClick={onClose}
-              className="cancel-button"
+              className="btn btn-secondary"
               disabled={isLoading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="submit-button"
+              className="btn btn-primary"
               disabled={isLoading}
             >
               {isLoading ? 'Updating...' : 'Update Material'}

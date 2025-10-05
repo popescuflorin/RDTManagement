@@ -158,7 +158,7 @@ const DeleteMaterialConfirmation: React.FC<DeleteMaterialConfirmationProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="cancel-button"
+            className="btn btn-secondary"
             disabled={isLoading}
           >
             Cancel
@@ -166,7 +166,7 @@ const DeleteMaterialConfirmation: React.FC<DeleteMaterialConfirmationProps> = ({
           <button
             type="button"
             onClick={handleDelete}
-            className="delete-button"
+            className="btn btn-danger"
             disabled={isLoading}
           >
             {isLoading ? 'Deleting...' : 'Delete Material'}

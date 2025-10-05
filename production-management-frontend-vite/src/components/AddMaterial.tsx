@@ -132,7 +132,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
       <div className="add-material-modal">
         <div className="add-material-header">
           <h2>📦 Add Material to Inventory</h2>
-          <button className="close-button" onClick={onClose}>×</button>
+          <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
         </div>
 
         <div className="mode-selector">
@@ -380,14 +380,14 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
             <button
               type="button"
               onClick={onClose}
-              className="cancel-button"
+              className="btn btn-secondary"
               disabled={isLoading}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="submit-button"
+              className="btn btn-primary"
               disabled={isLoading || !isFormValid()}
             >
               {isLoading ? 'Adding...' : mode === 'new' ? 'Create Material' : 'Add to Stock'}
