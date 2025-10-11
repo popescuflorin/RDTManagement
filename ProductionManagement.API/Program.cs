@@ -27,6 +27,7 @@ builder.Services.AddScoped<IRawMaterialRepository, RawMaterialRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IAcquisitionRepository, AcquisitionRepository>();
+builder.Services.AddScoped<ITransportRepository, TransportRepository>();
 
 // Add JWT service
 builder.Services.AddScoped<IJwtService, JwtService>();

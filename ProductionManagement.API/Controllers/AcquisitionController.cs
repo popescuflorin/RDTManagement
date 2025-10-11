@@ -15,17 +15,20 @@ namespace ProductionManagement.API.Controllers
         private readonly IUserRepository _userRepository;
         private readonly ISupplierRepository _supplierRepository;
         private readonly IRawMaterialRepository _rawMaterialRepository;
+        private readonly ITransportRepository _transportRepository;
 
         public AcquisitionController(
             IAcquisitionRepository acquisitionRepository,
             IUserRepository userRepository,
             ISupplierRepository supplierRepository,
-            IRawMaterialRepository rawMaterialRepository)
+            IRawMaterialRepository rawMaterialRepository,
+            ITransportRepository transportRepository)
         {
             _acquisitionRepository = acquisitionRepository;
             _userRepository = userRepository;
             _supplierRepository = supplierRepository;
             _rawMaterialRepository = rawMaterialRepository;
+            _transportRepository = transportRepository;
         }
 
         [HttpGet]
@@ -84,13 +87,13 @@ namespace ProductionManagement.API.Controllers
                 Type = request.Type,
                 Status = AcquisitionStatus.Draft,
                 CreatedByUserId = userId,
+                AssignedToUserId = request.AssignedToUserId ?? userId, // Default to creator if not specified
                 SupplierId = request.SupplierId,
                 SupplierName = supplierName,
                 SupplierContact = request.SupplierContact,
                 Notes = request.Notes,
                 DueDate = request.DueDate,
-                TransportCarName = request.TransportCarName,
-                TransportPhoneNumber = request.TransportPhoneNumber,
+                TransportId = request.TransportId,
                 TransportDate = request.TransportDate,
                 TransportNotes = request.TransportNotes,
                 CreatedAt = DateTime.UtcNow,
@@ -109,6 +112,7 @@ namespace ProductionManagement.API.Controllers
                     {
                         Name = itemRequest.Name,
                         Color = itemRequest.Color,
+                        Type = acquisition.Type == AcquisitionType.RawMaterials ? MaterialType.RawMaterial : MaterialType.RecyclableMaterial,
                         Quantity = 0, // Start with 0 quantity, will be updated when received
                         QuantityType = itemRequest.QuantityType,
                         UnitCost = 0, // Will be updated when received with actual cost
@@ -182,13 +186,13 @@ namespace ProductionManagement.API.Controllers
 
             acquisition.Title = request.Title;
             acquisition.Description = request.Description;
+            acquisition.AssignedToUserId = request.AssignedToUserId;
             acquisition.SupplierId = request.SupplierId;
             acquisition.SupplierName = supplierName;
             acquisition.SupplierContact = request.SupplierContact;
             acquisition.Notes = request.Notes;
             acquisition.DueDate = request.DueDate;
-            acquisition.TransportCarName = request.TransportCarName;
-            acquisition.TransportPhoneNumber = request.TransportPhoneNumber;
+            acquisition.TransportId = request.TransportId;
             acquisition.TransportDate = request.TransportDate;
             acquisition.TransportNotes = request.TransportNotes;
             acquisition.UpdatedAt = DateTime.UtcNow;
@@ -215,6 +219,7 @@ namespace ProductionManagement.API.Controllers
                     {
                         Name = itemRequest.Name,
                         Color = itemRequest.Color,
+                        Type = acquisition.Type == AcquisitionType.RawMaterials ? MaterialType.RawMaterial : MaterialType.RecyclableMaterial,
                         Quantity = 0, // Start with 0 quantity, will be updated when received
                         QuantityType = itemRequest.QuantityType,
                         UnitCost = 0, // Will be updated when received with actual cost
@@ -302,7 +307,7 @@ namespace ProductionManagement.API.Controllers
                 return Unauthorized("Invalid user ID");
             }
 
-            // Update items with actual costs and add to inventory
+            // Update items with received quantities
             foreach (var itemRequest in request.Items)
             {
                 var acquisitionItem = acquisition.Items.FirstOrDefault(i => i.Id == itemRequest.AcquisitionItemId);
@@ -311,38 +316,169 @@ namespace ProductionManagement.API.Controllers
                     return BadRequest($"Acquisition item with ID {itemRequest.AcquisitionItemId} not found");
                 }
 
+                // Update the quantity to the received quantity
+                acquisitionItem.Quantity = itemRequest.ReceivedQuantity;
                 acquisitionItem.ActualUnitCost = itemRequest.ActualUnitCost;
                 acquisitionItem.UpdatedAt = DateTime.UtcNow;
 
-                // Add to inventory
-                var rawMaterial = await _rawMaterialRepository.GetByIdAsync(acquisitionItem.RawMaterialId);
-                if (rawMaterial != null)
+                // For Raw Materials, add directly to inventory
+                if (acquisition.Type == AcquisitionType.RawMaterials)
                 {
-                    rawMaterial.Quantity += acquisitionItem.Quantity;
-                    rawMaterial.UpdatedAt = DateTime.UtcNow;
-
-                    // Update unit cost using weighted average
-                    if (acquisitionItem.ActualUnitCost.HasValue)
+                    var rawMaterial = await _rawMaterialRepository.GetByIdAsync(acquisitionItem.RawMaterialId);
+                    if (rawMaterial != null)
                     {
-                        var currentTotalValue = rawMaterial.Quantity * rawMaterial.UnitCost;
-                        var newTotalValue = currentTotalValue + (acquisitionItem.Quantity * acquisitionItem.ActualUnitCost.Value);
-                        var newTotalQuantity = rawMaterial.Quantity;
-                        
-                        if (newTotalQuantity > 0)
-                        {
-                            rawMaterial.UnitCost = newTotalValue / newTotalQuantity;
-                        }
-                    }
+                        rawMaterial.Quantity += itemRequest.ReceivedQuantity;
+                        rawMaterial.UpdatedAt = DateTime.UtcNow;
 
-                    await _rawMaterialRepository.UpdateAsync(rawMaterial);
+                        // Update unit cost using weighted average
+                        if (acquisitionItem.ActualUnitCost.HasValue)
+                        {
+                            var currentTotalValue = (rawMaterial.Quantity - itemRequest.ReceivedQuantity) * rawMaterial.UnitCost;
+                            var newTotalValue = currentTotalValue + (itemRequest.ReceivedQuantity * acquisitionItem.ActualUnitCost.Value);
+                            var newTotalQuantity = rawMaterial.Quantity;
+                            
+                            if (newTotalQuantity > 0)
+                            {
+                                rawMaterial.UnitCost = newTotalValue / newTotalQuantity;
+                            }
+                        }
+
+                        await _rawMaterialRepository.UpdateAsync(rawMaterial);
+                    }
                 }
+                // For Recyclable Materials, don't add to inventory yet (they need processing)
             }
 
-            // Update acquisition status
-            acquisition.Status = AcquisitionStatus.Received;
+            // Update acquisition status based on type
+            if (acquisition.Type == AcquisitionType.RawMaterials)
+            {
+                acquisition.Status = AcquisitionStatus.Received;
+            }
+            else if (acquisition.Type == AcquisitionType.RecyclableMaterials)
+            {
+                acquisition.Status = AcquisitionStatus.ReadyForProcessing;
+            }
+            
             acquisition.ReceivedAt = DateTime.UtcNow;
             acquisition.ReceivedByUserId = userId;
             acquisition.TotalActualCost = acquisition.Items.Sum(i => i.ActualTotalCost);
+
+            await _acquisitionRepository.UpdateAsync(acquisition);
+
+            return Ok(MapToDto(acquisition));
+        }
+
+        [HttpPost("{id}/process")]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<ActionResult<AcquisitionDto>> ProcessAcquisition(int id, ProcessAcquisitionRequest request)
+        {
+            var acquisition = await _acquisitionRepository.GetByIdWithItemsAsync(id);
+
+            if (acquisition == null)
+            {
+                return NotFound();
+            }
+
+            if (acquisition.Status != AcquisitionStatus.ReadyForProcessing)
+            {
+                return BadRequest("Only acquisitions with 'Ready for Processing' status can be processed");
+            }
+
+            if (acquisition.Type != AcquisitionType.RecyclableMaterials)
+            {
+                return BadRequest("Only recyclable material acquisitions can be processed");
+            }
+
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (!int.TryParse(userIdClaim, out int userId))
+            {
+                return Unauthorized("Invalid user ID");
+            }
+
+            // Validate that recyclable item IDs exist in the acquisition
+            var recyclableItemIds = acquisition.Items.Select(i => i.Id).ToHashSet();
+            foreach (var material in request.Materials)
+            {
+                if (!recyclableItemIds.Contains(material.RecyclableItemId))
+                {
+                    return BadRequest($"Recyclable item with ID {material.RecyclableItemId} not found in this acquisition");
+                }
+            }
+
+            // Validate quantities don't exceed available recyclable quantities
+            var recyclableQuantities = acquisition.Items.ToDictionary(i => i.Id, i => i.Quantity);
+            var processedQuantities = request.Materials
+                .GroupBy(m => m.RecyclableItemId)
+                .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity));
+
+            foreach (var (itemId, processedQty) in processedQuantities)
+            {
+                if (processedQty > recyclableQuantities[itemId])
+                {
+                    var item = acquisition.Items.First(i => i.Id == itemId);
+                    return BadRequest($"Total processed quantity for '{item.Name}' exceeds available quantity ({recyclableQuantities[itemId]} {item.QuantityType})");
+                }
+            }
+
+            // Process materials: create new or add to existing raw materials
+            foreach (var material in request.Materials)
+            {
+                RawMaterial rawMaterial;
+
+                if (material.RawMaterialId == 0)
+                {
+                    // Create new raw material
+                    rawMaterial = new RawMaterial
+                    {
+                        Name = material.Name,
+                        Color = material.Color,
+                        Description = material.Description,
+                        Quantity = material.Quantity,
+                        QuantityType = material.UnitOfMeasure,
+                        UnitCost = 0, // No cost for processed recyclables
+                        Type = MaterialType.RawMaterial, // Processed recyclables become raw materials
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    await _rawMaterialRepository.AddAsync(rawMaterial);
+                }
+                else
+                {
+                    // Add to existing raw material
+                    var existingRawMaterial = await _rawMaterialRepository.GetByIdAsync(material.RawMaterialId);
+                    if (existingRawMaterial == null)
+                    {
+                        return BadRequest($"Raw material with ID {material.RawMaterialId} not found");
+                    }
+
+                    existingRawMaterial.Quantity += material.Quantity;
+                    existingRawMaterial.UpdatedAt = DateTime.UtcNow;
+
+                    await _rawMaterialRepository.UpdateAsync(existingRawMaterial);
+                    rawMaterial = existingRawMaterial;
+                }
+
+                // Track the processed material relationship
+                var processedMaterial = new ProcessedMaterial
+                {
+                    AcquisitionId = acquisition.Id,
+                    AcquisitionItemId = material.RecyclableItemId,
+                    RawMaterialId = rawMaterial.Id,
+                    Quantity = material.Quantity,
+                    CreatedAt = DateTime.UtcNow,
+                    IsActive = true
+                };
+
+                acquisition.ProcessedMaterials.Add(processedMaterial);
+            }
+
+            // Update acquisition status to Received (processing complete)
+            acquisition.Status = AcquisitionStatus.Received;
+            acquisition.ReceivedAt = DateTime.UtcNow;
+            acquisition.ReceivedByUserId = userId;
+            acquisition.UpdatedAt = DateTime.UtcNow;
 
             await _acquisitionRepository.UpdateAsync(acquisition);
 
@@ -373,6 +509,30 @@ namespace ProductionManagement.API.Controllers
             return NoContent();
         }
 
+        [HttpPost("{id}/cancel")]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<ActionResult<AcquisitionDto>> CancelAcquisition(int id)
+        {
+            var acquisition = await _acquisitionRepository.GetByIdWithItemsAsync(id);
+
+            if (acquisition == null)
+            {
+                return NotFound();
+            }
+
+            if (acquisition.Status != AcquisitionStatus.Draft)
+            {
+                return BadRequest("Only draft acquisitions can be cancelled");
+            }
+
+            acquisition.Status = AcquisitionStatus.Cancelled;
+            acquisition.UpdatedAt = DateTime.UtcNow;
+
+            await _acquisitionRepository.UpdateAsync(acquisition);
+
+            return Ok(MapToDto(acquisition));
+        }
+
         [HttpGet("statistics")]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<AcquisitionStatistics>> GetStatistics()
@@ -398,8 +558,9 @@ namespace ProductionManagement.API.Controllers
         {
             // Note: For performance, we should ideally include user data in the query
             // For now, we'll use the user names from the acquisition entity itself
-            var createdByUserName = "Unknown";
-            var receivedByUserName = acquisition.ReceivedByUserId.HasValue ? "Unknown" : null;
+            var createdByUserName = acquisition.CreatedBy?.Username ?? "Unknown";
+            var receivedByUserName = acquisition.ReceivedBy?.Username;
+            var assignedToUserName = acquisition.AssignedTo?.Username;
 
             // In a real scenario, you'd want to include user data in the repository query
             // or create a separate method that loads user data efficiently
@@ -418,13 +579,16 @@ namespace ProductionManagement.API.Controllers
                 CreatedByUserName = createdByUserName,
                 ReceivedByUserId = acquisition.ReceivedByUserId,
                 ReceivedByUserName = receivedByUserName,
+                AssignedToUserId = acquisition.AssignedToUserId,
+                AssignedToUserName = assignedToUserName,
                 SupplierId = acquisition.SupplierId,
                 SupplierName = acquisition.SupplierName,
                 SupplierContact = acquisition.SupplierContact,
                 Notes = acquisition.Notes,
                 DueDate = acquisition.DueDate,
-                TransportCarName = acquisition.TransportCarName,
-                TransportPhoneNumber = acquisition.TransportPhoneNumber,
+                TransportId = acquisition.TransportId,
+                TransportCarName = acquisition.Transport?.CarName,
+                TransportPhoneNumber = acquisition.Transport?.PhoneNumber,
                 TransportDate = acquisition.TransportDate,
                 TransportNotes = acquisition.TransportNotes,
                 TotalEstimatedCost = acquisition.TotalEstimatedCost,
@@ -434,7 +598,24 @@ namespace ProductionManagement.API.Controllers
                 CanEdit = acquisition.Status == AcquisitionStatus.Draft,
                 CanDelete = acquisition.Status == AcquisitionStatus.Draft,
                 CanReceive = acquisition.Status == AcquisitionStatus.Draft,
-                Items = acquisition.Items.Select(MapItemToDto).ToList()
+                Items = acquisition.Items.Select(MapItemToDto).ToList(),
+                ProcessedMaterials = acquisition.ProcessedMaterials.Select(MapProcessedMaterialToDto).ToList()
+            };
+        }
+
+        private ProcessedMaterialDto MapProcessedMaterialToDto(ProcessedMaterial pm)
+        {
+            return new ProcessedMaterialDto
+            {
+                Id = pm.Id,
+                AcquisitionId = pm.AcquisitionId,
+                AcquisitionItemId = pm.AcquisitionItemId,
+                RawMaterialId = pm.RawMaterialId,
+                RawMaterialName = pm.RawMaterial?.Name ?? string.Empty,
+                RawMaterialColor = pm.RawMaterial?.Color ?? string.Empty,
+                RawMaterialQuantityType = pm.RawMaterial?.QuantityType ?? string.Empty,
+                Quantity = pm.Quantity,
+                CreatedAt = pm.CreatedAt
             };
         }
 

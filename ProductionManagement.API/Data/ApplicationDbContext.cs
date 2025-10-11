@@ -17,7 +17,9 @@ namespace ProductionManagement.API.Data
         public DbSet<ProductMaterial> ProductMaterials { get; set; }
         public DbSet<Acquisition> Acquisitions { get; set; }
         public DbSet<AcquisitionItem> AcquisitionItems { get; set; }
+        public DbSet<ProcessedMaterial> ProcessedMaterials { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
+        public DbSet<Transport> Transports { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -91,6 +93,14 @@ namespace ProductionManagement.API.Data
                 entity.Ignore(e => e.LastAcquisitionDate);
             });
 
+            // Transport configuration
+            modelBuilder.Entity<Transport>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.CarName).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.PhoneNumber).IsRequired().HasMaxLength(20);
+            });
+
             // Acquisition configuration
             modelBuilder.Entity<Acquisition>(entity =>
             {
@@ -98,12 +108,52 @@ namespace ProductionManagement.API.Data
                 entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.TotalEstimatedCost).HasPrecision(18, 2);
                 entity.Property(e => e.TotalActualCost).HasPrecision(18, 2);
-                entity.Property(e => e.TransportCarName).HasMaxLength(100);
-                entity.Property(e => e.TransportPhoneNumber).HasMaxLength(20);
+
+                entity.HasOne(e => e.CreatedBy)
+                    .WithMany()
+                    .HasForeignKey(e => e.CreatedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.ReceivedBy)
+                    .WithMany()
+                    .HasForeignKey(e => e.ReceivedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.AssignedTo)
+                    .WithMany()
+                    .HasForeignKey(e => e.AssignedToUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(e => e.Supplier)
                     .WithMany()
                     .HasForeignKey(e => e.SupplierId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Transport)
+                    .WithMany(t => t.Acquisitions)
+                    .HasForeignKey(e => e.TransportId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ProcessedMaterial configuration
+            modelBuilder.Entity<ProcessedMaterial>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Quantity).HasPrecision(18, 2);
+
+                entity.HasOne(e => e.Acquisition)
+                    .WithMany(a => a.ProcessedMaterials)
+                    .HasForeignKey(e => e.AcquisitionId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.AcquisitionItem)
+                    .WithMany()
+                    .HasForeignKey(e => e.AcquisitionItemId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.RawMaterial)
+                    .WithMany()
+                    .HasForeignKey(e => e.RawMaterialId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 

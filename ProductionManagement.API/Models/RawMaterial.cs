@@ -1,10 +1,17 @@
 namespace ProductionManagement.API.Models
 {
+    public enum MaterialType
+    {
+        RawMaterial = 0,
+        RecyclableMaterial = 1
+    }
+
     public class RawMaterial
     {
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
+        public MaterialType Type { get; set; } = MaterialType.RawMaterial;
         public decimal Quantity { get; set; }
         public string QuantityType { get; set; } = string.Empty; // kg, liters, pieces, etc.
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
@@ -20,6 +27,7 @@ namespace ProductionManagement.API.Models
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
+        public MaterialType Type { get; set; }
         public decimal Quantity { get; set; }
         public string QuantityType { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
@@ -36,6 +44,7 @@ namespace ProductionManagement.API.Models
     {
         public string Name { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
+        public MaterialType Type { get; set; } = MaterialType.RawMaterial;
         public decimal Quantity { get; set; }
         public string QuantityType { get; set; } = string.Empty;
         public decimal MinimumStock { get; set; } = 0;
@@ -47,6 +56,7 @@ namespace ProductionManagement.API.Models
     {
         public string Name { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;
+        public MaterialType Type { get; set; }
         public decimal Quantity { get; set; }
         public string QuantityType { get; set; } = string.Empty;
         public decimal MinimumStock { get; set; } = 0;
@@ -62,7 +72,7 @@ namespace ProductionManagement.API.Models
         public decimal? NewUnitCost { get; set; }
     }
 
-    public class MaterialType
+    public class MaterialTypeInfo
     {
         public string Name { get; set; } = string.Empty;
         public string Color { get; set; } = string.Empty;

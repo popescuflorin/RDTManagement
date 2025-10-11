@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductionManagement.API.Data;
 
@@ -11,9 +12,11 @@ using ProductionManagement.API.Data;
 namespace ProductionManagement.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251011110213_AddTransportEntity")]
+    partial class AddTransportEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,9 +32,6 @@ namespace ProductionManagement.API.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("AssignedToUserId")
-                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
@@ -108,8 +108,6 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedToUserId");
-
                     b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("ReceivedByUserId");
@@ -180,44 +178,6 @@ namespace ProductionManagement.API.Migrations
                     b.HasIndex("RawMaterialId");
 
                     b.ToTable("AcquisitionItems");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProcessedMaterial", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AcquisitionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AcquisitionItemId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Quantity")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("RawMaterialId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AcquisitionId");
-
-                    b.HasIndex("AcquisitionItemId");
-
-                    b.HasIndex("RawMaterialId");
-
-                    b.ToTable("ProcessedMaterials");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.Product", b =>
@@ -344,9 +304,6 @@ namespace ProductionManagement.API.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("int");
-
                     b.Property<decimal>("UnitCost")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
@@ -370,7 +327,6 @@ namespace ProductionManagement.API.Migrations
                             Name = "Steel Sheets",
                             Quantity = 150.5m,
                             QuantityType = "kg",
-                            Type = 0,
                             UnitCost = 2.50m,
                             UpdatedAt = new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -385,7 +341,6 @@ namespace ProductionManagement.API.Migrations
                             Name = "Aluminum Rods",
                             Quantity = 75m,
                             QuantityType = "pieces",
-                            Type = 0,
                             UnitCost = 15.00m,
                             UpdatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Utc)
                         },
@@ -400,7 +355,6 @@ namespace ProductionManagement.API.Migrations
                             Name = "Paint",
                             Quantity = 25.8m,
                             QuantityType = "liters",
-                            Type = 0,
                             UnitCost = 12.00m,
                             UpdatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc)
                         });
@@ -590,21 +544,15 @@ namespace ProductionManagement.API.Migrations
 
             modelBuilder.Entity("ProductionManagement.API.Models.Acquisition", b =>
                 {
-                    b.HasOne("ProductionManagement.API.Models.User", "AssignedTo")
-                        .WithMany()
-                        .HasForeignKey("AssignedToUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("ProductionManagement.API.Models.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ProductionManagement.API.Models.User", "ReceivedBy")
                         .WithMany()
-                        .HasForeignKey("ReceivedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("ReceivedByUserId");
 
                     b.HasOne("ProductionManagement.API.Models.Supplier", "Supplier")
                         .WithMany()
@@ -619,8 +567,6 @@ namespace ProductionManagement.API.Migrations
                         .WithMany("Acquisitions")
                         .HasForeignKey("TransportId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.Navigation("AssignedTo");
 
                     b.Navigation("CreatedBy");
 
@@ -650,33 +596,6 @@ namespace ProductionManagement.API.Migrations
                     b.Navigation("RawMaterial");
                 });
 
-            modelBuilder.Entity("ProductionManagement.API.Models.ProcessedMaterial", b =>
-                {
-                    b.HasOne("ProductionManagement.API.Models.Acquisition", "Acquisition")
-                        .WithMany("ProcessedMaterials")
-                        .HasForeignKey("AcquisitionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ProductionManagement.API.Models.AcquisitionItem", "AcquisitionItem")
-                        .WithMany()
-                        .HasForeignKey("AcquisitionItemId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ProductionManagement.API.Models.RawMaterial", "RawMaterial")
-                        .WithMany()
-                        .HasForeignKey("RawMaterialId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Acquisition");
-
-                    b.Navigation("AcquisitionItem");
-
-                    b.Navigation("RawMaterial");
-                });
-
             modelBuilder.Entity("ProductionManagement.API.Models.ProductMaterial", b =>
                 {
                     b.HasOne("ProductionManagement.API.Models.RawMaterial", null)
@@ -695,8 +614,6 @@ namespace ProductionManagement.API.Migrations
             modelBuilder.Entity("ProductionManagement.API.Models.Acquisition", b =>
                 {
                     b.Navigation("Items");
-
-                    b.Navigation("ProcessedMaterials");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.Product", b =>

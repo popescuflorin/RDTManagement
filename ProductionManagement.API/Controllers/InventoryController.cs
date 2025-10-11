@@ -34,7 +34,8 @@ namespace ProductionManagement.API.Controllers
                 MinimumStock = m.MinimumStock,
                 UnitCost = m.UnitCost,
                 Description = m.Description,
-                IsActive = m.IsActive
+                IsActive = m.IsActive,
+                Type = m.Type
             }).OrderBy(m => m.Name).ThenBy(m => m.Color).ToList();
 
             return Ok(materialInfos);
@@ -68,12 +69,12 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("types")]
-        public async Task<ActionResult<IEnumerable<MaterialType>>> GetMaterialTypes()
+        public async Task<ActionResult<IEnumerable<MaterialTypeInfo>>> GetMaterialTypes()
         {
             var materials = await _rawMaterialRepository.GetActiveRawMaterialsAsync();
             var materialTypes = materials
                 .GroupBy(m => new { m.Name, m.Color, m.QuantityType })
-                .Select(g => new MaterialType
+                .Select(g => new MaterialTypeInfo
                 {
                     Name = g.Key.Name,
                     Color = g.Key.Color,
@@ -131,6 +132,7 @@ namespace ProductionManagement.API.Controllers
             {
                 Name = request.Name,
                 Color = request.Color,
+                Type = request.Type,
                 Quantity = request.Quantity,
                 QuantityType = request.QuantityType,
                 MinimumStock = request.MinimumStock,
@@ -148,6 +150,7 @@ namespace ProductionManagement.API.Controllers
                 Id = createdMaterial.Id,
                 Name = createdMaterial.Name,
                 Color = newMaterial.Color,
+                Type = newMaterial.Type,
                 Quantity = newMaterial.Quantity,
                 QuantityType = newMaterial.QuantityType,
                 CreatedAt = newMaterial.CreatedAt,
@@ -229,6 +232,7 @@ namespace ProductionManagement.API.Controllers
             // Update material
             material.Name = request.Name;
             material.Color = request.Color;
+            material.Type = request.Type;
             material.Quantity = request.Quantity;
             material.QuantityType = request.QuantityType;
             material.MinimumStock = request.MinimumStock;

@@ -11,7 +11,6 @@ import type {
   CreateRawMaterialRequest,
   UpdateRawMaterialRequest,
   AddToExistingMaterialRequest,
-  MaterialType,
   InventoryStatistics,
   Product,
   CreateProductRequest,
@@ -28,7 +27,10 @@ import type {
   Supplier,
   CreateSupplierRequest,
   UpdateSupplierRequest,
-  SupplierStatistics
+  SupplierStatistics,
+  Transport,
+  CreateTransportRequest,
+  UpdateTransportRequest
 } from '../types';
 
 const API_BASE_URL = 'http://localhost:5136/api';
@@ -103,7 +105,7 @@ export const userApi = {
 export const inventoryApi = {
   getAllMaterials: () => api.get<RawMaterial[]>('/inventory'),
   getMaterial: (id: number) => api.get<RawMaterial>(`/inventory/${id}`),
-  getMaterialTypes: () => api.get<MaterialType[]>('/inventory/types'),
+  getMaterialTypes: () => api.get<import('../types').MaterialTypeInfo[]>('/inventory/types'),
   getLowStockMaterials: () => api.get<RawMaterial[]>('/inventory/low-stock'),
   getStatistics: () => api.get<InventoryStatistics>('/inventory/statistics'),
   createMaterial: (materialData: CreateRawMaterialRequest) => api.post<RawMaterial>('/inventory', materialData),
@@ -132,7 +134,9 @@ export const acquisitionApi = {
   createAcquisition: (acquisitionData: CreateAcquisitionRequest) => api.post<Acquisition>('/acquisition', acquisitionData),
   updateAcquisition: (id: number, acquisitionData: UpdateAcquisitionRequest) => api.put<Acquisition>(`/acquisition/${id}`, acquisitionData),
   deleteAcquisition: (id: number) => api.delete(`/acquisition/${id}`),
+  cancelAcquisition: (id: number) => api.post<Acquisition>(`/acquisition/${id}/cancel`),
   receiveAcquisition: (id: number, receiveData: ReceiveAcquisitionRequest) => api.post<Acquisition>(`/acquisition/${id}/receive`, receiveData),
+  processAcquisition: (id: number, processData: any) => api.post<Acquisition>(`/acquisition/${id}/process`, processData),
 };
 
 // Supplier API
@@ -143,6 +147,17 @@ export const supplierApi = {
   createSupplier: (supplierData: CreateSupplierRequest) => api.post<Supplier>('/supplier', supplierData),
   updateSupplier: (id: number, supplierData: UpdateSupplierRequest) => api.put<Supplier>(`/supplier/${id}`, supplierData),
   deleteSupplier: (id: number) => api.delete(`/supplier/${id}`),
+};
+
+// Transport API
+export const transportApi = {
+  getAllTransports: () => api.get<Transport[]>('/transport'),
+  getTransport: (id: number) => api.get<Transport>(`/transport/${id}`),
+  getTransportByCarName: (carName: string) => api.get<Transport>(`/transport/by-car-name/${encodeURIComponent(carName)}`),
+  searchTransports: (searchTerm: string) => api.get<Transport[]>(`/transport/search?searchTerm=${encodeURIComponent(searchTerm)}`),
+  createTransport: (transportData: CreateTransportRequest) => api.post<Transport>('/transport', transportData),
+  updateTransport: (id: number, transportData: UpdateTransportRequest) => api.put<Transport>(`/transport/${id}`, transportData),
+  deleteTransport: (id: number) => api.delete(`/transport/${id}`),
 };
 
 export default api;

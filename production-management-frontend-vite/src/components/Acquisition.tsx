@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { acquisitionApi } from '../services/api';
 import type { Acquisition, AcquisitionStatistics } from '../types';
 import { AcquisitionStatus, AcquisitionType } from '../types';
-import { Plus, Edit, Trash2, Package, Search, Filter } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, Search, Filter, Eye, Recycle } from 'lucide-react';
 import CreateAcquisition from './CreateAcquisition';
+import EditAcquisition from './EditAcquisition';
+import ReceiveAcquisition from './ReceiveAcquisition';
+import ProcessAcquisition from './ProcessAcquisition';
+import ViewAcquisition from './ViewAcquisition';
 import './Acquisition.css';
 
 const Acquisition: React.FC = () => {
@@ -17,6 +21,8 @@ const Acquisition: React.FC = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showReceiveModal, setShowReceiveModal] = useState(false);
+  const [showProcessModal, setShowProcessModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [selectedAcquisition, setSelectedAcquisition] = useState<Acquisition | null>(null);
 
   useEffect(() => {
@@ -60,16 +66,27 @@ const Acquisition: React.FC = () => {
     setShowReceiveModal(true);
   };
 
+  const handleViewAcquisition = (acquisition: Acquisition) => {
+    setSelectedAcquisition(acquisition);
+    setShowViewModal(true);
+  };
+
+  const handleProcessAcquisition = (acquisition: Acquisition) => {
+    setSelectedAcquisition(acquisition);
+    setShowProcessModal(true);
+  };
+
   const handleDelete = async () => {
     if (!selectedAcquisition) return;
 
     try {
-      await acquisitionApi.deleteAcquisition(selectedAcquisition.id);
+      // Cancel the acquisition (set status to Cancelled)
+      await acquisitionApi.cancelAcquisition(selectedAcquisition.id);
       await loadData();
       setShowDeleteModal(false);
       setSelectedAcquisition(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to delete acquisition');
+      setError(err.response?.data?.message || 'Failed to cancel acquisition');
     }
   };
 
@@ -77,7 +94,8 @@ const Acquisition: React.FC = () => {
     const statusConfig = {
       [AcquisitionStatus.Draft]: { label: 'Draft', className: 'status-draft' },
       [AcquisitionStatus.Received]: { label: 'Received', className: 'status-received' },
-      [AcquisitionStatus.Cancelled]: { label: 'Cancelled', className: 'status-cancelled' }
+      [AcquisitionStatus.Cancelled]: { label: 'Cancelled', className: 'status-cancelled' },
+      [AcquisitionStatus.ReadyForProcessing]: { label: 'Ready for Processing', className: 'status-processing' }
     };
 
     const config = statusConfig[status];
@@ -94,8 +112,8 @@ const Acquisition: React.FC = () => {
 
   // Function to determine due date status
   const getDueDateStatus = (acquisition: Acquisition): 'green' | 'yellow' | 'red' | 'completed' => {
-    // If acquisition is completed/received, show green
-    if (acquisition.status === AcquisitionStatus.Received) {
+    // If acquisition is completed/received or ready for processing, show green
+    if (acquisition.status === AcquisitionStatus.Received || acquisition.status === AcquisitionStatus.ReadyForProcessing) {
       return 'completed';
     }
     
@@ -235,6 +253,7 @@ const Acquisition: React.FC = () => {
             <option value="all">All Status</option>
             <option value={AcquisitionStatus.Draft}>Draft</option>
             <option value={AcquisitionStatus.Received}>Received</option>
+            <option value={AcquisitionStatus.ReadyForProcessing}>Ready for Processing</option>
             <option value={AcquisitionStatus.Cancelled}>Cancelled</option>
           </select>
         </div>
@@ -249,6 +268,7 @@ const Acquisition: React.FC = () => {
               <th>Title</th>
               <th>Type</th>
               <th>Status</th>
+              <th>Assigned To</th>
               <th>Supplier</th>
               <th>Items</th>
               <th>Due Date</th>
@@ -259,7 +279,7 @@ const Acquisition: React.FC = () => {
           <tbody>
             {filteredAcquisitions.length === 0 ? (
               <tr>
-                <td colSpan={9} className="empty-state">
+                <td colSpan={10} className="empty-state">
                   <div className="empty-content">
                     <Package size={48} />
                     <h3>No acquisitions found</h3>
@@ -294,6 +314,11 @@ const Acquisition: React.FC = () => {
                     </span>
                   </td>
                   <td>{getStatusBadge(acquisition.status)}</td>
+                  <td>
+                    <div className="assigned-user-info">
+                      {acquisition.assignedToUserName || 'Unassigned'}
+                    </div>
+                  </td>
                   <td>
                     <div className="supplier-info">
                       <div className="supplier-name">{acquisition.supplierName || '-'}</div>
@@ -331,6 +356,13 @@ const Acquisition: React.FC = () => {
                   </td>
                   <td>
                     <div className="action-buttons">
+                      <button
+                        className="action-button view-button"
+                        onClick={() => handleViewAcquisition(acquisition)}
+                        title="View"
+                      >
+                        <Eye size={16} />
+                      </button>
                       {acquisition.canEdit && (
                         <button
                           className="action-button edit-button"
@@ -347,6 +379,15 @@ const Acquisition: React.FC = () => {
                           title="Receive"
                         >
                           <Package size={16} />
+                        </button>
+                      )}
+                      {acquisition.status === AcquisitionStatus.ReadyForProcessing && (
+                        <button
+                          className="action-button process-button"
+                          onClick={() => handleProcessAcquisition(acquisition)}
+                          title="Process"
+                        >
+                          <Recycle size={16} />
                         </button>
                       )}
                       {acquisition.canDelete && (
@@ -375,35 +416,32 @@ const Acquisition: React.FC = () => {
       />
 
       {showEditModal && selectedAcquisition && (
-        <div className="modal-backdrop" onClick={() => setShowEditModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            {/* Edit Acquisition Modal - Will be implemented */}
-            <h2>Edit Acquisition</h2>
-            <p>Editing: {selectedAcquisition.title}</p>
-            <p>Modal content will be implemented in the next step</p>
-            <button onClick={() => setShowEditModal(false)}>Close</button>
-          </div>
-        </div>
+        <EditAcquisition
+          isOpen={showEditModal}
+          onClose={() => setShowEditModal(false)}
+          onSuccess={loadData}
+          acquisition={selectedAcquisition}
+        />
       )}
 
       {showDeleteModal && selectedAcquisition && (
         <div className="modal-backdrop" onClick={() => setShowDeleteModal(false)}>
           <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Delete Acquisition</h2>
-            <p>Are you sure you want to delete "{selectedAcquisition.title}"?</p>
-            <p className="warning-text">This action cannot be undone.</p>
+            <h2>Cancel Acquisition</h2>
+            <p>Are you sure you want to cancel "{selectedAcquisition.title}"?</p>
+            <p className="warning-text">This will mark the acquisition as cancelled and it cannot be received.</p>
             <div className="modal-actions">
               <button 
                 className="cancel-button"
                 onClick={() => setShowDeleteModal(false)}
               >
-                Cancel
+                Go Back
               </button>
               <button 
                 className="delete-button"
                 onClick={handleDelete}
               >
-                Delete
+                Cancel Acquisition
               </button>
             </div>
           </div>
@@ -411,15 +449,29 @@ const Acquisition: React.FC = () => {
       )}
 
       {showReceiveModal && selectedAcquisition && (
-        <div className="modal-backdrop" onClick={() => setShowReceiveModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            {/* Receive Acquisition Modal - Will be implemented */}
-            <h2>Receive Acquisition</h2>
-            <p>Receiving: {selectedAcquisition.title}</p>
-            <p>Modal content will be implemented in the next step</p>
-            <button onClick={() => setShowReceiveModal(false)}>Close</button>
-          </div>
-        </div>
+        <ReceiveAcquisition
+          isOpen={showReceiveModal}
+          onClose={() => setShowReceiveModal(false)}
+          onSuccess={loadData}
+          acquisition={selectedAcquisition}
+        />
+      )}
+
+      {showProcessModal && selectedAcquisition && (
+        <ProcessAcquisition
+          isOpen={showProcessModal}
+          onClose={() => setShowProcessModal(false)}
+          onSuccess={loadData}
+          acquisition={selectedAcquisition}
+        />
+      )}
+
+      {showViewModal && selectedAcquisition && (
+        <ViewAcquisition
+          isOpen={showViewModal}
+          onClose={() => setShowViewModal(false)}
+          acquisition={selectedAcquisition}
+        />
       )}
     </div>
   );

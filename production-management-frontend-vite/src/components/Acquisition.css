@@ -193,6 +193,7 @@
   font-size: var(--text-base);
   transition: border-color 0.2s ease;
   background: var(--surface);
+  color: var(--text-primary);
 }
 
 .search-input:focus {
@@ -220,6 +221,7 @@
   font-size: var(--text-base);
   background: var(--surface);
   cursor: pointer;
+  color: var(--text-primary);
 }
 
 .filter-select:focus {
@@ -313,6 +315,12 @@
   color: var(--success-700);
 }
 
+.status-processing {
+  background: #e8f4f8;
+  color: #0077b6;
+  font-weight: 500;
+}
+
 .status-cancelled {
   background: var(--error-100);
   color: var(--error-700);
@@ -376,6 +384,16 @@
   transition: all var(--transition-fast);
 }
 
+.view-button {
+  background: #e8f4f8;
+  color: #0077b6;
+}
+
+.view-button:hover {
+  background: #d1e9f2;
+  color: #005f8a;
+}
+
 .edit-button {
   background: var(--primary-100);
   color: var(--primary-600);
@@ -394,6 +412,16 @@
 .receive-button:hover {
   background: var(--success-200);
   color: var(--success-700);
+}
+
+.process-button {
+  background: #e8f4f8;
+  color: #0077b6;
+}
+
+.process-button:hover {
+  background: #d1e9f2;
+  color: #005f8a;
 }
 
 .delete-button {

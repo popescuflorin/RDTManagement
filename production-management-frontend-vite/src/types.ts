@@ -55,10 +55,18 @@ export interface AdminUpdateUserRequest {
 }
 
 // Inventory Management Types
+export const MaterialType = {
+  RawMaterial: 0,
+  RecyclableMaterial: 1
+} as const;
+
+export type MaterialType = typeof MaterialType[keyof typeof MaterialType];
+
 export interface RawMaterial {
   id: number;
   name: string;
   color: string;
+  type: MaterialType;
   quantity: number;
   quantityType: string;
   createdAt: string;
@@ -74,6 +82,7 @@ export interface RawMaterial {
 export interface CreateRawMaterialRequest {
   name: string;
   color: string;
+  type: MaterialType;
   quantity: number;
   quantityType: string;
   minimumStock: number;
@@ -84,6 +93,7 @@ export interface CreateRawMaterialRequest {
 export interface UpdateRawMaterialRequest {
   name: string;
   color: string;
+  type: MaterialType;
   quantity: number;
   quantityType: string;
   minimumStock: number;
@@ -98,7 +108,7 @@ export interface AddToExistingMaterialRequest {
   newUnitCost?: number;
 }
 
-export interface MaterialType {
+export interface MaterialTypeInfo {
   name: string;
   color: string;
   quantityType: string;
@@ -230,10 +240,30 @@ export type AcquisitionType = typeof AcquisitionType[keyof typeof AcquisitionTyp
 export const AcquisitionStatus = {
   Draft: 0,
   Received: 1,
-  Cancelled: 2
+  Cancelled: 2,
+  ReadyForProcessing: 3
 } as const;
 
 export type AcquisitionStatus = typeof AcquisitionStatus[keyof typeof AcquisitionStatus];
+
+// Transport Types
+export interface Transport {
+  id: number;
+  carName: string;
+  phoneNumber: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface CreateTransportRequest {
+  carName: string;
+  phoneNumber: string;
+}
+
+export interface UpdateTransportRequest {
+  carName: string;
+  phoneNumber: string;
+}
 
 export interface Acquisition {
   id: number;
@@ -248,12 +278,15 @@ export interface Acquisition {
   createdByUserName: string;
   receivedByUserId?: number;
   receivedByUserName?: string;
+  assignedToUserId?: number;
+  assignedToUserName?: string;
   supplierId?: number;
   supplierName?: string;
   supplierContact?: string;
   notes?: string;
   dueDate?: string;
   // Transport details
+  transportId?: number;
   transportCarName?: string;
   transportPhoneNumber?: string;
   transportDate?: string;
@@ -266,6 +299,19 @@ export interface Acquisition {
   canDelete: boolean;
   canReceive: boolean;
   items: AcquisitionItem[];
+  processedMaterials: ProcessedMaterial[];
+}
+
+export interface ProcessedMaterial {
+  id: number;
+  acquisitionId: number;
+  acquisitionItemId: number;
+  rawMaterialId: number;
+  rawMaterialName: string;
+  rawMaterialColor: string;
+  rawMaterialQuantityType: string;
+  quantity: number;
+  createdAt: string;
 }
 
 export interface AcquisitionItem {
@@ -288,13 +334,13 @@ export interface CreateAcquisitionRequest {
   title: string;
   description: string;
   type: AcquisitionType;
+  assignedToUserId?: number;
   supplierId?: number;
   supplierContact?: string;
   notes?: string;
   dueDate?: string;
   // Transport details
-  transportCarName?: string;
-  transportPhoneNumber?: string;
+  transportId?: number;
   transportDate?: string;
   transportNotes?: string;
   items: CreateAcquisitionItemRequest[];
@@ -313,13 +359,13 @@ export interface CreateAcquisitionItemRequest {
 export interface UpdateAcquisitionRequest {
   title: string;
   description: string;
+  assignedToUserId?: number;
   supplierId?: number;
   supplierContact?: string;
   notes?: string;
   dueDate?: string;
   // Transport details
-  transportCarName?: string;
-  transportPhoneNumber?: string;
+  transportId?: number;
   transportDate?: string;
   transportNotes?: string;
   items: UpdateAcquisitionItemRequest[];
@@ -342,6 +388,7 @@ export interface ReceiveAcquisitionRequest {
 
 export interface ReceiveAcquisitionItemRequest {
   acquisitionItemId: number;
+  receivedQuantity: number;
   actualUnitCost?: number;
 }
 

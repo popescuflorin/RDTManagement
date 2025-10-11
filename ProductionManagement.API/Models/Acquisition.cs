@@ -39,6 +39,11 @@ namespace ProductionManagement.API.Models
         [ForeignKey("ReceivedByUserId")]
         public virtual User? ReceivedBy { get; set; }
 
+        public int? AssignedToUserId { get; set; }
+
+        [ForeignKey("AssignedToUserId")]
+        public virtual User? AssignedTo { get; set; }
+
         public int? SupplierId { get; set; }
 
         [StringLength(100)]
@@ -56,13 +61,13 @@ namespace ProductionManagement.API.Models
 
         public DateTime? DueDate { get; set; }
 
-        // Transport details
-        [StringLength(100)]
-        public string? TransportCarName { get; set; }
+        // Transport relationship
+        public int? TransportId { get; set; }
 
-        [StringLength(20)]
-        public string? TransportPhoneNumber { get; set; }
+        [ForeignKey("TransportId")]
+        public virtual Transport? Transport { get; set; }
 
+        // Transport specific details for this acquisition
         public DateTime? TransportDate { get; set; }
 
         [StringLength(500)]
@@ -74,8 +79,9 @@ namespace ProductionManagement.API.Models
 
         public bool IsActive { get; set; } = true;
 
-        // Navigation property
+        // Navigation properties
         public virtual ICollection<AcquisitionItem> Items { get; set; } = new List<AcquisitionItem>();
+        public virtual ICollection<ProcessedMaterial> ProcessedMaterials { get; set; } = new List<ProcessedMaterial>();
 
         // Calculated properties
         [NotMapped]
@@ -158,6 +164,7 @@ namespace ProductionManagement.API.Models
     {
         Draft = 0,
         Received = 1,
-        Cancelled = 2
+        Cancelled = 2,
+        ReadyForProcessing = 3
     }
 }

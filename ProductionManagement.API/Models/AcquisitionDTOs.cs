@@ -15,6 +15,8 @@ namespace ProductionManagement.API.Models
         [Required]
         public AcquisitionType Type { get; set; } = AcquisitionType.RawMaterials;
 
+        public int? AssignedToUserId { get; set; }
+
         public int? SupplierId { get; set; }
 
         [StringLength(100)]
@@ -26,8 +28,7 @@ namespace ProductionManagement.API.Models
         public DateTime? DueDate { get; set; }
 
         // Transport details
-        public string? TransportCarName { get; set; }
-        public string? TransportPhoneNumber { get; set; }
+        public int? TransportId { get; set; }
         public DateTime? TransportDate { get; set; }
         public string? TransportNotes { get; set; }
 
@@ -71,6 +72,8 @@ namespace ProductionManagement.API.Models
         [StringLength(500)]
         public string Description { get; set; } = string.Empty;
 
+        public int? AssignedToUserId { get; set; }
+
         public int? SupplierId { get; set; }
 
         [StringLength(100)]
@@ -82,8 +85,7 @@ namespace ProductionManagement.API.Models
         public DateTime? DueDate { get; set; }
 
         // Transport details
-        public string? TransportCarName { get; set; }
-        public string? TransportPhoneNumber { get; set; }
+        public int? TransportId { get; set; }
         public DateTime? TransportDate { get; set; }
         public string? TransportNotes { get; set; }
 
@@ -130,8 +132,44 @@ namespace ProductionManagement.API.Models
         [Required]
         public int AcquisitionItemId { get; set; }
 
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal ReceivedQuantity { get; set; }
+
         [Range(0, double.MaxValue)]
         public decimal? ActualUnitCost { get; set; }
+    }
+
+    public class ProcessAcquisitionRequest
+    {
+        [Required]
+        public int AcquisitionId { get; set; }
+
+        [Required]
+        public List<ProcessedMaterialRequest> Materials { get; set; } = new();
+    }
+
+    public class ProcessedMaterialRequest
+    {
+        [Required]
+        public int RecyclableItemId { get; set; }
+
+        public int RawMaterialId { get; set; } // 0 means create new
+
+        [Required]
+        public string Name { get; set; } = string.Empty;
+
+        [Required]
+        public string Color { get; set; } = string.Empty;
+
+        public string Description { get; set; } = string.Empty;
+
+        [Required]
+        [Range(0, double.MaxValue)]
+        public decimal Quantity { get; set; }
+
+        [Required]
+        public string UnitOfMeasure { get; set; } = string.Empty;
     }
 
     // Response DTOs
@@ -149,6 +187,8 @@ namespace ProductionManagement.API.Models
         public string CreatedByUserName { get; set; } = string.Empty;
         public int? ReceivedByUserId { get; set; }
         public string? ReceivedByUserName { get; set; }
+        public int? AssignedToUserId { get; set; }
+        public string? AssignedToUserName { get; set; }
         public int? SupplierId { get; set; }
         public string? SupplierName { get; set; }
         public string? SupplierContact { get; set; }
@@ -156,6 +196,7 @@ namespace ProductionManagement.API.Models
         public DateTime? DueDate { get; set; }
 
         // Transport details
+        public int? TransportId { get; set; }
         public string? TransportCarName { get; set; }
         public string? TransportPhoneNumber { get; set; }
         public DateTime? TransportDate { get; set; }
@@ -169,6 +210,20 @@ namespace ProductionManagement.API.Models
         public bool CanDelete { get; set; }
         public bool CanReceive { get; set; }
         public List<AcquisitionItemDto> Items { get; set; } = new();
+        public List<ProcessedMaterialDto> ProcessedMaterials { get; set; } = new();
+    }
+
+    public class ProcessedMaterialDto
+    {
+        public int Id { get; set; }
+        public int AcquisitionId { get; set; }
+        public int AcquisitionItemId { get; set; }
+        public int RawMaterialId { get; set; }
+        public string RawMaterialName { get; set; } = string.Empty;
+        public string RawMaterialColor { get; set; } = string.Empty;
+        public string RawMaterialQuantityType { get; set; } = string.Empty;
+        public decimal Quantity { get; set; }
+        public DateTime CreatedAt { get; set; }
     }
 
     public class AcquisitionItemDto

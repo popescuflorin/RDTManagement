@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { acquisitionApi, inventoryApi, supplierApi, transportApi, userApi } from '../services/api';
-import type { RawMaterial, CreateAcquisitionRequest, Supplier, CreateSupplierRequest, Transport, CreateTransportRequest, User } from '../types';
+import type { RawMaterial, UpdateAcquisitionRequest, Supplier, CreateSupplierRequest, Transport, CreateTransportRequest, User, Acquisition } from '../types';
 import { AcquisitionType, MaterialType } from '../types';
 import { X, Plus, Trash2, Building2, FileText, Truck, Package, UserCircle } from 'lucide-react';
 import './CreateAcquisition.css';
 
-interface CreateAcquisitionProps {
+interface EditAcquisitionProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
+  acquisition: Acquisition;
 }
 
 interface AcquisitionItem {
-  id: string;
-  rawMaterialId?: number;
+  id?: number;
+  rawMaterialId: number;
   name: string;
   color: string;
   description: string;
@@ -22,10 +23,11 @@ interface AcquisitionItem {
   isNew: boolean;
 }
 
-const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
+const EditAcquisition: React.FC<EditAcquisitionProps> = ({
   isOpen,
   onClose,
-  onSuccess
+  onSuccess,
+  acquisition
 }) => {
   const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
@@ -41,24 +43,15 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
   const [selectedSupplierId, setSelectedSupplierId] = useState<number | null>(null);
   const [supplierContact, setSupplierContact] = useState('');
   const [notes, setNotes] = useState('');
-  const [dueDate, setDueDate] = useState(() => {
-    // Set default due date to current date in YYYY-MM-DD format
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
+  const [dueDate, setDueDate] = useState('');
 
   // Transport details
   const [selectedTransportId, setSelectedTransportId] = useState<number | null>(null);
   const [transportSearchTerm, setTransportSearchTerm] = useState('');
   const [showTransportDropdown, setShowTransportDropdown] = useState(false);
   const [transportPhoneNumber, setTransportPhoneNumber] = useState('');
-  const [transportDate, setTransportDate] = useState(() => {
-    // Set default due date to current date in YYYY-MM-DD format
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  });
+  const [transportDate, setTransportDate] = useState('');
   const [transportNotes, setTransportNotes] = useState('');
-  const [acquisitionType, setAcquisitionType] = useState<AcquisitionType>(AcquisitionType.RawMaterials);
   
   // Supplier creation state
   const [showCreateSupplier, setShowCreateSupplier] = useState(false);
@@ -89,14 +82,14 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
   const [showMaterialDropdown, setShowMaterialDropdown] = useState(false);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && acquisition) {
       loadRawMaterials();
       loadSuppliers();
       loadTransports();
       loadUsers();
-      resetForm();
+      populateFormData();
     }
-  }, [isOpen]);
+  }, [isOpen, acquisition]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -114,28 +107,35 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
     }
   }, [showMaterialDropdown, showTransportDropdown]);
 
-  // Reset material search, dropdown, and selected items when acquisition type changes
-  useEffect(() => {
-    // Clear the material search term to refresh the filtered results
-    setMaterialSearchTerm('');
-    setShowMaterialDropdown(false);
+  const populateFormData = () => {
+    setTitle(acquisition.title);
+    setDescription(acquisition.description);
+    setSelectedAssignedUserId(acquisition.assignedToUserId || null);
+    setSelectedSupplierId(acquisition.supplierId || null);
+    setSupplierContact(acquisition.supplierContact || '');
+    setNotes(acquisition.notes || '');
+    setDueDate(acquisition.dueDate ? acquisition.dueDate.split('T')[0] : '');
     
-    // Clear all selected items
-    setItems([]);
+    // Transport details
+    setSelectedTransportId(acquisition.transportId || null);
+    setTransportSearchTerm(acquisition.transportCarName || '');
+    setTransportPhoneNumber(acquisition.transportPhoneNumber || '');
+    setTransportDate(acquisition.transportDate ? acquisition.transportDate.split('T')[0] : '');
+    setTransportNotes(acquisition.transportNotes || '');
     
-    // Clear the new item form if it was filled
-    setNewItem({
-      name: '',
-      color: '',
-      description: '',
-      quantity: 0,
-      unitOfMeasure: '',
-      isNew: true
-    });
-    
-    // Close the add item form
-    setShowAddItemForm(false);
-  }, [acquisitionType]);
+    // Convert acquisition items to local format
+    const mappedItems: AcquisitionItem[] = acquisition.items.map(item => ({
+      id: item.id,
+      rawMaterialId: item.rawMaterialId,
+      name: item.rawMaterialName,
+      color: item.rawMaterialColor,
+      description: '', // Description is not stored in acquisition items
+      quantity: item.quantity,
+      unitOfMeasure: item.quantityType,
+      isNew: false // Existing items from the acquisition
+    }));
+    setItems(mappedItems);
+  };
 
   const loadRawMaterials = async () => {
     try {
@@ -168,76 +168,10 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
     try {
       const response = await userApi.getAllUsers();
       setUsers(response.data);
-      
-      // Set default assigned user to current user
-      const currentUser = localStorage.getItem('user');
-      if (currentUser) {
-        const userData = JSON.parse(currentUser);
-        setSelectedAssignedUserId(userData.id);
-      }
     } catch (err: any) {
       setError('Failed to load users');
     }
   };
-
-  const resetForm = () => {
-    setTitle('');
-    setDescription('');
-    
-    // Reset assigned user to current user
-    const currentUser = localStorage.getItem('user');
-    if (currentUser) {
-      const userData = JSON.parse(currentUser);
-      setSelectedAssignedUserId(userData.id);
-    } else {
-      setSelectedAssignedUserId(null);
-    }
-    
-    setSelectedSupplierId(null);
-    setSupplierContact('');
-    setNotes('');
-    setDueDate(() => {
-      // Reset due date to current date
-      const today = new Date();
-      return today.toISOString().split('T')[0];
-    });
-    setAcquisitionType(AcquisitionType.RawMaterials);
-    setItems([]);
-    setShowAddItemForm(false);
-    setShowCreateSupplier(false);
-    
-    // Reset transport details
-    setSelectedTransportId(null);
-    setTransportSearchTerm('');
-    setShowTransportDropdown(false);
-    setTransportPhoneNumber('');
-    setTransportDate(() => {
-      // Reset due date to current date
-      const today = new Date();
-      return today.toISOString().split('T')[0];
-    });
-    setTransportNotes('');
-    setNewItem({
-      name: '',
-      description: '',
-      quantity: 0,
-      unitOfMeasure: '',
-      isNew: true
-    });
-    setNewSupplier({
-      name: '',
-      contactPerson: '',
-      phone: '',
-      email: '',
-      address: '',
-      city: '',
-      country: ''
-    });
-    setMaterialSearchTerm('');
-    setShowMaterialDropdown(false);
-    setError(null);
-  };
-
 
   const handleAddNewMaterial = () => {
     if (!newItem.name || !newItem.color || !newItem.unitOfMeasure || !newItem.quantity || newItem.quantity <= 0) {
@@ -246,13 +180,13 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
     }
 
     const newItemData: AcquisitionItem = {
-      id: newItem.id ?? `new-${Date.now()}`,
+      rawMaterialId: newItem.rawMaterialId || 0,
       name: newItem.name!,
       color: newItem.color!,
       description: newItem.description || '',
       quantity: newItem.quantity!,
       unitOfMeasure: newItem.unitOfMeasure!,
-      isNew: true
+      isNew: newItem.isNew || true
     };
     
     setItems([...items, newItemData]);
@@ -268,21 +202,20 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
     setMaterialSearchTerm('');
   };
 
-  const handleUpdateItem = (id: string, updates: Partial<AcquisitionItem>) => {
-    setItems(items.map(item => 
-      item.id === id ? { ...item, ...updates } : item
+  const handleUpdateItem = (index: number, updates: Partial<AcquisitionItem>) => {
+    setItems(items.map((item, i) => 
+      i === index ? { ...item, ...updates } : item
     ));
   };
 
-  const handleRemoveItem = (id: string) => {
-    setItems(items.filter(item => item.id !== id));
+  const handleRemoveItem = (index: number) => {
+    setItems(items.filter((_, i) => i !== index));
   };
 
   // Filter materials based on search term and acquisition type
   const filteredMaterials = rawMaterials.filter(material => {
-    // Filter by acquisition type - only show materials matching the acquisition type
-    const matchesType = (acquisitionType === AcquisitionType.RawMaterials && material.type === MaterialType.RawMaterial) ||
-                        (acquisitionType === AcquisitionType.RecyclableMaterials && material.type === MaterialType.RecyclableMaterial);
+    const matchesType = (acquisition.type === AcquisitionType.RawMaterials && material.type === MaterialType.RawMaterial) ||
+                        (acquisition.type === AcquisitionType.RecyclableMaterials && material.type === MaterialType.RecyclableMaterial);
     
     const matchesSearch = material.name.toLowerCase().includes(materialSearchTerm.toLowerCase()) ||
                          material.color.toLowerCase().includes(materialSearchTerm.toLowerCase());
@@ -306,12 +239,12 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
   const handleMaterialSelect = (material: RawMaterial) => {
     setNewItem(prev => ({
       ...prev,
+      rawMaterialId: material.id,
       name: material.name,
       color: material.color,
       description: material.description || '',
       unitOfMeasure: material.quantityType,
-      isNew: false,
-      id: material.id.toString()
+      isNew: false
     }));
     setMaterialSearchTerm(`${material.name} (${material.color})`);
     setShowMaterialDropdown(false);
@@ -329,7 +262,6 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
       setSelectedSupplierId(response.data.id);
       setShowCreateSupplier(false);
       if (newSupplier) {
-        // Use contact person, phone, or email as contact info
         let contactInfo = '';
         if (newSupplier.contactPerson) {
           contactInfo = newSupplier.contactPerson;
@@ -372,10 +304,8 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
       setSelectedSupplierId(supplierIdNum);
       setShowCreateSupplier(false);
       
-      // Find the selected supplier and populate contact field
       const selectedSupplier = suppliers.find(s => s.id === supplierIdNum);
       if (selectedSupplier) {
-        // Use contact person, phone, or email as contact info
         let contactInfo = '';
         if (selectedSupplier.contactPerson) {
           contactInfo = selectedSupplier.contactPerson;
@@ -397,7 +327,6 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
     setTransportSearchTerm(value);
     setShowTransportDropdown(true);
     
-    // If user clears the search, also clear the selected transport and phone
     if (!value.trim()) {
       setSelectedTransportId(null);
       setTransportPhoneNumber('');
@@ -444,10 +373,9 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
         transportId = transportResponse.data.id;
       }
 
-      const createRequest: CreateAcquisitionRequest = {
+      const updateRequest: UpdateAcquisitionRequest = {
         title: title.trim(),
         description: description.trim(),
-        type: acquisitionType,
         assignedToUserId: selectedAssignedUserId || undefined,
         supplierId: selectedSupplierId || undefined,
         supplierContact: supplierContact.trim() || undefined,
@@ -456,13 +384,13 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
         transportId: transportId || undefined,
         transportDate: transportDate || undefined,
         transportNotes: transportNotes.trim() || undefined,
-        items: items.map(item => {
-          // Try to parse the id as an integer, default to 0 if it fails
-          const parsedId = parseInt(item.id);
+        items: items.map((item) => {
+          const parsedId = item.rawMaterialId ? parseInt(item.rawMaterialId.toString()) : 0;
           const rawMaterialId = isNaN(parsedId) ? 0 : parsedId;
           
           return {
-            rawMaterialId: rawMaterialId, // Will be 0 for new materials
+            id: item.id, // Include existing item ID
+            rawMaterialId: rawMaterialId,
             name: item.name,
             color: item.color,
             description: item.description,
@@ -472,23 +400,21 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
         })
       };
 
-      await acquisitionApi.createAcquisition(createRequest);
+      await acquisitionApi.updateAcquisition(acquisition.id, updateRequest);
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create acquisition');
+      setError(err.response?.data?.message || 'Failed to update acquisition');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleClose = () => {
-    resetForm();
     onClose();
   };
 
   const handleBackdropClick = (e: React.MouseEvent) => {
-    // Prevent closing on backdrop click - only allow closing via buttons
     e.stopPropagation();
   };
 
@@ -498,7 +424,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
     <div className="modal-backdrop" onClick={handleBackdropClick}>
       <div className="modal-content create-acquisition-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Create New Acquisition</h2>
+          <h2>Edit Acquisition</h2>
           <button className="close-button" onClick={handleClose}>
             <X size={24} />
           </button>
@@ -530,14 +456,13 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
               </div>
               <div className="form-group">
                 <label htmlFor="type">Type</label>
-                <select
+                <input
+                  type="text"
                   id="type"
-                  value={acquisitionType}
-                  onChange={(e) => setAcquisitionType(Number(e.target.value) as AcquisitionType)}
-                >
-                  <option value={AcquisitionType.RawMaterials}>Raw Materials</option>
-                  <option value={AcquisitionType.RecyclableMaterials}>Recyclable Materials</option>
-                </select>
+                  value={acquisition.type === AcquisitionType.RawMaterials ? 'Raw Materials' : 'Recyclable Materials'}
+                  disabled
+                  className="disabled-field"
+                />
               </div>
             </div>
 
@@ -937,14 +862,13 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
               </div>
             )}
 
-
             {/* Selected Items */}
             {items.length > 0 && (
               <div className="selected-items">
                 <h4>Selected Materials ({items.length})</h4>
                 <div className="items-list">
-                  {items.map((item) => (
-                    <div key={item.id} className="item-card">
+                  {items.map((item, index) => (
+                    <div key={index} className="item-card">
                       <div className="item-info">
                         <div className="item-name">{item.name}</div>
                         <div className="item-color">Color: {item.color}</div>
@@ -959,7 +883,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                             <input
                               type="number"
                               value={item.quantity}
-                              onChange={(e) => handleUpdateItem(item.id, { quantity: parseFloat(e.target.value) || 0 })}
+                              onChange={(e) => handleUpdateItem(index, { quantity: parseFloat(e.target.value) || 0 })}
                               min="0"
                               step="0.01"
                             />
@@ -969,9 +893,9 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                             <input
                               type="text"
                               value={item.unitOfMeasure}
-                              onChange={(e) => handleUpdateItem(item.id, { unitOfMeasure: e.target.value })}
+                              onChange={(e) => handleUpdateItem(index, { unitOfMeasure: e.target.value })}
                               disabled={true}
-                              className={!item.isNew ? 'disabled-field' : ''}
+                              className="disabled-field"
                             />
                           </div>
                         </div>
@@ -981,10 +905,10 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                             <input
                               type="text"
                               value={item.color}
-                              onChange={(e) => handleUpdateItem(item.id, { color: e.target.value })}
+                              onChange={(e) => handleUpdateItem(index, { color: e.target.value })}
                               placeholder="Enter color"
                               disabled={true}
-                              className={!item.isNew ? 'disabled-field' : ''}
+                              className="disabled-field"
                             />
                           </div>
                         </div>
@@ -992,11 +916,11 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                           <label>Description</label>
                           <textarea
                             value={item.description}
-                            onChange={(e) => handleUpdateItem(item.id, { description: e.target.value })}
+                            onChange={(e) => handleUpdateItem(index, { description: e.target.value })}
                             placeholder="Material description"
                             rows={2}
                             disabled={true}
-                            className={!item.isNew ? 'disabled-field' : ''}
+                            className="disabled-field"
                           />
                         </div>
                         <div className="item-total">
@@ -1006,7 +930,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                       <button
                         type="button"
                         className="remove-item-button"
-                        onClick={() => handleRemoveItem(item.id)}
+                        onClick={() => handleRemoveItem(index)}
                       >
                         <Trash2 size={16} />
                       </button>
@@ -1040,7 +964,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
               className="submit-button"
               disabled={isLoading || !title.trim() || items.length === 0}
             >
-              {isLoading ? 'Creating...' : 'Create Acquisition'}
+              {isLoading ? 'Updating...' : 'Update Acquisition'}
             </button>
           </div>
         </form>
@@ -1049,4 +973,5 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
   );
 };
 
-export default CreateAcquisition;
+export default EditAcquisition;
+

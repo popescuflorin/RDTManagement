@@ -15,7 +15,13 @@ namespace ProductionManagement.API.Repositories
             return await _dbSet
                 .Include(a => a.Items)
                     .ThenInclude(i => i.RawMaterial)
+                .Include(a => a.ProcessedMaterials)
+                    .ThenInclude(pm => pm.RawMaterial)
                 .Include(a => a.Supplier)
+                .Include(a => a.Transport)
+                .Include(a => a.CreatedBy)
+                .Include(a => a.ReceivedBy)
+                .Include(a => a.AssignedTo)
                 .Where(a => a.IsActive)
                 .OrderByDescending(a => a.CreatedAt)
                 .ToListAsync();
@@ -26,7 +32,13 @@ namespace ProductionManagement.API.Repositories
             return await _dbSet
                 .Include(a => a.Items)
                     .ThenInclude(i => i.RawMaterial)
+                .Include(a => a.ProcessedMaterials)
+                    .ThenInclude(pm => pm.RawMaterial)
                 .Include(a => a.Supplier)
+                .Include(a => a.Transport)
+                .Include(a => a.CreatedBy)
+                .Include(a => a.ReceivedBy)
+                .Include(a => a.AssignedTo)
                 .FirstOrDefaultAsync(a => a.Id == id && a.IsActive);
         }
 
@@ -35,7 +47,13 @@ namespace ProductionManagement.API.Repositories
             return await _dbSet
                 .Include(a => a.Items)
                     .ThenInclude(i => i.RawMaterial)
+                .Include(a => a.ProcessedMaterials)
+                    .ThenInclude(pm => pm.RawMaterial)
                 .Include(a => a.Supplier)
+                .Include(a => a.Transport)
+                .Include(a => a.CreatedBy)
+                .Include(a => a.ReceivedBy)
+                .Include(a => a.AssignedTo)
                 .Where(a => a.IsActive)
                 .ToListAsync();
         }
