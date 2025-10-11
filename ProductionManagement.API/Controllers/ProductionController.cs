@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using ProductionManagement.API.Models;
+using ProductionManagement.API.Repositories;
 using System.Security.Claims;
 
 namespace ProductionManagement.API.Controllers
@@ -10,82 +11,47 @@ namespace ProductionManagement.API.Controllers
     [Authorize]
     public class ProductionController : ControllerBase
     {
-        // In-memory storage for demo purposes
-        private static List<Product> _products = new List<Product>();
+        private readonly IProductRepository _productRepository;
+        private readonly IRawMaterialRepository _rawMaterialRepository;
+        private readonly IUserRepository _userRepository;
+
+        // In-memory storage for finished products (could be added to DB later)
         private static List<FinishedProduct> _finishedProducts = new List<FinishedProduct>();
-        private static int _nextProductId = 1;
         private static int _nextFinishedProductId = 1;
-        private static int _nextProductMaterialId = 1;
 
-        // Reference to inventory (in real app, this would be through dependency injection)
-        private static List<RawMaterial> GetMaterials()
+        public ProductionController(
+            IProductRepository productRepository,
+            IRawMaterialRepository rawMaterialRepository,
+            IUserRepository userRepository)
         {
-            // This is a hack to access the materials from InventoryController
-            // In a real application, this would be through a shared service or database
-            var inventoryControllerType = typeof(InventoryController);
-            var materialsField = inventoryControllerType.GetField("_materials", 
-                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            return (List<RawMaterial>)materialsField?.GetValue(null) ?? new List<RawMaterial>();
+            _productRepository = productRepository;
+            _rawMaterialRepository = rawMaterialRepository;
+            _userRepository = userRepository;
         }
 
-        static ProductionController()
-        {
-            // Sample products
-            _products.Add(new Product
-            {
-                Id = _nextProductId++,
-                Name = "Steel Cabinet",
-                Description = "Heavy-duty steel storage cabinet with blue finish",
-                Category = "Furniture",
-                SellingPrice = 299.99m,
-                EstimatedProductionTimeMinutes = 120,
-                CreatedAt = DateTime.UtcNow.AddDays(-20),
-                UpdatedAt = DateTime.UtcNow.AddDays(-5),
-                RequiredMaterials = new List<ProductMaterial>
-                {
-                    new ProductMaterial { Id = _nextProductMaterialId++, MaterialId = 1, RequiredQuantity = 25.0m },  // Steel Sheets
-                    new ProductMaterial { Id = _nextProductMaterialId++, MaterialId = 3, RequiredQuantity = 2.5m },   // Blue Paint
-                    new ProductMaterial { Id = _nextProductMaterialId++, MaterialId = 5, RequiredQuantity = 1.2m }    // Screws
-                }
-            });
-
-            _products.Add(new Product
-            {
-                Id = _nextProductId++,
-                Name = "Aluminum Frame",
-                Description = "Lightweight aluminum frame for windows",
-                Category = "Construction",
-                SellingPrice = 149.99m,
-                EstimatedProductionTimeMinutes = 60,
-                CreatedAt = DateTime.UtcNow.AddDays(-15),
-                UpdatedAt = DateTime.UtcNow.AddDays(-2),
-                RequiredMaterials = new List<ProductMaterial>
-                {
-                    new ProductMaterial { Id = _nextProductMaterialId++, MaterialId = 2, RequiredQuantity = 8.0m }     // Aluminum Rods
-                }
-            });
-        }
+        // Removed static constructor - using database seeding instead
 
         [HttpGet]
-        public ActionResult<IEnumerable<ProductInfo>> GetAllProducts()
+        public async Task<ActionResult<IEnumerable<ProductInfo>>> GetAllProducts()
         {
-            var materials = GetMaterials();
+            var products = await _productRepository.GetProductsWithMaterialsAsync();
+            var materials = await _rawMaterialRepository.GetAllAsync();
             
-            var productInfos = _products.Select(p => CreateProductInfo(p, materials)).ToList();
+            var productInfos = products.Select(p => CreateProductInfo(p, materials.ToList())).ToList();
             return Ok(productInfos);
         }
 
         [HttpGet("{id}")]
-        public ActionResult<ProductInfo> GetProduct(int id)
+        public async Task<ActionResult<ProductInfo>> GetProduct(int id)
         {
-            var product = _products.FirstOrDefault(p => p.Id == id);
+            var product = await _productRepository.GetByIdWithMaterialsAsync(id);
             if (product == null)
             {
                 return NotFound(new { message = "Product not found" });
             }
 
-            var materials = GetMaterials();
-            var productInfo = CreateProductInfo(product, materials);
+            var materials = await _rawMaterialRepository.GetAllAsync();
+            var productInfo = CreateProductInfo(product, materials.ToList());
             return Ok(productInfo);
         }
 
@@ -96,11 +62,13 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("statistics")]
-        public ActionResult<ProductionStatistics> GetProductionStatistics()
+        public async Task<ActionResult<ProductionStatistics>> GetProductionStatistics()
         {
-            var materials = GetMaterials();
-            var activeProducts = _products.Where(p => p.IsActive).ToList();
-            var canProduceCount = activeProducts.Count(p => CanProduceProduct(p, materials));
+            var allProducts = await _productRepository.GetAllAsync();
+            var materials = await _rawMaterialRepository.GetAllAsync();
+            var materialsList = materials.ToList();
+            var activeProducts = allProducts.Where(p => p.IsActive).ToList();
+            var canProduceCount = activeProducts.Count(p => CanProduceProduct(p, materialsList));
             
             var totalFinishedProducts = _finishedProducts.Sum(fp => fp.Quantity);
             var totalProductionValue = _finishedProducts.Sum(fp => fp.Quantity * fp.ProductionCost);
@@ -119,7 +87,7 @@ namespace ProductionManagement.API.Controllers
 
             return Ok(new ProductionStatistics
             {
-                TotalProducts = _products.Count,
+                TotalProducts = allProducts.Count(),
                 ActiveProducts = activeProducts.Count,
                 ProductsCanProduce = canProduceCount,
                 TotalFinishedProducts = totalFinishedProducts,
@@ -130,14 +98,14 @@ namespace ProductionManagement.API.Controllers
 
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
-        public ActionResult<ProductInfo> CreateProduct([FromBody] CreateProductRequest request)
+        public async Task<ActionResult<ProductInfo>> CreateProduct([FromBody] CreateProductRequest request)
         {
-            var materials = GetMaterials();
+            var materials = await _rawMaterialRepository.GetAllAsync();
 
             // Validate that all required materials exist
             foreach (var reqMaterial in request.RequiredMaterials)
             {
-                var material = materials.FirstOrDefault(m => m.Id == reqMaterial.MaterialId);
+                var material = await _rawMaterialRepository.GetByIdAsync(reqMaterial.MaterialId);
                 if (material == null)
                 {
                     return BadRequest(new { message = $"Material with ID {reqMaterial.MaterialId} not found" });
@@ -146,7 +114,6 @@ namespace ProductionManagement.API.Controllers
 
             var newProduct = new Product
             {
-                Id = _nextProductId++,
                 Name = request.Name,
                 Description = request.Description,
                 Category = request.Category,
@@ -154,37 +121,43 @@ namespace ProductionManagement.API.Controllers
                 EstimatedProductionTimeMinutes = request.EstimatedProductionTimeMinutes,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow,
-                RequiredMaterials = request.RequiredMaterials.Select(rm => new ProductMaterial
+                IsActive = true,
+                RequiredMaterials = request.RequiredMaterials.Select(rm =>
                 {
-                    Id = _nextProductMaterialId++,
-                    ProductId = _nextProductId - 1,
-                    MaterialId = rm.MaterialId,
-                    RequiredQuantity = rm.RequiredQuantity
+                    var mat = materials.FirstOrDefault(m => m.Id == rm.MaterialId);
+                    return new ProductMaterial
+                    {
+                        MaterialId = rm.MaterialId,
+                        RequiredQuantity = rm.RequiredQuantity,
+                        MaterialName = mat?.Name ?? "",
+                        MaterialColor = mat?.Color ?? "",
+                        QuantityType = mat?.QuantityType ?? ""
+                    };
                 }).ToList()
             };
 
-            _products.Add(newProduct);
+            var createdProduct = await _productRepository.AddAsync(newProduct);
 
-            var productInfo = CreateProductInfo(newProduct, materials);
-            return CreatedAtAction(nameof(GetProduct), new { id = newProduct.Id }, productInfo);
+            var productInfo = CreateProductInfo(createdProduct, materials.ToList());
+            return CreatedAtAction(nameof(GetProduct), new { id = createdProduct.Id }, productInfo);
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Manager")]
-        public ActionResult<ProductInfo> UpdateProduct(int id, [FromBody] UpdateProductRequest request)
+        public async Task<ActionResult<ProductInfo>> UpdateProduct(int id, [FromBody] UpdateProductRequest request)
         {
-            var product = _products.FirstOrDefault(p => p.Id == id);
+            var product = await _productRepository.GetByIdWithMaterialsAsync(id);
             if (product == null)
             {
                 return NotFound(new { message = "Product not found" });
             }
 
-            var materials = GetMaterials();
+            var materials = await _rawMaterialRepository.GetAllAsync();
 
             // Validate that all required materials exist
             foreach (var reqMaterial in request.RequiredMaterials)
             {
-                var material = materials.FirstOrDefault(m => m.Id == reqMaterial.MaterialId);
+                var material = await _rawMaterialRepository.GetByIdAsync(reqMaterial.MaterialId);
                 if (material == null)
                 {
                     return BadRequest(new { message = $"Material with ID {reqMaterial.MaterialId} not found" });
@@ -201,37 +174,45 @@ namespace ProductionManagement.API.Controllers
             product.UpdatedAt = DateTime.UtcNow;
 
             // Update required materials
-            product.RequiredMaterials = request.RequiredMaterials.Select(rm => new ProductMaterial
+            product.RequiredMaterials = request.RequiredMaterials.Select(rm =>
             {
-                Id = _nextProductMaterialId++,
-                ProductId = id,
-                MaterialId = rm.MaterialId,
-                RequiredQuantity = rm.RequiredQuantity
+                var mat = materials.FirstOrDefault(m => m.Id == rm.MaterialId);
+                return new ProductMaterial
+                {
+                    ProductId = id,
+                    MaterialId = rm.MaterialId,
+                    RequiredQuantity = rm.RequiredQuantity,
+                    MaterialName = mat?.Name ?? "",
+                    MaterialColor = mat?.Color ?? "",
+                    QuantityType = mat?.QuantityType ?? ""
+                };
             }).ToList();
 
-            var productInfo = CreateProductInfo(product, materials);
+            await _productRepository.UpdateAsync(product);
+
+            var productInfo = CreateProductInfo(product, materials.ToList());
             return Ok(productInfo);
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public IActionResult DeleteProduct(int id)
+        public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = _products.FirstOrDefault(p => p.Id == id);
+            var product = await _productRepository.GetByIdAsync(id);
             if (product == null)
             {
                 return NotFound(new { message = "Product not found" });
             }
 
-            _products.Remove(product);
+            await _productRepository.DeleteAsync(product);
             return Ok(new { message = "Product deleted successfully" });
         }
 
         [HttpPost("produce")]
         [Authorize(Roles = "Admin,Manager")]
-        public ActionResult<ProductionResult> ProduceProduct([FromBody] ProduceProductRequest request)
+        public async Task<ActionResult<ProductionResult>> ProduceProduct([FromBody] ProduceProductRequest request)
         {
-            var product = _products.FirstOrDefault(p => p.Id == request.ProductId);
+            var product = await _productRepository.GetByIdWithMaterialsAsync(request.ProductId);
             if (product == null)
             {
                 return NotFound(new { message = "Product not found" });
@@ -242,7 +223,8 @@ namespace ProductionManagement.API.Controllers
                 return BadRequest(new { message = "Cannot produce inactive product" });
             }
 
-            var materials = GetMaterials();
+            var allMaterials = await _rawMaterialRepository.GetAllAsync();
+            var materials = allMaterials.ToList();
             var materialsConsumed = new List<MaterialConsumption>();
             var totalCost = 0m;
 
@@ -276,6 +258,8 @@ namespace ProductionManagement.API.Controllers
                     material.Quantity -= totalRequired;
                     material.UpdatedAt = DateTime.UtcNow;
                     totalCost += cost;
+
+                    await _rawMaterialRepository.UpdateAsync(material);
 
                     materialsConsumed.Add(new MaterialConsumption
                     {

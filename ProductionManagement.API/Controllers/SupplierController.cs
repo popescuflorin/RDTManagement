@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using ProductionManagement.API.Models;
+using ProductionManagement.API.Repositories;
 using System.Security.Claims;
 
 namespace ProductionManagement.API.Controllers
@@ -10,62 +11,21 @@ namespace ProductionManagement.API.Controllers
     [Authorize]
     public class SupplierController : ControllerBase
     {
-        // In-memory storage for demo purposes
-        private static List<Supplier> _suppliers = new List<Supplier>
-        {
-            new Supplier
-            {
-                Id = 1,
-                Name = "Green Materials Co.",
-                Description = "Specialized in eco-friendly raw materials",
-                ContactPerson = "John Smith",
-                Phone = "+1-555-0123",
-                Email = "john@greenmaterials.com",
-                Address = "123 Eco Street",
-                City = "Greenville",
-                PostalCode = "12345",
-                Country = "USA",
-                TaxId = "TAX123456789",
-                RegistrationNumber = "REG987654321",
-                Notes = "Reliable supplier for sustainable materials",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow.AddDays(-30),
-                CreatedByUserId = 1,
-                CreatedByUserName = "admin"
-            },
-            new Supplier
-            {
-                Id = 2,
-                Name = "Recycle Pro Ltd.",
-                Description = "Leading provider of recyclable materials",
-                ContactPerson = "Sarah Johnson",
-                Phone = "+1-555-0456",
-                Email = "sarah@recyclepro.com",
-                Address = "456 Recycle Road",
-                City = "Eco City",
-                PostalCode = "67890",
-                Country = "USA",
-                TaxId = "TAX987654321",
-                RegistrationNumber = "REG123456789",
-                Notes = "Fast delivery and competitive prices",
-                IsActive = true,
-                CreatedAt = DateTime.UtcNow.AddDays(-20),
-                CreatedByUserId = 1,
-                CreatedByUserName = "admin"
-            }
-        };
+        private readonly ISupplierRepository _supplierRepository;
+        private readonly IUserRepository _userRepository;
 
-        private static int _nextSupplierId = 3;
+        public SupplierController(ISupplierRepository supplierRepository, IUserRepository userRepository)
+        {
+            _supplierRepository = supplierRepository;
+            _userRepository = userRepository;
+        }
 
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,User")]
         public async Task<ActionResult<IEnumerable<SupplierDto>>> GetSuppliers()
         {
-            var supplierDtos = _suppliers
-                .Where(s => s.IsActive)
-                .Select(MapToDto)
-                .OrderBy(s => s.Name)
-                .ToList();
+            var suppliers = await _supplierRepository.GetActiveSuppliersAsync();
+            var supplierDtos = suppliers.Select(MapToDto).ToList();
 
             return Ok(supplierDtos);
         }
@@ -74,7 +34,7 @@ namespace ProductionManagement.API.Controllers
         [Authorize(Roles = "Admin,Manager,User")]
         public async Task<ActionResult<SupplierDto>> GetSupplier(int id)
         {
-            var supplier = _suppliers.FirstOrDefault(s => s.Id == id && s.IsActive);
+            var supplier = await _supplierRepository.GetByIdWithDetailsAsync(id);
             if (supplier == null)
             {
                 return NotFound(new { message = "Supplier not found" });
@@ -93,21 +53,21 @@ namespace ProductionManagement.API.Controllers
                 return Unauthorized();
             }
 
-            var user = UserController.GetUserById(userId);
+            var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
                 return Unauthorized();
             }
 
             // Check if supplier with same name already exists
-            if (_suppliers.Any(s => s.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase)))
+            var existingSupplier = await _supplierRepository.FirstOrDefaultAsync(s => s.Name.ToLower() == request.Name.ToLower());
+            if (existingSupplier != null)
             {
                 return BadRequest(new { message = "Supplier with this name already exists" });
             }
 
             var supplier = new Supplier
             {
-                Id = _nextSupplierId++,
                 Name = request.Name,
                 Description = request.Description,
                 ContactPerson = request.ContactPerson,
@@ -126,23 +86,24 @@ namespace ProductionManagement.API.Controllers
                 CreatedByUserName = user.FirstName + " " + user.LastName
             };
 
-            _suppliers.Add(supplier);
+            var createdSupplier = await _supplierRepository.AddAsync(supplier);
 
-            return CreatedAtAction(nameof(GetSupplier), new { id = supplier.Id }, MapToDto(supplier));
+            return CreatedAtAction(nameof(GetSupplier), new { id = createdSupplier.Id }, MapToDto(createdSupplier));
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<SupplierDto>> UpdateSupplier(int id, [FromBody] UpdateSupplierRequest request)
         {
-            var supplier = _suppliers.FirstOrDefault(s => s.Id == id && s.IsActive);
-            if (supplier == null)
+            var supplier = await _supplierRepository.GetByIdAsync(id);
+            if (supplier == null || !supplier.IsActive)
             {
                 return NotFound(new { message = "Supplier not found" });
             }
 
             // Check if supplier with same name already exists (excluding current supplier)
-            if (_suppliers.Any(s => s.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase) && s.Id != id))
+            var nameExists = await _supplierRepository.FirstOrDefaultAsync(s => s.Name.ToLower() == request.Name.ToLower() && s.Id != id);
+            if (nameExists != null)
             {
                 return BadRequest(new { message = "Supplier with this name already exists" });
             }
@@ -163,6 +124,8 @@ namespace ProductionManagement.API.Controllers
             supplier.IsActive = request.IsActive;
             supplier.UpdatedAt = DateTime.UtcNow;
 
+            await _supplierRepository.UpdateAsync(supplier);
+
             return Ok(MapToDto(supplier));
         }
 
@@ -170,20 +133,19 @@ namespace ProductionManagement.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteSupplier(int id)
         {
-            var supplier = _suppliers.FirstOrDefault(s => s.Id == id);
+            var supplier = await _supplierRepository.GetByIdWithDetailsAsync(id);
             if (supplier == null)
             {
                 return NotFound(new { message = "Supplier not found" });
             }
 
             // Check if supplier has any acquisitions
-            var hasAcquisitions = _suppliers.Any(s => s.Id == id && s.Acquisitions.Any());
-            if (hasAcquisitions)
+            if (supplier.Acquisitions.Any())
             {
                 return BadRequest(new { message = "Cannot delete supplier with existing acquisitions" });
             }
 
-            _suppliers.Remove(supplier);
+            await _supplierRepository.DeleteAsync(supplier);
             return Ok(new { message = "Supplier deleted successfully" });
         }
 
@@ -191,13 +153,14 @@ namespace ProductionManagement.API.Controllers
         [Authorize(Roles = "Admin,Manager,User")]
         public async Task<ActionResult<SupplierStatistics>> GetStatistics()
         {
-            var activeSuppliers = _suppliers.Where(s => s.IsActive).ToList();
+            var allSuppliers = await _supplierRepository.GetAllAsync();
+            var activeSuppliers = allSuppliers.Where(s => s.IsActive).ToList();
             
             var statistics = new SupplierStatistics
             {
-                TotalSuppliers = _suppliers.Count,
+                TotalSuppliers = allSuppliers.Count(),
                 ActiveSuppliers = activeSuppliers.Count,
-                InactiveSuppliers = _suppliers.Count - activeSuppliers.Count,
+                InactiveSuppliers = allSuppliers.Count() - activeSuppliers.Count,
                 TotalAcquisitionValue = activeSuppliers.Sum(s => s.TotalAcquisitionValue),
                 TotalAcquisitions = activeSuppliers.Sum(s => s.TotalAcquisitions),
                 TopSupplierByValue = activeSuppliers.OrderByDescending(s => s.TotalAcquisitionValue).FirstOrDefault(),
@@ -207,7 +170,7 @@ namespace ProductionManagement.API.Controllers
             return Ok(statistics);
         }
 
-        private static SupplierDto MapToDto(Supplier supplier)
+        private SupplierDto MapToDto(Supplier supplier)
         {
             return new SupplierDto
             {
@@ -234,9 +197,6 @@ namespace ProductionManagement.API.Controllers
             };
         }
 
-        public static Supplier? GetSupplierById(int id)
-        {
-            return _suppliers.FirstOrDefault(s => s.Id == id && s.IsActive);
-        }
+        // Static method removed - use ISupplierRepository.GetByIdAsync instead
     }
 }

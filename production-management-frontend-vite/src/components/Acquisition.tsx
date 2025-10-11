@@ -92,15 +92,57 @@ const Acquisition: React.FC = () => {
     return typeLabels[type];
   };
 
-  const filteredAcquisitions = acquisitions.filter(acquisition => {
-    const matchesSearch = acquisition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         acquisition.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         acquisition.supplierName?.toLowerCase().includes(searchTerm.toLowerCase());
+  // Function to determine due date status
+  const getDueDateStatus = (acquisition: Acquisition): 'green' | 'yellow' | 'red' | 'completed' => {
+    // If acquisition is completed/received, show green
+    if (acquisition.status === AcquisitionStatus.Received) {
+      return 'completed';
+    }
     
-    const matchesStatus = statusFilter === 'all' || acquisition.status === statusFilter;
+    // If no due date, show green (no urgency)
+    if (!acquisition.dueDate) {
+      return 'green';
+    }
     
-    return matchesSearch && matchesStatus;
-  });
+    const dueDate = new Date(acquisition.dueDate);
+    const today = new Date();
+    const timeDiff = dueDate.getTime() - today.getTime();
+    const daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+    
+    // If due date has passed, show red
+    if (daysDiff < 0) {
+      return 'red';
+    }
+    
+    // If due date is less than 5 days, show yellow
+    if (daysDiff <= 5) {
+      return 'yellow';
+    }
+    
+    // If due date is more than 5 days, show green
+    return 'green';
+  };
+
+  const filteredAcquisitions = acquisitions
+    .filter(acquisition => {
+      const matchesSearch = acquisition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           acquisition.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           acquisition.supplierName?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      const matchesStatus = statusFilter === 'all' || acquisition.status === statusFilter;
+      
+      return matchesSearch && matchesStatus;
+    })
+    .sort((a, b) => {
+      // Sort by due date ascending (null dates at the end)
+      if (!a.dueDate && !b.dueDate) return 0;
+      if (!a.dueDate) return 1;
+      if (!b.dueDate) return -1;
+      
+      const dateA = new Date(a.dueDate);
+      const dateB = new Date(b.dueDate);
+      return dateA.getTime() - dateB.getTime();
+    });
 
   if (isLoading) {
     return (
@@ -158,15 +200,6 @@ const Acquisition: React.FC = () => {
               <div className="stat-label">Received</div>
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Package size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">${statistics.totalEstimatedCost.toFixed(2)}</div>
-              <div className="stat-label">Total Estimated Cost</div>
-            </div>
-          </div>
         </div>
       )}
 
@@ -212,13 +245,13 @@ const Acquisition: React.FC = () => {
         <table className="acquisitions-table">
           <thead>
             <tr>
+              <th className="status-bar-column"></th>
               <th>Title</th>
               <th>Type</th>
               <th>Status</th>
               <th>Supplier</th>
               <th>Items</th>
               <th>Due Date</th>
-              <th>Estimated Cost</th>
               <th>Created</th>
               <th>Actions</th>
             </tr>
@@ -244,6 +277,9 @@ const Acquisition: React.FC = () => {
             ) : (
               filteredAcquisitions.map((acquisition) => (
                 <tr key={acquisition.id}>
+                  <td className="status-bar-cell">
+                    <div className={`status-bar status-${getDueDateStatus(acquisition)}`}></div>
+                  </td>
                   <td>
                     <div className="acquisition-title">
                       <div className="title">{acquisition.title}</div>
@@ -280,14 +316,6 @@ const Acquisition: React.FC = () => {
                         </div>
                       ) : (
                         <div className="no-due-date">-</div>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="cost-info">
-                      <div className="estimated-cost">${acquisition.totalEstimatedCost.toFixed(2)}</div>
-                      {acquisition.totalActualCost > 0 && (
-                        <div className="actual-cost">Actual: ${acquisition.totalActualCost.toFixed(2)}</div>
                       )}
                     </div>
                   </td>

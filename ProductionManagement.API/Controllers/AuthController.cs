@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using ProductionManagement.API.Models;
+using ProductionManagement.API.Repositories;
 using ProductionManagement.API.Services;
 using System.Security.Claims;
 using System.Security.Cryptography;
@@ -13,47 +14,19 @@ namespace ProductionManagement.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IJwtService _jwtService;
-        private static readonly List<User> _users = new List<User>
-        {
-            new User
-            {
-                Id = 1,
-                Username = "admin",
-                Email = "admin@example.com",
-                PasswordHash = HashPassword("admin123"),
-                FirstName = "Admin",
-                LastName = "User",
-                Role = "Admin",
-                CreatedAt = DateTime.Now.AddDays(-30),
-                LastLoginAt = DateTime.Now.AddDays(-1),
-                IsActive = true
-            },
-            new User
-            {
-                Id = 2,
-                Username = "user",
-                Email = "user@example.com",
-                PasswordHash = HashPassword("user123"),
-                FirstName = "Regular",
-                LastName = "User",
-                Role = "User",
-                CreatedAt = DateTime.Now.AddDays(-15),
-                LastLoginAt = DateTime.Now.AddDays(-2),
-                IsActive = true
-            }
-        };
-
+        private readonly IUserRepository _userRepository;
         private static readonly Dictionary<string, string> _refreshTokens = new Dictionary<string, string>();
 
-        public AuthController(IJwtService jwtService)
+        public AuthController(IJwtService jwtService, IUserRepository userRepository)
         {
             _jwtService = jwtService;
+            _userRepository = userRepository;
         }
 
         [HttpPost("login")]
-        public ActionResult<LoginResponse> Login(LoginRequest request)
+        public async Task<ActionResult<LoginResponse>> Login(LoginRequest request)
         {
-            var user = _users.FirstOrDefault(u => u.Username == request.Username && u.IsActive);
+            var user = await _userRepository.GetByUsernameAsync(request.Username);
             
             if (user == null || !VerifyPassword(request.Password, user.PasswordHash))
             {
@@ -61,6 +34,7 @@ namespace ProductionManagement.API.Controllers
             }
 
             user.LastLoginAt = DateTime.UtcNow;
+            await _userRepository.UpdateAsync(user);
 
             var token = _jwtService.GenerateToken(user);
             var refreshToken = _jwtService.GenerateRefreshToken();
@@ -89,14 +63,14 @@ namespace ProductionManagement.API.Controllers
 
 
         [HttpPost("refresh")]
-        public ActionResult<LoginResponse> RefreshToken([FromBody] string refreshToken)
+        public async Task<ActionResult<LoginResponse>> RefreshToken([FromBody] string refreshToken)
         {
             if (!_refreshTokens.TryGetValue(refreshToken, out var username))
             {
                 return Unauthorized(new { message = "Invalid refresh token" });
             }
 
-            var user = _users.FirstOrDefault(u => u.Username == username && u.IsActive);
+            var user = await _userRepository.GetByUsernameAsync(username);
             if (user == null)
             {
                 return Unauthorized(new { message = "User not found" });
@@ -156,21 +130,20 @@ namespace ProductionManagement.API.Controllers
 
         [HttpPost("admin/register")]
         [Authorize(Roles = "Admin")]
-        public ActionResult<UserInfo> AdminRegister(AdminRegisterRequest request)
+        public async Task<ActionResult<UserInfo>> AdminRegister(AdminRegisterRequest request)
         {
-            if (_users.Any(u => u.Username == request.Username))
+            if (await _userRepository.UsernameExistsAsync(request.Username))
             {
                 return BadRequest(new { message = "Username already exists" });
             }
 
-            if (_users.Any(u => u.Email == request.Email))
+            if (await _userRepository.EmailExistsAsync(request.Email))
             {
                 return BadRequest(new { message = "Email already exists" });
             }
 
             var user = new User
             {
-                Id = _users.Count > 0 ? _users.Max(u => u.Id) + 1 : 1,
                 Username = request.Username,
                 Email = request.Email,
                 PasswordHash = HashPassword(request.Password),
@@ -182,17 +155,17 @@ namespace ProductionManagement.API.Controllers
                 IsActive = true
             };
 
-            _users.Add(user);
+            var createdUser = await _userRepository.AddAsync(user);
 
             var userInfo = new UserInfo
             {
-                Id = user.Id,
-                Username = user.Username,
-                Email = user.Email,
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                Role = user.Role,
-                LastLoginAt = user.LastLoginAt
+                Id = createdUser.Id,
+                Username = createdUser.Username,
+                Email = createdUser.Email,
+                FirstName = createdUser.FirstName,
+                LastName = createdUser.LastName,
+                Role = createdUser.Role,
+                LastLoginAt = createdUser.LastLoginAt
             };
 
             return Ok(userInfo);

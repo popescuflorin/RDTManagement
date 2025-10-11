@@ -607,3 +607,45 @@
   font-style: italic;
   font-size: var(--text-sm);
 }
+
+/* Status bar styles */
+.status-bar-column {
+  width: 8px;
+  padding: 0 !important;
+  border-right: none !important;
+}
+
+.status-bar-cell {
+  width: 8px;
+  padding: 0 !important;
+  border-right: none !important;
+}
+
+.status-bar {
+  width: 8px;
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  transition: all 0.2s ease;
+}
+
+.status-bar.status-green {
+  background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.status-bar.status-yellow {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.status-bar.status-red {
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+}
+
+.status-bar.status-completed {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+}
+
+/* Hover effect for status bars */
+.acquisitions-table tbody tr:hover .status-bar {
+  transform: scaleX(1.2);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
+}

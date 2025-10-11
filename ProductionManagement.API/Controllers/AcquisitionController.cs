@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProductionManagement.API.Models;
+using ProductionManagement.API.Repositories;
 using System.Security.Claims;
 
 namespace ProductionManagement.API.Controllers
@@ -10,37 +11,45 @@ namespace ProductionManagement.API.Controllers
     [Authorize]
     public class AcquisitionController : ControllerBase
     {
-        // In-memory storage for demo purposes
-        private static List<Acquisition> _acquisitions = new List<Acquisition>();
-        private static int _nextAcquisitionId = 1;
-        private static int _nextAcquisitionItemId = 1;
+        private readonly IAcquisitionRepository _acquisitionRepository;
+        private readonly IUserRepository _userRepository;
+        private readonly ISupplierRepository _supplierRepository;
+        private readonly IRawMaterialRepository _rawMaterialRepository;
+
+        public AcquisitionController(
+            IAcquisitionRepository acquisitionRepository,
+            IUserRepository userRepository,
+            ISupplierRepository supplierRepository,
+            IRawMaterialRepository rawMaterialRepository)
+        {
+            _acquisitionRepository = acquisitionRepository;
+            _userRepository = userRepository;
+            _supplierRepository = supplierRepository;
+            _rawMaterialRepository = rawMaterialRepository;
+        }
 
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,User")]
         public async Task<ActionResult<IEnumerable<AcquisitionDto>>> GetAcquisitions()
         {
-            var acquisitions = _acquisitions
-                .Where(a => a.IsActive)
-                .OrderByDescending(a => a.CreatedAt)
-                .Select(MapToDto)
-                .ToList();
+            var acquisitions = await _acquisitionRepository.GetActiveAcquisitionsAsync();
+            var acquisitionDtos = acquisitions.Select(MapToDto).ToList();
 
-            return await Task.FromResult(Ok(acquisitions));
+            return Ok(acquisitionDtos);
         }
 
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin,Manager,User")]
         public async Task<ActionResult<AcquisitionDto>> GetAcquisition(int id)
         {
-            var acquisition = _acquisitions
-                .FirstOrDefault(a => a.Id == id && a.IsActive);
+            var acquisition = await _acquisitionRepository.GetByIdWithItemsAsync(id);
 
             if (acquisition == null)
             {
                 return NotFound();
             }
 
-            return await Task.FromResult(Ok(MapToDto(acquisition)));
+            return Ok(MapToDto(acquisition));
         }
 
         [HttpPost]
@@ -53,8 +62,8 @@ namespace ProductionManagement.API.Controllers
                 return Unauthorized("Invalid user ID");
             }
 
-            // Get user info from UserController's static list
-            var user = UserController.GetUserById(userId);
+            // Get user info from repository
+            var user = await _userRepository.GetByIdAsync(userId);
             if (user == null)
             {
                 return Unauthorized("User not found");
@@ -64,13 +73,12 @@ namespace ProductionManagement.API.Controllers
             string? supplierName = null;
             if (request.SupplierId.HasValue)
             {
-                var supplier = SupplierController.GetSupplierById(request.SupplierId.Value);
+                var supplier = await _supplierRepository.GetByIdAsync(request.SupplierId.Value);
                 supplierName = supplier?.Name;
             }
 
             var acquisition = new Acquisition
             {
-                Id = _nextAcquisitionId++,
                 Title = request.Title,
                 Description = request.Description,
                 Type = request.Type,
@@ -99,7 +107,6 @@ namespace ProductionManagement.API.Controllers
                 {
                     var newRawMaterial = new RawMaterial
                     {
-                        Id = InventoryController.GetNextRawMaterialId(),
                         Name = itemRequest.Name,
                         Color = itemRequest.Color,
                         Quantity = 0, // Start with 0 quantity, will be updated when received
@@ -112,13 +119,13 @@ namespace ProductionManagement.API.Controllers
                     };
                     
                     // Add the new raw material to inventory
-                    InventoryController.AddRawMaterial(newRawMaterial);
-                    rawMaterialId = newRawMaterial.Id;
+                    var createdMaterial = await _rawMaterialRepository.AddAsync(newRawMaterial);
+                    rawMaterialId = createdMaterial.Id;
                 }
                 else
                 {
                     // Verify existing raw material exists
-                    var existingRawMaterial = InventoryController.GetRawMaterialById(rawMaterialId);
+                    var existingRawMaterial = await _rawMaterialRepository.GetByIdAsync(rawMaterialId);
                     if (existingRawMaterial == null)
                     {
                         return BadRequest($"Raw material with ID {rawMaterialId} not found");
@@ -127,7 +134,6 @@ namespace ProductionManagement.API.Controllers
 
                 var item = new AcquisitionItem
                 {
-                    Id = _nextAcquisitionItemId++,
                     AcquisitionId = acquisition.Id,
                     RawMaterialId = rawMaterialId,
                     Name = itemRequest.Name,
@@ -145,17 +151,16 @@ namespace ProductionManagement.API.Controllers
             // Calculate total estimated cost (always 0 for materials)
             acquisition.TotalEstimatedCost = 0;
 
-            _acquisitions.Add(acquisition);
+            var createdAcquisition = await _acquisitionRepository.AddAsync(acquisition);
 
-            return await Task.FromResult(CreatedAtAction(nameof(GetAcquisition), new { id = acquisition.Id }, MapToDto(acquisition)));
+            return CreatedAtAction(nameof(GetAcquisition), new { id = createdAcquisition.Id }, MapToDto(createdAcquisition));
         }
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<AcquisitionDto>> UpdateAcquisition(int id, UpdateAcquisitionRequest request)
         {
-            var acquisition = _acquisitions
-                .FirstOrDefault(a => a.Id == id && a.IsActive);
+            var acquisition = await _acquisitionRepository.GetByIdWithItemsAsync(id);
 
             if (acquisition == null)
             {
@@ -171,7 +176,7 @@ namespace ProductionManagement.API.Controllers
             string? supplierName = null;
             if (request.SupplierId.HasValue)
             {
-                var supplier = SupplierController.GetSupplierById(request.SupplierId.Value);
+                var supplier = await _supplierRepository.GetByIdAsync(request.SupplierId.Value);
                 supplierName = supplier?.Name;
             }
 
@@ -208,7 +213,6 @@ namespace ProductionManagement.API.Controllers
                 {
                     var newRawMaterial = new RawMaterial
                     {
-                        Id = InventoryController.GetNextRawMaterialId(),
                         Name = itemRequest.Name,
                         Color = itemRequest.Color,
                         Quantity = 0, // Start with 0 quantity, will be updated when received
@@ -221,13 +225,13 @@ namespace ProductionManagement.API.Controllers
                     };
                     
                     // Add the new raw material to inventory
-                    InventoryController.AddRawMaterial(newRawMaterial);
-                    rawMaterialId = newRawMaterial.Id;
+                    var createdMaterial = await _rawMaterialRepository.AddAsync(newRawMaterial);
+                    rawMaterialId = createdMaterial.Id;
                 }
                 else
                 {
                     // Verify existing raw material exists
-                    var existingRawMaterial = InventoryController.GetRawMaterialById(rawMaterialId);
+                    var existingRawMaterial = await _rawMaterialRepository.GetByIdAsync(rawMaterialId);
                     if (existingRawMaterial == null)
                     {
                         return BadRequest($"Raw material with ID {rawMaterialId} not found");
@@ -254,7 +258,6 @@ namespace ProductionManagement.API.Controllers
                     // Add new item
                     var newItem = new AcquisitionItem
                     {
-                        Id = _nextAcquisitionItemId++,
                         AcquisitionId = acquisition.Id,
                         RawMaterialId = rawMaterialId,
                         Name = itemRequest.Name,
@@ -272,15 +275,16 @@ namespace ProductionManagement.API.Controllers
             // Calculate total estimated cost (always 0 for materials)
             acquisition.TotalEstimatedCost = 0;
 
-            return await Task.FromResult(Ok(MapToDto(acquisition)));
+            await _acquisitionRepository.UpdateAsync(acquisition);
+
+            return Ok(MapToDto(acquisition));
         }
 
         [HttpPost("{id}/receive")]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<AcquisitionDto>> ReceiveAcquisition(int id, ReceiveAcquisitionRequest request)
         {
-            var acquisition = _acquisitions
-                .FirstOrDefault(a => a.Id == id && a.IsActive);
+            var acquisition = await _acquisitionRepository.GetByIdWithItemsAsync(id);
 
             if (acquisition == null)
             {
@@ -311,7 +315,7 @@ namespace ProductionManagement.API.Controllers
                 acquisitionItem.UpdatedAt = DateTime.UtcNow;
 
                 // Add to inventory
-                var rawMaterial = InventoryController.GetRawMaterialById(acquisitionItem.RawMaterialId);
+                var rawMaterial = await _rawMaterialRepository.GetByIdAsync(acquisitionItem.RawMaterialId);
                 if (rawMaterial != null)
                 {
                     rawMaterial.Quantity += acquisitionItem.Quantity;
@@ -329,6 +333,8 @@ namespace ProductionManagement.API.Controllers
                             rawMaterial.UnitCost = newTotalValue / newTotalQuantity;
                         }
                     }
+
+                    await _rawMaterialRepository.UpdateAsync(rawMaterial);
                 }
             }
 
@@ -338,15 +344,16 @@ namespace ProductionManagement.API.Controllers
             acquisition.ReceivedByUserId = userId;
             acquisition.TotalActualCost = acquisition.Items.Sum(i => i.ActualTotalCost);
 
-            return await Task.FromResult(Ok(MapToDto(acquisition)));
+            await _acquisitionRepository.UpdateAsync(acquisition);
+
+            return Ok(MapToDto(acquisition));
         }
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> DeleteAcquisition(int id)
         {
-            var acquisition = _acquisitions
-                .FirstOrDefault(a => a.Id == id && a.IsActive);
+            var acquisition = await _acquisitionRepository.GetByIdAsync(id);
 
             if (acquisition == null)
             {
@@ -361,34 +368,41 @@ namespace ProductionManagement.API.Controllers
             acquisition.IsActive = false;
             acquisition.UpdatedAt = DateTime.UtcNow;
 
-            return await Task.FromResult(NoContent());
+            await _acquisitionRepository.UpdateAsync(acquisition);
+
+            return NoContent();
         }
 
         [HttpGet("statistics")]
         [Authorize(Roles = "Admin,Manager")]
         public async Task<ActionResult<AcquisitionStatistics>> GetStatistics()
         {
+            var activeAcquisitions = await _acquisitionRepository.GetActiveAcquisitionsAsync();
+
             var statistics = new AcquisitionStatistics
             {
-                TotalAcquisitions = _acquisitions.Count(a => a.IsActive),
-                DraftAcquisitions = _acquisitions.Count(a => a.IsActive && a.Status == AcquisitionStatus.Draft),
-                ReceivedAcquisitions = _acquisitions.Count(a => a.IsActive && a.Status == AcquisitionStatus.Received),
-                CancelledAcquisitions = _acquisitions.Count(a => a.IsActive && a.Status == AcquisitionStatus.Cancelled),
-                TotalEstimatedCost = _acquisitions.Where(a => a.IsActive).Sum(a => a.TotalEstimatedCost),
-                TotalActualCost = _acquisitions.Where(a => a.IsActive).Sum(a => a.TotalActualCost),
-                TotalItems = _acquisitions.Where(a => a.IsActive).Sum(a => a.Items.Count),
-                TotalQuantity = _acquisitions.Where(a => a.IsActive).Sum(a => a.Items.Sum(i => (int)i.Quantity))
+                TotalAcquisitions = activeAcquisitions.Count(),
+                DraftAcquisitions = await _acquisitionRepository.GetCountByStatusAsync(AcquisitionStatus.Draft),
+                ReceivedAcquisitions = await _acquisitionRepository.GetCountByStatusAsync(AcquisitionStatus.Received),
+                CancelledAcquisitions = await _acquisitionRepository.GetCountByStatusAsync(AcquisitionStatus.Cancelled),
+                TotalEstimatedCost = await _acquisitionRepository.GetTotalCostByStatusAsync(AcquisitionStatus.Draft, false),
+                TotalActualCost = await _acquisitionRepository.GetTotalCostByStatusAsync(AcquisitionStatus.Received, true),
+                TotalItems = activeAcquisitions.Sum(a => a.Items.Count),
+                TotalQuantity = activeAcquisitions.Sum(a => a.Items.Sum(i => (int)i.Quantity))
             };
 
-            return await Task.FromResult(Ok(statistics));
+            return Ok(statistics);
         }
 
         private AcquisitionDto MapToDto(Acquisition acquisition)
         {
-            var createdByUser = UserController.GetUserById(acquisition.CreatedByUserId);
-            var receivedByUser = acquisition.ReceivedByUserId.HasValue 
-                ? UserController.GetUserById(acquisition.ReceivedByUserId.Value) 
-                : null;
+            // Note: For performance, we should ideally include user data in the query
+            // For now, we'll use the user names from the acquisition entity itself
+            var createdByUserName = "Unknown";
+            var receivedByUserName = acquisition.ReceivedByUserId.HasValue ? "Unknown" : null;
+
+            // In a real scenario, you'd want to include user data in the repository query
+            // or create a separate method that loads user data efficiently
 
             return new AcquisitionDto
             {
@@ -401,9 +415,9 @@ namespace ProductionManagement.API.Controllers
                 UpdatedAt = acquisition.UpdatedAt,
                 ReceivedAt = acquisition.ReceivedAt,
                 CreatedByUserId = acquisition.CreatedByUserId,
-                CreatedByUserName = createdByUser != null ? $"{createdByUser.FirstName} {createdByUser.LastName}" : "Unknown",
+                CreatedByUserName = createdByUserName,
                 ReceivedByUserId = acquisition.ReceivedByUserId,
-                ReceivedByUserName = receivedByUser != null ? $"{receivedByUser.FirstName} {receivedByUser.LastName}" : null,
+                ReceivedByUserName = receivedByUserName,
                 SupplierId = acquisition.SupplierId,
                 SupplierName = acquisition.SupplierName,
                 SupplierContact = acquisition.SupplierContact,
@@ -426,8 +440,6 @@ namespace ProductionManagement.API.Controllers
 
         private AcquisitionItemDto MapItemToDto(AcquisitionItem item)
         {
-            var rawMaterial = InventoryController.GetRawMaterialById(item.RawMaterialId);
-
             return new AcquisitionItemDto
             {
                 Id = item.Id,

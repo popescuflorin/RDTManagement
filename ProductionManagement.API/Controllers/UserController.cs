@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using ProductionManagement.API.Models;
+using ProductionManagement.API.Repositories;
 using System.Security.Claims;
 
 namespace ProductionManagement.API.Controllers
@@ -10,38 +11,15 @@ namespace ProductionManagement.API.Controllers
     [Authorize]
     public class UserController : ControllerBase
     {
-        private static readonly List<User> _users = new List<User>
+        private readonly IUserRepository _userRepository;
+
+        public UserController(IUserRepository userRepository)
         {
-            new User
-            {
-                Id = 1,
-                Username = "admin",
-                Email = "admin@example.com",
-                PasswordHash = "hashedpassword",
-                FirstName = "Admin",
-                LastName = "User",
-                Role = "Admin",
-                CreatedAt = DateTime.Now.AddDays(-30),
-                LastLoginAt = DateTime.Now.AddDays(-1),
-                IsActive = true
-            },
-            new User
-            {
-                Id = 2,
-                Username = "user",
-                Email = "user@example.com",
-                PasswordHash = "hashedpassword",
-                FirstName = "Regular",
-                LastName = "User",
-                Role = "User",
-                CreatedAt = DateTime.Now.AddDays(-15),
-                LastLoginAt = DateTime.Now.AddDays(-2),
-                IsActive = true
-            }
-        };
+            _userRepository = userRepository;
+        }
 
         [HttpGet("profile")]
-        public ActionResult<UserInfo> GetProfile()
+        public async Task<ActionResult<UserInfo>> GetProfile()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
@@ -49,8 +27,8 @@ namespace ProductionManagement.API.Controllers
                 return Unauthorized();
             }
 
-            var user = _users.FirstOrDefault(u => u.Id == userId && u.IsActive);
-            if (user == null)
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null || !user.IsActive)
             {
                 return NotFound();
             }
@@ -70,7 +48,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("profile")]
-        public ActionResult<UserInfo> UpdateProfile([FromBody] UpdateProfileRequest request)
+        public async Task<ActionResult<UserInfo>> UpdateProfile([FromBody] UpdateProfileRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
@@ -78,8 +56,8 @@ namespace ProductionManagement.API.Controllers
                 return Unauthorized();
             }
 
-            var user = _users.FirstOrDefault(u => u.Id == userId && u.IsActive);
-            if (user == null)
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null || !user.IsActive)
             {
                 return NotFound();
             }
@@ -88,6 +66,8 @@ namespace ProductionManagement.API.Controllers
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.Email = request.Email;
+
+            await _userRepository.UpdateAsync(user);
 
             var userInfo = new UserInfo
             {
@@ -104,7 +84,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("dashboard")]
-        public ActionResult<DashboardData> GetDashboardData()
+        public async Task<ActionResult<DashboardData>> GetDashboardData()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (userIdClaim == null || !int.TryParse(userIdClaim, out var userId))
@@ -112,17 +92,19 @@ namespace ProductionManagement.API.Controllers
                 return Unauthorized();
             }
 
-            var user = _users.FirstOrDefault(u => u.Id == userId && u.IsActive);
-            if (user == null)
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null || !user.IsActive)
             {
                 return NotFound();
             }
 
+            var allUsers = await _userRepository.GetAllAsync();
+
             var dashboardData = new DashboardData
             {
                 WelcomeMessage = $"Welcome back, {user.FirstName}!",
-                TotalUsers = _users.Count,
-                ActiveUsers = _users.Count(u => u.IsActive),
+                TotalUsers = allUsers.Count(),
+                ActiveUsers = allUsers.Count(u => u.IsActive),
                 LastLogin = user.LastLoginAt,
                 SystemStatus = "All systems operational",
                 RecentActivity = new List<string>
@@ -138,9 +120,10 @@ namespace ProductionManagement.API.Controllers
 
         [HttpGet("all")]
         [Authorize(Roles = "Admin")]
-        public ActionResult<List<UserInfo>> GetAllUsers()
+        public async Task<ActionResult<List<UserInfo>>> GetAllUsers()
         {
-            var userInfos = _users.Select(u => new UserInfo
+            var users = await _userRepository.GetActiveUsersAsync();
+            var userInfos = users.Select(u => new UserInfo
             {
                 Id = u.Id,
                 Username = u.Username,
@@ -156,22 +139,24 @@ namespace ProductionManagement.API.Controllers
 
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
-        public ActionResult<UserInfo> UpdateUser(int id, [FromBody] AdminUpdateUserRequest request)
+        public async Task<ActionResult<UserInfo>> UpdateUser(int id, [FromBody] AdminUpdateUserRequest request)
         {
-            var user = _users.FirstOrDefault(u => u.Id == id);
+            var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
             {
                 return NotFound(new { message = "User not found" });
             }
 
             // Check if username already exists for another user
-            if (_users.Any(u => u.Username == request.Username && u.Id != id))
+            var usernameExists = await _userRepository.FirstOrDefaultAsync(u => u.Username == request.Username && u.Id != id);
+            if (usernameExists != null)
             {
                 return BadRequest(new { message = "Username already exists" });
             }
 
             // Check if email already exists for another user
-            if (_users.Any(u => u.Email == request.Email && u.Id != id))
+            var emailExists = await _userRepository.FirstOrDefaultAsync(u => u.Email == request.Email && u.Id != id);
+            if (emailExists != null)
             {
                 return BadRequest(new { message = "Email already exists" });
             }
@@ -183,6 +168,8 @@ namespace ProductionManagement.API.Controllers
             user.LastName = request.LastName;
             user.Role = request.Role;
             user.IsActive = request.IsActive;
+
+            await _userRepository.UpdateAsync(user);
 
             var userInfo = new UserInfo
             {
@@ -200,7 +187,7 @@ namespace ProductionManagement.API.Controllers
 
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
-        public IActionResult DeleteUser(int id)
+        public async Task<IActionResult> DeleteUser(int id)
         {
             var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (currentUserIdClaim != null && int.TryParse(currentUserIdClaim, out var currentUserId))
@@ -211,20 +198,17 @@ namespace ProductionManagement.API.Controllers
                 }
             }
 
-            var user = _users.FirstOrDefault(u => u.Id == id);
+            var user = await _userRepository.GetByIdAsync(id);
             if (user == null)
             {
                 return NotFound(new { message = "User not found" });
             }
 
-            _users.Remove(user);
+            await _userRepository.DeleteAsync(user);
             return Ok(new { message = "User deleted successfully" });
         }
 
-        public static User? GetUserById(int id)
-        {
-            return _users.FirstOrDefault(u => u.Id == id && u.IsActive);
-        }
+        // Static method removed - use IUserRepository.GetByIdAsync instead
     }
 
     public class UpdateProfileRequest
