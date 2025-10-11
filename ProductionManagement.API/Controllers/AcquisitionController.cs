@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProductionManagement.API.Data;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
 using System.Security.Claims;
@@ -16,19 +17,22 @@ namespace ProductionManagement.API.Controllers
         private readonly ISupplierRepository _supplierRepository;
         private readonly IRawMaterialRepository _rawMaterialRepository;
         private readonly ITransportRepository _transportRepository;
+        private readonly ApplicationDbContext _context;
 
         public AcquisitionController(
             IAcquisitionRepository acquisitionRepository,
             IUserRepository userRepository,
             ISupplierRepository supplierRepository,
             IRawMaterialRepository rawMaterialRepository,
-            ITransportRepository transportRepository)
+            ITransportRepository transportRepository,
+            ApplicationDbContext context)
         {
             _acquisitionRepository = acquisitionRepository;
             _userRepository = userRepository;
             _supplierRepository = supplierRepository;
             _rawMaterialRepository = rawMaterialRepository;
             _transportRepository = transportRepository;
+            _context = context;
         }
 
         [HttpGet]
@@ -157,6 +161,9 @@ namespace ProductionManagement.API.Controllers
 
             var createdAcquisition = await _acquisitionRepository.AddAsync(acquisition);
 
+            // Log creation history
+            await LogHistoryAsync(createdAcquisition.Id, userId, "Created", $"Acquisition created with {acquisition.Items.Count} items");
+
             return CreatedAtAction(nameof(GetAcquisition), new { id = createdAcquisition.Id }, MapToDto(createdAcquisition));
         }
 
@@ -282,6 +289,14 @@ namespace ProductionManagement.API.Controllers
 
             await _acquisitionRepository.UpdateAsync(acquisition);
 
+            // Get user ID for history
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdClaim, out int userId))
+            {
+                // Log update history
+                await LogHistoryAsync(acquisition.Id, userId, "Updated", $"Acquisition details updated. Items: {acquisition.Items.Count(i => i.IsActive)}");
+            }
+
             return Ok(MapToDto(acquisition));
         }
 
@@ -353,10 +368,14 @@ namespace ProductionManagement.API.Controllers
             if (acquisition.Type == AcquisitionType.RawMaterials)
             {
                 acquisition.Status = AcquisitionStatus.Received;
+                // Log history for raw materials receipt
+                await LogHistoryAsync(acquisition.Id, userId, "Received", $"Raw materials received and added to inventory. Total: {acquisition.TotalQuantity} units");
             }
             else if (acquisition.Type == AcquisitionType.RecyclableMaterials)
             {
                 acquisition.Status = AcquisitionStatus.ReadyForProcessing;
+                // Log history for recyclables receipt
+                await LogHistoryAsync(acquisition.Id, userId, "Ready for Processing", $"Recyclable materials received and ready for processing. Total: {acquisition.TotalQuantity} units");
             }
             
             acquisition.ReceivedAt = DateTime.UtcNow;
@@ -482,6 +501,10 @@ namespace ProductionManagement.API.Controllers
 
             await _acquisitionRepository.UpdateAsync(acquisition);
 
+            // Log processing history
+            var totalProcessed = request.Materials.Sum(m => m.Quantity);
+            await LogHistoryAsync(acquisition.Id, userId, "Processed", $"Recyclable materials processed into {request.Materials.Count} raw material types. Total output: {totalProcessed} units");
+
             return Ok(MapToDto(acquisition));
         }
 
@@ -529,6 +552,13 @@ namespace ProductionManagement.API.Controllers
             acquisition.UpdatedAt = DateTime.UtcNow;
 
             await _acquisitionRepository.UpdateAsync(acquisition);
+
+            // Get user ID and log cancellation
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (int.TryParse(userIdClaim, out int userId))
+            {
+                await LogHistoryAsync(acquisition.Id, userId, "Cancelled", "Acquisition cancelled");
+            }
 
             return Ok(MapToDto(acquisition));
         }
@@ -599,7 +629,23 @@ namespace ProductionManagement.API.Controllers
                 CanDelete = acquisition.Status == AcquisitionStatus.Draft,
                 CanReceive = acquisition.Status == AcquisitionStatus.Draft,
                 Items = acquisition.Items.Select(MapItemToDto).ToList(),
-                ProcessedMaterials = acquisition.ProcessedMaterials.Select(MapProcessedMaterialToDto).ToList()
+                ProcessedMaterials = acquisition.ProcessedMaterials.Select(MapProcessedMaterialToDto).ToList(),
+                History = acquisition.History.OrderByDescending(h => h.Timestamp).Select(MapHistoryToDto).ToList()
+            };
+        }
+
+        private AcquisitionHistoryDto MapHistoryToDto(AcquisitionHistory history)
+        {
+            return new AcquisitionHistoryDto
+            {
+                Id = history.Id,
+                AcquisitionId = history.AcquisitionId,
+                UserId = history.UserId,
+                UserName = history.User?.Username ?? "Unknown",
+                Action = history.Action,
+                Timestamp = history.Timestamp,
+                Changes = history.Changes,
+                Notes = history.Notes
             };
         }
 
@@ -637,6 +683,23 @@ namespace ProductionManagement.API.Controllers
                 EstimatedTotalCost = item.EstimatedTotalCost,
                 ActualTotalCost = item.ActualTotalCost
             };
+        }
+
+        private async Task LogHistoryAsync(int acquisitionId, int userId, string action, string? notes = null, string? changes = null)
+        {
+            var history = new AcquisitionHistory
+            {
+                AcquisitionId = acquisitionId,
+                UserId = userId,
+                Action = action,
+                Timestamp = DateTime.UtcNow,
+                Notes = notes,
+                Changes = changes,
+                IsActive = true
+            };
+
+            await _context.AcquisitionHistories.AddAsync(history);
+            await _context.SaveChangesAsync();
         }
     }
 }

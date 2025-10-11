@@ -211,6 +211,19 @@ namespace ProductionManagement.API.Models
         public bool CanReceive { get; set; }
         public List<AcquisitionItemDto> Items { get; set; } = new();
         public List<ProcessedMaterialDto> ProcessedMaterials { get; set; } = new();
+        public List<AcquisitionHistoryDto> History { get; set; } = new();
+    }
+
+    public class AcquisitionHistoryDto
+    {
+        public int Id { get; set; }
+        public int AcquisitionId { get; set; }
+        public int UserId { get; set; }
+        public string UserName { get; set; } = string.Empty;
+        public string Action { get; set; } = string.Empty;
+        public DateTime Timestamp { get; set; }
+        public string? Changes { get; set; }
+        public string? Notes { get; set; }
     }
 
     public class ProcessedMaterialDto

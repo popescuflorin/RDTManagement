@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Acquisition } from '../types';
 import { AcquisitionType, AcquisitionStatus } from '../types';
-import { X, FileText, Truck, Building2, Package, UserCircle } from 'lucide-react';
+import { X, FileText, Truck, Building2, Package, UserCircle, History, Clock } from 'lucide-react';
 import './CreateAcquisition.css';
 
 interface ViewAcquisitionProps {
@@ -296,6 +296,42 @@ const ViewAcquisition: React.FC<ViewAcquisitionProps> = ({
                 <div className="summary-item">
                   <strong>Total Output Quantity:</strong> {acquisition.processedMaterials.reduce((sum, pm) => sum + pm.quantity, 0).toFixed(2)} units
                 </div>
+              </div>
+            </div>
+          )}
+
+          {/* History Timeline */}
+          {acquisition.history && acquisition.history.length > 0 && (
+            <div className="form-section">
+              <h3><History size={20} /> Change History</h3>
+              <div className="history-timeline">
+                {acquisition.history.map((historyItem) => (
+                  <div key={historyItem.id} className="history-item">
+                    <div className="history-icon">
+                      <Clock size={16} />
+                    </div>
+                    <div className="history-content">
+                      <div className="history-header">
+                        <span className="history-action">{historyItem.action}</span>
+                        <span className="history-timestamp">
+                          {new Date(historyItem.timestamp).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="history-user">
+                        <UserCircle size={14} style={{display: 'inline', marginRight: '4px'}} />
+                        {historyItem.userName}
+                      </div>
+                      {historyItem.notes && (
+                        <div className="history-notes">{historyItem.notes}</div>
+                      )}
+                      {historyItem.changes && (
+                        <div className="history-changes">
+                          <strong>Changes:</strong> {historyItem.changes}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
           )}

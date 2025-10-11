@@ -82,6 +82,7 @@ namespace ProductionManagement.API.Models
         // Navigation properties
         public virtual ICollection<AcquisitionItem> Items { get; set; } = new List<AcquisitionItem>();
         public virtual ICollection<ProcessedMaterial> ProcessedMaterials { get; set; } = new List<ProcessedMaterial>();
+        public virtual ICollection<AcquisitionHistory> History { get; set; } = new List<AcquisitionHistory>();
 
         // Calculated properties
         [NotMapped]

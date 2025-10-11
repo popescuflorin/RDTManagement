@@ -300,6 +300,18 @@ export interface Acquisition {
   canReceive: boolean;
   items: AcquisitionItem[];
   processedMaterials: ProcessedMaterial[];
+  history: AcquisitionHistory[];
+}
+
+export interface AcquisitionHistory {
+  id: number;
+  acquisitionId: number;
+  userId: number;
+  userName: string;
+  action: string;
+  timestamp: string;
+  changes?: string;
+  notes?: string;
 }
 
 export interface ProcessedMaterial {

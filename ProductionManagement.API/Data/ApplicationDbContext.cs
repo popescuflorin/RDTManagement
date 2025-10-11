@@ -18,6 +18,7 @@ namespace ProductionManagement.API.Data
         public DbSet<Acquisition> Acquisitions { get; set; }
         public DbSet<AcquisitionItem> AcquisitionItems { get; set; }
         public DbSet<ProcessedMaterial> ProcessedMaterials { get; set; }
+        public DbSet<AcquisitionHistory> AcquisitionHistories { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Transport> Transports { get; set; }
 
@@ -154,6 +155,24 @@ namespace ProductionManagement.API.Data
                 entity.HasOne(e => e.RawMaterial)
                     .WithMany()
                     .HasForeignKey(e => e.RawMaterialId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // AcquisitionHistory configuration
+            modelBuilder.Entity<AcquisitionHistory>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Action).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Notes).HasMaxLength(500);
+
+                entity.HasOne(e => e.Acquisition)
+                    .WithMany(a => a.History)
+                    .HasForeignKey(e => e.AcquisitionId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.User)
+                    .WithMany()
+                    .HasForeignKey(e => e.UserId)
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
