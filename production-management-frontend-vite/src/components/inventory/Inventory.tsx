@@ -2,15 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { 
   Package, 
   AlertTriangle, 
-  DollarSign, 
   Plus, 
   Search, 
   Edit, 
   Trash2,
   Loader2
 } from 'lucide-react';
-import { inventoryApi } from '../services/api';
-import type { RawMaterial, InventoryStatistics } from '../types';
+import { inventoryApi } from '../../services/api';
+import type { RawMaterial, InventoryStatistics } from '../../types';
 import AddMaterial from './AddMaterial';
 import EditMaterial from './EditMaterial';
 import DeleteMaterialConfirmation from './DeleteMaterialConfirmation';
@@ -27,7 +26,7 @@ const Inventory: React.FC = () => {
   const [selectedMaterial, setSelectedMaterial] = useState<RawMaterial | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterBy, setFilterBy] = useState<'all' | 'low-stock' | 'active'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'quantity' | 'value' | 'updated'>('name');
+  const [sortBy, setSortBy] = useState<'name' | 'quantity' | 'updated'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
@@ -130,9 +129,6 @@ const Inventory: React.FC = () => {
         case 'quantity':
           comparison = a.quantity - b.quantity;
           break;
-        case 'value':
-          comparison = a.totalValue - b.totalValue;
-          break;
         case 'updated':
           comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
           break;
@@ -140,13 +136,6 @@ const Inventory: React.FC = () => {
 
       return sortOrder === 'asc' ? comparison : -comparison;
     });
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(value);
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -202,15 +191,6 @@ const Inventory: React.FC = () => {
               <div className="stat-label">Low Stock</div>
             </div>
           </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <DollarSign size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{formatCurrency(statistics.totalInventoryValue)}</div>
-              <div className="stat-label">Total Value</div>
-            </div>
-          </div>
         </div>
       )}
 
@@ -264,13 +244,6 @@ const Inventory: React.FC = () => {
                 Quantity
               </th>
               <th>Min. Stock</th>
-              <th>Unit Cost</th>
-              <th 
-                className={`sortable ${sortBy === 'value' ? `sorted-${sortOrder}` : ''}`}
-                onClick={() => handleSort('value')}
-              >
-                Total Value
-              </th>
               <th>Status</th>
               <th 
                 className={`sortable ${sortBy === 'updated' ? `sorted-${sortOrder}` : ''}`}
@@ -284,7 +257,7 @@ const Inventory: React.FC = () => {
           <tbody>
             {filteredAndSortedMaterials.length === 0 ? (
               <tr>
-                <td colSpan={9} className="no-materials">
+                <td colSpan={7} className="no-materials">
                   {searchTerm || filterBy !== 'all' 
                     ? 'No materials found matching your criteria.' 
                     : 'No materials in inventory. Add some materials to get started.'}
@@ -317,8 +290,6 @@ const Inventory: React.FC = () => {
                     )}
                   </td>
                   <td>{material.minimumStock.toLocaleString()} {material.quantityType}</td>
-                  <td>{formatCurrency(material.unitCost)}</td>
-                  <td className="value-cell">{formatCurrency(material.totalValue)}</td>
                   <td className="status-cell">
                     <span className={`status-badge ${material.isActive ? 'status-active' : 'status-inactive'}`}>
                       {material.isActive ? 'Active' : 'Inactive'}

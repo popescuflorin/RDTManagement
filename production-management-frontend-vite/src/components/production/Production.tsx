@@ -13,8 +13,8 @@ import {
   Play,
   Loader2
 } from 'lucide-react';
-import { productionApi } from '../services/api';
-import type { Product, ProductionStatistics } from '../types';
+import { productionApi } from '../../services/api';
+import type { Product, ProductionStatistics } from '../../types';
 import AddProduct from './AddProduct';
 import EditProduct from './EditProduct';
 import DeleteProductConfirmation from './DeleteProductConfirmation';

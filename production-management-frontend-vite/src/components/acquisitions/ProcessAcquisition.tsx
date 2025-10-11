@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { acquisitionApi, inventoryApi } from '../services/api';
-import type { Acquisition, RawMaterial } from '../types';
-import { AcquisitionType, MaterialType } from '../types';
+import { acquisitionApi, inventoryApi } from '../../services/api';
+import type { Acquisition, RawMaterial } from '../../types';
+import { AcquisitionType, MaterialType } from '../../types';
 import { X, Package, FileText, Truck, Building2, Plus, Trash2 } from 'lucide-react';
 import './CreateAcquisition.css';
 

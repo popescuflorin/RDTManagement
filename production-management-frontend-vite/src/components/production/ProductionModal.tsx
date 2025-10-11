@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { productionApi } from '../services/api';
-import type { Product, ProduceProductRequest, ProductionResult } from '../types';
+import { productionApi } from '../../services/api';
+import type { Product, ProduceProductRequest, ProductionResult } from '../../types';
 import './ProductionModal.css';
 
 interface ProductionModalProps {

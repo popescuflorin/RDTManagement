@@ -10,8 +10,8 @@ import {
   Loader2,
   RotateCcw
 } from 'lucide-react';
-import { userApi } from '../services/api';
-import type { User } from '../types';
+import { userApi } from '../../services/api';
+import type { User } from '../../types';
 import AdminRegister from './AdminRegister';
 import EditUser from './EditUser';
 import DeleteConfirmation from './DeleteConfirmation';

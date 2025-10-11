@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { userApi } from '../services/api';
-import type { User, AdminUpdateUserRequest } from '../types';
+import { userApi } from '../../services/api';
+import type { User, AdminUpdateUserRequest } from '../../types';
 import './EditUser.css';
 
 interface EditUserProps {

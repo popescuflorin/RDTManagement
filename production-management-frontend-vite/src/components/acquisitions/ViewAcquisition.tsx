@@ -1,6 +1,6 @@
 import React from 'react';
-import type { Acquisition } from '../types';
-import { AcquisitionType, AcquisitionStatus } from '../types';
+import type { Acquisition } from '../../types';
+import { AcquisitionType, AcquisitionStatus } from '../../types';
 import { X, FileText, Truck, Building2, Package, UserCircle, History, Clock } from 'lucide-react';
 import './CreateAcquisition.css';
 

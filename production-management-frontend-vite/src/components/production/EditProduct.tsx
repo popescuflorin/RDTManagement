@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { Product } from '../types';
+import type { Product } from '../../types';
 
 interface EditProductProps {
   product: Product;

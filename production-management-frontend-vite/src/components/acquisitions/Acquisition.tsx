@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { acquisitionApi } from '../services/api';
-import type { Acquisition, AcquisitionStatistics } from '../types';
-import { AcquisitionStatus, AcquisitionType } from '../types';
+import { acquisitionApi } from '../../services/api';
+import type { Acquisition as AcquisitionType, AcquisitionStatistics } from '../../types';
+import { AcquisitionStatus, AcquisitionType as AcqType } from '../../types';
 import { Plus, Edit, Trash2, Package, Search, Filter, Eye, Recycle } from 'lucide-react';
 import CreateAcquisition from './CreateAcquisition';
 import EditAcquisition from './EditAcquisition';
@@ -11,7 +11,7 @@ import ViewAcquisition from './ViewAcquisition';
 import './Acquisition.css';
 
 const Acquisition: React.FC = () => {
-  const [acquisitions, setAcquisitions] = useState<Acquisition[]>([]);
+  const [acquisitions, setAcquisitions] = useState<AcquisitionType[]>([]);
   const [statistics, setStatistics] = useState<AcquisitionStatistics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,7 +23,7 @@ const Acquisition: React.FC = () => {
   const [showReceiveModal, setShowReceiveModal] = useState(false);
   const [showProcessModal, setShowProcessModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [selectedAcquisition, setSelectedAcquisition] = useState<Acquisition | null>(null);
+  const [selectedAcquisition, setSelectedAcquisition] = useState<AcquisitionType | null>(null);
 
   useEffect(() => {
     loadData();
@@ -51,27 +51,27 @@ const Acquisition: React.FC = () => {
     setShowCreateModal(true);
   };
 
-  const handleEditAcquisition = (acquisition: Acquisition) => {
+  const handleEditAcquisition = (acquisition: AcquisitionType) => {
     setSelectedAcquisition(acquisition);
     setShowEditModal(true);
   };
 
-  const handleDeleteAcquisition = (acquisition: Acquisition) => {
+  const handleDeleteAcquisition = (acquisition: AcquisitionType) => {
     setSelectedAcquisition(acquisition);
     setShowDeleteModal(true);
   };
 
-  const handleReceiveAcquisition = (acquisition: Acquisition) => {
+  const handleReceiveAcquisition = (acquisition: AcquisitionType) => {
     setSelectedAcquisition(acquisition);
     setShowReceiveModal(true);
   };
 
-  const handleViewAcquisition = (acquisition: Acquisition) => {
+  const handleViewAcquisition = (acquisition: AcquisitionType) => {
     setSelectedAcquisition(acquisition);
     setShowViewModal(true);
   };
 
-  const handleProcessAcquisition = (acquisition: Acquisition) => {
+  const handleProcessAcquisition = (acquisition: AcquisitionType) => {
     setSelectedAcquisition(acquisition);
     setShowProcessModal(true);
   };
@@ -102,16 +102,16 @@ const Acquisition: React.FC = () => {
     return <span className={`status-badge ${config.className}`}>{config.label}</span>;
   };
 
-  const getTypeLabel = (type: AcquisitionType) => {
+  const getTypeLabel = (type: AcqType) => {
     const typeLabels = {
-      [AcquisitionType.RawMaterials]: 'Raw Materials',
-      [AcquisitionType.RecyclableMaterials]: 'Recyclable Materials'
+      [AcqType.RawMaterials]: 'Raw Materials',
+      [AcqType.RecyclableMaterials]: 'Recyclable Materials'
     };
     return typeLabels[type];
   };
 
   // Function to determine due date status
-  const getDueDateStatus = (acquisition: Acquisition): 'green' | 'yellow' | 'red' | 'completed' => {
+  const getDueDateStatus = (acquisition: AcquisitionType): 'green' | 'yellow' | 'red' | 'completed' => {
     // If acquisition is completed/received or ready for processing, show green
     if (acquisition.status === AcquisitionStatus.Received || acquisition.status === AcquisitionStatus.ReadyForProcessing) {
       return 'completed';

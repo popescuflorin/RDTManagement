@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { inventoryApi } from '../services/api';
-import type { RawMaterial } from '../types';
+import { inventoryApi } from '../../services/api';
+import type { RawMaterial } from '../../types';
 import './DeleteMaterialConfirmation.css';
 
 interface DeleteMaterialConfirmationProps {

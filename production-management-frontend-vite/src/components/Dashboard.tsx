@@ -13,12 +13,12 @@ import {
 } from 'lucide-react';
 import { userApi, authApi } from '../services/api';
 import type { User, DashboardData } from '../types';
-import AdminRegister from './AdminRegister';
+import AdminRegister from './users/AdminRegister';
 import Sidebar from './Sidebar';
-import UserManagement from './UserManagement';
-import Inventory from './Inventory';
-import Production from './Production';
-import Acquisition from './Acquisition';
+import UserManagement from './users/UserManagement';
+import Inventory from './inventory/Inventory';
+import Production from './production/Production';
+import AcquisitionPage from './acquisitions/Acquisition';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -104,7 +104,7 @@ const Dashboard: React.FC = () => {
       case 'inventory':
         return <Inventory />;
       case 'acquisitions':
-        return <Acquisition />;
+        return <AcquisitionPage />;
       case 'orders':
         return <div className="page-content"><h2>Orders</h2><p>Order management functionality will be implemented here.</p></div>;
       case 'reports':

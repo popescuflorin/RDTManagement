@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { acquisitionApi } from '../services/api';
-import type { Acquisition, ReceiveAcquisitionRequest } from '../types';
-import { AcquisitionType } from '../types';
+import { acquisitionApi } from '../../services/api';
+import type { Acquisition, ReceiveAcquisitionRequest } from '../../types';
+import { AcquisitionType } from '../../types';
 import { X, Package, FileText, Truck, Building2, UserCircle } from 'lucide-react';
 import './CreateAcquisition.css';
 

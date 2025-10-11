@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { productionApi, inventoryApi } from '../services/api';
-import type { Product, CreateProductRequest, CreateProductMaterialRequest, RawMaterial } from '../types';
+import { productionApi, inventoryApi } from '../../services/api';
+import type { Product, CreateProductRequest, CreateProductMaterialRequest, RawMaterial } from '../../types';
 import './AddProduct.css';
 
 interface AddProductProps {

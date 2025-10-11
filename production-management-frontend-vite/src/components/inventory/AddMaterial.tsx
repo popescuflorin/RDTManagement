@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { inventoryApi } from '../services/api';
-import type { RawMaterial, CreateRawMaterialRequest, AddToExistingMaterialRequest, MaterialType } from '../types';
+import { inventoryApi } from '../../services/api';
+import type { RawMaterial, CreateRawMaterialRequest, AddToExistingMaterialRequest, MaterialType } from '../../types';
 import './AddMaterial.css';
 
 interface AddMaterialProps {

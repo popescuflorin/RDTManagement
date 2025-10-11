@@ -48,9 +48,9 @@ const Sidebar: React.FC<SidebarProps> = ({
       requiredRole: 'Admin'
     },
     {
-      id: 'production',
-      label: 'Production',
-      icon: Factory
+      id: 'acquisitions',
+      label: 'Acquisitions',
+      icon: ShoppingCart
     },
     {
       id: 'inventory',
@@ -58,9 +58,9 @@ const Sidebar: React.FC<SidebarProps> = ({
       icon: Package
     },
     {
-      id: 'acquisitions',
-      label: 'Acquisitions',
-      icon: ShoppingCart
+      id: 'production',
+      label: 'Production',
+      icon: Factory
     },
     {
       id: 'orders',

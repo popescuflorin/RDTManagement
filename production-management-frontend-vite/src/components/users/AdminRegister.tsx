@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import type { AdminRegisterRequest, User } from '../types';
-import { authApi } from '../services/api';
+import type { AdminRegisterRequest, User } from '../../types';
+import { authApi } from '../../services/api';
 import './AdminRegister.css';
 
 interface AdminRegisterProps {

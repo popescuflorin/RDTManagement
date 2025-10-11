@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { acquisitionApi, inventoryApi, supplierApi, transportApi, userApi } from '../services/api';
-import type { RawMaterial, UpdateAcquisitionRequest, Supplier, CreateSupplierRequest, Transport, CreateTransportRequest, User, Acquisition } from '../types';
-import { AcquisitionType, MaterialType } from '../types';
+import { acquisitionApi, inventoryApi, supplierApi, transportApi, userApi } from '../../services/api';
+import type { RawMaterial, UpdateAcquisitionRequest, Supplier, CreateSupplierRequest, Transport, CreateTransportRequest, User, Acquisition } from '../../types';
+import { AcquisitionType, MaterialType } from '../../types';
 import { X, Plus, Trash2, Building2, FileText, Truck, Package, UserCircle } from 'lucide-react';
 import './CreateAcquisition.css';
 
