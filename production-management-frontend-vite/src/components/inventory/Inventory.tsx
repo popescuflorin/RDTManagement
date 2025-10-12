@@ -6,13 +6,16 @@ import {
   Search, 
   Edit, 
   Trash2,
+  CheckCircle,
   Loader2
 } from 'lucide-react';
 import { inventoryApi } from '../../services/api';
 import type { RawMaterial, InventoryStatistics } from '../../types';
+import { MaterialType } from '../../types';
 import AddMaterial from './AddMaterial';
 import EditMaterial from './EditMaterial';
 import DeleteMaterialConfirmation from './DeleteMaterialConfirmation';
+import ActivateMaterialModal from './ActivateMaterialModal';
 import './Inventory.css';
 
 const Inventory: React.FC = () => {
@@ -23,11 +26,18 @@ const Inventory: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showActivateModal, setShowActivateModal] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<RawMaterial | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterBy, setFilterBy] = useState<'all' | 'low-stock' | 'active'>('all');
+  const [filterBy, setFilterBy] = useState<MaterialType>(MaterialType.RawMaterial);
+  const [showInactive, setShowInactive] = useState(false);
   const [sortBy, setSortBy] = useState<'name' | 'quantity' | 'updated'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  
+  // Get user role from localStorage
+  const userString = localStorage.getItem('user');
+  const user = userString ? JSON.parse(userString) : null;
+  const isAdmin = user?.role === 'Admin';
 
   useEffect(() => {
     loadData();
@@ -38,7 +48,7 @@ const Inventory: React.FC = () => {
     setError(null);
     try {
       const [materialsResponse, statisticsResponse] = await Promise.all([
-        inventoryApi.getAllMaterials(),
+        inventoryApi.getAllMaterialsIncludingInactive(),
         inventoryApi.getStatistics()
       ]);
       setMaterials(materialsResponse.data);
@@ -78,6 +88,11 @@ const Inventory: React.FC = () => {
     setShowDeleteModal(true);
   };
 
+  const handleActivateMaterial = (material: RawMaterial) => {
+    setSelectedMaterial(material);
+    setShowActivateModal(true);
+  };
+
   const handleMaterialDeleted = (materialId: number) => {
     setMaterials(prevMaterials => prevMaterials.filter(material => material.id !== materialId));
     setShowDeleteModal(false);
@@ -85,9 +100,21 @@ const Inventory: React.FC = () => {
     loadData(); // Refresh statistics
   };
 
+  const handleMaterialActivated = (materialId: number) => {
+    setMaterials(prevMaterials => 
+      prevMaterials.map(material => 
+        material.id === materialId ? { ...material, isActive: true } : material
+      )
+    );
+    setShowActivateModal(false);
+    setSelectedMaterial(null);
+    loadData(); // Refresh statistics
+  };
+
   const closeModals = () => {
     setShowEditModal(false);
     setShowDeleteModal(false);
+    setShowActivateModal(false);
     setSelectedMaterial(null);
   };
 
@@ -109,15 +136,13 @@ const Inventory: React.FC = () => {
         material.quantityType.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (material.description && material.description.toLowerCase().includes(searchTerm.toLowerCase()));
 
-      // Category filter
-      let categoryMatch = true;
-      if (filterBy === 'low-stock') {
-        categoryMatch = material.isLowStock;
-      } else if (filterBy === 'active') {
-        categoryMatch = material.isActive;
-      }
+      // Material type filter
+      const typeMatch = material.type === filterBy;
 
-      return searchMatch && categoryMatch;
+      // Active/Inactive filter
+      const activeMatch = showInactive ? !material.isActive : material.isActive;
+
+      return searchMatch && typeMatch && activeMatch;
     })
     .sort((a, b) => {
       let comparison = 0;
@@ -209,13 +234,22 @@ const Inventory: React.FC = () => {
         <div className="filter-container">
           <select 
             value={filterBy} 
-            onChange={(e) => setFilterBy(e.target.value as typeof filterBy)}
+            onChange={(e) => setFilterBy(Number(e.target.value) as MaterialType)}
             className="filter-select"
           >
-            <option value="all">All Materials</option>
-            <option value="active">Active Only</option>
-            <option value="low-stock">Low Stock</option>
+            <option value={MaterialType.RawMaterial}>Raw Materials</option>
+            <option value={MaterialType.RecyclableMaterial}>Recyclable Materials</option>
           </select>
+        </div>
+        <div className="checkbox-filter">
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={showInactive}
+              onChange={(e) => setShowInactive(e.target.checked)}
+            />
+            <span>Show Inactive Materials</span>
+          </label>
         </div>
       </div>
 
@@ -258,9 +292,9 @@ const Inventory: React.FC = () => {
             {filteredAndSortedMaterials.length === 0 ? (
               <tr>
                 <td colSpan={7} className="no-materials">
-                  {searchTerm || filterBy !== 'all' 
+                  {searchTerm 
                     ? 'No materials found matching your criteria.' 
-                    : 'No materials in inventory. Add some materials to get started.'}
+                    : 'No materials in this category. Add some materials to get started.'}
                 </td>
               </tr>
             ) : (
@@ -305,13 +339,26 @@ const Inventory: React.FC = () => {
                       >
                         <Edit size={16} />
                       </button>
-                      <button 
-                        className="btn btn-sm btn-danger" 
-                        title="Delete Material"
-                        onClick={() => handleDeleteMaterial(material)}
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      {material.isActive ? (
+                        isAdmin && (
+                          <button 
+                            className="btn btn-sm btn-danger" 
+                            title={material.quantity > 0 ? "Cannot deactivate - stock must be 0" : "Deactivate Material"}
+                            onClick={() => handleDeleteMaterial(material)}
+                            disabled={material.quantity > 0}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        )
+                      ) : (
+                        <button 
+                          className="btn btn-sm btn-success" 
+                          title="Activate Material"
+                          onClick={() => handleActivateMaterial(material)}
+                        >
+                          <CheckCircle size={16} />
+                        </button>
+                      )}
                     </div>
                   </td>
                 </tr>
@@ -342,6 +389,14 @@ const Inventory: React.FC = () => {
           material={selectedMaterial}
           onClose={closeModals}
           onMaterialDeleted={handleMaterialDeleted}
+        />
+      )}
+
+      {showActivateModal && selectedMaterial && (
+        <ActivateMaterialModal
+          material={selectedMaterial}
+          onClose={closeModals}
+          onMaterialActivated={handleMaterialActivated}
         />
       )}
     </div>

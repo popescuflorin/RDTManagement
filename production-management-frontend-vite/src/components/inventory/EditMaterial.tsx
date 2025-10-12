@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { inventoryApi } from '../../services/api';
 import type { RawMaterial, UpdateRawMaterialRequest } from '../../types';
+import { MaterialType } from '../../types';
 import './EditMaterial.css';
 
 interface EditMaterialProps {
@@ -13,6 +14,7 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
   const [formData, setFormData] = useState<UpdateRawMaterialRequest>({
     name: material.name,
     color: material.color,
+    type: material.type,
     quantity: material.quantity,
     quantityType: material.quantityType,
     minimumStock: material.minimumStock,
@@ -52,16 +54,6 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
   };
 
   const commonQuantityTypes = ['kg', 'liters', 'pieces', 'meters', 'grams', 'tons'];
-  const commonColors = ['Silver', 'Black', 'White', 'Red', 'Blue', 'Green', 'Yellow', 'Orange', 'Purple', 'Brown', 'Gray', 'Clear'];
-
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(value);
-  };
-
-  const calculatedTotalValue = formData.quantity * formData.unitCost;
 
   return (
     <div className="edit-material-overlay">
@@ -83,11 +75,13 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
             <div className="summary-details">
               <div className="summary-item">
                 <span className="label">Name:</span>
-                <span className="value">{material.name}</span>
+                <span className="value">{material.name} ({material.color})</span>
               </div>
               <div className="summary-item">
-                <span className="label">Current Value:</span>
-                <span className="value">{formatCurrency(material.totalValue)}</span>
+                <span className="label">Type:</span>
+                <span className="value">
+                  {material.type === MaterialType.RawMaterial ? 'Raw Material' : 'Recyclable Material'}
+                </span>
               </div>
               <div className="summary-item">
                 <span className="label">Last Updated:</span>
@@ -98,38 +92,72 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="name">Material Name</label>
+              <label htmlFor="name">Material Name *</label>
               <input
                 type="text"
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
+                placeholder="e.g., Steel Sheets, Paint, Screws"
                 required
                 disabled={isLoading}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="color">Color</label>
-              <select
+              <label htmlFor="color">Color *</label>
+              <input
+                type="text"
                 id="color"
                 name="color"
                 value={formData.color}
                 onChange={handleInputChange}
+                placeholder="e.g., Silver, Black, Red"
                 required
                 disabled={isLoading}
-              >
-                <option value="">Select Color</option>
-                {commonColors.map(color => (
-                  <option key={color} value={color}>{color}</option>
-                ))}
-              </select>
+              />
             </div>
           </div>
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="quantity">Current Quantity</label>
+              <label htmlFor="type">Material Type *</label>
+              <select
+                id="type"
+                name="type"
+                value={formData.type}
+                onChange={handleInputChange}
+                required
+                disabled={isLoading}
+              >
+                <option value={MaterialType.RawMaterial}>Raw Material</option>
+                <option value={MaterialType.RecyclableMaterial}>Recyclable Material</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="quantityType">Unit Type *</label>
+              <input
+                type="text"
+                id="quantityType"
+                name="quantityType"
+                value={formData.quantityType}
+                onChange={handleInputChange}
+                placeholder="e.g., kg, liters, pieces"
+                required
+                disabled={isLoading}
+                list="quantityTypeOptions"
+              />
+              <datalist id="quantityTypeOptions">
+                {commonQuantityTypes.map(type => (
+                  <option key={type} value={type} />
+                ))}
+              </datalist>
+            </div>
+          </div>
+
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="quantity">Current Quantity *</label>
               <input
                 type="number"
                 id="quantity"
@@ -143,25 +171,6 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
               />
             </div>
             <div className="form-group">
-              <label htmlFor="quantityType">Unit Type</label>
-              <select
-                id="quantityType"
-                name="quantityType"
-                value={formData.quantityType}
-                onChange={handleInputChange}
-                required
-                disabled={isLoading}
-              >
-                <option value="">Select Unit</option>
-                {commonQuantityTypes.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
               <label htmlFor="minimumStock">Minimum Stock Level</label>
               <input
                 type="number"
@@ -174,50 +183,19 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
                 disabled={isLoading}
               />
             </div>
-            <div className="form-group">
-              <label htmlFor="unitCost">Unit Cost ($)</label>
-              <input
-                type="number"
-                id="unitCost"
-                name="unitCost"
-                value={formData.unitCost}
-                onChange={handleInputChange}
-                min="0"
-                step="0.01"
-                disabled={isLoading}
-              />
-            </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="description">Description</label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                placeholder="Optional description of the material..."
-                rows={3}
-                disabled={isLoading}
-              />
-            </div>
-            <div className="form-group status-group">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  name="isActive"
-                  checked={formData.isActive}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                />
-                <span className="checkbox-text">Material is Active</span>
-              </label>
-              <div className="calculated-value">
-                <div className="calculation-label">New Total Value:</div>
-                <div className="calculation-result">{formatCurrency(calculatedTotalValue)}</div>
-              </div>
-            </div>
+          <div className="form-group">
+            <label htmlFor="description">Description</label>
+            <textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder="Optional description of the material..."
+              rows={3}
+              disabled={isLoading}
+            />
           </div>
 
           {/* Stock Status Indicators */}
@@ -233,12 +211,6 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
                 }
               </div>
             </div>
-            {!formData.isActive && (
-              <div className="stock-indicator inactive">
-                <div className="indicator-icon">🚫</div>
-                <div className="indicator-text">Material will be marked as inactive</div>
-              </div>
-            )}
           </div>
 
           <div className="form-actions">

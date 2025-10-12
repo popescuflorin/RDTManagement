@@ -41,6 +41,29 @@ namespace ProductionManagement.API.Controllers
             return Ok(materialInfos);
         }
 
+        [HttpGet("all-including-inactive")]
+        public async Task<ActionResult<IEnumerable<RawMaterialInfo>>> GetAllMaterialsIncludingInactive()
+        {
+            var materials = await _rawMaterialRepository.GetAllRawMaterialsIncludingInactiveAsync();
+            var materialInfos = materials.Select(m => new RawMaterialInfo
+            {
+                Id = m.Id,
+                Name = m.Name,
+                Color = m.Color,
+                Quantity = m.Quantity,
+                QuantityType = m.QuantityType,
+                CreatedAt = m.CreatedAt,
+                UpdatedAt = m.UpdatedAt,
+                MinimumStock = m.MinimumStock,
+                UnitCost = m.UnitCost,
+                Description = m.Description,
+                IsActive = m.IsActive,
+                Type = m.Type
+            }).OrderBy(m => m.Name).ThenBy(m => m.Color).ToList();
+
+            return Ok(materialInfos);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<RawMaterialInfo>> GetMaterial(int id)
         {

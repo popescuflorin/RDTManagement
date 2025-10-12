@@ -104,6 +104,7 @@ export const userApi = {
 // Inventory API
 export const inventoryApi = {
   getAllMaterials: () => api.get<RawMaterial[]>('/inventory'),
+  getAllMaterialsIncludingInactive: () => api.get<RawMaterial[]>('/inventory/all-including-inactive'),
   getMaterial: (id: number) => api.get<RawMaterial>(`/inventory/${id}`),
   getMaterialTypes: () => api.get<import('../types').MaterialTypeInfo[]>('/inventory/types'),
   getLowStockMaterials: () => api.get<RawMaterial[]>('/inventory/low-stock'),

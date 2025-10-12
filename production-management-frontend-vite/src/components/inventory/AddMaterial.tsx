@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { inventoryApi } from '../../services/api';
-import type { RawMaterial, CreateRawMaterialRequest, AddToExistingMaterialRequest, MaterialType } from '../../types';
+import type { RawMaterial, CreateRawMaterialRequest, AddToExistingMaterialRequest, MaterialTypeInfo } from '../../types';
+import { MaterialType } from '../../types';
 import './AddMaterial.css';
 
 interface AddMaterialProps {
@@ -10,7 +11,7 @@ interface AddMaterialProps {
 
 const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated }) => {
   const [mode, setMode] = useState<'new' | 'existing'>('new');
-  const [materialTypes, setMaterialTypes] = useState<MaterialType[]>([]);
+  const [materialTypes, setMaterialTypes] = useState<MaterialTypeInfo[]>([]);
   const [existingMaterials, setExistingMaterials] = useState<RawMaterial[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +20,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
   const [newMaterialData, setNewMaterialData] = useState<CreateRawMaterialRequest>({
     name: '',
     color: '',
+    type: MaterialType.RawMaterial,
     quantity: 0,
     quantityType: '',
     minimumStock: 0,
@@ -76,11 +78,12 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
     }
   };
 
-  const handleMaterialTypeSelect = (materialType: MaterialType) => {
+  const handleMaterialTypeSelect = (materialType: MaterialTypeInfo) => {
     setNewMaterialData(prev => ({
       ...prev,
       name: materialType.name,
       color: materialType.color,
+      type: MaterialType.RawMaterial,
       quantityType: materialType.quantityType,
       description: materialType.description || ''
     }));
@@ -116,8 +119,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
       return newMaterialData.name && 
              newMaterialData.color && 
              newMaterialData.quantityType && 
-             newMaterialData.quantity > 0 && 
-             newMaterialData.unitCost >= 0;
+             newMaterialData.quantity > 0;
     } else {
       return existingMaterialData.materialId > 0 && 
              existingMaterialData.quantityToAdd > 0;
@@ -125,7 +127,6 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
   };
 
   const commonQuantityTypes = ['kg', 'liters', 'pieces', 'meters', 'grams', 'tons'];
-  const commonColors = ['Silver', 'Black', 'White', 'Red', 'Blue', 'Green', 'Yellow', 'Orange', 'Purple', 'Brown', 'Gray', 'Clear'];
 
   return (
     <div className="add-material-overlay">
@@ -199,19 +200,52 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                 </div>
                 <div className="form-group">
                   <label htmlFor="color">Color *</label>
-                  <select
+                  <input
+                    type="text"
                     id="color"
                     name="color"
                     value={newMaterialData.color}
                     onChange={handleNewMaterialChange}
+                    placeholder="e.g., Silver, Black, Red"
+                    required
+                    disabled={isLoading}
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label htmlFor="type">Material Type *</label>
+                  <select
+                    id="type"
+                    name="type"
+                    value={newMaterialData.type}
+                    onChange={handleNewMaterialChange}
                     required
                     disabled={isLoading}
                   >
-                    <option value="">Select Color</option>
-                    {commonColors.map(color => (
-                      <option key={color} value={color}>{color}</option>
-                    ))}
+                    <option value={MaterialType.RawMaterial}>Raw Material</option>
+                    <option value={MaterialType.RecyclableMaterial}>Recyclable Material</option>
                   </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="quantityType">Unit Type *</label>
+                  <input
+                    type="text"
+                    id="quantityType"
+                    name="quantityType"
+                    value={newMaterialData.quantityType}
+                    onChange={handleNewMaterialChange}
+                    placeholder="e.g., kg, liters, pieces"
+                    required
+                    disabled={isLoading}
+                    list="quantityTypeOptions"
+                  />
+                  <datalist id="quantityTypeOptions">
+                    {commonQuantityTypes.map(type => (
+                      <option key={type} value={type} />
+                    ))}
+                  </datalist>
                 </div>
               </div>
 
@@ -231,44 +265,12 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="quantityType">Unit Type *</label>
-                  <select
-                    id="quantityType"
-                    name="quantityType"
-                    value={newMaterialData.quantityType}
-                    onChange={handleNewMaterialChange}
-                    required
-                    disabled={isLoading}
-                  >
-                    <option value="">Select Unit</option>
-                    {commonQuantityTypes.map(type => (
-                      <option key={type} value={type}>{type}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="form-row">
-                <div className="form-group">
                   <label htmlFor="minimumStock">Minimum Stock Level</label>
                   <input
                     type="number"
                     id="minimumStock"
                     name="minimumStock"
                     value={newMaterialData.minimumStock}
-                    onChange={handleNewMaterialChange}
-                    min="0"
-                    step="0.01"
-                    disabled={isLoading}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="unitCost">Unit Cost ($)</label>
-                  <input
-                    type="number"
-                    id="unitCost"
-                    name="unitCost"
-                    value={newMaterialData.unitCost}
                     onChange={handleNewMaterialChange}
                     min="0"
                     step="0.01"
@@ -325,15 +327,17 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                       <span className="value">{selectedExistingMaterial.color}</span>
                     </div>
                     <div className="detail-row">
+                      <span className="label">Type:</span>
+                      <span className="value">
+                        {selectedExistingMaterial.type === MaterialType.RawMaterial ? 'Raw Material' : 'Recyclable Material'}
+                      </span>
+                    </div>
+                    <div className="detail-row">
                       <span className="label">Current Stock:</span>
                       <span className={`value ${selectedExistingMaterial.isLowStock ? 'low-stock' : ''}`}>
                         {selectedExistingMaterial.quantity} {selectedExistingMaterial.quantityType}
                         {selectedExistingMaterial.isLowStock && ' (Low Stock!)'}
                       </span>
-                    </div>
-                    <div className="detail-row">
-                      <span className="label">Current Unit Cost:</span>
-                      <span className="value">${selectedExistingMaterial.unitCost.toFixed(2)}</span>
                     </div>
                   </div>
                 </div>
@@ -354,23 +358,6 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                     required
                     disabled={isLoading}
                   />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="newUnitCost">New Unit Cost ($)</label>
-                  <input
-                    type="number"
-                    id="newUnitCost"
-                    name="newUnitCost"
-                    value={existingMaterialData.newUnitCost || ''}
-                    onChange={handleExistingMaterialChange}
-                    min="0"
-                    step="0.01"
-                    placeholder="Optional - if cost changed"
-                    disabled={isLoading}
-                  />
-                  <small className="field-hint">
-                    Leave empty to keep current cost. If provided, will calculate weighted average.
-                  </small>
                 </div>
               </div>
             </>

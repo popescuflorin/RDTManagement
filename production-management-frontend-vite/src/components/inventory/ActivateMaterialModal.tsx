@@ -2,37 +2,37 @@ import React, { useState } from 'react';
 import { inventoryApi } from '../../services/api';
 import type { RawMaterial } from '../../types';
 import { MaterialType } from '../../types';
-import './DeleteMaterialConfirmation.css';
+import './ActivateMaterialModal.css';
 
-interface DeleteMaterialConfirmationProps {
+interface ActivateMaterialModalProps {
   material: RawMaterial;
   onClose: () => void;
-  onMaterialDeleted: (materialId: number) => void;
+  onMaterialActivated: (materialId: number) => void;
 }
 
-const DeleteMaterialConfirmation: React.FC<DeleteMaterialConfirmationProps> = ({ 
+const ActivateMaterialModal: React.FC<ActivateMaterialModalProps> = ({ 
   material, 
   onClose, 
-  onMaterialDeleted 
+  onMaterialActivated 
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleDeactivate = async () => {
+  const handleActivate = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      // Update material to set isActive = false
+      // Update material to set isActive = true
       await inventoryApi.updateMaterial(material.id, {
         ...material,
-        isActive: false
+        isActive: true
       });
-      onMaterialDeleted(material.id);
+      onMaterialActivated(material.id);
       onClose();
     } catch (error: any) {
-      console.error('Error deactivating material:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to deactivate material. Please try again.';
+      console.error('Error activating material:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to activate material. Please try again.';
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -48,14 +48,14 @@ const DeleteMaterialConfirmation: React.FC<DeleteMaterialConfirmationProps> = ({
   };
 
   return (
-    <div className="delete-material-confirmation-overlay">
-      <div className="delete-material-confirmation-modal">
-        <div className="delete-material-confirmation-header">
-          <h2>⚠️ Deactivate Material</h2>
+    <div className="activate-material-overlay">
+      <div className="activate-material-modal">
+        <div className="activate-material-header">
+          <h2>✅ Activate Material</h2>
           <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
         </div>
 
-        <div className="delete-material-confirmation-content">
+        <div className="activate-material-content">
           {error && (
             <div className="error-message">
               {error}
@@ -63,8 +63,8 @@ const DeleteMaterialConfirmation: React.FC<DeleteMaterialConfirmationProps> = ({
           )}
 
           <p className="confirmation-text">
-            Are you sure you want to deactivate this material? The material will be marked as inactive 
-            and removed from active inventory lists.
+            Are you sure you want to activate this material? The material will be marked as active 
+            and will appear in active inventory lists.
           </p>
 
           <div className="material-summary">
@@ -87,6 +87,12 @@ const DeleteMaterialConfirmation: React.FC<DeleteMaterialConfirmationProps> = ({
                 </span>
               </div>
               <div className="summary-item">
+                <span className="label">Minimum Stock:</span>
+                <span className="value">
+                  {material.minimumStock.toLocaleString()} {material.quantityType}
+                </span>
+              </div>
+              <div className="summary-item">
                 <span className="label">Last Updated:</span>
                 <span className="value">{formatDate(material.updatedAt)}</span>
               </div>
@@ -103,13 +109,13 @@ const DeleteMaterialConfirmation: React.FC<DeleteMaterialConfirmationProps> = ({
           <div className="info-section">
             <div className="info-icon">ℹ️</div>
             <div className="info-text">
-              <strong>Note:</strong> This material can only be deactivated because its current stock is 0. 
-              Deactivated materials can be reactivated later through the edit function.
+              <strong>Note:</strong> Once activated, this material will be available for use in production 
+              and will appear in all active inventory lists.
             </div>
           </div>
         </div>
 
-        <div className="delete-material-confirmation-actions">
+        <div className="activate-material-actions">
           <button
             type="button"
             onClick={onClose}
@@ -120,11 +126,11 @@ const DeleteMaterialConfirmation: React.FC<DeleteMaterialConfirmationProps> = ({
           </button>
           <button
             type="button"
-            onClick={handleDeactivate}
-            className="btn btn-danger"
+            onClick={handleActivate}
+            className="btn btn-success"
             disabled={isLoading}
           >
-            {isLoading ? 'Deactivating...' : 'Deactivate Material'}
+            {isLoading ? 'Activating...' : 'Activate Material'}
           </button>
         </div>
       </div>
@@ -132,4 +138,5 @@ const DeleteMaterialConfirmation: React.FC<DeleteMaterialConfirmationProps> = ({
   );
 };
 
-export default DeleteMaterialConfirmation;
+export default ActivateMaterialModal;
+

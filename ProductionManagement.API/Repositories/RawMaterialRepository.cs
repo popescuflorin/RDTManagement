@@ -18,6 +18,13 @@ namespace ProductionManagement.API.Repositories
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<RawMaterial>> GetAllRawMaterialsIncludingInactiveAsync()
+        {
+            return await _dbSet
+                .OrderBy(m => m.Name)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<RawMaterial>> GetLowStockMaterialsAsync()
         {
             return await _dbSet

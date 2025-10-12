@@ -5,6 +5,7 @@ namespace ProductionManagement.API.Repositories
     public interface IRawMaterialRepository : IRepository<RawMaterial>
     {
         Task<IEnumerable<RawMaterial>> GetActiveRawMaterialsAsync();
+        Task<IEnumerable<RawMaterial>> GetAllRawMaterialsIncludingInactiveAsync();
         Task<IEnumerable<RawMaterial>> GetLowStockMaterialsAsync();
         Task<RawMaterial?> GetByIdWithDetailsAsync(int id);
         Task<decimal> GetTotalInventoryValueAsync();
