@@ -1,0 +1,122 @@
+/* Cancel Production Plan Modal */
+.cancel-plan-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+.cancel-plan-modal {
+  background: white;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow: hidden;
+  animation: slideUp 0.3s ease;
+}
+
+.cancel-plan-header {
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--surface-200);
+}
+
+.cancel-plan-header h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+
+.cancel-plan-content {
+  padding: var(--space-lg);
+}
+
+.cancel-plan-content p {
+  margin: 0 0 var(--space-md) 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.warning-text {
+  color: var(--warning-600);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+
+.cancel-plan-actions {
+  display: flex;
+  gap: var(--space-md);
+  justify-content: flex-end;
+  padding: var(--space-lg);
+  border-top: 1px solid var(--surface-200);
+}
+
+.cancel-plan-actions .btn {
+  padding: var(--space-sm) var(--space-lg);
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid;
+}
+
+.cancel-plan-actions .cancel-button {
+  background: var(--surface-100);
+  border-color: var(--surface-300);
+  color: var(--text-secondary);
+}
+
+.cancel-plan-actions .cancel-button:hover:not(:disabled) {
+  background: var(--surface-200);
+  border-color: var(--surface-400);
+  color: var(--text-primary);
+}
+
+.cancel-plan-actions .delete-button {
+  background: #dc2626;
+  color: white;
+}
+
+.cancel-plan-actions .delete-button:hover:not(:disabled) {
+  background: var(--danger-600);
+  border-color: var(--danger-600);
+}
+
+.cancel-plan-actions .btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+

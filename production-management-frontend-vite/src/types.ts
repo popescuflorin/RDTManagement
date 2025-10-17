@@ -57,7 +57,8 @@ export interface AdminUpdateUserRequest {
 // Inventory Management Types
 export const MaterialType = {
   RawMaterial: 0,
-  RecyclableMaterial: 1
+  RecyclableMaterial: 1,
+  FinishedProduct: 2
 } as const;
 
 export type MaterialType = typeof MaterialType[keyof typeof MaterialType];
@@ -413,6 +414,169 @@ export interface AcquisitionStatistics {
   totalActualCost: number;
   totalItems: number;
   totalQuantity: number;
+}
+
+// Production Plan Types
+export const ProductionPlanStatus = {
+  Draft: 0,
+  Planned: 1,
+  InProgress: 2,
+  Completed: 3,
+  Cancelled: 4
+} as const;
+
+export type ProductionPlanStatus = typeof ProductionPlanStatus[keyof typeof ProductionPlanStatus];
+
+export interface ProductionPlan {
+  id: number;
+  name: string;
+  description: string;
+  targetProductId: number;
+  targetProductName: string;
+  targetProductColor: string;
+  targetProductQuantityType: string;
+  quantityToProduce: number;
+  status: ProductionPlanStatus;
+  createdByUserId: number;
+  createdByUserName: string;
+  startedByUserId?: number;
+  startedByUserName?: string;
+  completedByUserId?: number;
+  completedByUserName?: string;
+  createdAt: string;
+  plannedStartDate?: string;
+  startedAt?: string;
+  completedAt?: string;
+  estimatedCost: number;
+  actualCost?: number;
+  estimatedProductionTimeMinutes: number;
+  actualProductionTimeMinutes?: number;
+  notes?: string;
+  canProduce: boolean;
+  missingMaterials: string[];
+  requiredMaterials: ProductionPlanMaterial[];
+}
+
+export interface ProductionPlanMaterial {
+  id: number;
+  productionPlanId: number;
+  rawMaterialId: number;
+  materialName: string;
+  materialColor: string;
+  quantityType: string;
+  requiredQuantity: number;
+  actualQuantityUsed?: number;
+  availableQuantity: number;
+  estimatedUnitCost: number;
+  actualUnitCost?: number;
+  isAvailable: boolean;
+}
+
+export interface CreateProductionPlanRequest {
+  name: string;
+  description: string;
+  targetProductId?: number;
+  newFinishedProduct?: CreateFinishedProductRequest;
+  quantityToProduce: number;
+  plannedStartDate?: string;
+  estimatedProductionTimeMinutes: number;
+  notes?: string;
+  requiredMaterials: CreateProductionPlanMaterialRequest[];
+}
+
+export interface CreateFinishedProductRequest {
+  name: string;
+  color: string;
+  quantityType: string;
+  description?: string;
+  minimumStock: number;
+}
+
+export interface CreateProductionPlanMaterialRequest {
+  rawMaterialId: number;
+  requiredQuantity: number;
+}
+
+export interface UpdateProductionPlanRequest {
+  name: string;
+  description: string;
+  quantityToProduce: number;
+  plannedStartDate?: string;
+  estimatedProductionTimeMinutes: number;
+  notes?: string;
+  requiredMaterials: CreateProductionPlanMaterialRequest[];
+}
+
+export interface ExecuteProductionPlanRequest {
+  actualQuantityProduced?: number;
+  actualProductionTimeMinutes?: number;
+  notes?: string;
+  materialsUsed?: ActualMaterialUsage[];
+}
+
+export interface ActualMaterialUsage {
+  rawMaterialId: number;
+  quantityUsed: number;
+}
+
+export interface ProductionPlanExecutionResult {
+  success: boolean;
+  message: string;
+  quantityProduced: number;
+  totalCost: number;
+  materialsConsumed: MaterialConsumptionResult[];
+}
+
+export interface MaterialConsumptionResult {
+  materialId: number;
+  materialName: string;
+  materialColor: string;
+  quantityConsumed: number;
+  quantityType: string;
+  cost: number;
+}
+
+export interface ProductionPlanStatistics {
+  totalPlans: number;
+  draftPlans: number;
+  plannedPlans: number;
+  inProgressPlans: number;
+  completedPlans: number;
+  cancelledPlans: number;
+  totalProductionValue: number;
+  totalProductionCost: number;
+  totalUnitsProduced: number;
+}
+
+// Product Template Types
+export interface ProductTemplate {
+  id: number;
+  finishedProductId: number;
+  finishedProductName: string;
+  finishedProductColor: string;
+  estimatedProductionTimeMinutes: number;
+  requiredMaterials: ProductTemplateMaterial[];
+}
+
+export interface ProductTemplateMaterial {
+  id: number;
+  rawMaterialId: number;
+  materialName: string;
+  materialColor: string;
+  quantityType: string;
+  requiredQuantity: number;
+  availableQuantity: number;
+  unitCost: number;
+}
+
+export interface UpdateProductTemplateRequest {
+  estimatedProductionTimeMinutes: number;
+  requiredMaterials: CreateProductTemplateMaterialRequest[];
+}
+
+export interface CreateProductTemplateMaterialRequest {
+  rawMaterialId: number;
+  requiredQuantity: number;
 }
 
 // Supplier Types

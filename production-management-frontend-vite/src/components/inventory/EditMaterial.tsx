@@ -132,6 +132,7 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
               >
                 <option value={MaterialType.RawMaterial}>Raw Material</option>
                 <option value={MaterialType.RecyclableMaterial}>Recyclable Material</option>
+                <option value={MaterialType.FinishedProduct}>Finished Product</option>
               </select>
             </div>
             <div className="form-group">

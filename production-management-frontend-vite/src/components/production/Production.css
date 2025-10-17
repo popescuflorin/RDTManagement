@@ -310,6 +310,11 @@
   font-size: 0.8rem;
 }
 
+.material-quantity.insufficient {
+  color: #dc2626;
+  font-weight: 600;
+}
+
 .materials-more {
   color: #666;
   font-size: 0.8rem;
@@ -371,6 +376,31 @@
 .status-inactive {
   background-color: #f8d7da;
   color: #721c24;
+}
+
+.status-draft {
+  background-color: #e2e8f0;
+  color: #475569;
+}
+
+.status-planned {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-in-progress {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-completed {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-cancelled {
+  background-color: #fee2e2;
+  color: #991b1b;
 }
 
 .production-badge {

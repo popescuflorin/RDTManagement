@@ -7,6 +7,7 @@ import {
   Edit, 
   Trash2,
   CheckCircle,
+  Eye,
   Loader2
 } from 'lucide-react';
 import { inventoryApi } from '../../services/api';
@@ -14,6 +15,7 @@ import type { RawMaterial, InventoryStatistics } from '../../types';
 import { MaterialType } from '../../types';
 import AddMaterial from './AddMaterial';
 import EditMaterial from './EditMaterial';
+import ViewMaterial from './ViewMaterial';
 import DeleteMaterialConfirmation from './DeleteMaterialConfirmation';
 import ActivateMaterialModal from './ActivateMaterialModal';
 import './Inventory.css';
@@ -24,6 +26,7 @@ const Inventory: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showActivateModal, setShowActivateModal] = useState(false);
@@ -65,6 +68,11 @@ const Inventory: React.FC = () => {
     setMaterials(prevMaterials => [...prevMaterials, newMaterial]);
     setShowAddModal(false);
     loadData(); // Refresh statistics
+  };
+
+  const handleViewMaterial = (material: RawMaterial) => {
+    setSelectedMaterial(material);
+    setShowViewModal(true);
   };
 
   const handleEditMaterial = (material: RawMaterial) => {
@@ -112,6 +120,7 @@ const Inventory: React.FC = () => {
   };
 
   const closeModals = () => {
+    setShowViewModal(false);
     setShowEditModal(false);
     setShowDeleteModal(false);
     setShowActivateModal(false);
@@ -239,6 +248,7 @@ const Inventory: React.FC = () => {
           >
             <option value={MaterialType.RawMaterial}>Raw Materials</option>
             <option value={MaterialType.RecyclableMaterial}>Recyclable Materials</option>
+            <option value={MaterialType.FinishedProduct}>Finished Products</option>
           </select>
         </div>
         <div className="checkbox-filter">
@@ -333,6 +343,13 @@ const Inventory: React.FC = () => {
                   <td className="actions-cell">
                     <div className="action-buttons">
                       <button 
+                        className="btn btn-sm btn-info" 
+                        title="View Material"
+                        onClick={() => handleViewMaterial(material)}
+                      >
+                        <Eye size={16} />
+                      </button>
+                      <button 
                         className="btn btn-sm btn-warning" 
                         title="Edit Material"
                         onClick={() => handleEditMaterial(material)}
@@ -373,6 +390,13 @@ const Inventory: React.FC = () => {
         <AddMaterial
           onClose={() => setShowAddModal(false)}
           onMaterialCreated={handleMaterialCreated}
+        />
+      )}
+
+      {showViewModal && selectedMaterial && (
+        <ViewMaterial
+          material={selectedMaterial}
+          onClose={closeModals}
         />
       )}
 

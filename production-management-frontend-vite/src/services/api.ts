@@ -19,6 +19,12 @@ import type {
   ProductionResult,
   FinishedProduct,
   ProductionStatistics,
+  ProductionPlan,
+  CreateProductionPlanRequest,
+  UpdateProductionPlanRequest,
+  ExecuteProductionPlanRequest,
+  ProductionPlanExecutionResult,
+  ProductionPlanStatistics,
   Acquisition,
   AcquisitionStatistics,
   CreateAcquisitionRequest,
@@ -125,6 +131,21 @@ export const productionApi = {
   updateProduct: (id: number, productData: UpdateProductRequest) => api.put<Product>(`/production/${id}`, productData),
   deleteProduct: (id: number) => api.delete(`/production/${id}`),
   produceProduct: (productionData: ProduceProductRequest) => api.post<ProductionResult>('/production/produce', productionData),
+};
+
+// Production Plan API
+export const productionPlanApi = {
+  getAllPlans: () => api.get<ProductionPlan[]>('/productionplan'),
+  getPlan: (id: number) => api.get<ProductionPlan>(`/productionplan/${id}`),
+  getStatistics: () => api.get<ProductionPlanStatistics>('/productionplan/statistics'),
+  getProductTemplate: (finishedProductId: number) => api.get<ProductTemplate>(`/productionplan/template/${finishedProductId}`),
+  updateProductTemplate: (finishedProductId: number, templateData: UpdateProductTemplateRequest) => api.put<ProductTemplate>(`/productionplan/template/${finishedProductId}`, templateData),
+  createPlan: (planData: CreateProductionPlanRequest) => api.post<ProductionPlan>('/productionplan', planData),
+  updatePlan: (id: number, planData: UpdateProductionPlanRequest) => api.put<ProductionPlan>(`/productionplan/${id}`, planData),
+  deletePlan: (id: number) => api.delete(`/productionplan/${id}`),
+  executePlan: (id: number, executionData: ExecuteProductionPlanRequest) => api.post<ProductionPlanExecutionResult>(`/productionplan/${id}/execute`, executionData),
+  startPlan: (id: number) => api.post<ProductionPlan>(`/productionplan/${id}/start`, {}),
+  cancelPlan: (id: number) => api.post<ProductionPlan>(`/productionplan/${id}/cancel`, {}),
 };
 
 // Acquisition API

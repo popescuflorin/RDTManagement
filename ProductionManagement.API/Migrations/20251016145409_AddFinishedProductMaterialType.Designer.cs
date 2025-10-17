@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductionManagement.API.Data;
 
@@ -11,9 +12,11 @@ using ProductionManagement.API.Data;
 namespace ProductionManagement.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251016145409_AddFinishedProductMaterialType")]
+    partial class AddFinishedProductMaterialType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -343,178 +346,6 @@ namespace ProductionManagement.API.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductMaterials");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("EstimatedProductionTimeMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FinishedProductId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FinishedProductId")
-                        .IsUnique();
-
-                    b.ToTable("ProductTemplates");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplateMaterial", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ProductTemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RawMaterialId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("RequiredQuantity")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductTemplateId");
-
-                    b.HasIndex("RawMaterialId");
-
-                    b.ToTable("ProductTemplateMaterials");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductionPlan", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("ActualCost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int?>("ActualProductionTimeMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("CompletedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CreatedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("EstimatedCost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("EstimatedProductionTimeMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("PlannedStartDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("QuantityToProduce")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("StartedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("StartedByUserId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TargetProductId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompletedByUserId");
-
-                    b.HasIndex("CreatedByUserId");
-
-                    b.HasIndex("StartedByUserId");
-
-                    b.HasIndex("TargetProductId");
-
-                    b.ToTable("ProductionPlans");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductionPlanMaterial", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal?>("ActualQuantityUsed")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("ActualUnitCost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("EstimatedUnitCost")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("ProductionPlanId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RawMaterialId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("RequiredQuantity")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductionPlanId");
-
-                    b.HasIndex("RawMaterialId");
-
-                    b.ToTable("ProductionPlanMaterials");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.RawMaterial", b =>
@@ -924,88 +755,6 @@ namespace ProductionManagement.API.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplate", b =>
-                {
-                    b.HasOne("ProductionManagement.API.Models.RawMaterial", "FinishedProduct")
-                        .WithMany()
-                        .HasForeignKey("FinishedProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FinishedProduct");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplateMaterial", b =>
-                {
-                    b.HasOne("ProductionManagement.API.Models.ProductTemplate", "ProductTemplate")
-                        .WithMany("RequiredMaterials")
-                        .HasForeignKey("ProductTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProductionManagement.API.Models.RawMaterial", "RawMaterial")
-                        .WithMany()
-                        .HasForeignKey("RawMaterialId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ProductTemplate");
-
-                    b.Navigation("RawMaterial");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductionPlan", b =>
-                {
-                    b.HasOne("ProductionManagement.API.Models.User", "CompletedByUser")
-                        .WithMany()
-                        .HasForeignKey("CompletedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("ProductionManagement.API.Models.User", "CreatedByUser")
-                        .WithMany()
-                        .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("ProductionManagement.API.Models.User", "StartedByUser")
-                        .WithMany()
-                        .HasForeignKey("StartedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("ProductionManagement.API.Models.RawMaterial", "TargetProduct")
-                        .WithMany()
-                        .HasForeignKey("TargetProductId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("CompletedByUser");
-
-                    b.Navigation("CreatedByUser");
-
-                    b.Navigation("StartedByUser");
-
-                    b.Navigation("TargetProduct");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductionPlanMaterial", b =>
-                {
-                    b.HasOne("ProductionManagement.API.Models.ProductionPlan", "ProductionPlan")
-                        .WithMany("RequiredMaterials")
-                        .HasForeignKey("ProductionPlanId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProductionManagement.API.Models.RawMaterial", "RawMaterial")
-                        .WithMany()
-                        .HasForeignKey("RawMaterialId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ProductionPlan");
-
-                    b.Navigation("RawMaterial");
-                });
-
             modelBuilder.Entity("ProductionManagement.API.Models.Acquisition", b =>
                 {
                     b.Navigation("History");
@@ -1016,16 +765,6 @@ namespace ProductionManagement.API.Migrations
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.Product", b =>
-                {
-                    b.Navigation("RequiredMaterials");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplate", b =>
-                {
-                    b.Navigation("RequiredMaterials");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductionPlan", b =>
                 {
                     b.Navigation("RequiredMaterials");
                 });

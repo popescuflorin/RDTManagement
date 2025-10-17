@@ -15,6 +15,10 @@ namespace ProductionManagement.API.Data
         public DbSet<RawMaterial> RawMaterials { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ProductMaterial> ProductMaterials { get; set; }
+        public DbSet<ProductTemplate> ProductTemplates { get; set; }
+        public DbSet<ProductTemplateMaterial> ProductTemplateMaterials { get; set; }
+        public DbSet<ProductionPlan> ProductionPlans { get; set; }
+        public DbSet<ProductionPlanMaterial> ProductionPlanMaterials { get; set; }
         public DbSet<Acquisition> Acquisitions { get; set; }
         public DbSet<AcquisitionItem> AcquisitionItems { get; set; }
         public DbSet<ProcessedMaterial> ProcessedMaterials { get; set; }
@@ -189,6 +193,87 @@ namespace ProductionManagement.API.Data
                 entity.HasOne(e => e.Acquisition)
                     .WithMany(a => a.Items)
                     .HasForeignKey(e => e.AcquisitionId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.RawMaterial)
+                    .WithMany()
+                    .HasForeignKey(e => e.RawMaterialId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ProductionPlan configuration
+            modelBuilder.Entity<ProductionPlan>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.QuantityToProduce).HasPrecision(18, 2);
+                entity.Property(e => e.EstimatedCost).HasPrecision(18, 2);
+                entity.Property(e => e.ActualCost).HasPrecision(18, 2);
+
+                entity.HasOne(e => e.TargetProduct)
+                    .WithMany()
+                    .HasForeignKey(e => e.TargetProductId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.CreatedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.CreatedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.StartedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.StartedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.CompletedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.CompletedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ProductionPlanMaterial configuration
+            modelBuilder.Entity<ProductionPlanMaterial>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.RequiredQuantity).HasPrecision(18, 2);
+                entity.Property(e => e.ActualQuantityUsed).HasPrecision(18, 2);
+                entity.Property(e => e.EstimatedUnitCost).HasPrecision(18, 2);
+                entity.Property(e => e.ActualUnitCost).HasPrecision(18, 2);
+
+                entity.HasOne(e => e.ProductionPlan)
+                    .WithMany(p => p.RequiredMaterials)
+                    .HasForeignKey(e => e.ProductionPlanId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.RawMaterial)
+                    .WithMany()
+                    .HasForeignKey(e => e.RawMaterialId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // ProductTemplate configuration
+            modelBuilder.Entity<ProductTemplate>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                
+                entity.HasOne(e => e.FinishedProduct)
+                    .WithMany()
+                    .HasForeignKey(e => e.FinishedProductId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // One template per finished product
+                entity.HasIndex(e => e.FinishedProductId).IsUnique();
+            });
+
+            // ProductTemplateMaterial configuration
+            modelBuilder.Entity<ProductTemplateMaterial>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.RequiredQuantity).HasPrecision(18, 2);
+
+                entity.HasOne(e => e.ProductTemplate)
+                    .WithMany(p => p.RequiredMaterials)
+                    .HasForeignKey(e => e.ProductTemplateId)
                     .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(e => e.RawMaterial)

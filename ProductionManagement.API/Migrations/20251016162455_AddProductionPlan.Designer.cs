@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductionManagement.API.Data;
 
@@ -11,9 +12,11 @@ using ProductionManagement.API.Data;
 namespace ProductionManagement.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251016162455_AddProductionPlan")]
+    partial class AddProductionPlan
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -343,61 +346,6 @@ namespace ProductionManagement.API.Migrations
                     b.HasIndex("ProductId");
 
                     b.ToTable("ProductMaterials");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplate", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("EstimatedProductionTimeMinutes")
-                        .HasColumnType("int");
-
-                    b.Property<int>("FinishedProductId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("FinishedProductId")
-                        .IsUnique();
-
-                    b.ToTable("ProductTemplates");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplateMaterial", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ProductTemplateId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("RawMaterialId")
-                        .HasColumnType("int");
-
-                    b.Property<decimal>("RequiredQuantity")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductTemplateId");
-
-                    b.HasIndex("RawMaterialId");
-
-                    b.ToTable("ProductTemplateMaterials");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.ProductionPlan", b =>
@@ -924,36 +872,6 @@ namespace ProductionManagement.API.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplate", b =>
-                {
-                    b.HasOne("ProductionManagement.API.Models.RawMaterial", "FinishedProduct")
-                        .WithMany()
-                        .HasForeignKey("FinishedProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("FinishedProduct");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplateMaterial", b =>
-                {
-                    b.HasOne("ProductionManagement.API.Models.ProductTemplate", "ProductTemplate")
-                        .WithMany("RequiredMaterials")
-                        .HasForeignKey("ProductTemplateId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("ProductionManagement.API.Models.RawMaterial", "RawMaterial")
-                        .WithMany()
-                        .HasForeignKey("RawMaterialId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("ProductTemplate");
-
-                    b.Navigation("RawMaterial");
-                });
-
             modelBuilder.Entity("ProductionManagement.API.Models.ProductionPlan", b =>
                 {
                     b.HasOne("ProductionManagement.API.Models.User", "CompletedByUser")
@@ -1016,11 +934,6 @@ namespace ProductionManagement.API.Migrations
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.Product", b =>
-                {
-                    b.Navigation("RequiredMaterials");
-                });
-
-            modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplate", b =>
                 {
                     b.Navigation("RequiredMaterials");
                 });

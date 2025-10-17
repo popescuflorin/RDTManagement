@@ -369,7 +369,7 @@
   min-width: 100px;
 }
 
-.action-buttons {
+.action-buttons
   display: flex;
   gap: 8px;
   justify-content: center;
@@ -401,6 +401,16 @@
 
 .btn-success:hover:not(:disabled) {
   background-color: #16a34a;
+  transform: translateY(-1px);
+}
+
+.btn-info {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.btn-info:hover:not(:disabled) {
+  background-color: #2563eb;
   transform: translateY(-1px);
 }
 

@@ -3,7 +3,8 @@ namespace ProductionManagement.API.Models
     public enum MaterialType
     {
         RawMaterial = 0,
-        RecyclableMaterial = 1
+        RecyclableMaterial = 1,
+        FinishedProduct = 2
     }
 
     public class RawMaterial
