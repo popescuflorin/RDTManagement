@@ -74,7 +74,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
           <button
             type="button"
             onClick={onClose}
-            className="btn btn-secondary"
+            className="cancel-button"
             disabled={isLoading}
           >
             Cancel
@@ -82,7 +82,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
           <button
             type="button"
             onClick={handleDelete}
-            className="btn btn-danger"
+            className="delete-button"
             disabled={isLoading}
           >
             {isLoading ? 'Deleting...' : 'Delete User'}
