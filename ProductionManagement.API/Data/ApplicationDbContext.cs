@@ -25,6 +25,9 @@ namespace ProductionManagement.API.Data
         public DbSet<AcquisitionHistory> AcquisitionHistories { get; set; }
         public DbSet<Supplier> Suppliers { get; set; }
         public DbSet<Transport> Transports { get; set; }
+        public DbSet<Client> Clients { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderMaterial> OrderMaterials { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -274,6 +277,62 @@ namespace ProductionManagement.API.Data
                 entity.HasOne(e => e.ProductTemplate)
                     .WithMany(p => p.RequiredMaterials)
                     .HasForeignKey(e => e.ProductTemplateId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.RawMaterial)
+                    .WithMany()
+                    .HasForeignKey(e => e.RawMaterialId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // Client configuration
+            modelBuilder.Entity<Client>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.ContactPerson).HasMaxLength(100);
+                entity.Property(e => e.Email).HasMaxLength(100);
+                entity.Property(e => e.Phone).HasMaxLength(20);
+                entity.Property(e => e.Address).HasMaxLength(200);
+                entity.Property(e => e.City).HasMaxLength(100);
+                entity.Property(e => e.PostalCode).HasMaxLength(50);
+                entity.Property(e => e.Country).HasMaxLength(100);
+                entity.Property(e => e.Notes).HasMaxLength(1000);
+                entity.Property(e => e.CreatedByUserName).IsRequired().HasMaxLength(100);
+            });
+
+            // Order configuration
+            modelBuilder.Entity<Order>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Description).HasMaxLength(500);
+                entity.Property(e => e.Notes).HasMaxLength(1000);
+                entity.Property(e => e.CreatedByUserName).IsRequired().HasMaxLength(100);
+
+                entity.HasOne(e => e.Client)
+                    .WithMany(c => c.Orders)
+                    .HasForeignKey(e => e.ClientId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.Transport)
+                    .WithMany(t => t.Orders)
+                    .HasForeignKey(e => e.TransportId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // OrderMaterial configuration
+            modelBuilder.Entity<OrderMaterial>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Quantity).HasPrecision(18, 2);
+                entity.Property(e => e.UnitPrice).HasPrecision(18, 2);
+                entity.Property(e => e.MaterialName).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.MaterialColor).IsRequired().HasMaxLength(100);
+                entity.Property(e => e.QuantityType).IsRequired().HasMaxLength(50);
+
+                entity.HasOne(e => e.Order)
+                    .WithMany(o => o.OrderMaterials)
+                    .HasForeignKey(e => e.OrderId)
                     .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(e => e.RawMaterial)

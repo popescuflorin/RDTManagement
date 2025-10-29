@@ -235,7 +235,6 @@
 .form-group input,
 .form-group textarea,
 .form-group select {
-  padding: var(--space-md);
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   font-size: var(--text-base);

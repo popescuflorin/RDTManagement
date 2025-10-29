@@ -186,7 +186,7 @@
 /* Form Groups */
 .form-group {
   margin-bottom: var(--space-lg);
-  padding: var(--space-lg);
+  padding: 0;
 }
 
 .form-group:last-child {
@@ -202,7 +202,8 @@
 }
 
 .form-group input,
-.form-group textarea {
+.form-group textarea,
+.form-group select {
   width: 100%;
   padding: var(--space-sm) var(--space-md);
   border: 1px solid var(--surface-300);
@@ -210,20 +211,42 @@
   font-size: 0.875rem;
   transition: all 0.2s ease;
   background: white;
+  min-height: 40px;
+  box-sizing: border-box;
+}
+
+.form-group input {
+  height: 40px;
+}
+
+.form-group textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.form-group select {
+  height: 40px;
+  cursor: pointer;
 }
 
 .form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus,
+.form-group select:focus {
   outline: none;
   border-color: var(--success-500);
   box-shadow: 0 0 0 3px var(--success-100);
 }
 
 .form-group input:disabled,
-.form-group textarea:disabled {
+.form-group textarea:disabled,
+.form-group select:disabled {
   background: var(--surface-100);
   color: var(--text-tertiary);
   cursor: not-allowed;
+}
+
+.form-group select option {
+  padding: var(--space-xs);
 }
 
 .input-help {
@@ -461,7 +484,17 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: var(--space-lg);
-  align-items: end;
+  align-items: start;
+  margin-bottom: var(--space-lg);
+}
+
+.form-row:last-child {
+  margin-bottom: 0;
+}
+
+.form-row .form-group {
+  margin-bottom: 0;
+  padding: 0;
 }
 
 /* Produced Materials */
@@ -517,6 +550,27 @@
   border: 1px solid var(--surface-200);
 }
 
+/* Add Material Section */
+.add-material-section {
+  background: white;
+  padding: var(--space-lg);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--surface-200);
+}
+
+.add-material-section .form-row {
+  margin-bottom: var(--space-md);
+}
+
+.add-material-section .form-row:last-child {
+  margin-bottom: 0;
+}
+
+.add-material-section .form-group {
+  padding: 0;
+  margin-bottom: 0;
+}
+
 .mode-button {
   flex: 1;
   padding: var(--space-sm) var(--space-md);
@@ -557,6 +611,19 @@
   padding: var(--space-lg);
   border-radius: var(--radius-sm);
   border: 1px solid var(--surface-200);
+}
+
+.new-material-form .form-row {
+  margin-bottom: var(--space-md);
+}
+
+.new-material-form .form-row:last-child {
+  margin-bottom: 0;
+}
+
+.new-material-form .form-group {
+  padding: 0;
+  margin-bottom: 0;
 }
 
 /* Section Toggle */

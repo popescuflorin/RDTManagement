@@ -29,6 +29,8 @@ builder.Services.AddScoped<IProductionPlanRepository, ProductionPlanRepository>(
 builder.Services.AddScoped<ISupplierRepository, SupplierRepository>();
 builder.Services.AddScoped<IAcquisitionRepository, AcquisitionRepository>();
 builder.Services.AddScoped<ITransportRepository, TransportRepository>();
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
 // Add JWT service
 builder.Services.AddScoped<IJwtService, JwtService>();

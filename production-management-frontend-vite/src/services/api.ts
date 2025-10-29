@@ -36,10 +36,16 @@ import type {
   SupplierStatistics,
   Transport,
   CreateTransportRequest,
-  UpdateTransportRequest
+  UpdateTransportRequest,
+  ProductTemplate,
+  UpdateProductTemplateRequest,
+  Order,
+  CreateOrderRequest,
+  UpdateOrderRequest,
+  OrderStatistics
 } from '../types';
 
-const API_BASE_URL = 'http://localhost:5136/api';
+const API_BASE_URL = 'http://localhost:5000/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -180,6 +186,28 @@ export const transportApi = {
   createTransport: (transportData: CreateTransportRequest) => api.post<Transport>('/transport', transportData),
   updateTransport: (id: number, transportData: UpdateTransportRequest) => api.put<Transport>(`/transport/${id}`, transportData),
   deleteTransport: (id: number) => api.delete(`/transport/${id}`),
+};
+
+// Order API
+export const orderApi = {
+  getAllOrders: () => api.get<Order[]>('/order'),
+  getOrder: (id: number) => api.get<Order>(`/order/${id}`),
+  getStatistics: () => api.get<OrderStatistics>('/order/statistics'),
+  createOrder: (orderData: CreateOrderRequest) => api.post<Order>('/order', orderData),
+  updateOrder: (id: number, orderData: UpdateOrderRequest) => api.put<Order>(`/order/${id}`, orderData),
+  processOrder: (id: number) => api.post<Order>(`/order/${id}/process`, {}),
+  cancelOrder: (id: number) => api.post<Order>(`/order/${id}/cancel`, {}),
+  deleteOrder: (id: number) => api.delete(`/order/${id}`),
+};
+
+// Client API
+export const clientApi = {
+  getAllClients: () => api.get<Client[]>('/client'),
+  getClient: (id: number) => api.get<Client>(`/client/${id}`),
+  getStatistics: () => api.get<ClientStatistics>('/client/statistics'),
+  createClient: (clientData: CreateClientRequest) => api.post<Client>('/client', clientData),
+  updateClient: (id: number, clientData: UpdateClientRequest) => api.put<Client>(`/client/${id}`, clientData),
+  deleteClient: (id: number) => api.delete(`/client/${id}`),
 };
 
 export default api;

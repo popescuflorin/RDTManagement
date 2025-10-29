@@ -19,6 +19,7 @@ import UserManagement from './users/UserManagement';
 import Inventory from './inventory/Inventory';
 import Production from './production/Production';
 import AcquisitionPage from './acquisitions/Acquisition';
+import Orders from './orders/Orders';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -106,7 +107,7 @@ const Dashboard: React.FC = () => {
       case 'acquisitions':
         return <AcquisitionPage />;
       case 'orders':
-        return <div className="page-content"><h2>Orders</h2><p>Order management functionality will be implemented here.</p></div>;
+        return <Orders />;
       case 'reports':
         return <div className="page-content"><h2>Reports</h2><p>Reports functionality will be implemented here.</p></div>;
       case 'settings':

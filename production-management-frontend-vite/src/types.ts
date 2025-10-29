@@ -643,3 +643,153 @@ export interface SupplierStatistics {
   topSupplierByValue?: Supplier;
   topSupplierByCount?: Supplier;
 }
+
+// Order Types
+export const OrderStatus = {
+  Draft: 0,
+  Pending: 1,
+  Processing: 2,
+  Shipped: 3,
+  Delivered: 4,
+  Cancelled: 5
+} as const;
+
+export type OrderStatus = typeof OrderStatus[keyof typeof OrderStatus];
+
+export interface Order {
+  id: number;
+  clientId: number;
+  clientName: string;
+  clientContactPerson?: string;
+  clientEmail?: string;
+  clientPhone?: string;
+  clientAddress?: string;
+  clientCity?: string;
+  clientPostalCode?: string;
+  clientCountry?: string;
+  description?: string;
+  notes?: string;
+  status: OrderStatus;
+  statusLabel: string;
+  orderDate: string;
+  expectedDeliveryDate?: string;
+  deliveryDate?: string;
+  transportId?: number;
+  transportCarName?: string;
+  transportPhoneNumber?: string;
+  transportDate?: string;
+  transportNotes?: string;
+  createdByUserName: string;
+  createdAt: string;
+  updatedAt?: string;
+  orderMaterials: OrderMaterial[];
+  totalValue: number;
+}
+
+export interface OrderMaterial {
+  id: number;
+  orderId: number;
+  rawMaterialId: number;
+  materialName: string;
+  materialColor: string;
+  quantityType: string;
+  quantity: number;
+  unitPrice: number;
+  totalPrice: number;
+}
+
+export interface CreateOrderRequest {
+  clientId: number;
+  description?: string;
+  notes?: string;
+  orderDate: string;
+  expectedDeliveryDate?: string;
+  transportId?: number;
+  transportDate?: string;
+  transportNotes?: string;
+  orderMaterials: CreateOrderMaterialRequest[];
+}
+
+export interface CreateOrderMaterialRequest {
+  rawMaterialId: number;
+  quantity: number;
+}
+
+export interface UpdateOrderRequest {
+  clientId?: number;
+  description?: string;
+  notes?: string;
+  status?: OrderStatus;
+  orderDate?: string;
+  expectedDeliveryDate?: string;
+  transportId?: number;
+  transportDate?: string;
+  transportNotes?: string;
+  orderMaterials?: CreateOrderMaterialRequest[];
+}
+
+export interface OrderStatistics {
+  totalOrders: number;
+  draftOrders: number;
+  pendingOrders: number;
+  processingOrders: number;
+  shippedOrders: number;
+  deliveredOrders: number;
+  totalOrderValue: number;
+}
+
+// Client Types
+export interface Client {
+  id: number;
+  name: string;
+  contactPerson?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
+  notes?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt?: string;
+  createdByUserName: string;
+  totalOrders: number;
+  totalOrderValue: number;
+  lastOrderDate?: string;
+}
+
+export interface CreateClientRequest {
+  name: string;
+  contactPerson?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
+  notes?: string;
+}
+
+export interface UpdateClientRequest {
+  name?: string;
+  contactPerson?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  country?: string;
+  notes?: string;
+  isActive?: boolean;
+}
+
+export interface ClientStatistics {
+  totalClients: number;
+  activeClients: number;
+  inactiveClients: number;
+  totalOrderValue: number;
+  totalOrders: number;
+  topClientByValue?: Client;
+  topClientByCount?: Client;
+}

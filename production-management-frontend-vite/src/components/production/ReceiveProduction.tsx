@@ -9,7 +9,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { productionPlanApi, inventoryApi } from '../../services/api';
-import type { ProductionPlan, RawMaterial } from '../../types';
+import type { CreateRawMaterialRequest, ProductionPlan, RawMaterial } from '../../types';
 import { ProductionPlanStatus, MaterialType } from '../../types';
 import './ReceiveProduction.css';
 
@@ -117,18 +117,25 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
         return;
       }
 
+      // Validate that name, color, and quantityType are not just whitespace
+      if (newMaterialData.name.trim() === '' || newMaterialData.color.trim() === '' || newMaterialData.quantityType.trim() === '') {
+        setError('Name, color, and quantity type cannot be empty');
+        return;
+      }
+
       try {
-        const createMaterialRequest = {
-          name: newMaterialData.name,
-          color: newMaterialData.color,
-          type: newMaterialData.type,
+        const createMaterialRequest : CreateRawMaterialRequest = {
+          name: newMaterialData.name.trim(),
+          color: newMaterialData.color.trim(),
+          type: newMaterialData.type, // Ensure type is sent as number
           quantity: currentMaterial.quantity,
-          quantityType: newMaterialData.quantityType,
+          quantityType: newMaterialData.quantityType.trim(),
           minimumStock: 0,
           unitCost: 0,
-          description: newMaterialData.description
+          description: newMaterialData.description?.trim() || ''
         };
 
+        console.log('Creating material with request:', createMaterialRequest);
         const response = await inventoryApi.createMaterial(createMaterialRequest);
         const createdMaterial = response.data;
 
@@ -157,7 +164,8 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
         await loadMaterials();
       } catch (error: any) {
         console.error('Error creating material:', error);
-        setError(error.response?.data?.message || 'Failed to create material');
+        console.error('Error response:', error.response?.data);
+        setError(error.response?.data?.message || error.response?.data?.title || 'Failed to create material');
       }
     }
   };
@@ -274,7 +282,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
   const StatusIcon = statusInfo.icon;
 
   return (
-    <div className="receive-production-overlay" onClick={onClose}>
+    <div className="receive-production-overlay">
       <div className="receive-production-modal" onClick={(e) => e.stopPropagation()}>
         <div className="receive-production-header">
           <div className="header-content">

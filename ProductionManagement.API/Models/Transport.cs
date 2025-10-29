@@ -22,8 +22,9 @@ namespace ProductionManagement.API.Models
 
         public bool IsActive { get; set; } = true;
 
-        // Navigation property
+        // Navigation properties
         public virtual ICollection<Acquisition> Acquisitions { get; set; } = new List<Acquisition>();
+        public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 }
 
