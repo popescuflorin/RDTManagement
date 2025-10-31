@@ -7,6 +7,7 @@ export interface User {
   role: string;
   lastLoginAt: string;
   isActive: boolean;
+  receiveEmails: boolean;
   permissions: string[];
 }
 
@@ -45,6 +46,7 @@ export interface AdminRegisterRequest {
   firstName: string;
   lastName: string;
   role: string;
+  receiveEmails: boolean;
 }
 
 export interface AdminUpdateUserRequest {
@@ -54,6 +56,7 @@ export interface AdminUpdateUserRequest {
   lastName: string;
   role: string;
   isActive: boolean;
+  receiveEmails: boolean;
 }
 
 // Inventory Management Types

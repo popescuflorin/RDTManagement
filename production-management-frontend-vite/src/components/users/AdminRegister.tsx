@@ -15,7 +15,8 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
     password: '',
     firstName: '',
     lastName: '',
-    role: ''
+    role: '',
+    receiveEmails: true
   });
   const [roles, setRoles] = useState<RoleDto[]>([]);
   const [isLoadingRoles, setIsLoadingRoles] = useState(true);
@@ -40,10 +41,12 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target;
+    const { name, value, type } = e.target;
+    const checked = (e.target as HTMLInputElement).checked;
+    
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
@@ -172,6 +175,24 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
                 </>
               )}
             </select>
+          </div>
+
+          <div className="form-group checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                name="receiveEmails"
+                checked={formData.receiveEmails}
+                onChange={handleChange}
+                disabled={isLoading}
+              />
+              <span className="checkbox-label">
+                Enable Email Notifications
+                <small className="checkbox-description">
+                  User will receive email notifications for acquisitions and system events
+                </small>
+              </span>
+            </label>
           </div>
 
           <div className="form-actions">

@@ -16,7 +16,8 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
     firstName: user.firstName,
     lastName: user.lastName,
     role: user.role,
-    isActive: user.isActive
+    isActive: user.isActive,
+    receiveEmails: user.receiveEmails
   });
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -133,6 +134,24 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
                 <option value="User">User</option>
               </select>
             </div>
+          </div>
+
+          <div className="form-group checkbox-group">
+            <label>
+              <input
+                type="checkbox"
+                name="receiveEmails"
+                checked={formData.receiveEmails}
+                onChange={handleInputChange}
+                disabled={isLoading}
+              />
+              <span className="checkbox-label">
+                Enable Email Notifications
+                <small className="checkbox-description">
+                  User will receive email notifications for acquisitions and system events
+                </small>
+              </span>
+            </label>
           </div>
 
           <div className="form-actions">
