@@ -12,8 +12,8 @@ using ProductionManagement.API.Data;
 namespace ProductionManagement.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251031121955_AddRolesTable")]
-    partial class AddRolesTable
+    [Migration("20251031180946_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -857,6 +857,24 @@ namespace ProductionManagement.API.Migrations
                             Description = "Basic access with view-only permissions",
                             IsSystemRole = true,
                             Name = "User"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Description = "Supervise production and inventory, limited administrative access",
+                            IsSystemRole = false,
+                            Name = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Description = "Manage inventory and acquisitions only",
+                            IsSystemRole = false,
+                            Name = "Warehouse Operator"
                         });
                 });
 
@@ -891,6 +909,864 @@ namespace ProductionManagement.API.Migrations
                         .IsUnique();
 
                     b.ToTable("RolePermissions");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.ViewTab",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Create",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.View",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Edit",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Cancel",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Receive",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Process",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.ViewTab",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Add",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Edit",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.View",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Deactivate",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Activate",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.ViewTab",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Create",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Edit",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.View",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Cancel",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Execute",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Receive",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.ViewTab",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Create",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Edit",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.View",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Cancel",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 26,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Process",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 27,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Users.ViewTab",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 28,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Users.Create",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 29,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Users.Edit",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 30,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Users.View",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 31,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Users.Deactivate",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 32,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Users.Activate",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 33,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Roles.ViewTab",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 34,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Roles.ManagePermissions",
+                            Role = "Admin"
+                        },
+                        new
+                        {
+                            Id = 35,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.ViewTab",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 36,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Create",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 37,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.View",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 38,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Edit",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 39,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Cancel",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 40,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Receive",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 41,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Process",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 42,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.ViewTab",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 43,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Add",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 44,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Edit",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 45,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.View",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 46,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Deactivate",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 47,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Activate",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 48,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.ViewTab",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 49,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Create",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 50,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Edit",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 51,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.View",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 52,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Cancel",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 53,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Execute",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 54,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Receive",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 55,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.ViewTab",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 56,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Create",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 57,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Edit",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 58,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.View",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 59,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Cancel",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 60,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Process",
+                            Role = "Manager"
+                        },
+                        new
+                        {
+                            Id = 61,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.ViewTab",
+                            Role = "User"
+                        },
+                        new
+                        {
+                            Id = 62,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.View",
+                            Role = "User"
+                        },
+                        new
+                        {
+                            Id = 63,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.ViewTab",
+                            Role = "User"
+                        },
+                        new
+                        {
+                            Id = 64,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.View",
+                            Role = "User"
+                        },
+                        new
+                        {
+                            Id = 65,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.ViewTab",
+                            Role = "User"
+                        },
+                        new
+                        {
+                            Id = 66,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.View",
+                            Role = "User"
+                        },
+                        new
+                        {
+                            Id = 67,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.ViewTab",
+                            Role = "User"
+                        },
+                        new
+                        {
+                            Id = 68,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.View",
+                            Role = "User"
+                        },
+                        new
+                        {
+                            Id = 69,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.ViewTab",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 70,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Create",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 71,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.View",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 72,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Edit",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 73,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Cancel",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 74,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Receive",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 75,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Process",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 76,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.ViewTab",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 77,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Add",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 78,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Edit",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 79,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.View",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 80,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Deactivate",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 81,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Activate",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 82,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.ViewTab",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 83,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Create",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 84,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Edit",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 85,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.View",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 86,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Cancel",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 87,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Execute",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 88,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Production.Receive",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 89,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.ViewTab",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 90,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Create",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 91,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Edit",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 92,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.View",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 93,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Cancel",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 94,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Orders.Process",
+                            Role = "Supervisor"
+                        },
+                        new
+                        {
+                            Id = 95,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.ViewTab",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 96,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Create",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 97,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.View",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 98,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Edit",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 99,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Cancel",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 100,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Receive",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 101,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Acquisitions.Process",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 102,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.ViewTab",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 103,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Add",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 104,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Edit",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 105,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.View",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 106,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Deactivate",
+                            Role = "Warehouse Operator"
+                        },
+                        new
+                        {
+                            Id = 107,
+                            CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
+                            CreatedByUserId = "System",
+                            Permission = "Inventory.Activate",
+                            Role = "Warehouse Operator"
+                        });
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.Supplier", b =>
@@ -1039,6 +1915,9 @@ namespace ProductionManagement.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("ReceiveEmails")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -1070,6 +1949,7 @@ namespace ProductionManagement.API.Migrations
                             LastLoginAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             LastName = "User",
                             PasswordHash = "JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=",
+                            ReceiveEmails = true,
                             Role = "Admin",
                             Username = "admin"
                         });

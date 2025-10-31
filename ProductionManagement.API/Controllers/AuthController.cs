@@ -155,12 +155,19 @@ namespace ProductionManagement.API.Controllers
                 Role = request.Role,
                 CreatedAt = DateTime.UtcNow,
                 LastLoginAt = DateTime.UtcNow,
-                IsActive = true
+                IsActive = true,
+                ReceiveEmails = request.ReceiveEmails
             };
 
             var createdUser = await _userRepository.AddAsync(user);
             var userInfo = await CreateUserInfoAsync(createdUser);
-            await _emailService.SendWelcomeEmailAsync(request.Email, request.Username, request.Password);
+            
+            // Only send welcome email if user has email notifications enabled
+            if (request.ReceiveEmails)
+            {
+                await _emailService.SendWelcomeEmailAsync(request.Email, request.Username, request.Password);
+            }
+            
             return Ok(userInfo);
         }
 
@@ -191,6 +198,7 @@ namespace ProductionManagement.API.Controllers
                 Role = user.Role,
                 LastLoginAt = user.LastLoginAt,
                 IsActive = user.IsActive,
+                ReceiveEmails = user.ReceiveEmails,
                 Permissions = permissions.ToList()
             };
         }

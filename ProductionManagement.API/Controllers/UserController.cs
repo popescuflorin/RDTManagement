@@ -127,17 +127,25 @@ namespace ProductionManagement.API.Controllers
         public async Task<ActionResult<List<UserInfo>>> GetAllUsers()
         {
             var users = await _userRepository.GetAllUsersAsync();
-            var userInfos = users.Select(u => new UserInfo
+            var userInfos = new List<UserInfo>();
+            
+            foreach (var u in users)
             {
-                Id = u.Id,
-                Username = u.Username,
-                Email = u.Email,
-                FirstName = u.FirstName,
-                LastName = u.LastName,
-                Role = u.Role,
-                LastLoginAt = u.LastLoginAt,
-                IsActive = u.IsActive
-            }).ToList();
+                var permissions = await _rolePermissionRepository.GetPermissionsByRoleAsync(u.Role);
+                userInfos.Add(new UserInfo
+                {
+                    Id = u.Id,
+                    Username = u.Username,
+                    Email = u.Email,
+                    FirstName = u.FirstName,
+                    LastName = u.LastName,
+                    Role = u.Role,
+                    LastLoginAt = u.LastLoginAt,
+                    IsActive = u.IsActive,
+                    ReceiveEmails = u.ReceiveEmails,
+                    Permissions = permissions.ToList()
+                });
+            }
 
             return Ok(userInfos);
         }
@@ -173,9 +181,12 @@ namespace ProductionManagement.API.Controllers
             user.LastName = request.LastName;
             user.Role = request.Role;
             user.IsActive = request.IsActive;
+            user.ReceiveEmails = request.ReceiveEmails;
 
             await _userRepository.UpdateAsync(user);
 
+            var permissions = await _rolePermissionRepository.GetPermissionsByRoleAsync(user.Role);
+            
             var userInfo = new UserInfo
             {
                 Id = user.Id,
@@ -185,7 +196,9 @@ namespace ProductionManagement.API.Controllers
                 LastName = user.LastName,
                 Role = user.Role,
                 LastLoginAt = user.LastLoginAt,
-                IsActive = user.IsActive
+                IsActive = user.IsActive,
+                ReceiveEmails = user.ReceiveEmails,
+                Permissions = permissions.ToList()
             };
 
             return Ok(userInfo);
@@ -269,5 +282,6 @@ namespace ProductionManagement.API.Controllers
         public string LastName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public bool IsActive { get; set; } = true;
+        public bool ReceiveEmails { get; set; } = true;
     }
 }

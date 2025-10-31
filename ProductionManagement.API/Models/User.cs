@@ -12,6 +12,7 @@ namespace ProductionManagement.API.Models
         public DateTime CreatedAt { get; set; }
         public DateTime LastLoginAt { get; set; }
         public bool IsActive { get; set; } = true;
+        public bool ReceiveEmails { get; set; } = true;
     }
 
     public class LoginRequest
@@ -38,6 +39,7 @@ namespace ProductionManagement.API.Models
         public string Role { get; set; } = string.Empty;
         public DateTime LastLoginAt { get; set; }
         public bool IsActive { get; set; } = true;
+        public bool ReceiveEmails { get; set; } = true;
         public List<string> Permissions { get; set; } = new List<string>();
     }
 
@@ -50,5 +52,6 @@ namespace ProductionManagement.API.Models
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
         public string Role { get; set; } = "User";
+        public bool ReceiveEmails { get; set; } = true;
     }
 }
