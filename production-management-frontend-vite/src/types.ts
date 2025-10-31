@@ -6,6 +6,7 @@ export interface User {
   lastName: string;
   role: string;
   lastLoginAt: string;
+  isActive: boolean;
 }
 
 export interface LoginRequest {

@@ -8,13 +8,15 @@ import {
   Eye, 
   AlertTriangle, 
   Loader2,
-  RotateCcw
+  RotateCcw,
+  UserCheck
 } from 'lucide-react';
 import { userApi } from '../../services/api';
 import type { User } from '../../types';
 import AdminRegister from './AdminRegister';
 import EditUser from './EditUser';
 import DeleteConfirmation from './DeleteConfirmation';
+import ActivateUser from './ActivateUser';
 import './UserManagement.css';
 
 const UserManagement: React.FC = () => {
@@ -24,6 +26,7 @@ const UserManagement: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showActivateModal, setShowActivateModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -77,9 +80,25 @@ const UserManagement: React.FC = () => {
     setSelectedUser(null);
   };
 
+  const handleActivateUser = (user: User) => {
+    setSelectedUser(user);
+    setShowActivateModal(true);
+  };
+
+  const handleUserActivated = (updatedUser: User) => {
+    setUsers(prevUsers => 
+      prevUsers.map(user => 
+        user.id === updatedUser.id ? updatedUser : user
+      )
+    );
+    setShowActivateModal(false);
+    setSelectedUser(null);
+  };
+
   const closeModals = () => {
     setShowEditModal(false);
     setShowDeleteModal(false);
+    setShowActivateModal(false);
     setSelectedUser(null);
   };
 
@@ -231,13 +250,23 @@ const UserManagement: React.FC = () => {
                     >
                       <Edit size={16} />
                     </button>
-                    <button 
-                      className="btn btn-sm btn-danger" 
-                      title="Delete User"
-                      onClick={() => handleDeleteUser(user)}
-                    >
-                      <Trash2 size={16} />
-                    </button>
+                    {user.isActive ? (
+                      <button 
+                        className="btn btn-sm btn-danger" 
+                        title="Deactivate User"
+                        onClick={() => handleDeleteUser(user)}
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    ) : (
+                      <button 
+                        className="btn btn-sm btn-success" 
+                        title="Activate User"
+                        onClick={() => handleActivateUser(user)}
+                      >
+                        <UserCheck size={16} />
+                      </button>
+                    )}
                     <button className="btn btn-sm btn-secondary" title="View Details">
                       <Eye size={16} />
                     </button>
@@ -290,6 +319,14 @@ const UserManagement: React.FC = () => {
           user={selectedUser}
           onClose={closeModals}
           onUserDeleted={handleUserDeleted}
+        />
+      )}
+
+      {showActivateModal && selectedUser && (
+        <ActivateUser
+          user={selectedUser}
+          onClose={closeModals}
+          onUserActivated={handleUserActivated}
         />
       )}
     </div>

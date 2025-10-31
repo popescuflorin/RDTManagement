@@ -9,6 +9,7 @@ namespace ProductionManagement.API.Repositories
         Task<bool> UsernameExistsAsync(string username);
         Task<bool> EmailExistsAsync(string email);
         Task<IEnumerable<User>> GetActiveUsersAsync();
+        Task<IEnumerable<User>> GetAllUsersAsync();
         Task<IEnumerable<User>> GetUsersByRoleAsync(string role);
     }
 }

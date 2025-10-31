@@ -85,24 +85,16 @@ const Login: React.FC = () => {
             />
           </div>
 
-          <button
-            type="submit"
-            className="btn btn-primary btn-lg"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Signing In...' : 'Sign In'}
-          </button>
-        </form>
-
-
-        <div className="demo-credentials">
-          <h3>Demo Credentials:</h3>
-          <p><strong>Admin:</strong> admin / admin123</p>
-          <p><strong>User:</strong> user / user123</p>
-          <div className="admin-note">
-            <p><small>Note: Only administrators can create new user accounts.</small></p>
+          <div className="button-wrapper">
+            <button
+              type="submit"
+              className="btn btn-primary btn-lg"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Signing In...' : 'Sign In'}
+            </button>
           </div>
-        </div>
+        </form>
       </div>
     </div>
   );

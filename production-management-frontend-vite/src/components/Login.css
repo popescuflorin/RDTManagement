@@ -184,6 +184,19 @@
   display: none;
 }
 
+/* Button wrapper for centering */
+.button-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: var(--space-lg);
+}
+
+.button-wrapper button {
+  min-width: 200px;
+  max-width: 300px;
+}
+
 .error-message {
   background: rgba(244, 67, 54, 0.15);
   backdrop-filter: blur(10px);

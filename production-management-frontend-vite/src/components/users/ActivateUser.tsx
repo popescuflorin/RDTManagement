@@ -1,29 +1,37 @@
 import React, { useState } from 'react';
 import { userApi } from '../../services/api';
 import type { User } from '../../types';
-import './DeleteConfirmation.css';
+import './ActivateUser.css';
 
-interface DeleteConfirmationProps {
+interface ActivateUserProps {
   user: User;
   onClose: () => void;
-  onUserDeleted: (userId: number) => void;
+  onUserActivated: (updatedUser: User) => void;
 }
 
-const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, onUserDeleted }) => {
+const ActivateUser: React.FC<ActivateUserProps> = ({ user, onClose, onUserActivated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleDelete = async () => {
+  const handleActivate = async () => {
     setIsLoading(true);
     setError(null);
 
     try {
-      await userApi.deleteUser(user.id);
-      onUserDeleted(user.id);
+      // Update the user with isActive set to true
+      const response = await userApi.updateUser(user.id, {
+        username: user.username,
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        isActive: true
+      });
+      onUserActivated(response.data);
       onClose();
     } catch (error: any) {
-      console.error('Error deleting user:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to delete user. Please try again.';
+      console.error('Error activating user:', error);
+      const errorMessage = error.response?.data?.message || 'Failed to activate user. Please try again.';
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -31,14 +39,14 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
   };
 
   return (
-    <div className="delete-confirmation-overlay">
-      <div className="delete-confirmation-modal">
-        <div className="delete-confirmation-header">
-          <div className="warning-icon">⚠️</div>
-          <h2>Deactivate User</h2>
+    <div className="activate-user-overlay">
+      <div className="activate-user-modal">
+        <div className="activate-user-header">
+          <div className="success-icon">✓</div>
+          <h2>Activate User</h2>
         </div>
 
-        <div className="delete-confirmation-content">
+        <div className="activate-user-content">
           {error && (
             <div className="error-message">
               {error}
@@ -46,7 +54,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
           )}
 
           <p className="confirmation-text">
-            Are you sure you want to deactivate this user account?
+            Are you sure you want to activate this user account?
           </p>
 
           <div className="user-details">
@@ -60,18 +68,17 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
             </div>
           </div>
 
-          <div className="warning-text">
-            <strong>Warning:</strong> Deactivating this user will:
+          <div className="info-text">
+            <strong>Activating this user will:</strong>
             <ul>
-              <li>Block their access to the system</li>
-              <li>Prevent them from logging in</li>
-              <li>Keep their data for record-keeping</li>
-              <li>Can be reactivated later by editing the user</li>
+              <li>Restore their access to the system</li>
+              <li>Allow them to log in again</li>
+              <li>Enable all their previous permissions</li>
             </ul>
           </div>
         </div>
 
-        <div className="delete-confirmation-actions">
+        <div className="activate-user-actions">
           <button
             type="button"
             onClick={onClose}
@@ -82,11 +89,11 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
           </button>
           <button
             type="button"
-            onClick={handleDelete}
-            className="delete-button"
+            onClick={handleActivate}
+            className="activate-button"
             disabled={isLoading}
           >
-            {isLoading ? 'Deactivating...' : 'Deactivate User'}
+            {isLoading ? 'Activating...' : 'Activate User'}
           </button>
         </div>
       </div>
@@ -94,4 +101,5 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
   );
 };
 
-export default DeleteConfirmation;
+export default ActivateUser;
+

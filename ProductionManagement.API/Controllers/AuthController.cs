@@ -33,6 +33,12 @@ namespace ProductionManagement.API.Controllers
                 return Unauthorized(new { message = "Invalid username or password" });
             }
 
+            // Check if user account is active
+            if (!user.IsActive)
+            {
+                return Unauthorized(new { message = "Your account has been deactivated. Please contact an administrator." });
+            }
+
             user.LastLoginAt = DateTime.UtcNow;
             await _userRepository.UpdateAsync(user);
 
@@ -54,7 +60,8 @@ namespace ProductionManagement.API.Controllers
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     Role = user.Role,
-                    LastLoginAt = user.LastLoginAt
+                    LastLoginAt = user.LastLoginAt,
+                    IsActive = user.IsActive
                 }
             };
 
@@ -76,6 +83,13 @@ namespace ProductionManagement.API.Controllers
                 return Unauthorized(new { message = "User not found" });
             }
 
+            // Check if user account is active
+            if (!user.IsActive)
+            {
+                _refreshTokens.Remove(refreshToken);
+                return Unauthorized(new { message = "Your account has been deactivated. Please contact an administrator." });
+            }
+
             var newToken = _jwtService.GenerateToken(user);
             var newRefreshToken = _jwtService.GenerateRefreshToken();
             
@@ -95,7 +109,8 @@ namespace ProductionManagement.API.Controllers
                     FirstName = user.FirstName,
                     LastName = user.LastName,
                     Role = user.Role,
-                    LastLoginAt = user.LastLoginAt
+                    LastLoginAt = user.LastLoginAt,
+                    IsActive = user.IsActive
                 }
             };
 
@@ -165,7 +180,8 @@ namespace ProductionManagement.API.Controllers
                 FirstName = createdUser.FirstName,
                 LastName = createdUser.LastName,
                 Role = createdUser.Role,
-                LastLoginAt = createdUser.LastLoginAt
+                LastLoginAt = createdUser.LastLoginAt,
+                IsActive = createdUser.IsActive
             };
 
             return Ok(userInfo);

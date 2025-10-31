@@ -502,3 +502,15 @@
     padding: 0 10px;
   }
 }
+
+/* Button Styles */
+.btn-success {
+  background: var(--success-600);
+  color: var(--text-inverse);
+  border: 1px solid var(--success-600);
+}
+
+.btn-success:hover {
+  background: var(--success-700);
+  border-color: var(--success-700);
+}

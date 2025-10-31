@@ -35,6 +35,11 @@ namespace ProductionManagement.API.Repositories
             return await _dbSet.Where(u => u.IsActive).ToListAsync();
         }
 
+        public async Task<IEnumerable<User>> GetAllUsersAsync()
+        {
+            return await _dbSet.ToListAsync();
+        }
+
         public async Task<IEnumerable<User>> GetUsersByRoleAsync(string role)
         {
             return await _dbSet.Where(u => u.Role == role && u.IsActive).ToListAsync();

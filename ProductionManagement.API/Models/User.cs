@@ -37,6 +37,7 @@ namespace ProductionManagement.API.Models
         public string LastName { get; set; } = string.Empty;
         public string Role { get; set; } = string.Empty;
         public DateTime LastLoginAt { get; set; }
+        public bool IsActive { get; set; } = true;
     }
 
 

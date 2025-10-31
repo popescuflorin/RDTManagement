@@ -41,7 +41,8 @@ namespace ProductionManagement.API.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Role = user.Role,
-                LastLoginAt = user.LastLoginAt
+                LastLoginAt = user.LastLoginAt,
+                IsActive = user.IsActive
             };
 
             return Ok(userInfo);
@@ -77,7 +78,8 @@ namespace ProductionManagement.API.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Role = user.Role,
-                LastLoginAt = user.LastLoginAt
+                LastLoginAt = user.LastLoginAt,
+                IsActive = user.IsActive
             };
 
             return Ok(userInfo);
@@ -122,7 +124,7 @@ namespace ProductionManagement.API.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<UserInfo>>> GetAllUsers()
         {
-            var users = await _userRepository.GetActiveUsersAsync();
+            var users = await _userRepository.GetAllUsersAsync();
             var userInfos = users.Select(u => new UserInfo
             {
                 Id = u.Id,
@@ -131,7 +133,8 @@ namespace ProductionManagement.API.Controllers
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 Role = u.Role,
-                LastLoginAt = u.LastLoginAt
+                LastLoginAt = u.LastLoginAt,
+                IsActive = u.IsActive
             }).ToList();
 
             return Ok(userInfos);
@@ -179,7 +182,8 @@ namespace ProductionManagement.API.Controllers
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 Role = user.Role,
-                LastLoginAt = user.LastLoginAt
+                LastLoginAt = user.LastLoginAt,
+                IsActive = user.IsActive
             };
 
             return Ok(userInfo);
@@ -194,7 +198,7 @@ namespace ProductionManagement.API.Controllers
             {
                 if (currentUserId == id)
                 {
-                    return BadRequest(new { message = "You cannot delete your own account" });
+                    return BadRequest(new { message = "You cannot deactivate your own account" });
                 }
             }
 
@@ -204,8 +208,17 @@ namespace ProductionManagement.API.Controllers
                 return NotFound(new { message = "User not found" });
             }
 
-            await _userRepository.DeleteAsync(user);
-            return Ok(new { message = "User deleted successfully" });
+            // Check if user is already inactive
+            if (!user.IsActive)
+            {
+                return BadRequest(new { message = "User is already deactivated" });
+            }
+
+            // Soft delete: Mark user as inactive instead of deleting
+            user.IsActive = false;
+            await _userRepository.UpdateAsync(user);
+            
+            return Ok(new { message = "User deactivated successfully" });
         }
 
         // Static method removed - use IUserRepository.GetByIdAsync instead

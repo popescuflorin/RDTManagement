@@ -133,18 +133,6 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
                 <option value="User">User</option>
               </select>
             </div>
-            <div className="form-group checkbox-group">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  name="isActive"
-                  checked={formData.isActive}
-                  onChange={handleInputChange}
-                  disabled={isLoading}
-                />
-                <span className="checkbox-text">Active User</span>
-              </label>
-            </div>
           </div>
 
           <div className="form-actions">
