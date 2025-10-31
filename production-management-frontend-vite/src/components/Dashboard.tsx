@@ -108,10 +108,6 @@ const Dashboard: React.FC = () => {
         return <AcquisitionPage />;
       case 'orders':
         return <Orders />;
-      case 'reports':
-        return <div className="page-content"><h2>Reports</h2><p>Reports functionality will be implemented here.</p></div>;
-      case 'settings':
-        return <div className="page-content"><h2>Settings</h2><p>Settings functionality will be implemented here.</p></div>;
       default:
         return renderDashboardContent();
     }

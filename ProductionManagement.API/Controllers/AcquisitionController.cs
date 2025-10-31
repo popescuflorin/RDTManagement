@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Data;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
@@ -36,7 +37,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager,User")]
+        [RequirePermission(Permissions.ViewAcquisitionsTab)]
         public async Task<ActionResult<IEnumerable<AcquisitionDto>>> GetAcquisitions()
         {
             var acquisitions = await _acquisitionRepository.GetActiveAcquisitionsAsync();
@@ -46,7 +47,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Manager,User")]
+        [RequirePermission(Permissions.ViewAcquisition)]
         public async Task<ActionResult<AcquisitionDto>> GetAcquisition(int id)
         {
             var acquisition = await _acquisitionRepository.GetByIdWithItemsAsync(id);
@@ -60,7 +61,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.CreateAcquisition)]
         public async Task<ActionResult<AcquisitionDto>> CreateAcquisition(CreateAcquisitionRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -168,7 +169,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.EditAcquisition)]
         public async Task<ActionResult<AcquisitionDto>> UpdateAcquisition(int id, UpdateAcquisitionRequest request)
         {
             var acquisition = await _acquisitionRepository.GetByIdWithItemsAsync(id);
@@ -301,7 +302,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost("{id}/receive")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.ReceiveAcquisition)]
         public async Task<ActionResult<AcquisitionDto>> ReceiveAcquisition(int id, ReceiveAcquisitionRequest request)
         {
             var acquisition = await _acquisitionRepository.GetByIdWithItemsAsync(id);
@@ -388,7 +389,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost("{id}/process")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.ProcessAcquisition)]
         public async Task<ActionResult<AcquisitionDto>> ProcessAcquisition(int id, ProcessAcquisitionRequest request)
         {
             var acquisition = await _acquisitionRepository.GetByIdWithItemsAsync(id);
@@ -509,7 +510,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.CancelAcquisition)]
         public async Task<IActionResult> DeleteAcquisition(int id)
         {
             var acquisition = await _acquisitionRepository.GetByIdAsync(id);
@@ -533,7 +534,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost("{id}/cancel")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.CancelAcquisition)]
         public async Task<ActionResult<AcquisitionDto>> CancelAcquisition(int id)
         {
             var acquisition = await _acquisitionRepository.GetByIdWithItemsAsync(id);
@@ -564,7 +565,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("statistics")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.ViewAcquisitionsTab)]
         public async Task<ActionResult<AcquisitionStatistics>> GetStatistics()
         {
             var activeAcquisitions = await _acquisitionRepository.GetActiveAcquisitionsAsync();

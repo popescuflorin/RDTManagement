@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
 using System.Security.Claims;
@@ -12,10 +13,12 @@ namespace ProductionManagement.API.Controllers
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepository;
+        private readonly IRolePermissionRepository _rolePermissionRepository;
 
-        public UserController(IUserRepository userRepository)
+        public UserController(IUserRepository userRepository, IRolePermissionRepository rolePermissionRepository)
         {
             _userRepository = userRepository;
+            _rolePermissionRepository = rolePermissionRepository;
         }
 
         [HttpGet("profile")]
@@ -121,7 +124,6 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("all")]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<UserInfo>>> GetAllUsers()
         {
             var users = await _userRepository.GetAllUsersAsync();
@@ -141,7 +143,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
+        [RequirePermission(Permissions.EditUser)]
         public async Task<ActionResult<UserInfo>> UpdateUser(int id, [FromBody] AdminUpdateUserRequest request)
         {
             var user = await _userRepository.GetByIdAsync(id);
@@ -190,7 +192,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [RequirePermission(Permissions.DeactivateUser)]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var currentUserIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -222,6 +224,24 @@ namespace ProductionManagement.API.Controllers
         }
 
         // Static method removed - use IUserRepository.GetByIdAsync instead
+
+        private async Task<UserInfo> CreateUserInfoAsync(User user)
+        {
+            var permissions = await _rolePermissionRepository.GetPermissionsByRoleAsync(user.Role);
+            
+            return new UserInfo
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = user.Role,
+                LastLoginAt = user.LastLoginAt,
+                IsActive = user.IsActive,
+                Permissions = permissions.ToList()
+            };
+        }
     }
 
     public class UpdateProfileRequest

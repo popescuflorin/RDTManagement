@@ -8,6 +8,8 @@ import ViewOrder from './ViewOrder';
 import EditOrder from './EditOrder';
 import ProcessOrder from './ProcessOrder';
 import CancelOrderModal from './CancelOrderModal';
+import ProtectedButton from '../ProtectedButton';
+import { Permissions } from '../../hooks/usePermissions';
 import './Orders.css';
 
 const Orders: React.FC = () => {
@@ -178,13 +180,14 @@ const Orders: React.FC = () => {
           <Package size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
           Orders
         </h1>
-        <button 
+        <ProtectedButton
+          requiredPermission={Permissions.CreateOrder}
           className="btn btn-primary"
           onClick={handleCreateOrder}
         >
           <Plus size={16} />
           Create New Order
-        </button>
+        </ProtectedButton>
       </div>
 
       {/* Statistics Cards */}
@@ -350,39 +353,43 @@ const Orders: React.FC = () => {
                   <td>{getStatusBadge(order.status)}</td>
                   <td className="actions-cell">
                     <div className="action-buttons">
-                      <button
+                      <ProtectedButton
+                        requiredPermission={Permissions.ViewOrder}
                         className="btn btn-sm btn-info"
                         title="View Order"
                         onClick={() => handleViewOrder(order)}
                       >
                         <Eye size={16} />
-                      </button>
+                      </ProtectedButton>
                       {order.status === OrderStatus.Draft && (
-                        <button
+                        <ProtectedButton
+                          requiredPermission={Permissions.EditOrder}
                           className="btn btn-sm btn-primary"
                           title="Edit Order"
                           onClick={() => handleEditOrder(order)}
                         >
                           <Edit size={16} />
-                        </button>
+                        </ProtectedButton>
                       )}
                       {(order.status === OrderStatus.Draft || order.status === OrderStatus.Pending) && (
-                        <button
+                        <ProtectedButton
+                          requiredPermission={Permissions.ProcessOrder}
                           className="btn btn-sm btn-success"
                           title="Process Order"
                           onClick={() => handleProcessOrder(order)}
                         >
                           <Play size={16} />
-                        </button>
+                        </ProtectedButton>
                       )}
                       {order.status !== OrderStatus.Delivered && order.status !== OrderStatus.Cancelled && (
-                        <button
+                        <ProtectedButton
+                          requiredPermission={Permissions.CancelOrder}
                           className="btn btn-sm btn-danger"
                           title="Cancel Order"
                           onClick={() => handleCancelOrder(order)}
                         >
                           <XCircle size={16} />
-                        </button>
+                        </ProtectedButton>
                       )}
                     </div>
                   </td>

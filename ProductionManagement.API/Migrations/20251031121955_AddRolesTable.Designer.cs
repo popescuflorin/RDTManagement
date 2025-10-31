@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductionManagement.API.Data;
 
@@ -11,9 +12,11 @@ using ProductionManagement.API.Data;
 namespace ProductionManagement.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251031121955_AddRolesTable")]
+    partial class AddRolesTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,7 +123,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasIndex("TransportId");
 
-                    b.ToTable("Acquisitions", (string)null);
+                    b.ToTable("Acquisitions");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.AcquisitionHistory", b =>
@@ -161,7 +164,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("AcquisitionHistories", (string)null);
+                    b.ToTable("AcquisitionHistories");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.AcquisitionItem", b =>
@@ -220,7 +223,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasIndex("RawMaterialId");
 
-                    b.ToTable("AcquisitionItems", (string)null);
+                    b.ToTable("AcquisitionItems");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.Client", b =>
@@ -284,7 +287,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Clients", (string)null);
+                    b.ToTable("Clients");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.Order", b =>
@@ -345,7 +348,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasIndex("TransportId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.OrderMaterial", b =>
@@ -394,7 +397,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasIndex("RawMaterialId");
 
-                    b.ToTable("OrderMaterials", (string)null);
+                    b.ToTable("OrderMaterials");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.ProcessedMaterial", b =>
@@ -432,7 +435,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasIndex("RawMaterialId");
 
-                    b.ToTable("ProcessedMaterials", (string)null);
+                    b.ToTable("ProcessedMaterials");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.Product", b =>
@@ -474,7 +477,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.ProductMaterial", b =>
@@ -516,7 +519,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductMaterials", (string)null);
+                    b.ToTable("ProductMaterials");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplate", b =>
@@ -544,7 +547,7 @@ namespace ProductionManagement.API.Migrations
                     b.HasIndex("FinishedProductId")
                         .IsUnique();
 
-                    b.ToTable("ProductTemplates", (string)null);
+                    b.ToTable("ProductTemplates");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.ProductTemplateMaterial", b =>
@@ -571,7 +574,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasIndex("RawMaterialId");
 
-                    b.ToTable("ProductTemplateMaterials", (string)null);
+                    b.ToTable("ProductTemplateMaterials");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.ProductionPlan", b =>
@@ -649,7 +652,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasIndex("TargetProductId");
 
-                    b.ToTable("ProductionPlans", (string)null);
+                    b.ToTable("ProductionPlans");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.ProductionPlanMaterial", b =>
@@ -688,7 +691,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasIndex("RawMaterialId");
 
-                    b.ToTable("ProductionPlanMaterials", (string)null);
+                    b.ToTable("ProductionPlanMaterials");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.RawMaterial", b =>
@@ -743,7 +746,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("RawMaterials", (string)null);
+                    b.ToTable("RawMaterials");
 
                     b.HasData(
                         new
@@ -825,7 +828,7 @@ namespace ProductionManagement.API.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Roles", (string)null);
+                    b.ToTable("Roles");
 
                     b.HasData(
                         new
@@ -887,7 +890,7 @@ namespace ProductionManagement.API.Migrations
                     b.HasIndex("Role", "Permission")
                         .IsUnique();
 
-                    b.ToTable("RolePermissions", (string)null);
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.Supplier", b =>
@@ -965,7 +968,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Suppliers", (string)null);
+                    b.ToTable("Suppliers");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.Transport", b =>
@@ -997,7 +1000,7 @@ namespace ProductionManagement.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Transports", (string)null);
+                    b.ToTable("Transports");
                 });
 
             modelBuilder.Entity("ProductionManagement.API.Models.User", b =>
@@ -1054,7 +1057,7 @@ namespace ProductionManagement.API.Migrations
                     b.HasIndex("Username")
                         .IsUnique();
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
 
                     b.HasData(
                         new

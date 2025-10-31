@@ -11,6 +11,7 @@ import {
   ChevronLeft, 
   ChevronRight 
 } from 'lucide-react';
+import { usePermissions, Permissions } from '../hooks/usePermissions';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -25,7 +26,7 @@ interface MenuItem {
   id: string;
   label: string;
   icon: React.ComponentType<{ size?: number; className?: string }>;
-  requiredRole?: string;
+  requiredPermission?: string;
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -35,52 +36,49 @@ const Sidebar: React.FC<SidebarProps> = ({
   onNavigate,
   userRole
 }) => {
+  const { hasPermission } = usePermissions();
+
   const menuItems: MenuItem[] = [
     {
       id: 'dashboard',
       label: 'Dashboard',
       icon: BarChart3
+      // Dashboard is accessible to everyone
     },
     {
       id: 'users',
       label: 'User Management',
       icon: Users,
-      requiredRole: 'Admin'
+      requiredPermission: Permissions.ViewUsersTab
     },
     {
       id: 'acquisitions',
       label: 'Acquisitions',
-      icon: ShoppingCart
+      icon: ShoppingCart,
+      requiredPermission: Permissions.ViewAcquisitionsTab
     },
     {
       id: 'inventory',
       label: 'Inventory',
-      icon: Package
+      icon: Package,
+      requiredPermission: Permissions.ViewInventoryTab
     },
     {
       id: 'production',
       label: 'Production',
-      icon: Factory
+      icon: Factory,
+      requiredPermission: Permissions.ViewProductionTab
     },
     {
       id: 'orders',
       label: 'Orders',
-      icon: ClipboardList
-    },
-    {
-      id: 'reports',
-      label: 'Reports',
-      icon: TrendingUp
-    },
-    {
-      id: 'settings',
-      label: 'Settings',
-      icon: Settings
+      icon: ClipboardList,
+      requiredPermission: Permissions.ViewOrdersTab
     }
   ];
 
   const filteredMenuItems = menuItems.filter(item => 
-    !item.requiredRole || item.requiredRole === userRole
+    !item.requiredPermission || hasPermission(item.requiredPermission)
   );
 
   return (

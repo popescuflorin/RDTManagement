@@ -14,13 +14,17 @@ namespace ProductionManagement.API.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IJwtService _jwtService;
+        private readonly IEmailService _emailService;
         private readonly IUserRepository _userRepository;
+        private readonly IRolePermissionRepository _rolePermissionRepository;
         private static readonly Dictionary<string, string> _refreshTokens = new Dictionary<string, string>();
 
-        public AuthController(IJwtService jwtService, IUserRepository userRepository)
+        public AuthController(IJwtService jwtService, IUserRepository userRepository, IRolePermissionRepository rolePermissionRepository, IEmailService emailService)
         {
             _jwtService = jwtService;
             _userRepository = userRepository;
+            _rolePermissionRepository = rolePermissionRepository;
+            _emailService = emailService;
         }
 
         [HttpPost("login")]
@@ -47,22 +51,14 @@ namespace ProductionManagement.API.Controllers
             
             _refreshTokens[refreshToken] = user.Username;
 
+            var userInfo = await CreateUserInfoAsync(user);
+
             var response = new LoginResponse
             {
                 Token = token,
                 RefreshToken = refreshToken,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(60),
-                User = new UserInfo
-                {
-                    Id = user.Id,
-                    Username = user.Username,
-                    Email = user.Email,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Role = user.Role,
-                    LastLoginAt = user.LastLoginAt,
-                    IsActive = user.IsActive
-                }
+                User = userInfo
             };
 
             return Ok(response);
@@ -96,22 +92,14 @@ namespace ProductionManagement.API.Controllers
             _refreshTokens.Remove(refreshToken);
             _refreshTokens[newRefreshToken] = user.Username;
 
+            var userInfo = await CreateUserInfoAsync(user);
+
             var response = new LoginResponse
             {
                 Token = newToken,
                 RefreshToken = newRefreshToken,
                 ExpiresAt = DateTime.UtcNow.AddMinutes(60),
-                User = new UserInfo
-                {
-                    Id = user.Id,
-                    Username = user.Username,
-                    Email = user.Email,
-                    FirstName = user.FirstName,
-                    LastName = user.LastName,
-                    Role = user.Role,
-                    LastLoginAt = user.LastLoginAt,
-                    IsActive = user.IsActive
-                }
+                User = userInfo
             };
 
             return Ok(response);
@@ -171,19 +159,8 @@ namespace ProductionManagement.API.Controllers
             };
 
             var createdUser = await _userRepository.AddAsync(user);
-
-            var userInfo = new UserInfo
-            {
-                Id = createdUser.Id,
-                Username = createdUser.Username,
-                Email = createdUser.Email,
-                FirstName = createdUser.FirstName,
-                LastName = createdUser.LastName,
-                Role = createdUser.Role,
-                LastLoginAt = createdUser.LastLoginAt,
-                IsActive = createdUser.IsActive
-            };
-
+            var userInfo = await CreateUserInfoAsync(createdUser);
+            await _emailService.SendWelcomeEmailAsync(request.Email, request.Username, request.Password);
             return Ok(userInfo);
         }
 
@@ -198,6 +175,24 @@ namespace ProductionManagement.API.Controllers
         {
             var hashedPassword = HashPassword(password);
             return hashedPassword == hash;
+        }
+
+        private async Task<UserInfo> CreateUserInfoAsync(User user)
+        {
+            var permissions = await _rolePermissionRepository.GetPermissionsByRoleAsync(user.Role);
+            
+            return new UserInfo
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Role = user.Role,
+                LastLoginAt = user.LastLoginAt,
+                IsActive = user.IsActive,
+                Permissions = permissions.ToList()
+            };
         }
     }
 }

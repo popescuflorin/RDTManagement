@@ -1,7 +1,10 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Data;
+using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
 using ProductionManagement.API.Services;
 using System.Security.Claims;
@@ -31,9 +34,16 @@ builder.Services.AddScoped<IAcquisitionRepository, AcquisitionRepository>();
 builder.Services.AddScoped<ITransportRepository, TransportRepository>();
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IRolePermissionRepository, RolePermissionRepository>();
 
 // Add JWT service
 builder.Services.AddScoped<IJwtService, JwtService>();
+
+// Add HTTP Client Factory
+builder.Services.AddHttpClient();
+
+// Add Email Service
+builder.Services.AddScoped<IEmailService, BrevoEmailService>();
 
 // Configure JWT authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
@@ -58,7 +68,21 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+// Register authorization handler (Scoped because it depends on scoped repository)
+builder.Services.AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
+
+// Configure authorization with permission-based policies
+builder.Services.AddAuthorization(options =>
+{
+    // Get all permissions and create policies for each
+    var allPermissions = Permissions.GetAllPermissions();
+    
+    foreach (var permission in allPermissions)
+    {
+        options.AddPolicy(permission, policy =>
+            policy.Requirements.Add(new PermissionRequirement(permission)));
+    }
+});
 
 // Add CORS
 builder.Services.AddCors(options =>

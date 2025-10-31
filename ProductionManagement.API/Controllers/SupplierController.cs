@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
 using System.Security.Claims;
@@ -21,7 +22,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager,User")]
+        [RequirePermission(Permissions.ViewAcquisitionsTab)]
         public async Task<ActionResult<IEnumerable<SupplierDto>>> GetSuppliers()
         {
             var suppliers = await _supplierRepository.GetActiveSuppliersAsync();
@@ -31,7 +32,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Manager,User")]
+        [RequirePermission(Permissions.ViewAcquisitionsTab)]
         public async Task<ActionResult<SupplierDto>> GetSupplier(int id)
         {
             var supplier = await _supplierRepository.GetByIdWithDetailsAsync(id);
@@ -44,7 +45,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.CreateAcquisition)]
         public async Task<ActionResult<SupplierDto>> CreateSupplier([FromBody] CreateSupplierRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -92,7 +93,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.EditAcquisition)]
         public async Task<ActionResult<SupplierDto>> UpdateSupplier(int id, [FromBody] UpdateSupplierRequest request)
         {
             var supplier = await _supplierRepository.GetByIdAsync(id);
@@ -130,7 +131,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [RequirePermission(Permissions.CreateAcquisition)]
         public async Task<IActionResult> DeleteSupplier(int id)
         {
             var supplier = await _supplierRepository.GetByIdWithDetailsAsync(id);
@@ -150,7 +151,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("statistics")]
-        [Authorize(Roles = "Admin,Manager,User")]
+        [RequirePermission(Permissions.ViewAcquisitionsTab)]
         public async Task<ActionResult<SupplierStatistics>> GetStatistics()
         {
             var allSuppliers = await _supplierRepository.GetAllAsync();

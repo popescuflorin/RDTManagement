@@ -18,6 +18,8 @@ import EditMaterial from './EditMaterial';
 import ViewMaterial from './ViewMaterial';
 import DeleteMaterialConfirmation from './DeleteMaterialConfirmation';
 import ActivateMaterialModal from './ActivateMaterialModal';
+import ProtectedButton from '../ProtectedButton';
+import { Permissions } from '../../hooks/usePermissions';
 import './Inventory.css';
 
 const Inventory: React.FC = () => {
@@ -36,11 +38,6 @@ const Inventory: React.FC = () => {
   const [showInactive, setShowInactive] = useState(false);
   const [sortBy, setSortBy] = useState<'name' | 'quantity' | 'updated'>('name');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  
-  // Get user role from localStorage
-  const userString = localStorage.getItem('user');
-  const user = userString ? JSON.parse(userString) : null;
-  const isAdmin = user?.role === 'Admin';
 
   useEffect(() => {
     loadData();
@@ -195,13 +192,14 @@ const Inventory: React.FC = () => {
           <Package size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
           Inventory Management
         </h1>
-        <button 
+        <ProtectedButton
+          requiredPermission={Permissions.AddMaterial}
           className="btn btn-primary"
           onClick={() => setShowAddModal(true)}
         >
           <Plus size={16} />
           Add Material
-        </button>
+        </ProtectedButton>
       </div>
 
       {/* Statistics Cards */}
@@ -342,39 +340,41 @@ const Inventory: React.FC = () => {
                   <td>{formatDate(material.updatedAt)}</td>
                   <td className="actions-cell">
                     <div className="action-buttons">
-                      <button 
+                      <ProtectedButton
+                        requiredPermission={Permissions.ViewMaterial}
                         className="btn btn-sm btn-info" 
                         title="View Material"
                         onClick={() => handleViewMaterial(material)}
                       >
                         <Eye size={16} />
-                      </button>
-                      <button 
+                      </ProtectedButton>
+                      <ProtectedButton
+                        requiredPermission={Permissions.EditMaterial}
                         className="btn btn-sm btn-warning" 
                         title="Edit Material"
                         onClick={() => handleEditMaterial(material)}
                       >
                         <Edit size={16} />
-                      </button>
+                      </ProtectedButton>
                       {material.isActive ? (
-                        isAdmin && (
-                          <button 
-                            className="btn btn-sm btn-danger" 
-                            title={material.quantity > 0 ? "Cannot deactivate - stock must be 0" : "Deactivate Material"}
-                            onClick={() => handleDeleteMaterial(material)}
-                            disabled={material.quantity > 0}
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        )
+                        <ProtectedButton
+                          requiredPermission={Permissions.DeactivateMaterial}
+                          className="btn btn-sm btn-danger" 
+                          title={material.quantity > 0 ? "Cannot deactivate - stock must be 0" : "Deactivate Material"}
+                          onClick={() => handleDeleteMaterial(material)}
+                          disabled={material.quantity > 0}
+                        >
+                          <Trash2 size={16} />
+                        </ProtectedButton>
                       ) : (
-                        <button 
+                        <ProtectedButton
+                          requiredPermission={Permissions.ActivateMaterial}
                           className="btn btn-sm btn-success" 
                           title="Activate Material"
                           onClick={() => handleActivateMaterial(material)}
                         >
                           <CheckCircle size={16} />
-                        </button>
+                        </ProtectedButton>
                       )}
                     </div>
                   </td>

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
 using System.Security.Claims;
@@ -19,7 +20,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager,User")]
+        [RequirePermission(Permissions.ViewOrdersTab)]
         public async Task<ActionResult<List<ClientInfo>>> GetAllClients()
         {
             var clients = await _clientRepository.GetActiveClientsAsync();
@@ -27,7 +28,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Manager,User")]
+        [RequirePermission(Permissions.ViewOrdersTab)]
         public async Task<ActionResult<ClientInfo>> GetClient(int id)
         {
             var client = await _clientRepository.GetByIdWithOrdersAsync(id);
@@ -40,7 +41,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.CreateOrder)]
         public async Task<ActionResult<ClientInfo>> CreateClient(CreateClientRequest request)
         {
             var userName = User.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
@@ -68,7 +69,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.EditOrder)]
         public async Task<ActionResult<ClientInfo>> UpdateClient(int id, UpdateClientRequest request)
         {
             var client = await _clientRepository.GetByIdAsync(id);
@@ -105,7 +106,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [RequirePermission(Permissions.CreateOrder)]
         public async Task<IActionResult> DeleteClient(int id)
         {
             var client = await _clientRepository.GetByIdWithOrdersAsync(id);
@@ -124,7 +125,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("statistics")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.ViewOrdersTab)]
         public async Task<ActionResult<ClientStatistics>> GetStatistics()
         {
             var allClients = await _clientRepository.GetAllAsync();

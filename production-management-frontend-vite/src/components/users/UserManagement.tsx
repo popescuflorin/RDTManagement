@@ -9,29 +9,40 @@ import {
   AlertTriangle, 
   Loader2,
   RotateCcw,
-  UserCheck
+  UserCheck,
+  Shield
 } from 'lucide-react';
-import { userApi } from '../../services/api';
-import type { User } from '../../types';
+import { userApi, rolePermissionApi } from '../../services/api';
+import type { User, RoleDto } from '../../types';
 import AdminRegister from './AdminRegister';
 import EditUser from './EditUser';
 import DeleteConfirmation from './DeleteConfirmation';
 import ActivateUser from './ActivateUser';
+import EditRolePermissions from './EditRolePermissions';
+import CreateRole from './CreateRole';
 import './UserManagement.css';
 
 const UserManagement: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
+  const [roles, setRoles] = useState<RoleDto[]>([]);
+  const [rolePermissions, setRolePermissions] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingRoles, setIsLoadingRoles] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showActivateModal, setShowActivateModal] = useState(false);
+  const [showEditRoleModal, setShowEditRoleModal] = useState(false);
+  const [showCreateRoleModal, setShowCreateRoleModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedRole, setSelectedRole] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [activeTab, setActiveTab] = useState<'users' | 'roles'>('users');
 
   useEffect(() => {
     loadUsers();
+    loadRoles();
   }, []);
 
   const loadUsers = async () => {
@@ -45,6 +56,27 @@ const UserManagement: React.FC = () => {
       setError('Failed to load users. Please try again.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadRoles = async () => {
+    try {
+      setIsLoadingRoles(true);
+      const rolesResponse = await rolePermissionApi.getAllRoles();
+      
+      setRoles(rolesResponse.data);
+      
+      // Load permission counts for each role
+      const permissionCounts: Record<string, number> = {};
+      for (const role of rolesResponse.data) {
+        const perms = await rolePermissionApi.getRolePermissions(role.name);
+        permissionCounts[role.name] = perms.data.permissions.length;
+      }
+      setRolePermissions(permissionCounts);
+    } catch (error) {
+      console.error('Error loading roles:', error);
+    } finally {
+      setIsLoadingRoles(false);
     }
   };
 
@@ -95,11 +127,34 @@ const UserManagement: React.FC = () => {
     setSelectedUser(null);
   };
 
+  const handleEditRole = (roleName: string) => {
+    setSelectedRole(roleName);
+    setShowEditRoleModal(true);
+  };
+
+  const handleRolePermissionsUpdated = async () => {
+    setShowEditRoleModal(false);
+    setSelectedRole(null);
+    await loadRoles();
+  };
+
+  const handleCreateRole = () => {
+    setShowCreateRoleModal(true);
+  };
+
+  const handleRoleCreated = async () => {
+    setShowCreateRoleModal(false);
+    await loadRoles();
+  };
+
   const closeModals = () => {
     setShowEditModal(false);
     setShowDeleteModal(false);
     setShowActivateModal(false);
+    setShowEditRoleModal(false);
+    setShowCreateRoleModal(false);
     setSelectedUser(null);
+    setSelectedRole(null);
   };
 
   const filteredUsers = users.filter(user =>
@@ -161,21 +216,52 @@ const UserManagement: React.FC = () => {
     <div className="user-management-container">
       <div className="user-management-header">
         <div className="header-left">
-          <h1>User Management</h1>
-          <p>Manage system users and their roles</p>
+          <h1>User & Role Management</h1>
+          <p>Manage system users, roles, and permissions</p>
         </div>
         <div className="header-right">
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="btn btn-primary"
-          >
-            <UserPlus size={16} />
-            Add New User
-          </button>
+          {activeTab === 'users' && (
+            <button
+              onClick={() => setShowAddModal(true)}
+              className="btn btn-primary"
+            >
+              <UserPlus size={16} />
+              Add New User
+            </button>
+          )}
+          {activeTab === 'roles' && (
+            <button
+              onClick={handleCreateRole}
+              className="btn btn-success"
+            >
+              <Shield size={16} />
+              Create New Role
+            </button>
+          )}
         </div>
       </div>
 
-      <div className="user-management-controls">
+      {/* Tab Navigation */}
+      <div className="tab-navigation">
+        <button
+          className={`tab-button ${activeTab === 'users' ? 'active' : ''}`}
+          onClick={() => setActiveTab('users')}
+        >
+          <Users size={18} />
+          Users
+        </button>
+        <button
+          className={`tab-button ${activeTab === 'roles' ? 'active' : ''}`}
+          onClick={() => setActiveTab('roles')}
+        >
+          <Shield size={18} />
+          Roles & Permissions
+        </button>
+      </div>
+
+      {activeTab === 'users' && (
+        <>
+          <div className="user-management-controls">
         <div className="search-container">
           <Search size={16} className="search-icon" />
           <input
@@ -298,6 +384,75 @@ const UserManagement: React.FC = () => {
           </div>
         )}
       </div>
+        </>
+      )}
+
+      {activeTab === 'roles' && (
+        <div className="roles-container">
+          {isLoadingRoles ? (
+            <div className="loading-state">
+              <Loader2 size={32} className="animate-spin" />
+              <p>Loading roles...</p>
+            </div>
+          ) : (
+            <div className="roles-table-container">
+              <table className="roles-table">
+                <thead>
+                  <tr>
+                    <th>Role</th>
+                    <th>Description</th>
+                    <th>Permissions Count</th>
+                    <th>Users</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {roles.map((role) => (
+                    <tr key={role.id} className="role-row">
+                      <td className="role-name-cell">
+                        <span className={getRoleBadgeClass(role.name)}>
+                          <Shield size={14} />
+                          {role.name}
+                        </span>
+                      </td>
+                      <td className="role-description-cell">
+                        {role.description || 'No description available'}
+                      </td>
+                      <td className="permissions-count-cell">
+                        <span className="permission-badge">
+                          {rolePermissions[role.name] || 0} permissions
+                        </span>
+                      </td>
+                      <td className="users-count-cell">
+                        {users.filter(u => u.role === role.name).length} users
+                      </td>
+                      <td className="actions-cell">
+                        <div className="action-buttons">
+                          <button 
+                            className="btn btn-sm btn-warning" 
+                            title="Edit Permissions"
+                            onClick={() => handleEditRole(role.name)}
+                          >
+                            <Edit size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+
+              {roles.length === 0 && !isLoadingRoles && (
+                <div className="empty-state">
+                  <Shield size={48} className="empty-icon" />
+                  <h3>No roles found</h3>
+                  <p>No roles configured in the system.</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       {showAddModal && (
         <AdminRegister
@@ -327,6 +482,21 @@ const UserManagement: React.FC = () => {
           user={selectedUser}
           onClose={closeModals}
           onUserActivated={handleUserActivated}
+        />
+      )}
+
+      {showEditRoleModal && selectedRole && (
+        <EditRolePermissions
+          role={selectedRole}
+          onClose={closeModals}
+          onPermissionsUpdated={handleRolePermissionsUpdated}
+        />
+      )}
+
+      {showCreateRoleModal && (
+        <CreateRole
+          onClose={closeModals}
+          onRoleCreated={handleRoleCreated}
         />
       )}
     </div>

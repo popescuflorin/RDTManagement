@@ -28,6 +28,8 @@ namespace ProductionManagement.API.Data
         public DbSet<Client> Clients { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderMaterial> OrderMaterials { get; set; }
+        public DbSet<RolePermission> RolePermissions { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -341,12 +343,80 @@ namespace ProductionManagement.API.Data
                     .OnDelete(DeleteBehavior.Restrict);
             });
 
+            // RolePermission configuration
+            modelBuilder.Entity<RolePermission>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Role).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Permission).IsRequired().HasMaxLength(100);
+                entity.HasIndex(e => new { e.Role, e.Permission }).IsUnique();
+            });
+
+            // Role configuration
+            modelBuilder.Entity<Role>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Description).HasMaxLength(500);
+                entity.HasIndex(e => e.Name).IsUnique();
+            });
+
             // Seed initial data
             SeedData(modelBuilder);
         }
 
         private void SeedData(ModelBuilder modelBuilder)
         {
+            // Seed default roles
+            modelBuilder.Entity<Role>().HasData(
+                new Role
+                {
+                    Id = 1,
+                    Name = "Admin",
+                    Description = "Full system access with all permissions",
+                    IsSystemRole = true,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedByUserId = "System"
+                },
+                new Role
+                {
+                    Id = 2,
+                    Name = "Manager",
+                    Description = "Manage operations without user administration",
+                    IsSystemRole = true,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedByUserId = "System"
+                },
+                new Role
+                {
+                    Id = 3,
+                    Name = "User",
+                    Description = "Basic access with view-only permissions",
+                    IsSystemRole = true,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedByUserId = "System"
+                },
+                // Custom role examples
+                new Role
+                {
+                    Id = 4,
+                    Name = "Supervisor",
+                    Description = "Supervise production and inventory, limited administrative access",
+                    IsSystemRole = false,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedByUserId = "System"
+                },
+                new Role
+                {
+                    Id = 5,
+                    Name = "Warehouse Operator",
+                    Description = "Manage inventory and acquisitions only",
+                    IsSystemRole = false,
+                    CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+                    CreatedByUserId = "System"
+                }
+            );
+
             // Seed admin user
             modelBuilder.Entity<User>().HasData(
                 new User
@@ -408,6 +478,110 @@ namespace ProductionManagement.API.Data
                     IsActive = true
                 }
             );
+
+            // Seed role permissions
+            SeedRolePermissions(modelBuilder);
+        }
+
+        private void SeedRolePermissions(ModelBuilder modelBuilder)
+        {
+            var rolePermissions = new List<RolePermission>();
+            int permissionId = 1;
+            var seedDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+            // Admin - All permissions
+            var allPermissions = Permissions.GetAllPermissions();
+            foreach (var permission in allPermissions)
+            {
+                rolePermissions.Add(new RolePermission
+                {
+                    Id = permissionId++,
+                    Role = "Admin",
+                    Permission = permission,
+                    CreatedAt = seedDate,
+                    CreatedByUserId = "System"
+                });
+            }
+
+            // Manager - Most permissions except user/role management
+            var managerPermissions = allPermissions.Where(p =>
+                !p.StartsWith("Users.") &&
+                !p.StartsWith("Roles.") &&
+                p != Permissions.ManageRolePermissions
+            ).ToList();
+            foreach (var permission in managerPermissions)
+            {
+                rolePermissions.Add(new RolePermission
+                {
+                    Id = permissionId++,
+                    Role = "Manager",
+                    Permission = permission,
+                    CreatedAt = seedDate,
+                    CreatedByUserId = "System"
+                });
+            }
+
+            // User - Basic view permissions
+            var userPermissions = new List<string>
+            {
+                Permissions.ViewAcquisitionsTab,
+                Permissions.ViewAcquisition,
+                Permissions.ViewInventoryTab,
+                Permissions.ViewMaterial,
+                Permissions.ViewProductionTab,
+                Permissions.ViewProductionPlan,
+                Permissions.ViewOrdersTab,
+                Permissions.ViewOrder
+            };
+            foreach (var permission in userPermissions)
+            {
+                rolePermissions.Add(new RolePermission
+                {
+                    Id = permissionId++,
+                    Role = "User",
+                    Permission = permission,
+                    CreatedAt = seedDate,
+                    CreatedByUserId = "System"
+                });
+            }
+
+            // Supervisor - Production, Inventory, and Orders (full access)
+            var supervisorPermissions = allPermissions.Where(p =>
+                p.StartsWith("Production.") ||
+                p.StartsWith("Inventory.") ||
+                p.StartsWith("Orders.") ||
+                p.StartsWith("Acquisitions.")
+            ).ToList();
+            foreach (var permission in supervisorPermissions)
+            {
+                rolePermissions.Add(new RolePermission
+                {
+                    Id = permissionId++,
+                    Role = "Supervisor",
+                    Permission = permission,
+                    CreatedAt = seedDate,
+                    CreatedByUserId = "System"
+                });
+            }
+
+            // Warehouse Operator - Inventory and Acquisitions only
+            var warehousePermissions = allPermissions.Where(p =>
+                p.StartsWith("Inventory.") ||
+                p.StartsWith("Acquisitions.")
+            ).ToList();
+            foreach (var permission in warehousePermissions)
+            {
+                rolePermissions.Add(new RolePermission
+                {
+                    Id = permissionId++,
+                    Role = "Warehouse Operator",
+                    Permission = permission,
+                    CreatedAt = seedDate,
+                    CreatedByUserId = "System"
+                });
+            }
+
+            modelBuilder.Entity<RolePermission>().HasData(rolePermissions);
         }
 
         private string HashPassword(string password)

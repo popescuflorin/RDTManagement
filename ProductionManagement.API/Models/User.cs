@@ -38,6 +38,7 @@ namespace ProductionManagement.API.Models
         public string Role { get; set; } = string.Empty;
         public DateTime LastLoginAt { get; set; }
         public bool IsActive { get; set; } = true;
+        public List<string> Permissions { get; set; } = new List<string>();
     }
 
 

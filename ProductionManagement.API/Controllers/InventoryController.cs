@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
 using System.Security.Claims;
@@ -137,7 +138,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.AddMaterial)]
         public async Task<ActionResult<RawMaterialInfo>> CreateMaterial([FromBody] CreateRawMaterialRequest request)
         {
             // Check if material with same name, color, and quantity type already exists
@@ -188,7 +189,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost("add-to-existing")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.AddMaterial)]
         public async Task<ActionResult<RawMaterialInfo>> AddToExistingMaterial([FromBody] AddToExistingMaterialRequest request)
         {
             var material = await _rawMaterialRepository.GetByIdAsync(request.MaterialId);
@@ -231,7 +232,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.EditMaterial)]
         public async Task<ActionResult<RawMaterialInfo>> UpdateMaterial(int id, [FromBody] UpdateRawMaterialRequest request)
         {
             var material = await _rawMaterialRepository.GetByIdAsync(id);
@@ -285,7 +286,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [RequirePermission(Permissions.DeactivateMaterial)]
         public async Task<IActionResult> DeleteMaterial(int id)
         {
             var material = await _rawMaterialRepository.GetByIdAsync(id);

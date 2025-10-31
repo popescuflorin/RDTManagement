@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import type { AdminRegisterRequest, User } from '../../types';
-import { authApi } from '../../services/api';
+import React, { useState, useEffect } from 'react';
+import type { AdminRegisterRequest, User, RoleDto } from '../../types';
+import { authApi, rolePermissionApi } from '../../services/api';
 import './AdminRegister.css';
 
 interface AdminRegisterProps {
@@ -15,10 +15,29 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
     password: '',
     firstName: '',
     lastName: '',
-    role: 'User'
+    role: ''
   });
+  const [roles, setRoles] = useState<RoleDto[]>([]);
+  const [isLoadingRoles, setIsLoadingRoles] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadRoles();
+  }, []);
+
+  const loadRoles = async () => {
+    try {
+      setIsLoadingRoles(true);
+      const response = await rolePermissionApi.getAllRoles();
+      setRoles(response.data);
+    } catch (err: any) {
+      console.error('Error loading roles:', err);
+      setError('Failed to load roles. Please try again.');
+    } finally {
+      setIsLoadingRoles(false);
+    }
+  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -135,9 +154,23 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
               value={formData.role}
               onChange={handleChange}
               required
+              disabled={isLoadingRoles || isLoading}
             >
-              <option value="User">User</option>
-              <option value="Admin">Admin</option>
+              {isLoadingRoles ? (
+                <option value="">Loading roles...</option>
+              ) : roles.length === 0 ? (
+                <option value="">No roles available</option>
+              ) : (
+                <>
+                  <option value="">Select a role</option>
+                  {roles.map((role) => (
+                    <option key={role.name} value={role.name}>
+                      {role.name}
+                      {role.description && ` - ${role.description}`}
+                    </option>
+                  ))}
+                </>
+              )}
             </select>
           </div>
 
@@ -148,9 +181,9 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
             <button
               type="submit"
               className="submit-button"
-              disabled={isLoading}
+              disabled={isLoading || isLoadingRoles}
             >
-              {isLoading ? 'Creating...' : 'Create User'}
+              {isLoading ? 'Creating...' : isLoadingRoles ? 'Loading...' : 'Create User'}
             </button>
           </div>
         </form>

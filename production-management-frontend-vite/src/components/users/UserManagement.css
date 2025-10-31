@@ -10,12 +10,55 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: var(--space-3xl);
+  margin-bottom: var(--space-xl);
   padding: var(--space-3xl);
   background: var(--surface);
   border-radius: var(--radius-lg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border);
+}
+
+/* Tab Navigation */
+.tab-navigation {
+  display: flex;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-3xl);
+  padding: 0 var(--space-3xl);
+  border-bottom: 2px solid var(--border);
+}
+
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-xl);
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  margin-bottom: -2px;
+}
+
+.tab-button:hover {
+  color: var(--text-primary);
+  background: var(--surface-hover);
+}
+
+.tab-button.active {
+  color: var(--primary-600);
+  border-bottom-color: var(--primary-600);
+}
+
+.tab-button svg {
+  transition: transform var(--transition-fast);
+}
+
+.tab-button:hover svg {
+  transform: scale(1.1);
 }
 
 .header-left h1 {
@@ -513,4 +556,86 @@
 .btn-success:hover {
   background: var(--success-700);
   border-color: var(--success-700);
+}
+
+/* Roles Container */
+.roles-container {
+  padding: 0 var(--space-3xl);
+}
+
+.roles-table-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin: 0;
+}
+
+.roles-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.roles-table thead {
+  background: var(--primary-500);
+  color: var(--text-inverse);
+}
+
+.roles-table th {
+  padding: var(--space-lg) var(--space-md);
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.roles-table tbody tr {
+  border-bottom: 1px solid var(--border);
+  transition: background-color 0.2s ease;
+}
+
+.roles-table tbody tr:hover {
+  background-color: var(--surface-hover);
+}
+
+.roles-table td {
+  padding: var(--space-lg) var(--space-md);
+  vertical-align: middle;
+}
+
+.role-name-cell .role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-base);
+  padding: var(--space-sm) var(--space-md);
+}
+
+.role-description-cell {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: var(--line-height-relaxed);
+}
+
+.permissions-count-cell {
+  text-align: center;
+}
+
+.permission-badge {
+  display: inline-block;
+  background: var(--primary-100);
+  color: var(--primary-700);
+  padding: var(--space-xs) var(--space-md);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 500;
+}
+
+.users-count-cell {
+  text-align: center;
+  color: var(--text-secondary);
+  font-weight: 500;
 }

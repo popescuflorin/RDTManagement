@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Data;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
@@ -23,6 +24,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet]
+        [RequirePermission(Permissions.ViewProductionTab)]
         public async Task<ActionResult<IEnumerable<ProductionPlanInfo>>> GetAll()
         {
             var plans = await _repository.GetAllAsync();
@@ -130,6 +132,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("{id}")]
+        [RequirePermission(Permissions.ViewProductionPlan)]
         public async Task<ActionResult<ProductionPlanInfo>> GetById(int id)
         {
             var plan = await _repository.GetByIdAsync(id);
@@ -141,6 +144,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost]
+        [RequirePermission(Permissions.CreateProductionPlan)]
         public async Task<ActionResult<ProductionPlanInfo>> Create([FromBody] CreateProductionPlanRequest request)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
@@ -289,6 +293,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
+        [RequirePermission(Permissions.EditProductionPlan)]
         public async Task<ActionResult<ProductionPlanInfo>> Update(int id, [FromBody] UpdateProductionPlanRequest request)
         {
             var plan = await _repository.GetByIdAsync(id);
@@ -344,6 +349,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
+        [RequirePermission(Permissions.CancelProductionPlan)]
         public async Task<ActionResult> Delete(int id)
         {
             var plan = await _repository.GetByIdAsync(id);
@@ -358,6 +364,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost("{id}/execute")]
+        [RequirePermission(Permissions.ExecuteProduction)]
         public async Task<ActionResult<ProductionPlanExecutionResult>> Execute(int id, [FromBody] ExecuteProductionPlanRequest request)
         {
             var plan = await _repository.GetByIdAsync(id);
@@ -463,6 +470,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost("{id}/cancel")]
+        [RequirePermission(Permissions.CancelProductionPlan)]
         public async Task<ActionResult<ProductionPlanInfo>> Cancel(int id)
         {
             var plan = await _repository.GetByIdAsync(id);
@@ -480,6 +488,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("statistics")]
+        [RequirePermission(Permissions.ViewProductionTab)]
         public async Task<ActionResult<ProductionPlanStatistics>> GetStatistics()
         {
             var stats = await _repository.GetStatisticsAsync();

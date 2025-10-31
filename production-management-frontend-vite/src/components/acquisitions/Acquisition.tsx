@@ -8,6 +8,8 @@ import EditAcquisition from './EditAcquisition';
 import ReceiveAcquisition from './ReceiveAcquisition';
 import ProcessAcquisition from './ProcessAcquisition';
 import ViewAcquisition from './ViewAcquisition';
+import ProtectedButton from '../ProtectedButton';
+import { Permissions } from '../../hooks/usePermissions';
 import './Acquisition.css';
 
 const Acquisition: React.FC = () => {
@@ -179,13 +181,14 @@ const Acquisition: React.FC = () => {
           <h1>Acquisitions</h1>
           <p>Manage raw material orders and acquisitions</p>
         </div>
-        <button 
+        <ProtectedButton
           className="add-acquisition-button"
           onClick={handleCreateAcquisition}
+          requiredPermission={Permissions.CreateAcquisition}
         >
           <Plus size={20} />
           Create Acquisition
-        </button>
+        </ProtectedButton>
       </div>
 
       {/* Statistics */}
@@ -284,13 +287,14 @@ const Acquisition: React.FC = () => {
                     <Package size={48} />
                     <h3>No acquisitions found</h3>
                     <p>Create your first acquisition to get started</p>
-                    <button 
+                    <ProtectedButton
                       className="empty-add-button"
                       onClick={handleCreateAcquisition}
+                      requiredPermission={Permissions.CreateAcquisition}
                     >
                       <Plus size={20} />
                       Create Acquisition
-                    </button>
+                    </ProtectedButton>
                   </div>
                 </td>
               </tr>
@@ -356,48 +360,53 @@ const Acquisition: React.FC = () => {
                   </td>
                   <td>
                     <div className="action-buttons">
-                      <button
+                      <ProtectedButton
                         className="action-button view-button"
                         onClick={() => handleViewAcquisition(acquisition)}
                         title="View"
+                        requiredPermission={Permissions.ViewAcquisition}
                       >
                         <Eye size={16} />
-                      </button>
+                      </ProtectedButton>
                       {acquisition.canEdit && (
-                        <button
+                        <ProtectedButton
                           className="action-button edit-button"
                           onClick={() => handleEditAcquisition(acquisition)}
                           title="Edit"
+                          requiredPermission={Permissions.EditAcquisition}
                         >
                           <Edit size={16} />
-                        </button>
+                        </ProtectedButton>
                       )}
                       {acquisition.canReceive && (
-                        <button
+                        <ProtectedButton
                           className="action-button receive-button"
                           onClick={() => handleReceiveAcquisition(acquisition)}
                           title="Receive"
+                          requiredPermission={Permissions.ReceiveAcquisition}
                         >
                           <Package size={16} />
-                        </button>
+                        </ProtectedButton>
                       )}
                       {acquisition.status === AcquisitionStatus.ReadyForProcessing && (
-                        <button
+                        <ProtectedButton
                           className="action-button process-button"
                           onClick={() => handleProcessAcquisition(acquisition)}
                           title="Process"
+                          requiredPermission={Permissions.ProcessAcquisition}
                         >
                           <Recycle size={16} />
-                        </button>
+                        </ProtectedButton>
                       )}
                       {acquisition.canDelete && (
-                        <button
+                        <ProtectedButton
                           className="action-button delete-button"
                           onClick={() => handleDeleteAcquisition(acquisition)}
                           title="Delete"
+                          requiredPermission={Permissions.CancelAcquisition}
                         >
                           <Trash2 size={16} />
-                        </button>
+                        </ProtectedButton>
                       )}
                     </div>
                   </td>

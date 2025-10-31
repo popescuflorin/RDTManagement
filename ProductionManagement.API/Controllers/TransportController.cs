@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
 
@@ -62,7 +63,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.CreateAcquisition)]
         public async Task<ActionResult<TransportDto>> CreateTransport(CreateTransportRequest request)
         {
             // Check if a transport with the same car name already exists
@@ -86,7 +87,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.EditAcquisition)]
         public async Task<ActionResult<TransportDto>> UpdateTransport(int id, UpdateTransportRequest request)
         {
             var transport = await _transportRepository.GetByIdAsync(id);
@@ -112,7 +113,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [RequirePermission(Permissions.CreateAcquisition)]
         public async Task<ActionResult> DeleteTransport(int id)
         {
             var transport = await _transportRepository.GetByIdAsync(id);

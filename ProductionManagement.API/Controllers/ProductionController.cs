@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
 using System.Security.Claims;
@@ -97,7 +98,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.CreateProductionPlan)]
         public async Task<ActionResult<ProductInfo>> CreateProduct([FromBody] CreateProductRequest request)
         {
             var materials = await _rawMaterialRepository.GetAllAsync();
@@ -143,7 +144,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.EditProductionPlan)]
         public async Task<ActionResult<ProductInfo>> UpdateProduct(int id, [FromBody] UpdateProductRequest request)
         {
             var product = await _productRepository.GetByIdWithMaterialsAsync(id);
@@ -195,7 +196,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin")]
+        [RequirePermission(Permissions.CancelProductionPlan)]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var product = await _productRepository.GetByIdAsync(id);
@@ -209,7 +210,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost("produce")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.ReceiveProduction)]
         public async Task<ActionResult<ProductionResult>> ProduceProduct([FromBody] ProduceProductRequest request)
         {
             var product = await _productRepository.GetByIdWithMaterialsAsync(request.ProductId);

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Data;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
@@ -34,7 +35,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager,User")]
+        [RequirePermission(Permissions.ViewOrdersTab)]
         public async Task<ActionResult<IEnumerable<OrderInfo>>> GetOrders()
         {
             var orders = await _orderRepository.GetActiveOrdersAsync();
@@ -43,7 +44,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin,Manager,User")]
+        [RequirePermission(Permissions.ViewOrder)]
         public async Task<ActionResult<OrderInfo>> GetOrder(int id)
         {
             var order = await _orderRepository.GetByIdWithMaterialsAsync(id);
@@ -55,7 +56,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.CreateOrder)]
         public async Task<ActionResult<OrderInfo>> CreateOrder([FromBody] CreateOrderRequest request)
         {
             var usernameClaim = User.FindFirst(ClaimTypes.Name)?.Value;
@@ -157,7 +158,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.EditOrder)]
         public async Task<ActionResult<OrderInfo>> UpdateOrder(int id, [FromBody] UpdateOrderRequest request)
         {
             var order = await _orderRepository.GetByIdWithMaterialsAsync(id);
@@ -270,7 +271,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost("{id}/process")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.ProcessOrder)]
         public async Task<ActionResult<OrderInfo>> ProcessOrder(int id)
         {
             var order = await _orderRepository.GetByIdWithMaterialsAsync(id);
@@ -324,7 +325,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost("{id}/cancel")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.CancelOrder)]
         public async Task<ActionResult<OrderInfo>> CancelOrder(int id)
         {
             var order = await _orderRepository.GetByIdWithMaterialsAsync(id);
@@ -353,7 +354,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin,Manager")]
+        [RequirePermission(Permissions.CancelOrder)]
         public async Task<IActionResult> DeleteOrder(int id)
         {
             var order = await _orderRepository.GetByIdAsync(id);
@@ -373,7 +374,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpGet("statistics")]
-        [Authorize(Roles = "Admin,Manager,User")]
+        [RequirePermission(Permissions.ViewOrdersTab)]
         public async Task<ActionResult<OrderStatistics>> GetStatistics()
         {
             var orders = await _orderRepository.GetOrdersWithMaterialsAsync();

@@ -42,7 +42,12 @@ import type {
   Order,
   CreateOrderRequest,
   UpdateOrderRequest,
-  OrderStatistics
+  OrderStatistics,
+  RolePermissions,
+  UpdateRolePermissionsRequest,
+  PermissionInfo,
+  RoleDto,
+  CreateRoleRequest
 } from '../types';
 
 const API_BASE_URL = 'http://localhost:5000/api';
@@ -198,6 +203,16 @@ export const orderApi = {
   processOrder: (id: number) => api.post<Order>(`/order/${id}/process`, {}),
   cancelOrder: (id: number) => api.post<Order>(`/order/${id}/cancel`, {}),
   deleteOrder: (id: number) => api.delete(`/order/${id}`),
+};
+
+export const rolePermissionApi = {
+  getAllPermissions: () => api.get<Record<string, PermissionInfo[]>>('/rolepermission/permissions'),
+  getAllRoles: () => api.get<RoleDto[]>('/rolepermission/roles'),
+  getRolePermissions: (role: string) => api.get<RolePermissions>(`/rolepermission/${role}`),
+  updateRolePermissions: (role: string, data: UpdateRolePermissionsRequest) => api.put<RolePermissions>(`/rolepermission/${role}`, data),
+  createRole: (data: CreateRoleRequest) => api.post<RoleDto>('/rolepermission/roles', data),
+  deleteRole: (roleId: number) => api.delete(`/rolepermission/roles/${roleId}`),
+  seedDefaultPermissions: () => api.post('/rolepermission/seed', {}),
 };
 
 // Client API

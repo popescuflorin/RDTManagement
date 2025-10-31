@@ -7,6 +7,7 @@ export interface User {
   role: string;
   lastLoginAt: string;
   isActive: boolean;
+  permissions: string[];
 }
 
 export interface LoginRequest {
@@ -793,4 +794,83 @@ export interface ClientStatistics {
   totalOrders: number;
   topClientByValue?: Client;
   topClientByCount?: Client;
+}
+
+// Permission System Types
+export const Permissions = {
+  // Acquisitions
+  ViewAcquisitionsTab: 'Acquisitions.ViewTab',
+  CreateAcquisition: 'Acquisitions.Create',
+  ViewAcquisition: 'Acquisitions.View',
+  EditAcquisition: 'Acquisitions.Edit',
+  CancelAcquisition: 'Acquisitions.Cancel',
+  ReceiveAcquisition: 'Acquisitions.Receive',
+  ProcessAcquisition: 'Acquisitions.Process',
+
+  // Inventory
+  ViewInventoryTab: 'Inventory.ViewTab',
+  AddMaterial: 'Inventory.Add',
+  EditMaterial: 'Inventory.Edit',
+  ViewMaterial: 'Inventory.View',
+  DeactivateMaterial: 'Inventory.Deactivate',
+  ActivateMaterial: 'Inventory.Activate',
+
+  // Production
+  ViewProductionTab: 'Production.ViewTab',
+  CreateProductionPlan: 'Production.Create',
+  EditProductionPlan: 'Production.Edit',
+  ViewProductionPlan: 'Production.View',
+  CancelProductionPlan: 'Production.Cancel',
+  ExecuteProduction: 'Production.Execute',
+  ReceiveProduction: 'Production.Receive',
+
+  // Orders
+  ViewOrdersTab: 'Orders.ViewTab',
+  CreateOrder: 'Orders.Create',
+  EditOrder: 'Orders.Edit',
+  ViewOrder: 'Orders.View',
+  CancelOrder: 'Orders.Cancel',
+  ProcessOrder: 'Orders.Process',
+
+  // Users
+  ViewUsersTab: 'Users.ViewTab',
+  CreateUser: 'Users.Create',
+  EditUser: 'Users.Edit',
+  ViewUser: 'Users.View',
+  DeactivateUser: 'Users.Deactivate',
+  ActivateUser: 'Users.Activate',
+
+  // Roles
+  ViewRolesTab: 'Roles.ViewTab',
+  ManageRolePermissions: 'Roles.ManagePermissions',
+} as const;
+
+export interface PermissionInfo {
+  key: string;
+  name: string;
+  description: string;
+}
+
+export interface RolePermissions {
+  role: string;
+  permissions: string[];
+}
+
+export interface UpdateRolePermissionsRequest {
+  role: string;
+  permissions: string[];
+}
+
+export interface RoleDto {
+  id: number;
+  name: string;
+  description?: string;
+  isSystemRole: boolean;
+  createdAt: string;
+}
+
+export interface CreateRoleRequest {
+  name: string;
+  description?: string;
+  permissions: string[];
 }
