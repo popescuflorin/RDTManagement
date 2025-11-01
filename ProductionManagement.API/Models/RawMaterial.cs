@@ -37,7 +37,8 @@ namespace ProductionManagement.API.Models
         public decimal UnitCost { get; set; }
         public string? Description { get; set; }
         public bool IsActive { get; set; }
-        public bool IsLowStock => Quantity <= MinimumStock;
+        public decimal RequestedQuantity { get; set; } = 0; // Quantity needed for pending production/orders
+        public bool IsLowStock => (Quantity - RequestedQuantity) <= MinimumStock || Quantity < RequestedQuantity;
         public decimal TotalValue => Quantity * UnitCost;
     }
 

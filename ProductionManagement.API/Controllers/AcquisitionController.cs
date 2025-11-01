@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Data;
 using ProductionManagement.API.Models;
@@ -48,6 +49,83 @@ namespace ProductionManagement.API.Controllers
             var acquisitionDtos = acquisitions.Select(MapToDto).ToList();
 
             return Ok(acquisitionDtos);
+        }
+
+        [HttpGet("paged")]
+        [RequirePermission(Permissions.ViewAcquisitionsTab)]
+        public async Task<ActionResult<PagedResult<AcquisitionDto>>> GetAcquisitionsPaged([FromQuery] AcquisitionPagedRequest request)
+        {
+            // Start with base query including related entities
+            var query = _context.Acquisitions
+                .Include(a => a.AssignedTo)
+                .Include(a => a.CreatedBy)
+                .Include(a => a.Supplier)
+                .Include(a => a.Transport)
+                .Include(a => a.Items)
+                .Where(a => a.IsActive)
+                .AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            {
+                var searchTerm = request.SearchTerm.ToLower();
+                query = query.Where(a =>
+                    a.Title.ToLower().Contains(searchTerm) ||
+                    (a.Description != null && a.Description.ToLower().Contains(searchTerm)) ||
+                    (a.Supplier != null && a.Supplier.Name.ToLower().Contains(searchTerm)) ||
+                    (a.AssignedTo != null && a.AssignedTo.Username.ToLower().Contains(searchTerm))
+                );
+            }
+
+            // Apply status filter
+            if (request.Status.HasValue)
+            {
+                query = query.Where(a => a.Status == request.Status.Value);
+            }
+
+            // Apply type filter
+            if (request.Type.HasValue)
+            {
+                query = query.Where(a => a.Type == request.Type.Value);
+            }
+
+            // Get total count before pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply sorting
+            query = request.SortBy.ToLower() switch
+            {
+                "title" => request.SortOrder.ToLower() == "asc" 
+                    ? query.OrderBy(a => a.Title) 
+                    : query.OrderByDescending(a => a.Title),
+                "status" => request.SortOrder.ToLower() == "asc" 
+                    ? query.OrderBy(a => a.Status) 
+                    : query.OrderByDescending(a => a.Status),
+                "duedate" => request.SortOrder.ToLower() == "asc" 
+                    ? query.OrderBy(a => a.DueDate) 
+                    : query.OrderByDescending(a => a.DueDate),
+                "createdat" or _ => request.SortOrder.ToLower() == "asc" 
+                    ? query.OrderBy(a => a.CreatedAt) 
+                    : query.OrderByDescending(a => a.CreatedAt)
+            };
+
+            // Apply pagination
+            var acquisitions = await query
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            var acquisitionDtos = acquisitions.Select(MapToDto).ToList();
+
+            var pagedResult = new PagedResult<AcquisitionDto>
+            {
+                Items = acquisitionDtos,
+                TotalCount = totalCount,
+                Page = request.Page,
+                PageSize = request.PageSize
+            };
+
+            return Ok(pagedResult);
         }
 
         [HttpGet("{id}")]

@@ -1,5 +1,4 @@
 import React from 'react';
-import { XCircle, AlertTriangle } from 'lucide-react';
 import type { ProductionPlan } from '../../types';
 import './CancelProductionPlanModal.css';
 

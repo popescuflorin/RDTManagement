@@ -25,7 +25,8 @@ const ActivateUser: React.FC<ActivateUserProps> = ({ user, onClose, onUserActiva
         firstName: user.firstName,
         lastName: user.lastName,
         role: user.role,
-        isActive: true
+        isActive: true,
+        receiveEmails: user.receiveEmails
       });
       onUserActivated(response.data);
       onClose();

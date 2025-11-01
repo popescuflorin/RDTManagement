@@ -4,6 +4,8 @@ using ProductionManagement.API.Authorization;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
 using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using ProductionManagement.API.Data;
 
 namespace ProductionManagement.API.Controllers
 {
@@ -13,10 +15,14 @@ namespace ProductionManagement.API.Controllers
     public class InventoryController : ControllerBase
     {
         private readonly IRawMaterialRepository _rawMaterialRepository;
+        private readonly ApplicationDbContext _context;
 
-        public InventoryController(IRawMaterialRepository rawMaterialRepository)
+        public InventoryController(
+            IRawMaterialRepository rawMaterialRepository,
+            ApplicationDbContext context)
         {
             _rawMaterialRepository = rawMaterialRepository;
+            _context = context;
         }
 
         [HttpGet]
@@ -46,6 +52,10 @@ namespace ProductionManagement.API.Controllers
         public async Task<ActionResult<IEnumerable<RawMaterialInfo>>> GetAllMaterialsIncludingInactive()
         {
             var materials = await _rawMaterialRepository.GetAllRawMaterialsIncludingInactiveAsync();
+            
+            // Calculate requested quantities from production plans and orders
+            var requestedQuantities = await CalculateRequestedQuantitiesAsync();
+            
             var materialInfos = materials.Select(m => new RawMaterialInfo
             {
                 Id = m.Id,
@@ -59,7 +69,8 @@ namespace ProductionManagement.API.Controllers
                 UnitCost = m.UnitCost,
                 Description = m.Description,
                 IsActive = m.IsActive,
-                Type = m.Type
+                Type = m.Type,
+                RequestedQuantity = requestedQuantities.ContainsKey(m.Id) ? requestedQuantities[m.Id] : 0
             }).OrderBy(m => m.Name).ThenBy(m => m.Color).ToList();
 
             return Ok(materialInfos);
@@ -313,15 +324,82 @@ namespace ProductionManagement.API.Controllers
                 .Select(m => new { m.Name, m.Color, m.Quantity, m.QuantityType })
                 .ToList();
 
+            // Calculate materials with insufficient stock (requested > available)
+            var requestedQuantities = await CalculateRequestedQuantitiesAsync();
+            var insufficientStockCount = 0;
+            
+            foreach (var material in materials)
+            {
+                var requestedQty = requestedQuantities.ContainsKey(material.Id) ? requestedQuantities[material.Id] : 0;
+                var availableQty = material.Quantity - requestedQty;
+                
+                // Material has insufficient stock if available quantity is negative or if requested exceeds current stock
+                if (availableQty < 0 || material.Quantity < requestedQty)
+                {
+                    insufficientStockCount++;
+                }
+            }
+
             return Ok(new
             {
                 TotalMaterials = totalMaterials,
                 LowStockCount = lowStockCount,
+                InsufficientStockCount = insufficientStockCount,
                 TotalInventoryValue = totalValue,
                 MostStockedMaterials = mostUsedMaterials
             });
         }
 
         // Static methods removed - use IRawMaterialRepository instead
+
+        /// <summary>
+        /// Calculates the total requested quantity for each material from:
+        /// - Production Plans (Draft, InProgress statuses)
+        /// - Orders (Draft status)
+        /// </summary>
+        private async Task<Dictionary<int, decimal>> CalculateRequestedQuantitiesAsync()
+        {
+            var requestedQuantities = new Dictionary<int, decimal>();
+
+            // Get materials requested from production plans (Draft + InProgress)
+            // Multiply RequiredQuantity by QuantityToProduce to get total requirement
+            var productionPlanMaterials = await _context.ProductionPlanMaterials
+                .Include(ppm => ppm.ProductionPlan)
+                .Where(ppm => ppm.ProductionPlan!.Status == ProductionPlanStatus.Draft || 
+                              ppm.ProductionPlan!.Status == ProductionPlanStatus.InProgress)
+                .GroupBy(ppm => ppm.RawMaterialId)
+                .Select(g => new { 
+                    MaterialId = g.Key, 
+                    TotalQuantity = g.Sum(x => x.RequiredQuantity * x.ProductionPlan!.QuantityToProduce) 
+                })
+                .ToListAsync();
+
+            foreach (var item in productionPlanMaterials)
+            {
+                requestedQuantities[item.MaterialId] = item.TotalQuantity;
+            }
+
+            // Get materials requested from orders (Draft status)
+            var orderMaterials = await _context.OrderMaterials
+                .Include(om => om.Order)
+                .Where(om => om.Order!.Status == OrderStatus.Draft)
+                .GroupBy(om => om.RawMaterialId)
+                .Select(g => new { MaterialId = g.Key, TotalQuantity = g.Sum(x => x.Quantity) })
+                .ToListAsync();
+
+            foreach (var item in orderMaterials)
+            {
+                if (requestedQuantities.ContainsKey(item.MaterialId))
+                {
+                    requestedQuantities[item.MaterialId] += item.TotalQuantity;
+                }
+                else
+                {
+                    requestedQuantities[item.MaterialId] = item.TotalQuantity;
+                }
+            }
+
+            return requestedQuantities;
+        }
     }
 }

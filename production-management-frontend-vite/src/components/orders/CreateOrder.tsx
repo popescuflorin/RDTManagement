@@ -127,11 +127,8 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
       return;
     }
 
-    // Check available quantity
-    if (material.quantity < newItem.quantity) {
-      setError(`Insufficient quantity. Available: ${material.quantity} ${material.quantityType}`);
-      return;
-    }
+    // Note: We allow ordering more than available quantity for future fulfillment
+    // The inventory "Requested Quantity" feature will track over-commitments
 
     const unitPrice = material.unitCost > 0 ? material.unitCost : 0;
     const newItemData: OrderItem = {
@@ -161,12 +158,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
     const item = items.find(i => i.id === id);
     if (!item) return;
 
-    const material = finishedProducts.find(m => m.id === item.rawMaterialId);
-    if (material && quantity > material.quantity) {
-      setError(`Insufficient quantity. Available: ${material.quantity} ${material.quantityType}`);
-      return;
-    }
-
+    // Allow updating quantity without restriction for future fulfillment
     setItems(items.map(i =>
       i.id === id
         ? { ...i, quantity, totalPrice: i.unitPrice * quantity }

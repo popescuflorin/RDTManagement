@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import type { Order } from '../../types';
-import { OrderStatus } from '../../types';
 import { X, Package, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import { orderApi } from '../../services/api';
 import './ProcessOrder.css';

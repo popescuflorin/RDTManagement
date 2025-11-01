@@ -81,6 +81,7 @@ export interface RawMaterial {
   unitCost: number;
   description?: string;
   isActive: boolean;
+  requestedQuantity: number;
   isLowStock: boolean;
   totalValue: number;
 }
@@ -124,6 +125,7 @@ export interface MaterialTypeInfo {
 export interface InventoryStatistics {
   totalMaterials: number;
   lowStockCount: number;
+  insufficientStockCount: number;
   totalInventoryValue: number;
   mostStockedMaterials: Array<{
     name: string;
@@ -421,6 +423,26 @@ export interface AcquisitionStatistics {
   totalActualCost: number;
   totalItems: number;
   totalQuantity: number;
+}
+
+export interface AcquisitionPagedRequest {
+  page: number;
+  pageSize: number;
+  searchTerm?: string;
+  status?: AcquisitionStatus;
+  type?: AcquisitionType;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  hasPreviousPage: boolean;
+  hasNextPage: boolean;
 }
 
 // Production Plan Types

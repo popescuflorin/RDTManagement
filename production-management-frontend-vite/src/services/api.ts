@@ -27,6 +27,8 @@ import type {
   ProductionPlanStatistics,
   Acquisition,
   AcquisitionStatistics,
+  AcquisitionPagedRequest,
+  PagedResult,
   CreateAcquisitionRequest,
   UpdateAcquisitionRequest,
   ReceiveAcquisitionRequest,
@@ -43,6 +45,10 @@ import type {
   CreateOrderRequest,
   UpdateOrderRequest,
   OrderStatistics,
+  Client,
+  CreateClientRequest,
+  UpdateClientRequest,
+  ClientStatistics,
   RolePermissions,
   UpdateRolePermissionsRequest,
   PermissionInfo,
@@ -162,6 +168,7 @@ export const productionPlanApi = {
 // Acquisition API
 export const acquisitionApi = {
   getAllAcquisitions: () => api.get<Acquisition[]>('/acquisition'),
+  getAcquisitionsPaged: (params: AcquisitionPagedRequest) => api.get<PagedResult<Acquisition>>('/acquisition/paged', { params }),
   getAcquisition: (id: number) => api.get<Acquisition>(`/acquisition/${id}`),
   getStatistics: () => api.get<AcquisitionStatistics>('/acquisition/statistics'),
   createAcquisition: (acquisitionData: CreateAcquisitionRequest) => api.post<Acquisition>('/acquisition', acquisitionData),

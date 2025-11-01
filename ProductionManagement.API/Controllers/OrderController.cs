@@ -81,10 +81,9 @@ namespace ProductionManagement.API.Controllers
                 {
                     return BadRequest(new { message = $"Material '{material.Name}' is not active" });
                 }
-                if (material.Quantity < orderMaterial.Quantity)
-                {
-                    return BadRequest(new { message = $"Insufficient quantity for '{material.Name}'. Available: {material.Quantity} {material.QuantityType}, Requested: {orderMaterial.Quantity} {material.QuantityType}" });
-                }
+                // Note: We allow ordering more than available quantity for future fulfillment
+                // The inventory "Requested Quantity" feature will track over-commitments
+                // Availability check happens when processing the order
             }
 
             // Validate client

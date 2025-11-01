@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { orderApi } from '../../services/api';
-import type { Order, OrderStatistics } from '../../types';
+import { orderApi, inventoryApi } from '../../services/api';
+import type { Order, OrderStatistics, RawMaterial } from '../../types';
 import { OrderStatus } from '../../types';
 import { Plus, Edit, Package, Search, Eye, Clock, Loader2, Truck, CheckCircle, BarChart3, XCircle, Play } from 'lucide-react';
 import CreateOrder from './CreateOrder';
@@ -15,6 +15,7 @@ import './Orders.css';
 const Orders: React.FC = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [statistics, setStatistics] = useState<OrderStatistics | null>(null);
+  const [inventory, setInventory] = useState<RawMaterial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -34,13 +35,15 @@ const Orders: React.FC = () => {
   const loadData = async () => {
     try {
       setIsLoading(true);
-      const [ordersResponse, statsResponse] = await Promise.all([
+      const [ordersResponse, statsResponse, inventoryResponse] = await Promise.all([
         orderApi.getAllOrders(),
-        orderApi.getStatistics()
+        orderApi.getStatistics(),
+        inventoryApi.getAllMaterialsIncludingInactive()
       ]);
       
       setOrders(ordersResponse.data);
       setStatistics(statsResponse.data);
+      setInventory(inventoryResponse.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load order data');
     } finally {
@@ -162,6 +165,31 @@ const Orders: React.FC = () => {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
+  };
+
+  // Check if an order has sufficient inventory to be processed
+  const hasInsufficientStock = (order: Order): { hasIssue: boolean; insufficientItems: string[] } => {
+    const insufficientItems: string[] = [];
+    
+    for (const orderMaterial of order.orderMaterials) {
+      const inventoryItem = inventory.find(inv => inv.id === orderMaterial.rawMaterialId);
+      
+      if (!inventoryItem) {
+        insufficientItems.push(`${orderMaterial.materialName} (Not found in inventory)`);
+        continue;
+      }
+      
+      if (inventoryItem.quantity < orderMaterial.quantity) {
+        insufficientItems.push(
+          `${orderMaterial.materialName} (Need: ${orderMaterial.quantity}, Available: ${inventoryItem.quantity})`
+        );
+      }
+    }
+    
+    return {
+      hasIssue: insufficientItems.length > 0,
+      insufficientItems
+    };
   };
 
   if (isLoading) {
@@ -371,16 +399,26 @@ const Orders: React.FC = () => {
                           <Edit size={16} />
                         </ProtectedButton>
                       )}
-                      {(order.status === OrderStatus.Draft || order.status === OrderStatus.Pending) && (
-                        <ProtectedButton
-                          requiredPermission={Permissions.ProcessOrder}
-                          className="btn btn-sm btn-success"
-                          title="Process Order"
-                          onClick={() => handleProcessOrder(order)}
-                        >
-                          <Play size={16} />
-                        </ProtectedButton>
-                      )}
+                      {(order.status === OrderStatus.Draft || order.status === OrderStatus.Pending) && (() => {
+                        const stockCheck = hasInsufficientStock(order);
+                        const isDisabled = stockCheck.hasIssue;
+                        const title = isDisabled 
+                          ? `Insufficient stock:\n${stockCheck.insufficientItems.join('\n')}`
+                          : 'Process Order';
+                        
+                        return (
+                          <ProtectedButton
+                            requiredPermission={Permissions.ProcessOrder}
+                            className={`btn btn-sm ${isDisabled ? 'btn-secondary' : 'btn-success'}`}
+                            title={title}
+                            onClick={() => !isDisabled && handleProcessOrder(order)}
+                            disabled={isDisabled}
+                            style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
+                          >
+                            <Play size={16} />
+                          </ProtectedButton>
+                        );
+                      })()}
                       {order.status !== OrderStatus.Delivered && order.status !== OrderStatus.Cancelled && (
                         <ProtectedButton
                           requiredPermission={Permissions.CancelOrder}

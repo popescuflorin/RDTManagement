@@ -8,7 +8,8 @@ import {
   Trash2,
   CheckCircle,
   Eye,
-  Loader2
+  Loader2,
+  XCircle
 } from 'lucide-react';
 import { inventoryApi } from '../../services/api';
 import type { RawMaterial, InventoryStatistics } from '../../types';
@@ -223,6 +224,16 @@ const Inventory: React.FC = () => {
               <div className="stat-label">Low Stock</div>
             </div>
           </div>
+          <div className={`stat-card ${statistics.insufficientStockCount > 0 ? 'error' : ''}`}>
+            <div className="stat-icon">
+              <XCircle size={24} />
+            </div>
+            <div className="stat-content">
+              <div className="stat-number">{statistics.insufficientStockCount}</div>
+              <div className="stat-label">Insufficient Stock</div>
+              <div className="stat-description">Pending requests exceed available quantity</div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -283,8 +294,10 @@ const Inventory: React.FC = () => {
                 className={`sortable ${sortBy === 'quantity' ? `sorted-${sortOrder}` : ''}`}
                 onClick={() => handleSort('quantity')}
               >
-                Quantity
+                In Stock
               </th>
+              <th>Requested</th>
+              <th>Available</th>
               <th>Min. Stock</th>
               <th>Status</th>
               <th 
@@ -299,14 +312,18 @@ const Inventory: React.FC = () => {
           <tbody>
             {filteredAndSortedMaterials.length === 0 ? (
               <tr>
-                <td colSpan={7} className="no-materials">
+                <td colSpan={10} className="no-materials">
                   {searchTerm 
                     ? 'No materials found matching your criteria.' 
                     : 'No materials in this category. Add some materials to get started.'}
                 </td>
               </tr>
             ) : (
-              filteredAndSortedMaterials.map((material) => (
+              filteredAndSortedMaterials.map((material) => {
+                const availableQuantity = material.quantity - material.requestedQuantity;
+                const isInsufficient = availableQuantity < 0;
+                
+                return (
                 <tr key={material.id} className={!material.isActive ? 'inactive-material' : ''}>
                   <td className="material-name-cell">
                     <div className="material-name">{material.name}</div>
@@ -327,8 +344,23 @@ const Inventory: React.FC = () => {
                     <div className="quantity-value">
                       {material.quantity.toLocaleString()} {material.quantityType}
                     </div>
+                  </td>
+                  <td className="quantity-cell">
+                    <div className="quantity-value" style={{ color: material.requestedQuantity > 0 ? '#ff9800' : '#666' }}>
+                      {material.requestedQuantity.toLocaleString()} {material.quantityType}
+                    </div>
+                  </td>
+                  <td className="quantity-cell">
+                    <div className="quantity-value" style={{ 
+                      color: isInsufficient ? '#f44336' : (availableQuantity <= material.minimumStock ? '#ff9800' : '#4caf50'),
+                      fontWeight: isInsufficient ? 'bold' : 'normal'
+                    }}>
+                      {availableQuantity.toLocaleString()} {material.quantityType}
+                    </div>
                     {material.isLowStock && (
-                      <div className="low-stock-indicator">Low Stock!</div>
+                      <div className="low-stock-indicator">
+                        {isInsufficient ? 'Insufficient!' : 'Low Stock!'}
+                      </div>
                     )}
                   </td>
                   <td>{material.minimumStock.toLocaleString()} {material.quantityType}</td>
@@ -379,7 +411,8 @@ const Inventory: React.FC = () => {
                     </div>
                   </td>
                 </tr>
-              ))
+                );
+              })
             )}
           </tbody>
         </table>

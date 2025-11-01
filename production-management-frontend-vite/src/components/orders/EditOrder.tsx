@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { orderApi, inventoryApi, transportApi, clientApi } from '../../services/api';
 import type { RawMaterial, UpdateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest, Order } from '../../types';
-import { MaterialType, OrderStatus } from '../../types';
+import { MaterialType } from '../../types';
 import { X, Plus, Trash2, UserCircle, Truck, Package, FileText } from 'lucide-react';
 import './CreateOrder.css';
 
@@ -181,11 +181,8 @@ const EditOrder: React.FC<EditOrderProps> = ({
       return;
     }
 
-    // Check available quantity
-    if (material.quantity < newItem.quantity) {
-      setError(`Insufficient quantity. Available: ${material.quantity} ${material.quantityType}`);
-      return;
-    }
+    // Note: We allow ordering more than available quantity for future fulfillment
+    // The inventory "Requested Quantity" feature will track over-commitments
 
     const unitPrice = material.unitCost > 0 ? material.unitCost : 0;
     const newItemData: OrderItem = {

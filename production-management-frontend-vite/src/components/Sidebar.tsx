@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { 
   BarChart3, 
   Users, 
@@ -6,8 +6,6 @@ import {
   Package, 
   ShoppingCart,
   ClipboardList, 
-  TrendingUp, 
-  Settings, 
   ChevronLeft, 
   ChevronRight 
 } from 'lucide-react';

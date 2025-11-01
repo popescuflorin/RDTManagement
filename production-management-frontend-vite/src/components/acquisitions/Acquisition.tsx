@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { acquisitionApi } from '../../services/api';
-import type { Acquisition as AcquisitionType, AcquisitionStatistics } from '../../types';
+import type { Acquisition as AcquisitionType, AcquisitionStatistics, PagedResult } from '../../types';
 import { AcquisitionStatus, AcquisitionType as AcqType } from '../../types';
-import { Plus, Edit, Trash2, Package, Search, Filter, Eye, Recycle } from 'lucide-react';
+import { Plus, Edit, Trash2, Package, Search, Filter, Eye, Recycle, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import CreateAcquisition from './CreateAcquisition';
 import EditAcquisition from './EditAcquisition';
 import ReceiveAcquisition from './ReceiveAcquisition';
@@ -13,12 +13,21 @@ import { Permissions } from '../../hooks/usePermissions';
 import './Acquisition.css';
 
 const Acquisition: React.FC = () => {
-  const [acquisitions, setAcquisitions] = useState<AcquisitionType[]>([]);
+  const [pagedData, setPagedData] = useState<PagedResult<AcquisitionType> | null>(null);
   const [statistics, setStatistics] = useState<AcquisitionStatistics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Pagination and filtering state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<AcquisitionStatus | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<AcquisitionStatus | null>(null);
+  const [typeFilter, setTypeFilter] = useState<AcqType | null>(null);
+  const [sortBy, setSortBy] = useState<string>('CreatedAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  
+  // Modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -29,17 +38,25 @@ const Acquisition: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [currentPage, pageSize, searchTerm, statusFilter, typeFilter, sortBy, sortOrder]);
 
   const loadData = async () => {
     try {
       setIsLoading(true);
-      const [acquisitionsResponse, statsResponse] = await Promise.all([
-        acquisitionApi.getAllAcquisitions(),
+      const [pagedResponse, statsResponse] = await Promise.all([
+        acquisitionApi.getAcquisitionsPaged({
+          page: currentPage,
+          pageSize: pageSize,
+          searchTerm: searchTerm || undefined,
+          status: statusFilter ?? undefined,
+          type: typeFilter ?? undefined,
+          sortBy: sortBy,
+          sortOrder: sortOrder
+        }),
         acquisitionApi.getStatistics()
       ]);
       
-      setAcquisitions(acquisitionsResponse.data);
+      setPagedData(pagedResponse.data);
       setStatistics(statsResponse.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load acquisition data');
@@ -112,6 +129,27 @@ const Acquisition: React.FC = () => {
     return typeLabels[type];
   };
 
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      // Toggle sort order if clicking the same column
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new column and default to descending
+      setSortBy(column);
+      setSortOrder('desc');
+    }
+    setCurrentPage(1); // Reset to first page when sorting changes
+  };
+
+  const getSortIcon = (column: string) => {
+    if (sortBy !== column) {
+      return <ArrowUpDown size={14} className="sort-icon inactive" />;
+    }
+    return sortOrder === 'asc' 
+      ? <ArrowUp size={14} className="sort-icon active" />
+      : <ArrowDown size={14} className="sort-icon active" />;
+  };
+
   // Function to determine due date status
   const getDueDateStatus = (acquisition: AcquisitionType): 'green' | 'yellow' | 'red' | 'completed' => {
     // If acquisition is completed/received or ready for processing, show green
@@ -143,26 +181,7 @@ const Acquisition: React.FC = () => {
     return 'green';
   };
 
-  const filteredAcquisitions = acquisitions
-    .filter(acquisition => {
-      const matchesSearch = acquisition.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           acquisition.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           acquisition.supplierName?.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = statusFilter === 'all' || acquisition.status === statusFilter;
-      
-      return matchesSearch && matchesStatus;
-    })
-    .sort((a, b) => {
-      // Sort by due date ascending (null dates at the end)
-      if (!a.dueDate && !b.dueDate) return 0;
-      if (!a.dueDate) return 1;
-      if (!b.dueDate) return -1;
-      
-      const dateA = new Date(a.dueDate);
-      const dateB = new Date(b.dueDate);
-      return dateA.getTime() - dateB.getTime();
-    });
+  const acquisitions = pagedData?.items || [];
 
   if (isLoading) {
     return (
@@ -241,19 +260,58 @@ const Acquisition: React.FC = () => {
               type="text"
               placeholder="Search acquisitions..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reset to first page on search
+              }}
               className="search-input"
             />
           </div>
         </div>
+        
+        {/* Type Filter Buttons */}
+        <div className="filter-buttons">
+          <button
+            className={`filter-btn ${typeFilter === null ? 'active' : ''}`}
+            onClick={() => {
+              setTypeFilter(null);
+              setCurrentPage(1);
+            }}
+          >
+            All Types
+          </button>
+          <button
+            className={`filter-btn ${typeFilter === AcqType.RawMaterials ? 'active' : ''}`}
+            onClick={() => {
+              setTypeFilter(AcqType.RawMaterials);
+              setCurrentPage(1);
+            }}
+          >
+            Raw Materials
+          </button>
+          <button
+            className={`filter-btn ${typeFilter === AcqType.RecyclableMaterials ? 'active' : ''}`}
+            onClick={() => {
+              setTypeFilter(AcqType.RecyclableMaterials);
+              setCurrentPage(1);
+            }}
+          >
+            Recyclable Materials
+          </button>
+        </div>
+
+        {/* Status Filter */}
         <div className="filter-container">
           <Filter size={20} className="filter-icon" />
           <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as AcquisitionStatus | 'all')}
+            value={statusFilter ?? ''}
+            onChange={(e) => {
+              setStatusFilter(e.target.value ? Number(e.target.value) as AcquisitionStatus : null);
+              setCurrentPage(1);
+            }}
             className="filter-select"
           >
-            <option value="all">All Status</option>
+            <option value="">All Status</option>
             <option value={AcquisitionStatus.Draft}>Draft</option>
             <option value={AcquisitionStatus.Received}>Received</option>
             <option value={AcquisitionStatus.ReadyForProcessing}>Ready for Processing</option>
@@ -268,38 +326,62 @@ const Acquisition: React.FC = () => {
           <thead>
             <tr>
               <th className="status-bar-column"></th>
-              <th>Title</th>
+              <th className="sortable" onClick={() => handleSort('Title')}>
+                <div className="th-content">
+                  <span>Title</span>
+                  {getSortIcon('Title')}
+                </div>
+              </th>
               <th>Type</th>
-              <th>Status</th>
+              <th className="sortable" onClick={() => handleSort('Status')}>
+                <div className="th-content">
+                  <span>Status</span>
+                  {getSortIcon('Status')}
+                </div>
+              </th>
               <th>Assigned To</th>
               <th>Supplier</th>
               <th>Items</th>
-              <th>Due Date</th>
-              <th>Created</th>
+              <th className="sortable" onClick={() => handleSort('DueDate')}>
+                <div className="th-content">
+                  <span>Due Date</span>
+                  {getSortIcon('DueDate')}
+                </div>
+              </th>
+              <th className="sortable" onClick={() => handleSort('CreatedAt')}>
+                <div className="th-content">
+                  <span>Created</span>
+                  {getSortIcon('CreatedAt')}
+                </div>
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredAcquisitions.length === 0 ? (
+            {acquisitions.length === 0 ? (
               <tr>
                 <td colSpan={10} className="empty-state">
                   <div className="empty-content">
                     <Package size={48} />
                     <h3>No acquisitions found</h3>
-                    <p>Create your first acquisition to get started</p>
-                    <ProtectedButton
-                      className="empty-add-button"
-                      onClick={handleCreateAcquisition}
-                      requiredPermission={Permissions.CreateAcquisition}
-                    >
-                      <Plus size={20} />
-                      Create Acquisition
-                    </ProtectedButton>
+                    <p>{searchTerm || statusFilter !== null || typeFilter !== null 
+                      ? 'No acquisitions match your filters' 
+                      : 'Create your first acquisition to get started'}</p>
+                    {!searchTerm && statusFilter === null && typeFilter === null && (
+                      <ProtectedButton
+                        className="empty-add-button"
+                        onClick={handleCreateAcquisition}
+                        requiredPermission={Permissions.CreateAcquisition}
+                      >
+                        <Plus size={20} />
+                        Create Acquisition
+                      </ProtectedButton>
+                    )}
                   </div>
                 </td>
               </tr>
             ) : (
-              filteredAcquisitions.map((acquisition) => (
+              acquisitions.map((acquisition) => (
                 <tr key={acquisition.id}>
                   <td className="status-bar-cell">
                     <div className={`status-bar status-${getDueDateStatus(acquisition)}`}></div>
@@ -416,6 +498,91 @@ const Acquisition: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {pagedData && pagedData.totalPages > 0 && (
+        <div className="pagination-container">
+          <div className="pagination-info">
+            Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} acquisitions
+          </div>
+          
+          <div className="pagination-controls">
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(1)}
+              disabled={!pagedData.hasPreviousPage}
+            >
+              First
+            </button>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={!pagedData.hasPreviousPage}
+            >
+              <ChevronLeft size={16} />
+              Previous
+            </button>
+            
+            <div className="pagination-pages">
+              {Array.from({ length: Math.min(5, pagedData.totalPages) }, (_, i) => {
+                let pageNum;
+                if (pagedData.totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= pagedData.totalPages - 2) {
+                  pageNum = pagedData.totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    className={`pagination-page ${currentPage === pageNum ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={!pagedData.hasNextPage}
+            >
+              Next
+              <ChevronRight size={16} />
+            </button>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(pagedData.totalPages)}
+              disabled={!pagedData.hasNextPage}
+            >
+              Last
+            </button>
+          </div>
+          
+          <div className="page-size-selector">
+            <label>Show:</label>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span>per page</span>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       <CreateAcquisition
