@@ -338,7 +338,9 @@ export interface AcquisitionItem {
   rawMaterialId: number;
   rawMaterialName: string;
   rawMaterialColor: string;
-  quantity: number;
+  orderedQuantity: number;
+  receivedQuantity?: number;
+  quantity: number; // Effective quantity (received or ordered) - for backward compatibility
   quantityType: string;
   actualUnitCost?: number;
   notes?: string;

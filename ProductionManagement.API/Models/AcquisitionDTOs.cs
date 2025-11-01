@@ -246,7 +246,9 @@ namespace ProductionManagement.API.Models
         public int RawMaterialId { get; set; }
         public string RawMaterialName { get; set; } = string.Empty;
         public string RawMaterialColor { get; set; } = string.Empty;
-        public decimal Quantity { get; set; }
+        public decimal OrderedQuantity { get; set; }
+        public decimal? ReceivedQuantity { get; set; }
+        public decimal Quantity { get; set; } // For backward compatibility
         public string QuantityType { get; set; } = string.Empty;
         public decimal? ActualUnitCost { get; set; }
         public string? Notes { get; set; }

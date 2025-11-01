@@ -47,8 +47,8 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
       name: item.rawMaterialName,
       color: item.rawMaterialColor,
       description: '', // Not stored in acquisition items
-      orderedQuantity: item.quantity,
-      receivedQuantity: item.quantity, // Default to ordered quantity
+      orderedQuantity: item.orderedQuantity,
+      receivedQuantity: item.receivedQuantity ?? item.orderedQuantity, // Use received if exists, otherwise ordered
       unitOfMeasure: item.quantityType
     }));
     setItems(receivedItems);

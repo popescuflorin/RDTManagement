@@ -151,7 +151,8 @@ namespace ProductionManagement.API.Controllers
                     RawMaterialId = rawMaterialId,
                     Name = itemRequest.Name,
                     Color = itemRequest.Color,
-                    Quantity = itemRequest.Quantity,
+                    OrderedQuantity = itemRequest.Quantity,
+                    ReceivedQuantity = null, // Not received yet
                     QuantityType = itemRequest.QuantityType,
                     Notes = itemRequest.Notes,
                     CreatedAt = DateTime.UtcNow,
@@ -337,7 +338,8 @@ namespace ProductionManagement.API.Controllers
                         existingItem.RawMaterialId = rawMaterialId;
                         existingItem.Name = itemRequest.Name;
                         existingItem.Color = itemRequest.Color;
-                        existingItem.Quantity = itemRequest.Quantity;
+                        existingItem.OrderedQuantity = itemRequest.Quantity;
+                        // Don't update ReceivedQuantity here - it's only set during reception
                         existingItem.QuantityType = itemRequest.QuantityType;
                         existingItem.Notes = itemRequest.Notes;
                         existingItem.UpdatedAt = DateTime.UtcNow;
@@ -352,7 +354,8 @@ namespace ProductionManagement.API.Controllers
                         RawMaterialId = rawMaterialId,
                         Name = itemRequest.Name,
                         Color = itemRequest.Color,
-                        Quantity = itemRequest.Quantity,
+                        OrderedQuantity = itemRequest.Quantity,
+                        ReceivedQuantity = null, // Not received yet
                         QuantityType = itemRequest.QuantityType,
                         Notes = itemRequest.Notes,
                         CreatedAt = DateTime.UtcNow,
@@ -427,8 +430,8 @@ namespace ProductionManagement.API.Controllers
                     return BadRequest($"Acquisition item with ID {itemRequest.AcquisitionItemId} not found");
                 }
 
-                // Update the quantity to the received quantity
-                acquisitionItem.Quantity = itemRequest.ReceivedQuantity;
+                // Set the received quantity (keeping ordered quantity intact)
+                acquisitionItem.ReceivedQuantity = itemRequest.ReceivedQuantity;
                 acquisitionItem.ActualUnitCost = itemRequest.ActualUnitCost;
                 acquisitionItem.UpdatedAt = DateTime.UtcNow;
 
@@ -480,6 +483,13 @@ namespace ProductionManagement.API.Controllers
 
             await _acquisitionRepository.UpdateAsync(acquisition);
 
+            // Send email notifications
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user != null)
+            {
+                await SendAcquisitionReceivedEmailsAsync(acquisition, user);
+            }
+
             return Ok(MapToDto(acquisition));
         }
 
@@ -521,7 +531,7 @@ namespace ProductionManagement.API.Controllers
             }
 
             // Validate quantities don't exceed available recyclable quantities
-            var recyclableQuantities = acquisition.Items.ToDictionary(i => i.Id, i => i.Quantity);
+            var recyclableQuantities = acquisition.Items.ToDictionary(i => i.Id, i => i.EffectiveQuantity);
             var processedQuantities = request.Materials
                 .GroupBy(m => m.RecyclableItemId)
                 .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity));
@@ -600,6 +610,13 @@ namespace ProductionManagement.API.Controllers
             // Log processing history
             var totalProcessed = request.Materials.Sum(m => m.Quantity);
             await LogHistoryAsync(acquisition.Id, userId, "Processed", $"Recyclable materials processed into {request.Materials.Count} raw material types. Total output: {totalProcessed} units");
+
+            // Send email notifications
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user != null)
+            {
+                await SendAcquisitionProcessedEmailsAsync(acquisition, user, request.Materials.Count, totalProcessed);
+            }
 
             return Ok(MapToDto(acquisition));
         }
@@ -692,7 +709,7 @@ namespace ProductionManagement.API.Controllers
                 TotalEstimatedCost = await _acquisitionRepository.GetTotalCostByStatusAsync(AcquisitionStatus.Draft, false),
                 TotalActualCost = await _acquisitionRepository.GetTotalCostByStatusAsync(AcquisitionStatus.Received, true),
                 TotalItems = activeAcquisitions.Sum(a => a.Items.Count),
-                TotalQuantity = activeAcquisitions.Sum(a => a.Items.Sum(i => (int)i.Quantity))
+                TotalQuantity = activeAcquisitions.Sum(a => a.Items.Sum(i => (int)i.EffectiveQuantity))
             };
 
             return Ok(statistics);
@@ -738,7 +755,7 @@ namespace ProductionManagement.API.Controllers
                 TotalEstimatedCost = acquisition.TotalEstimatedCost,
                 TotalActualCost = acquisition.TotalActualCost,
                 TotalItems = acquisition.Items.Count,
-                TotalQuantity = acquisition.Items.Sum(i => (int)i.Quantity),
+                TotalQuantity = acquisition.Items.Sum(i => (int)i.EffectiveQuantity),
                 CanEdit = acquisition.Status == AcquisitionStatus.Draft,
                 CanDelete = acquisition.Status == AcquisitionStatus.Draft,
                 CanReceive = acquisition.Status == AcquisitionStatus.Draft,
@@ -788,7 +805,9 @@ namespace ProductionManagement.API.Controllers
                 RawMaterialId = item.RawMaterialId,
                 RawMaterialName = item.Name,
                 RawMaterialColor = item.Color,
-                Quantity = item.Quantity,
+                OrderedQuantity = item.OrderedQuantity,
+                ReceivedQuantity = item.ReceivedQuantity,
+                Quantity = item.EffectiveQuantity, // Use effective quantity for backward compatibility
                 QuantityType = item.QuantityType,
                 ActualUnitCost = item.ActualUnitCost,
                 Notes = item.Notes,
@@ -844,7 +863,9 @@ namespace ProductionManagement.API.Controllers
                 {
                     Name = item.Name,
                     Color = item.Color,
-                    Quantity = item.Quantity,
+                    OrderedQuantity = item.OrderedQuantity,
+                    ReceivedQuantity = item.ReceivedQuantity,
+                    Quantity = item.OrderedQuantity, // For creation email, use ordered quantity
                     QuantityType = item.QuantityType
                 }).ToList();
 
@@ -953,7 +974,9 @@ namespace ProductionManagement.API.Controllers
                 {
                     Name = item.Name,
                     Color = item.Color,
-                    Quantity = item.Quantity,
+                    OrderedQuantity = item.OrderedQuantity,
+                    ReceivedQuantity = item.ReceivedQuantity,
+                    Quantity = item.EffectiveQuantity,
                     QuantityType = item.QuantityType
                 }).ToList();
 
@@ -1004,7 +1027,10 @@ namespace ProductionManagement.API.Controllers
                         continue;
                     }
 
-                    await _emailService.SendAcquisitionUpdatedAsync(
+                    // Only send email if admin has email notifications enabled
+                    if (admin.ReceiveEmails)
+                    {
+                        await _emailService.SendAcquisitionUpdatedAsync(
                         toEmail: admin.Email,
                         userName: $"{admin.FirstName} {admin.LastName}",
                         acquisitionTitle: acquisition.Title,
@@ -1021,7 +1047,8 @@ namespace ProductionManagement.API.Controllers
                         transportDate: acquisition.TransportDate,
                         transportNotes: acquisition.TransportNotes,
                         items: itemsList
-                    );
+                        );
+                    }
                 }
 
                 // Send email to creator if they're not the updater, assigned user, or admin
@@ -1029,7 +1056,7 @@ namespace ProductionManagement.API.Controllers
                     (assignedUser == null || acquisition.CreatedByUserId != assignedUser.Id))
                 {
                     var creator = await _userRepository.GetByIdAsync(acquisition.CreatedByUserId);
-                    if (creator != null && !adminUsers.Any(a => a.Id == creator.Id))
+                    if (creator != null && !adminUsers.Any(a => a.Id == creator.Id) && creator.ReceiveEmails)
                     {
                         var creatorName = $"{creator.FirstName} {creator.LastName}";
                         await _emailService.SendAcquisitionUpdatedAsync(
@@ -1089,7 +1116,9 @@ namespace ProductionManagement.API.Controllers
                 {
                     Name = item.Name,
                     Color = item.Color,
-                    Quantity = item.Quantity,
+                    OrderedQuantity = item.OrderedQuantity,
+                    ReceivedQuantity = item.ReceivedQuantity,
+                    Quantity = item.EffectiveQuantity,
                     QuantityType = item.QuantityType
                 }).ToList();
 
@@ -1104,8 +1133,8 @@ namespace ProductionManagement.API.Controllers
                     {
                         assignedToName = $"{assignedUser.FirstName} {assignedUser.LastName}";
                         
-                        // Send email to assigned user if not the deleter
-                        if (assignedUser.Id != deletedByUser.Id)
+                        // Send email to assigned user if not the deleter (and if they have email notifications enabled)
+                        if (assignedUser.Id != deletedByUser.Id && assignedUser.ReceiveEmails)
                         {
                             await _emailService.SendAcquisitionDeletedAsync(
                                 toEmail: assignedUser.Email,
@@ -1139,23 +1168,27 @@ namespace ProductionManagement.API.Controllers
                         continue;
                     }
 
-                    await _emailService.SendAcquisitionDeletedAsync(
-                        toEmail: admin.Email,
-                        userName: $"{admin.FirstName} {admin.LastName}",
-                        acquisitionTitle: acquisition.Title,
-                        acquisitionNumber: acquisitionNumber,
-                        acquisitionType: acquisitionType,
-                        deletedBy: deletedByName,
-                        assignedToUser: assignedToName,
-                        description: acquisition.Description,
-                        supplierName: acquisition.SupplierName,
-                        supplierContact: acquisition.SupplierContact,
-                        transportCarName: transportCarName,
-                        transportPhoneNumber: transportPhoneNumber,
-                        transportDate: acquisition.TransportDate,
-                        transportNotes: acquisition.TransportNotes,
-                        items: itemsList
-                    );
+                    // Only send email if admin has email notifications enabled
+                    if (admin.ReceiveEmails)
+                    {
+                        await _emailService.SendAcquisitionDeletedAsync(
+                            toEmail: admin.Email,
+                            userName: $"{admin.FirstName} {admin.LastName}",
+                            acquisitionTitle: acquisition.Title,
+                            acquisitionNumber: acquisitionNumber,
+                            acquisitionType: acquisitionType,
+                            deletedBy: deletedByName,
+                            assignedToUser: assignedToName,
+                            description: acquisition.Description,
+                            supplierName: acquisition.SupplierName,
+                            supplierContact: acquisition.SupplierContact,
+                            transportCarName: transportCarName,
+                            transportPhoneNumber: transportPhoneNumber,
+                            transportDate: acquisition.TransportDate,
+                            transportNotes: acquisition.TransportNotes,
+                            items: itemsList
+                        );
+                    }
                 }
 
                 // Send email to creator if they're not the deleter, assigned user, or admin
@@ -1163,7 +1196,7 @@ namespace ProductionManagement.API.Controllers
                     (assignedUser == null || acquisition.CreatedByUserId != assignedUser.Id))
                 {
                     var creator = await _userRepository.GetByIdAsync(acquisition.CreatedByUserId);
-                    if (creator != null && !adminUsers.Any(a => a.Id == creator.Id))
+                    if (creator != null && !adminUsers.Any(a => a.Id == creator.Id) && creator.ReceiveEmails)
                     {
                         var creatorName = $"{creator.FirstName} {creator.LastName}";
                         await _emailService.SendAcquisitionDeletedAsync(
@@ -1193,5 +1226,266 @@ namespace ProductionManagement.API.Controllers
                 Console.WriteLine($"Error sending acquisition deleted emails: {ex.Message}");
             }
         }
+
+        private async Task SendAcquisitionReceivedEmailsAsync(Acquisition acquisition, User receivedByUser)
+        {
+            try
+            {
+                var acquisitionNumber = $"ACQ-{acquisition.Id:D5}";
+                var acquisitionType = acquisition.Type == AcquisitionType.RawMaterials 
+                    ? "Raw Materials" 
+                    : "Recyclable Materials";
+                var receivedByName = $"{receivedByUser.FirstName} {receivedByUser.LastName}";
+
+                // Get transport details if available
+                string? transportCarName = null;
+                string? transportPhoneNumber = null;
+                if (acquisition.TransportId.HasValue)
+                {
+                    var transport = await _transportRepository.GetByIdAsync(acquisition.TransportId.Value);
+                    if (transport != null)
+                    {
+                        transportCarName = transport.CarName;
+                        transportPhoneNumber = transport.PhoneNumber;
+                    }
+                }
+
+                // Prepare items list for email
+                var itemsList = acquisition.Items.Where(i => i.IsActive).Select(item => new ProductionManagement.API.Services.AcquisitionItemEmailDto
+                {
+                    Name = item.Name,
+                    Color = item.Color,
+                    OrderedQuantity = item.OrderedQuantity,
+                    ReceivedQuantity = item.ReceivedQuantity,
+                    Quantity = item.EffectiveQuantity,
+                    QuantityType = item.QuantityType
+                }).ToList();
+
+                // Get assigned user
+                User? assignedUser = null;
+                string? assignedToName = null;
+                
+                if (acquisition.AssignedToUserId.HasValue)
+                {
+                    assignedUser = await _userRepository.GetByIdAsync(acquisition.AssignedToUserId.Value);
+                    if (assignedUser != null)
+                    {
+                        assignedToName = $"{assignedUser.FirstName} {assignedUser.LastName}";
+                        
+                        // Send email to assigned user if not the receiver (and if they have email notifications enabled)
+                        if (assignedUser.Id != receivedByUser.Id && assignedUser.ReceiveEmails)
+                        {
+                            await _emailService.SendAcquisitionReceivedAsync(
+                                toEmail: assignedUser.Email,
+                                userName: assignedToName,
+                                acquisitionTitle: acquisition.Title,
+                                acquisitionNumber: acquisitionNumber,
+                                acquisitionType: acquisitionType,
+                                receivedBy: receivedByName,
+                                assignedToUser: assignedToName,
+                                description: acquisition.Description,
+                                supplierName: acquisition.SupplierName,
+                                supplierContact: acquisition.SupplierContact,
+                                transportCarName: transportCarName,
+                                transportPhoneNumber: transportPhoneNumber,
+                                transportDate: acquisition.TransportDate,
+                                transportNotes: acquisition.TransportNotes,
+                                totalActualCost: acquisition.TotalActualCost,
+                                items: itemsList
+                            );
+                        }
+                    }
+                }
+
+                // Send email to all admin users
+                var adminUsers = await _userRepository.GetUsersByRoleAsync("Admin");
+                foreach (var admin in adminUsers)
+                {
+                    // Skip if admin is the receiver or the assigned user (already notified)
+                    if (admin.Id == receivedByUser.Id || 
+                        (assignedUser != null && admin.Id == assignedUser.Id))
+                    {
+                        continue;
+                    }
+
+                    // Only send email if admin has email notifications enabled
+                    if (admin.ReceiveEmails)
+                    {
+                        await _emailService.SendAcquisitionReceivedAsync(
+                            toEmail: admin.Email,
+                            userName: $"{admin.FirstName} {admin.LastName}",
+                            acquisitionTitle: acquisition.Title,
+                            acquisitionNumber: acquisitionNumber,
+                            acquisitionType: acquisitionType,
+                            receivedBy: receivedByName,
+                            assignedToUser: assignedToName,
+                            description: acquisition.Description,
+                            supplierName: acquisition.SupplierName,
+                            supplierContact: acquisition.SupplierContact,
+                            transportCarName: transportCarName,
+                            transportPhoneNumber: transportPhoneNumber,
+                            transportDate: acquisition.TransportDate,
+                            transportNotes: acquisition.TransportNotes,
+                            totalActualCost: acquisition.TotalActualCost,
+                            items: itemsList
+                        );
+                    }
+                }
+
+                // Send email to creator if they're not the receiver, assigned user, or admin
+                if (acquisition.CreatedByUserId != receivedByUser.Id && 
+                    (assignedUser == null || acquisition.CreatedByUserId != assignedUser.Id))
+                {
+                    var creator = await _userRepository.GetByIdAsync(acquisition.CreatedByUserId);
+                    if (creator != null && !adminUsers.Any(a => a.Id == creator.Id) && creator.ReceiveEmails)
+                    {
+                        var creatorName = $"{creator.FirstName} {creator.LastName}";
+                        await _emailService.SendAcquisitionReceivedAsync(
+                            toEmail: creator.Email,
+                            userName: creatorName,
+                            acquisitionTitle: acquisition.Title,
+                            acquisitionNumber: acquisitionNumber,
+                            acquisitionType: acquisitionType,
+                            receivedBy: receivedByName,
+                            assignedToUser: assignedToName,
+                            description: acquisition.Description,
+                            supplierName: acquisition.SupplierName,
+                            supplierContact: acquisition.SupplierContact,
+                            transportCarName: transportCarName,
+                            transportPhoneNumber: transportPhoneNumber,
+                            transportDate: acquisition.TransportDate,
+                            transportNotes: acquisition.TransportNotes,
+                            totalActualCost: acquisition.TotalActualCost,
+                            items: itemsList
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't fail the acquisition reception
+                Console.WriteLine($"Error sending acquisition received emails: {ex.Message}");
+            }
+        }
+
+        private async Task SendAcquisitionProcessedEmailsAsync(Acquisition acquisition, User processedByUser, int materialsProcessed, decimal totalOutputQuantity)
+        {
+            try
+            {
+                var acquisitionNumber = $"ACQ-{acquisition.Id:D5}";
+                var processedByName = $"{processedByUser.FirstName} {processedByUser.LastName}";
+
+                // Prepare input items list for email (the recyclable materials)
+                var itemsList = acquisition.Items.Where(i => i.IsActive).Select(item => new ProductionManagement.API.Services.AcquisitionItemEmailDto
+                {
+                    Name = item.Name,
+                    Color = item.Color,
+                    OrderedQuantity = item.OrderedQuantity,
+                    ReceivedQuantity = item.ReceivedQuantity,
+                    Quantity = item.EffectiveQuantity,
+                    QuantityType = item.QuantityType
+                }).ToList();
+
+                // Prepare output materials list for email (the processed raw materials)
+                var processedMaterialsList = acquisition.ProcessedMaterials.Where(pm => pm.IsActive).Select(pm => new ProductionManagement.API.Services.ProcessedMaterialEmailDto
+                {
+                    Name = pm.RawMaterial.Name,
+                    Color = pm.RawMaterial.Color,
+                    Quantity = pm.Quantity,
+                    QuantityType = pm.RawMaterial.QuantityType
+                }).ToList();
+
+                // Get assigned user
+                User? assignedUser = null;
+                string? assignedToName = null;
+                
+                if (acquisition.AssignedToUserId.HasValue)
+                {
+                    assignedUser = await _userRepository.GetByIdAsync(acquisition.AssignedToUserId.Value);
+                    if (assignedUser != null)
+                    {
+                        assignedToName = $"{assignedUser.FirstName} {assignedUser.LastName}";
+                        
+                        // Send email to assigned user if not the processor (and if they have email notifications enabled)
+                        if (assignedUser.Id != processedByUser.Id && assignedUser.ReceiveEmails)
+                        {
+                            await _emailService.SendAcquisitionProcessedAsync(
+                                toEmail: assignedUser.Email,
+                                userName: assignedToName,
+                                acquisitionTitle: acquisition.Title,
+                                acquisitionNumber: acquisitionNumber,
+                                processedBy: processedByName,
+                                materialsProcessed: materialsProcessed,
+                                totalOutputQuantity: totalOutputQuantity,
+                                assignedToUser: assignedToName,
+                                description: acquisition.Description,
+                                items: itemsList,
+                                processedMaterials: processedMaterialsList
+                            );
+                        }
+                    }
+                }
+
+                // Send email to all admin users
+                var adminUsers = await _userRepository.GetUsersByRoleAsync("Admin");
+                foreach (var admin in adminUsers)
+                {
+                    // Skip if admin is the processor or the assigned user (already notified)
+                    if (admin.Id == processedByUser.Id || 
+                        (assignedUser != null && admin.Id == assignedUser.Id))
+                    {
+                        continue;
+                    }
+
+                    // Only send email if admin has email notifications enabled
+                    if (admin.ReceiveEmails)
+                    {
+                        await _emailService.SendAcquisitionProcessedAsync(
+                            toEmail: admin.Email,
+                            userName: $"{admin.FirstName} {admin.LastName}",
+                            acquisitionTitle: acquisition.Title,
+                            acquisitionNumber: acquisitionNumber,
+                            processedBy: processedByName,
+                            materialsProcessed: materialsProcessed,
+                            totalOutputQuantity: totalOutputQuantity,
+                            assignedToUser: assignedToName,
+                            description: acquisition.Description,
+                            items: itemsList,
+                            processedMaterials: processedMaterialsList
+                        );
+                    }
+                }
+
+                // Send email to creator if they're not the processor, assigned user, or admin
+                if (acquisition.CreatedByUserId != processedByUser.Id && 
+                    (assignedUser == null || acquisition.CreatedByUserId != assignedUser.Id))
+                {
+                    var creator = await _userRepository.GetByIdAsync(acquisition.CreatedByUserId);
+                    if (creator != null && !adminUsers.Any(a => a.Id == creator.Id) && creator.ReceiveEmails)
+                    {
+                        var creatorName = $"{creator.FirstName} {creator.LastName}";
+                        await _emailService.SendAcquisitionProcessedAsync(
+                            toEmail: creator.Email,
+                            userName: creatorName,
+                            acquisitionTitle: acquisition.Title,
+                            acquisitionNumber: acquisitionNumber,
+                            processedBy: processedByName,
+                            materialsProcessed: materialsProcessed,
+                            totalOutputQuantity: totalOutputQuantity,
+                            assignedToUser: assignedToName,
+                            description: acquisition.Description,
+                            items: itemsList,
+                            processedMaterials: processedMaterialsList
+                        );
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't fail the acquisition processing
+                Console.WriteLine($"Error sending acquisition processed emails: {ex.Message}");
+            }
+        }
     }
 }
+

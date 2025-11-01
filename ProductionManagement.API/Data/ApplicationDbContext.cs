@@ -191,7 +191,8 @@ namespace ProductionManagement.API.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
                 entity.Property(e => e.Color).IsRequired().HasMaxLength(50);
-                entity.Property(e => e.Quantity).HasPrecision(18, 2);
+                entity.Property(e => e.OrderedQuantity).HasPrecision(18, 2).IsRequired();
+                entity.Property(e => e.ReceivedQuantity).HasPrecision(18, 2);
                 entity.Property(e => e.QuantityType).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.ActualUnitCost).HasPrecision(18, 2);
 

@@ -89,7 +89,7 @@ namespace ProductionManagement.API.Models
         public int TotalItems => Items.Count;
 
         [NotMapped]
-        public int TotalQuantity => (int)Items.Sum(i => i.Quantity);
+        public int TotalQuantity => (int)Items.Sum(i => i.EffectiveQuantity);
 
         [NotMapped]
         public bool CanEdit => Status == AcquisitionStatus.Draft;
@@ -128,7 +128,10 @@ namespace ProductionManagement.API.Models
 
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Quantity must be greater than 0")]
-        public decimal Quantity { get; set; }
+        public decimal OrderedQuantity { get; set; }
+
+        [Range(0, double.MaxValue)]
+        public decimal? ReceivedQuantity { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -152,7 +155,11 @@ namespace ProductionManagement.API.Models
         public decimal EstimatedTotalCost => 0; // No estimated cost for materials
 
         [NotMapped]
-        public decimal ActualTotalCost => (ActualUnitCost ?? 0) * Quantity;
+        public decimal ActualTotalCost => (ActualUnitCost ?? 0) * (ReceivedQuantity ?? OrderedQuantity);
+        
+        // Helper property to get the effective quantity (received if available, otherwise ordered)
+        [NotMapped]
+        public decimal EffectiveQuantity => ReceivedQuantity ?? OrderedQuantity;
     }
 
     public enum AcquisitionType

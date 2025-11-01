@@ -316,7 +316,7 @@ public class BrevoEmailService : IEmailService
                         <tr>
                             <td style='padding: 12px; border-bottom: 1px solid #e0e0e0;'>{item.Name}</td>
                             <td style='padding: 12px; border-bottom: 1px solid #e0e0e0;'>{item.Color}</td>
-                            <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right;'>{item.Quantity}</td>
+                            <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right;'>{item.OrderedQuantity}</td>
                             <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;'>{item.QuantityType}</td>
                         </tr>"));
             
@@ -328,7 +328,7 @@ public class BrevoEmailService : IEmailService
                             <tr style='background-color: #f5f5f5;'>
                                 <th style='padding: 12px; text-align: left; border-bottom: 2px solid #2196F3;'>Material Name</th>
                                 <th style='padding: 12px; text-align: center; border-bottom: 2px solid #2196F3;'>Color</th>
-                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #2196F3;'>Quantity</th>
+                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #2196F3;'>Ordered Qty</th>
                                 <th style='padding: 12px; text-align: center; border-bottom: 2px solid #2196F3;'>Unit</th>
                             </tr>
                         </thead>
@@ -511,17 +511,44 @@ public class BrevoEmailService : IEmailService
                 </div>";
         }
         
-        // Build items table
+        // Build items table with ordered and received quantities
         var itemsTable = "";
         if (items != null && items.Any())
         {
-            var itemRows = string.Join("", items.Select(item => $@"
+            var hasReceivedQty = items.Any(i => i.ReceivedQuantity.HasValue);
+            
+            var itemRows = string.Join("", items.Select(item => 
+            {
+                var receivedQtyCell = hasReceivedQty 
+                    ? $"<td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right;'>{(item.ReceivedQuantity.HasValue ? item.ReceivedQuantity.Value.ToString() : "-")}</td>"
+                    : "";
+                
+                var quantityStatus = "";
+                if (item.ReceivedQuantity.HasValue)
+                {
+                    if (item.ReceivedQuantity.Value == item.OrderedQuantity)
+                        quantityStatus = " <span style='color: #4CAF50; font-size: 11px;'>✓</span>";
+                    else if (item.ReceivedQuantity.Value < item.OrderedQuantity)
+                        quantityStatus = " <span style='color: #ff9800; font-size: 11px;'>⚠</span>";
+                    else
+                        quantityStatus = " <span style='color: #2196F3; font-size: 11px;'>↑</span>";
+                }
+                
+                return $@"
                         <tr>
                             <td style='padding: 12px; border-bottom: 1px solid #e0e0e0;'>{item.Name}</td>
                             <td style='padding: 12px; border-bottom: 1px solid #e0e0e0;'>{item.Color}</td>
-                            <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right;'>{item.Quantity}</td>
-                            <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;'>{item.QuantityType}</td>
-                        </tr>"));
+                            <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right;'>{item.OrderedQuantity}</td>
+                            {receivedQtyCell}
+                            <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center;'>{item.QuantityType}{quantityStatus}</td>
+                        </tr>";
+            }));
+            
+            var receivedHeader = hasReceivedQty 
+                ? "<th style='padding: 12px; text-align: right; border-bottom: 2px solid #ff9800;'>Received Qty</th>"
+                : "";
+            
+            var colspanValue = hasReceivedQty ? "3" : "2";
             
             itemsTable = $@"
                 <div class='section'>
@@ -529,10 +556,11 @@ public class BrevoEmailService : IEmailService
                     <table style='width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);'>
                         <thead>
                             <tr style='background-color: #f5f5f5;'>
-                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #2196F3;'>Material Name</th>
-                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #2196F3;'>Color</th>
-                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #2196F3;'>Quantity</th>
-                                <th style='padding: 12px; text-align: center; border-bottom: 2px solid #2196F3;'>Unit</th>
+                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #ff9800;'>Material Name</th>
+                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #ff9800;'>Color</th>
+                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #ff9800;'>Ordered Qty</th>
+                                {receivedHeader}
+                                <th style='padding: 12px; text-align: center; border-bottom: 2px solid #ff9800;'>Unit</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -540,8 +568,8 @@ public class BrevoEmailService : IEmailService
                         </tbody>
                         <tfoot>
                             <tr style='background-color: #f5f5f5; font-weight: bold;'>
-                                <td colspan='2' style='padding: 12px; border-top: 2px solid #2196F3;'>Total Items:</td>
-                                <td colspan='2' style='padding: 12px; text-align: right; border-top: 2px solid #2196F3;'>{items.Count} material(s)</td>
+                                <td colspan='2' style='padding: 12px; border-top: 2px solid #ff9800;'>Total Items:</td>
+                                <td colspan='{colspanValue}' style='padding: 12px; text-align: right; border-top: 2px solid #ff9800;'>{items.Count} material(s)</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -700,17 +728,33 @@ public class BrevoEmailService : IEmailService
                 </div>";
         }
         
-        // Build items table
+        // Build items table with ordered and received quantities
         var itemsTable = "";
         if (items != null && items.Any())
         {
-            var itemRows = string.Join("", items.Select(item => $@"
+            var hasReceivedQty = items.Any(i => i.ReceivedQuantity.HasValue);
+            
+            var itemRows = string.Join("", items.Select(item => 
+            {
+                var receivedQtyCell = hasReceivedQty 
+                    ? $"<td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right; text-decoration: line-through; color: #999;'>{(item.ReceivedQuantity.HasValue ? item.ReceivedQuantity.Value.ToString() : "-")}</td>"
+                    : "";
+                
+                return $@"
                         <tr>
                             <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-decoration: line-through; color: #999;'>{item.Name}</td>
                             <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-decoration: line-through; color: #999;'>{item.Color}</td>
-                            <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right; text-decoration: line-through; color: #999;'>{item.Quantity}</td>
+                            <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: right; text-decoration: line-through; color: #999;'>{item.OrderedQuantity}</td>
+                            {receivedQtyCell}
                             <td style='padding: 12px; border-bottom: 1px solid #e0e0e0; text-align: center; text-decoration: line-through; color: #999;'>{item.QuantityType}</td>
-                        </tr>"));
+                        </tr>";
+            }));
+            
+            var receivedHeader = hasReceivedQty 
+                ? "<th style='padding: 12px; text-align: right; border-bottom: 2px solid #e53935;'>Received Qty</th>"
+                : "";
+            
+            var colspanValue = hasReceivedQty ? "3" : "2";
             
             itemsTable = $@"
                 <div class='section'>
@@ -720,7 +764,8 @@ public class BrevoEmailService : IEmailService
                             <tr style='background-color: #f5f5f5;'>
                                 <th style='padding: 12px; text-align: left; border-bottom: 2px solid #e53935;'>Material Name</th>
                                 <th style='padding: 12px; text-align: left; border-bottom: 2px solid #e53935;'>Color</th>
-                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #e53935;'>Quantity</th>
+                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #e53935;'>Ordered Qty</th>
+                                {receivedHeader}
                                 <th style='padding: 12px; text-align: center; border-bottom: 2px solid #e53935;'>Unit</th>
                             </tr>
                         </thead>
@@ -730,7 +775,7 @@ public class BrevoEmailService : IEmailService
                         <tfoot>
                             <tr style='background-color: #ffebee; font-weight: bold;'>
                                 <td colspan='2' style='padding: 12px; border-top: 2px solid #e53935;'>Total Items (Cancelled):</td>
-                                <td colspan='2' style='padding: 12px; text-align: right; border-top: 2px solid #e53935;'>{items.Count} material(s)</td>
+                                <td colspan='{colspanValue}' style='padding: 12px; text-align: right; border-top: 2px solid #e53935;'>{items.Count} material(s)</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -817,46 +862,438 @@ public class BrevoEmailService : IEmailService
         return await SendEmailAsync(toEmail, userName, subject, htmlContent);
     }
 
-    public async Task<bool> SendAcquisitionReceivedAsync(string toEmail, string acquisitionNumber, string supplierName)
+    public async Task<bool> SendAcquisitionReceivedAsync(
+        string toEmail, 
+        string userName, 
+        string acquisitionTitle, 
+        string acquisitionNumber, 
+        string acquisitionType, 
+        string receivedBy, 
+        string? assignedToUser = null,
+        string? description = null,
+        string? supplierName = null,
+        string? supplierContact = null,
+        string? transportCarName = null,
+        string? transportPhoneNumber = null,
+        DateTime? transportDate = null,
+        string? transportNotes = null,
+        decimal? totalActualCost = null,
+        List<AcquisitionItemEmailDto>? items = null)
     {
-        var subject = $"✅ Acquisition Received: #{acquisitionNumber}";
+        var subject = $"✅ Acquisition Received: {acquisitionTitle} ({acquisitionNumber})";
+        
+        // Build items table HTML with ordered and received quantities
+        var itemsHtml = "";
+        if (items != null && items.Any())
+        {
+            itemsHtml = @"
+                <div style='margin-top: 30px;'>
+                    <h3 style='color: #2e7d32; margin-bottom: 15px; border-bottom: 2px solid #81c784; padding-bottom: 8px;'>📦 Received Materials</h3>
+                    <table style='width: 100%; border-collapse: collapse; margin-top: 10px;'>
+                        <thead>
+                            <tr style='background-color: #c8e6c9; color: #1b5e20;'>
+                                <th style='padding: 12px; text-align: left; border: 1px solid #a5d6a7;'>Material</th>
+                                <th style='padding: 12px; text-align: left; border: 1px solid #a5d6a7;'>Color</th>
+                                <th style='padding: 12px; text-align: right; border: 1px solid #a5d6a7;'>Ordered Qty</th>
+                                <th style='padding: 12px; text-align: right; border: 1px solid #a5d6a7;'>Received Qty</th>
+                                <th style='padding: 12px; text-align: center; border: 1px solid #a5d6a7;'>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>";
+            
+            foreach (var item in items)
+            {
+                // Determine status and icon
+                string statusIcon = "";
+                string statusText = "";
+                string statusColor = "#757575";
+                
+                if (item.ReceivedQuantity.HasValue)
+                {
+                    if (item.ReceivedQuantity.Value == item.OrderedQuantity)
+                    {
+                        statusIcon = "✓";
+                        statusText = "Complete";
+                        statusColor = "#4caf50";
+                    }
+                    else if (item.ReceivedQuantity.Value < item.OrderedQuantity)
+                    {
+                        statusIcon = "⚠";
+                        statusText = $"Partial ({(item.ReceivedQuantity.Value / item.OrderedQuantity * 100):N0}%)";
+                        statusColor = "#ff9800";
+                    }
+                    else
+                    {
+                        statusIcon = "↑";
+                        statusText = $"Excess (+{(item.ReceivedQuantity.Value - item.OrderedQuantity):N2})";
+                        statusColor = "#2196f3";
+                    }
+                }
+                
+                var receivedQty = item.ReceivedQuantity.HasValue ? $"{item.ReceivedQuantity.Value:N2}" : "-";
+                
+                itemsHtml += $@"
+                            <tr>
+                                <td style='padding: 10px; border: 1px solid #e0e0e0;'>{item.Name}</td>
+                                <td style='padding: 10px; border: 1px solid #e0e0e0;'>{item.Color}</td>
+                                <td style='padding: 10px; text-align: right; border: 1px solid #e0e0e0;'>{item.OrderedQuantity:N2} {item.QuantityType}</td>
+                                <td style='padding: 10px; text-align: right; border: 1px solid #e0e0e0; font-weight: bold; color: #2e7d32;'>{receivedQty} {item.QuantityType}</td>
+                                <td style='padding: 10px; text-align: center; border: 1px solid #e0e0e0; color: {statusColor}; font-weight: bold;'>{statusIcon} {statusText}</td>
+                            </tr>";
+            }
+            
+            itemsHtml += @"
+                        </tbody>
+                    </table>
+                </div>";
+        }
+
+        // Build supplier section
+        var supplierSection = "";
+        if (!string.IsNullOrEmpty(supplierName))
+        {
+            supplierSection = $@"
+                <div style='background-color: #e8f5e9; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #4caf50;'>
+                    <div style='color: #2e7d32; font-weight: bold; margin-bottom: 8px;'>🏢 Supplier</div>
+                    <div style='color: #424242; line-height: 1.6;'>
+                        <strong>{supplierName}</strong>{(string.IsNullOrEmpty(supplierContact) ? "" : $"<br/>Contact: {supplierContact}")}
+                    </div>
+                </div>";
+        }
+
+        // Build transport section
+        var transportSection = "";
+        if (!string.IsNullOrEmpty(transportCarName))
+        {
+            transportSection = $@"
+                <div style='background-color: #e3f2fd; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #2196f3;'>
+                    <div style='color: #1565c0; font-weight: bold; margin-bottom: 8px;'>🚚 Transport Details</div>
+                    <div style='color: #424242; line-height: 1.6;'>
+                        <strong>Vehicle:</strong> {transportCarName}<br/>
+                        {(string.IsNullOrEmpty(transportPhoneNumber) ? "" : $"<strong>Phone:</strong> {transportPhoneNumber}<br/>")}
+                        {(transportDate.HasValue ? $"<strong>Date:</strong> {transportDate.Value:MMM dd, yyyy}<br/>" : "")}
+                        {(string.IsNullOrEmpty(transportNotes) ? "" : $"<strong>Notes:</strong> {transportNotes}")}
+                    </div>
+                </div>";
+        }
+
+        // Build cost section
+        var costSection = "";
+        if (totalActualCost.HasValue && totalActualCost.Value > 0)
+        {
+            costSection = $@"
+                <div style='background-color: #fff3e0; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #ff9800;'>
+                    <div style='color: #e65100; font-weight: bold; margin-bottom: 8px;'>💰 Total Cost</div>
+                    <div style='color: #424242; font-size: 24px; font-weight: bold;'>${totalActualCost.Value:N2}</div>
+                </div>";
+        }
+
         var htmlContent = $@"
             <!DOCTYPE html>
             <html>
             <head>
-                <style>
-                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
-                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
-                    .header {{ background-color: #4CAF50; color: white; padding: 20px; text-align: center; border-radius: 8px 8px 0 0; }}
-                    .content {{ background-color: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }}
-                    .info-box {{ background-color: #fff; padding: 20px; border-left: 4px solid #4CAF50; margin: 20px 0; }}
-                    .button {{ display: inline-block; padding: 12px 30px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px; margin-top: 20px; }}
-                    .footer {{ text-align: center; margin-top: 20px; font-size: 12px; color: #666; }}
-                </style>
+                <meta charset='utf-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
             </head>
-            <body>
-                <div class='container'>
-                    <div class='header'>
-                        <h1>✅ Acquisition Received</h1>
-                    </div>
-                    <div class='content'>
-                        <div class='info-box'>
-                            <h2>Acquisition #{acquisitionNumber}</h2>
-                            <p><strong>Supplier:</strong> {supplierName}</p>
-                            <p><strong>Status:</strong> Received and added to inventory</p>
-                            <p>The materials from this acquisition have been successfully received and are now available in the inventory.</p>
-                        </div>
-                        
-                        <a href='http://localhost:5173/acquisitions' class='button'>View Acquisitions</a>
-                    </div>
-                    <div class='footer'>
-                        <p>© 2025 Production Management System. All rights reserved.</p>
-                    </div>
-                </div>
+            <body style='margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, ""Segoe UI"", Roboto, ""Helvetica Neue"", Arial, sans-serif; background-color: #f5f5f5;'>
+                <table width='100%' cellpadding='0' cellspacing='0' style='background-color: #f5f5f5; padding: 20px 0;'>
+                    <tr>
+                        <td align='center'>
+                            <table width='600' cellpadding='0' cellspacing='0' style='background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;'>
+                                <!-- Header -->
+                                <tr>
+                                    <td style='background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); padding: 30px; text-align: center;'>
+                                        <h1 style='color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;'>✅ Acquisition Received</h1>
+                                        <p style='color: #e8f5e9; margin: 8px 0 0 0; font-size: 14px;'>Materials successfully added to inventory</p>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Content -->
+                                <tr>
+                                    <td style='padding: 30px;'>
+                                        <!-- Greeting -->
+                                        <p style='color: #424242; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;'>
+                                            Hi <strong>{userName}</strong>,
+                                        </p>
+                                        
+                                        <!-- Success Message -->
+                                        <div style='background-color: #c8e6c9; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #81c784;'>
+                                            <p style='color: #1b5e20; font-size: 16px; margin: 0; text-align: center;'>
+                                                <strong>🎉 The acquisition has been successfully received and the materials have been added to your inventory!</strong>
+                                            </p>
+                                        </div>
+                                        
+                                        <!-- Acquisition Details -->
+                                        <div style='border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px; background-color: #fafafa;'>
+                                            <h2 style='color: #2e7d32; margin: 0 0 15px 0; font-size: 20px; border-bottom: 2px solid #81c784; padding-bottom: 10px;'>
+                                                {acquisitionTitle}
+                                            </h2>
+                                            <table width='100%' cellpadding='5' cellspacing='0'>
+                                                <tr>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Acquisition Number:</strong></td>
+                                                    <td style='color: #424242; padding: 8px 0;'>{acquisitionNumber}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Type:</strong></td>
+                                                    <td style='color: #424242; padding: 8px 0;'>{acquisitionType}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Received By:</strong></td>
+                                                    <td style='color: #424242; padding: 8px 0;'>{receivedBy}</td>
+                                                </tr>
+                                                {(string.IsNullOrEmpty(assignedToUser) ? "" : $@"
+                                                <tr>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Assigned To:</strong></td>
+                                                    <td style='color: #424242; padding: 8px 0;'>{assignedToUser}</td>
+                                                </tr>")}
+                                                {(string.IsNullOrEmpty(description) ? "" : $@"
+                                                <tr>
+                                                    <td colspan='2' style='color: #424242; padding: 12px 0 8px 0;'>
+                                                        <strong style='color: #757575;'>Description:</strong><br/>
+                                                        {description}
+                                                    </td>
+                                                </tr>")}
+                                            </table>
+                                        </div>
+                                        
+                                        <!-- Supplier Section -->
+                                        {supplierSection}
+                                        
+                                        <!-- Transport Section -->
+                                        {transportSection}
+                                        
+                                        <!-- Cost Section -->
+                                        {costSection}
+                                        
+                                        <!-- Items Table -->
+                                        {itemsHtml}
+                                        
+                                        <!-- Action Button -->
+                                        <div style='text-align: center; margin-top: 30px;'>
+                                            <a href='http://localhost:5173/acquisitions' style='display: inline-block; padding: 14px 32px; background-color: #4caf50; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);'>
+                                                View Acquisitions
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Footer -->
+                                <tr>
+                                    <td style='background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #e0e0e0;'>
+                                        <p style='color: #757575; font-size: 12px; margin: 0; line-height: 1.5;'>
+                                            © 2025 Production Management System. All rights reserved.<br/>
+                                            This is an automated notification. Please do not reply to this email.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
             </body>
             </html>";
 
-        return await SendEmailAsync(toEmail, "User", subject, htmlContent);
+        return await SendEmailAsync(toEmail, userName, subject, htmlContent);
+    }
+
+    public async Task<bool> SendAcquisitionProcessedAsync(
+        string toEmail, 
+        string userName, 
+        string acquisitionTitle, 
+        string acquisitionNumber, 
+        string processedBy,
+        int materialsProcessed,
+        decimal totalOutputQuantity,
+        string? assignedToUser = null,
+        string? description = null,
+        List<AcquisitionItemEmailDto>? items = null,
+        List<ProcessedMaterialEmailDto>? processedMaterials = null)
+    {
+        var subject = $"🔄 Acquisition Processed: {acquisitionTitle} ({acquisitionNumber})";
+        
+        // Build INPUT recyclable materials table
+        var itemsHtml = "";
+        if (items != null && items.Any())
+        {
+            itemsHtml = @"
+                <div style='margin-top: 30px;'>
+                    <h3 style='color: #ff9800; margin-bottom: 15px; border-bottom: 2px solid #ffb74d; padding-bottom: 8px;'>♻️ Input - Recyclable Materials</h3>
+                    <table style='width: 100%; border-collapse: collapse; margin-top: 10px;'>
+                        <thead>
+                            <tr style='background-color: #ffe0b2; color: #e65100;'>
+                                <th style='padding: 12px; text-align: left; border: 1px solid #ffcc80;'>Material</th>
+                                <th style='padding: 12px; text-align: left; border: 1px solid #ffcc80;'>Color</th>
+                                <th style='padding: 12px; text-align: right; border: 1px solid #ffcc80;'>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>";
+            
+            foreach (var item in items)
+            {
+                itemsHtml += $@"
+                            <tr>
+                                <td style='padding: 10px; border: 1px solid #e0e0e0;'>{item.Name}</td>
+                                <td style='padding: 10px; border: 1px solid #e0e0e0;'>{item.Color}</td>
+                                <td style='padding: 10px; text-align: right; border: 1px solid #e0e0e0; font-weight: bold;'>{item.Quantity:N2} {item.QuantityType}</td>
+                            </tr>";
+            }
+            
+            itemsHtml += @"
+                        </tbody>
+                    </table>
+                </div>";
+        }
+
+        // Build OUTPUT processed/cleaned raw materials table
+        var processedMaterialsHtml = "";
+        if (processedMaterials != null && processedMaterials.Any())
+        {
+            processedMaterialsHtml = @"
+                <div style='margin-top: 30px;'>
+                    <h3 style='color: #4caf50; margin-bottom: 15px; border-bottom: 2px solid #81c784; padding-bottom: 8px;'>✨ Output - Cleaned Raw Materials</h3>
+                    <table style='width: 100%; border-collapse: collapse; margin-top: 10px;'>
+                        <thead>
+                            <tr style='background-color: #c8e6c9; color: #1b5e20;'>
+                                <th style='padding: 12px; text-align: left; border: 1px solid #a5d6a7;'>Material</th>
+                                <th style='padding: 12px; text-align: left; border: 1px solid #a5d6a7;'>Color</th>
+                                <th style='padding: 12px; text-align: right; border: 1px solid #a5d6a7;'>Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody>";
+            
+            foreach (var material in processedMaterials)
+            {
+                processedMaterialsHtml += $@"
+                            <tr>
+                                <td style='padding: 10px; border: 1px solid #e0e0e0;'>{material.Name}</td>
+                                <td style='padding: 10px; border: 1px solid #e0e0e0;'>{material.Color}</td>
+                                <td style='padding: 10px; text-align: right; border: 1px solid #e0e0e0; font-weight: bold; color: #2e7d32;'>{material.Quantity:N2} {material.QuantityType}</td>
+                            </tr>";
+            }
+            
+            processedMaterialsHtml += $@"
+                        </tbody>
+                        <tfoot>
+                            <tr style='background-color: #c8e6c9; font-weight: bold;'>
+                                <td colspan='2' style='padding: 12px; border: 1px solid #a5d6a7; color: #1b5e20;'>Total Output:</td>
+                                <td style='padding: 12px; text-align: right; border: 1px solid #a5d6a7; color: #1b5e20;'>{totalOutputQuantity:N2} units</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>";
+        }
+
+        var htmlContent = $@"
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta charset='utf-8'>
+                <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+            </head>
+            <body style='margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, ""Segoe UI"", Roboto, ""Helvetica Neue"", Arial, sans-serif; background-color: #f5f5f5;'>
+                <table width='100%' cellpadding='0' cellspacing='0' style='background-color: #f5f5f5; padding: 20px 0;'>
+                    <tr>
+                        <td align='center'>
+                            <table width='600' cellpadding='0' cellspacing='0' style='background-color: #ffffff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden;'>
+                                <!-- Header -->
+                                <tr>
+                                    <td style='background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%); padding: 30px; text-align: center;'>
+                                        <h1 style='color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;'>🔄 Recyclables Processed</h1>
+                                        <p style='color: #e3f2fd; margin: 8px 0 0 0; font-size: 14px;'>Materials successfully converted to raw materials</p>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Content -->
+                                <tr>
+                                    <td style='padding: 30px;'>
+                                        <!-- Greeting -->
+                                        <p style='color: #424242; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;'>
+                                            Hi <strong>{userName}</strong>,
+                                        </p>
+                                        
+                                        <!-- Success Message -->
+                                        <div style='background-color: #bbdefb; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #64b5f6;'>
+                                            <p style='color: #0d47a1; font-size: 16px; margin: 0; text-align: center;'>
+                                                <strong>🎉 The recyclable materials have been successfully processed and are now available in inventory!</strong>
+                                            </p>
+                                        </div>
+                                        
+                                        <!-- Acquisition Details -->
+                                        <div style='border: 1px solid #e0e0e0; border-radius: 8px; padding: 20px; margin-bottom: 20px; background-color: #fafafa;'>
+                                            <h2 style='color: #1565c0; margin: 0 0 15px 0; font-size: 20px; border-bottom: 2px solid #64b5f6; padding-bottom: 10px;'>
+                                                {acquisitionTitle}
+                                            </h2>
+                                            <table width='100%' cellpadding='5' cellspacing='0'>
+                                                <tr>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Acquisition Number:</strong></td>
+                                                    <td style='color: #424242; padding: 8px 0;'>{acquisitionNumber}</td>
+                                                </tr>
+                                                <tr>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Processed By:</strong></td>
+                                                    <td style='color: #424242; padding: 8px 0;'>{processedBy}</td>
+                                                </tr>
+                                                {(string.IsNullOrEmpty(assignedToUser) ? "" : $@"
+                                                <tr>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Assigned To:</strong></td>
+                                                    <td style='color: #424242; padding: 8px 0;'>{assignedToUser}</td>
+                                                </tr>")}
+                                                {(string.IsNullOrEmpty(description) ? "" : $@"
+                                                <tr>
+                                                    <td colspan='2' style='color: #424242; padding: 12px 0 8px 0;'>
+                                                        <strong style='color: #757575;'>Description:</strong><br/>
+                                                        {description}
+                                                    </td>
+                                                </tr>")}
+                                            </table>
+                                        </div>
+                                        
+                                        <!-- Processing Summary -->
+                                        <div style='background-color: #e1f5fe; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #0288d1;'>
+                                            <h3 style='color: #01579b; margin: 0 0 15px 0; font-size: 18px;'>📊 Processing Summary</h3>
+                                            <div style='display: flex; justify-content: space-around; text-align: center;'>
+                                                <div>
+                                                    <div style='font-size: 32px; font-weight: bold; color: #0277bd;'>{materialsProcessed}</div>
+                                                    <div style='color: #546e7a; font-size: 14px; margin-top: 5px;'>Material Types</div>
+                                                </div>
+                                                <div>
+                                                    <div style='font-size: 32px; font-weight: bold; color: #0277bd;'>{totalOutputQuantity:N0}</div>
+                                                    <div style='color: #546e7a; font-size: 14px; margin-top: 5px;'>Total Output</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Input Materials Table -->
+                                        {itemsHtml}
+                                        
+                                        <!-- Output Materials Table -->
+                                        {processedMaterialsHtml}
+                                        
+                                        <!-- Action Button -->
+                                        <div style='text-align: center; margin-top: 30px;'>
+                                            <a href='http://localhost:5173/acquisitions' style='display: inline-block; padding: 14px 32px; background-color: #2196f3; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);'>
+                                                View Acquisitions
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Footer -->
+                                <tr>
+                                    <td style='background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #e0e0e0;'>
+                                        <p style='color: #757575; font-size: 12px; margin: 0; line-height: 1.5;'>
+                                            © 2025 Production Management System. All rights reserved.<br/>
+                                            This is an automated notification. Please do not reply to this email.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </body>
+            </html>";
+
+        return await SendEmailAsync(toEmail, userName, subject, htmlContent);
     }
 
     public async Task<bool> SendProductionCompletedAsync(string toEmail, string productionPlanName, int quantityProduced)

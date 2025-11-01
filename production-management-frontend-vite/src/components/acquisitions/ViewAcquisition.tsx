@@ -185,14 +185,25 @@ const ViewAcquisition: React.FC<ViewAcquisitionProps> = ({
                   <div className="item-details">
                     <div className="form-row">
                       <div className="form-group">
-                        <label>Quantity</label>
+                        <label>Ordered Quantity</label>
                         <input
                           type="number"
-                          value={item.quantity}
+                          value={item.orderedQuantity}
                           disabled
                           className="disabled-field"
                         />
                       </div>
+                      {item.receivedQuantity !== null && item.receivedQuantity !== undefined && (
+                        <div className="form-group">
+                          <label>Received Quantity</label>
+                          <input
+                            type="number"
+                            value={item.receivedQuantity}
+                            disabled
+                            className="disabled-field"
+                          />
+                        </div>
+                      )}
                       <div className="form-group">
                         <label>Unit of Measure</label>
                         <input
@@ -215,9 +226,26 @@ const ViewAcquisition: React.FC<ViewAcquisitionProps> = ({
                       </div>
                     )}
                     <div className="item-summary">
-                      <div className="item-total">
-                        Total: {item.quantity} {item.quantityType}
-                      </div>
+                      {item.receivedQuantity !== null && item.receivedQuantity !== undefined ? (
+                        <>
+                          <div className="item-total">
+                            Ordered: {item.orderedQuantity} {item.quantityType} | Received: {item.receivedQuantity} {item.quantityType}
+                          </div>
+                          {item.receivedQuantity === item.orderedQuantity && (
+                            <div className="quantity-status complete" style={{marginTop: '8px'}}>✓ Complete Delivery</div>
+                          )}
+                          {item.receivedQuantity < item.orderedQuantity && (
+                            <div className="quantity-status partial" style={{marginTop: '8px'}}>⚠ Partial Delivery ({((item.receivedQuantity / item.orderedQuantity) * 100).toFixed(0)}%)</div>
+                          )}
+                          {item.receivedQuantity > item.orderedQuantity && (
+                            <div className="quantity-status excess" style={{marginTop: '8px'}}>⚠ Excess Received (+{(item.receivedQuantity - item.orderedQuantity).toFixed(2)} {item.quantityType})</div>
+                          )}
+                        </>
+                      ) : (
+                        <div className="item-total">
+                          Ordered: {item.orderedQuantity} {item.quantityType}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
