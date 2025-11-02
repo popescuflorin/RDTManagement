@@ -11,7 +11,7 @@ import {
   Mail,
   User as UserIcon
 } from 'lucide-react';
-import { userApi, authApi } from '../services/api';
+import { userApi, authApi, clearAuthData } from '../services/api';
 import type { User, DashboardData } from '../types';
 import AdminRegister from './users/AdminRegister';
 import Sidebar from './Sidebar';
@@ -45,14 +45,21 @@ const Dashboard: React.FC = () => {
         const dashboardResponse = await userApi.getDashboard();
         setDashboardData(dashboardResponse.data);
       } catch (err: any) {
-        setError(err.response?.data?.message || 'Failed to load dashboard data');
+        // Check if it's an authentication error
+        if (err.response?.status === 401) {
+          // Token is invalid or expired, clear data and redirect
+          clearAuthData();
+          navigate('/login');
+        } else {
+          setError(err.response?.data?.message || 'Failed to load dashboard data');
+        }
       } finally {
         setIsLoading(false);
       }
     };
 
     loadDashboardData();
-  }, []);
+  }, [navigate]);
 
   const handleLogout = async () => {
     try {
@@ -63,9 +70,8 @@ const Dashboard: React.FC = () => {
     } catch (err) {
       console.error('Logout error:', err);
     } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('user');
+      // Clear all authentication data
+      clearAuthData();
       navigate('/login');
     }
   };

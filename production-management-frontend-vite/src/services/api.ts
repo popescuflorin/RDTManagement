@@ -65,42 +65,100 @@ const api = axios.create({
   },
 });
 
-// Add token to requests
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+// Utility function to clear all authentication data
+export const clearAuthData = () => {
+  localStorage.removeItem('token');
+  localStorage.removeItem('refreshToken');
+  localStorage.removeItem('user');
+};
 
-// Handle token refresh on 401 responses
+// Utility function to check if user is authenticated
+export const isAuthenticated = () => {
+  const token = localStorage.getItem('token');
+  const user = localStorage.getItem('user');
+  return token !== null && user !== null;
+};
+
+// Add token to requests
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Handle authentication errors and token refresh
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
+    const originalRequest = error.config;
+
+    // Check if error is 401 and we haven't already tried to refresh
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
       const refreshToken = localStorage.getItem('refreshToken');
+      
       if (refreshToken) {
         try {
-          const response = await axios.post(`${API_BASE_URL}/auth/refresh`, refreshToken);
-          const { token, refreshToken: newRefreshToken } = response.data;
+          // Try to refresh the token
+          const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { 
+            refreshToken 
+          }, {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          const { token, refreshToken: newRefreshToken, user } = response.data;
+          
+          // Store new tokens and user data
           localStorage.setItem('token', token);
           localStorage.setItem('refreshToken', newRefreshToken);
+          if (user) {
+            localStorage.setItem('user', JSON.stringify(user));
+          }
           
-          // Retry the original request
-          error.config.headers.Authorization = `Bearer ${token}`;
-          return api.request(error.config);
+          // Retry the original request with new token
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api.request(originalRequest);
         } catch (refreshError) {
-          // Refresh failed, redirect to login
-          localStorage.removeItem('token');
-          localStorage.removeItem('refreshToken');
-          window.location.href = '/login';
+          // Refresh token failed or expired
+          console.error('Token refresh failed:', refreshError);
+          clearAuthData();
+          
+          // Redirect to login page
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+          return Promise.reject(refreshError);
         }
       } else {
-        // No refresh token, redirect to login
+        // No refresh token available
+        clearAuthData();
+        
+        // Redirect to login page
+        if (window.location.pathname !== '/login') {
+          window.location.href = '/login';
+        }
+        return Promise.reject(error);
+      }
+    }
+
+    // Handle other 401 errors (after retry failed)
+    if (error.response?.status === 401) {
+      clearAuthData();
+      if (window.location.pathname !== '/login') {
         window.location.href = '/login';
       }
     }
+
     return Promise.reject(error);
   }
 );
