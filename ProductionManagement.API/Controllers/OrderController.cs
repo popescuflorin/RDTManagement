@@ -43,6 +43,73 @@ namespace ProductionManagement.API.Controllers
             return Ok(orderInfos);
         }
 
+        [HttpGet("paged")]
+        [RequirePermission(Permissions.ViewOrdersTab)]
+        public async Task<ActionResult<PagedResult<OrderInfo>>> GetOrdersPaged([FromQuery] OrderPagedRequest request)
+        {
+            // Start with base query including related entities
+            var query = _context.Orders
+                .Include(o => o.Client)
+                .Include(o => o.Transport)
+                .Include(o => o.OrderMaterials)
+                .AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            {
+                var searchTerm = request.SearchTerm.ToLower();
+                query = query.Where(o =>
+                    (o.Client != null && o.Client.Name.ToLower().Contains(searchTerm)) ||
+                    (o.Client != null && o.Client.Email != null && o.Client.Email.ToLower().Contains(searchTerm)) ||
+                    (o.Client != null && o.Client.Phone != null && o.Client.Phone.ToLower().Contains(searchTerm))
+                );
+            }
+
+            // Apply status filter
+            if (request.Status.HasValue)
+            {
+                query = query.Where(o => o.Status == request.Status.Value);
+            }
+
+            // Get total count before pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply sorting
+            query = request.SortBy.ToLower() switch
+            {
+                "orderdate" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(o => o.OrderDate)
+                    : query.OrderByDescending(o => o.OrderDate),
+                "expecteddeliverydate" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(o => o.ExpectedDeliveryDate)
+                    : query.OrderByDescending(o => o.ExpectedDeliveryDate),
+                "status" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(o => o.Status)
+                    : query.OrderByDescending(o => o.Status),
+                "createdat" or _ => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(o => o.CreatedAt)
+                    : query.OrderByDescending(o => o.CreatedAt)
+            };
+
+            // Apply pagination
+            var orders = await query
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            var orderInfos = orders.Select(MapToOrderInfo).ToList();
+
+            var pagedResult = new PagedResult<OrderInfo>
+            {
+                Items = orderInfos,
+                TotalCount = totalCount,
+                Page = request.Page,
+                PageSize = request.PageSize
+            };
+
+            return Ok(pagedResult);
+        }
+
         [HttpGet("{id}")]
         [RequirePermission(Permissions.ViewOrder)]
         public async Task<ActionResult<OrderInfo>> GetOrder(int id)

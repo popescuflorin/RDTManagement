@@ -118,5 +118,15 @@ namespace ProductionManagement.API.Models
         public int DeliveredOrders { get; set; }
         public decimal TotalOrderValue { get; set; }
     }
+
+    public class OrderPagedRequest
+    {
+        public int Page { get; set; } = 1;
+        public int PageSize { get; set; } = 10;
+        public string? SearchTerm { get; set; }
+        public OrderStatus? Status { get; set; }
+        public string SortBy { get; set; } = "CreatedAt";
+        public string SortOrder { get; set; } = "desc";
+    }
 }
 

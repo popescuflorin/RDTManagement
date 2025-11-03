@@ -786,6 +786,15 @@ export interface OrderStatistics {
   totalOrderValue: number;
 }
 
+export interface OrderPagedRequest {
+  page: number;
+  pageSize: number;
+  searchTerm?: string;
+  status?: OrderStatus;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
 // Client Types
 export interface Client {
   id: number;

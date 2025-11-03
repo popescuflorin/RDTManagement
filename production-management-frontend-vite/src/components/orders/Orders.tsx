@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { orderApi, inventoryApi } from '../../services/api';
-import type { Order, OrderStatistics, RawMaterial } from '../../types';
+import type { Order, OrderStatistics, RawMaterial, PagedResult } from '../../types';
 import { OrderStatus } from '../../types';
-import { Plus, Edit, Package, Search, Eye, Clock, Loader2, Truck, CheckCircle, BarChart3, XCircle, Play } from 'lucide-react';
+import { Plus, Edit, Package, Search, Filter, Eye, Clock, Loader2, Truck, CheckCircle, BarChart3, XCircle, Play, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import CreateOrder from './CreateOrder';
 import ViewOrder from './ViewOrder';
 import EditOrder from './EditOrder';
@@ -13,13 +13,21 @@ import { Permissions } from '../../hooks/usePermissions';
 import './Orders.css';
 
 const Orders: React.FC = () => {
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [pagedData, setPagedData] = useState<PagedResult<Order> | null>(null);
   const [statistics, setStatistics] = useState<OrderStatistics | null>(null);
   const [inventory, setInventory] = useState<RawMaterial[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Pagination and filtering state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<OrderStatus | 'all'>('all');
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | null>(null);
+  const [sortBy, setSortBy] = useState<string>('CreatedAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  
+  // Modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showProcessModal, setShowProcessModal] = useState(false);
@@ -30,20 +38,38 @@ const Orders: React.FC = () => {
 
   useEffect(() => {
     loadData();
+  }, [currentPage, pageSize, searchTerm, statusFilter, sortBy, sortOrder]);
+  
+  // Load inventory separately (not paginated, needed for stock checking)
+  useEffect(() => {
+    const loadInventory = async () => {
+      try {
+        const response = await inventoryApi.getAllMaterialsIncludingInactive();
+        setInventory(response.data);
+      } catch (err: any) {
+        console.error('Failed to load inventory:', err);
+      }
+    };
+    loadInventory();
   }, []);
 
   const loadData = async () => {
     try {
       setIsLoading(true);
-      const [ordersResponse, statsResponse, inventoryResponse] = await Promise.all([
-        orderApi.getAllOrders(),
-        orderApi.getStatistics(),
-        inventoryApi.getAllMaterialsIncludingInactive()
+      const [pagedResponse, statsResponse] = await Promise.all([
+        orderApi.getOrdersPaged({
+          page: currentPage,
+          pageSize: pageSize,
+          searchTerm: searchTerm || undefined,
+          status: statusFilter ?? undefined,
+          sortBy: sortBy,
+          sortOrder: sortOrder
+        }),
+        orderApi.getStatistics()
       ]);
       
-      setOrders(ordersResponse.data);
+      setPagedData(pagedResponse.data);
       setStatistics(statsResponse.data);
-      setInventory(inventoryResponse.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load order data');
     } finally {
@@ -127,6 +153,27 @@ const Orders: React.FC = () => {
     setSelectedOrder(null);
   };
 
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      // Toggle sort order if clicking the same column
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      // Set new column and default to descending
+      setSortBy(column);
+      setSortOrder('desc');
+    }
+    setCurrentPage(1); // Reset to first page when sorting changes
+  };
+
+  const getSortIcon = (column: string) => {
+    if (sortBy !== column) {
+      return <ArrowUpDown size={14} className="sort-icon inactive" />;
+    }
+    return sortOrder === 'asc' 
+      ? <ArrowUp size={14} className="sort-icon active" />
+      : <ArrowDown size={14} className="sort-icon active" />;
+  };
+
   const getStatusBadge = (status: OrderStatus) => {
     const statusConfig = {
       [OrderStatus.Draft]: { label: 'Draft', className: 'status-draft' },
@@ -141,16 +188,7 @@ const Orders: React.FC = () => {
     return <span className={`status-badge ${config.className}`}>{config.label}</span>;
   };
 
-  const filteredOrders = orders
-    .filter(order => {
-      const matchesSearch = order.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           order.clientEmail?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           order.clientPhone?.toLowerCase().includes(searchTerm.toLowerCase());
-      
-      const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
-      
-      return matchesSearch && matchesStatus;
-    });
+  const orders = pagedData?.items || [];
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -290,22 +328,33 @@ const Orders: React.FC = () => {
       {/* Filters and Search */}
       <div className="orders-controls">
         <div className="search-container">
-          <Search size={16} className="search-icon" />
-          <input
-            type="text"
-            placeholder="Search by client name, email, or phone..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
+          <div className="search-input-wrapper">
+            <Search size={20} className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search by client name, email, or phone..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reset to first page on search
+              }}
+              className="search-input"
+            />
+          </div>
         </div>
+        
+        {/* Status Filter */}
         <div className="filter-container">
+          <Filter size={20} className="filter-icon" />
           <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as OrderStatus | 'all')}
+            value={statusFilter ?? ''}
+            onChange={(e) => {
+              setStatusFilter(e.target.value ? Number(e.target.value) as OrderStatus : null);
+              setCurrentPage(1);
+            }}
             className="filter-select"
           >
-            <option value="all">All Status</option>
+            <option value="">All Status</option>
             <option value={OrderStatus.Draft}>Draft</option>
             <option value={OrderStatus.Pending}>Pending</option>
             <option value={OrderStatus.Processing}>Processing</option>
@@ -330,26 +379,41 @@ const Orders: React.FC = () => {
               <th>Order ID</th>
               <th>Client Name</th>
               <th>Contact</th>
-              <th>Order Date</th>
-              <th>Expected Delivery</th>
+              <th className="sortable" onClick={() => handleSort('OrderDate')}>
+                <div className="th-content">
+                  <span>Order Date</span>
+                  {getSortIcon('OrderDate')}
+                </div>
+              </th>
+              <th className="sortable" onClick={() => handleSort('ExpectedDeliveryDate')}>
+                <div className="th-content">
+                  <span>Expected Delivery</span>
+                  {getSortIcon('ExpectedDeliveryDate')}
+                </div>
+              </th>
               <th>Items</th>
               <th>Total Value</th>
               <th>Transport</th>
-              <th>Status</th>
+              <th className="sortable" onClick={() => handleSort('Status')}>
+                <div className="th-content">
+                  <span>Status</span>
+                  {getSortIcon('Status')}
+                </div>
+              </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.length === 0 ? (
+            {orders.length === 0 ? (
               <tr>
                 <td colSpan={10} className="no-data">
-                  {searchTerm || statusFilter !== 'all' 
+                  {searchTerm || statusFilter !== null 
                     ? 'No orders found matching your criteria' 
                     : 'No orders found. Create your first order!'}
                 </td>
               </tr>
             ) : (
-              filteredOrders.map(order => (
+              orders.map(order => (
                 <tr key={order.id}>
                   <td>#{order.id}</td>
                   <td>
@@ -437,6 +501,91 @@ const Orders: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {pagedData && pagedData.totalPages > 0 && (
+        <div className="pagination-container">
+          <div className="pagination-info">
+            Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} orders
+          </div>
+          
+          <div className="pagination-controls">
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(1)}
+              disabled={!pagedData.hasPreviousPage}
+            >
+              First
+            </button>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={!pagedData.hasPreviousPage}
+            >
+              <ChevronLeft size={16} />
+              Previous
+            </button>
+            
+            <div className="pagination-pages">
+              {Array.from({ length: Math.min(5, pagedData.totalPages) }, (_, i) => {
+                let pageNum;
+                if (pagedData.totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= pagedData.totalPages - 2) {
+                  pageNum = pagedData.totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    className={`pagination-page ${currentPage === pageNum ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={!pagedData.hasNextPage}
+            >
+              Next
+              <ChevronRight size={16} />
+            </button>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(pagedData.totalPages)}
+              disabled={!pagedData.hasNextPage}
+            >
+              Last
+            </button>
+          </div>
+          
+          <div className="page-size-selector">
+            <label>Show:</label>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span>per page</span>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       {showCreateModal && (

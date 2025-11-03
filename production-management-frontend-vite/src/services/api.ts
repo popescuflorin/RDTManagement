@@ -265,6 +265,8 @@ export const transportApi = {
 // Order API
 export const orderApi = {
   getAllOrders: () => api.get<Order[]>('/order'),
+  getOrdersPaged: (params: import('../types').OrderPagedRequest) => 
+    api.get<PagedResult<Order>>('/order/paged', { params }),
   getOrder: (id: number) => api.get<Order>(`/order/${id}`),
   getStatistics: () => api.get<OrderStatistics>('/order/statistics'),
   createOrder: (orderData: CreateOrderRequest) => api.post<Order>('/order', orderData),
