@@ -213,6 +213,8 @@ export const productionApi = {
 // Production Plan API
 export const productionPlanApi = {
   getAllPlans: () => api.get<ProductionPlan[]>('/productionplan'),
+  getPlansPaged: (params: import('../types').ProductionPlanPagedRequest) => 
+    api.get<PagedResult<ProductionPlan>>('/productionplan/paged', { params }),
   getPlan: (id: number) => api.get<ProductionPlan>(`/productionplan/${id}`),
   getStatistics: () => api.get<ProductionPlanStatistics>('/productionplan/statistics'),
   getProductTemplate: (finishedProductId: number) => api.get<ProductTemplate>(`/productionplan/template/${finishedProductId}`),

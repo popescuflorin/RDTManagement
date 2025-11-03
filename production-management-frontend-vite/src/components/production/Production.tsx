@@ -7,15 +7,21 @@ import {
   BarChart3, 
   Plus, 
   Search, 
+  Filter,
   Play,
   XCircle,
   Loader2,
   Edit,
   Eye,
-  Truck
+  Truck,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { productionPlanApi } from '../../services/api';
-import type { ProductionPlan, ProductionPlanStatistics } from '../../types';
+import type { ProductionPlan, ProductionPlanStatistics, PagedResult } from '../../types';
 import { ProductionPlanStatus } from '../../types';
 import CreateProductionPlan from './CreateProductionPlan';
 import CancelProductionPlanModal from './CancelProductionPlanModal';
@@ -27,10 +33,20 @@ import { Permissions } from '../../hooks/usePermissions';
 import './Production.css';
 
 const Production: React.FC = () => {
-  const [plans, setPlans] = useState<ProductionPlan[]>([]);
+  const [pagedData, setPagedData] = useState<PagedResult<ProductionPlan> | null>(null);
   const [statistics, setStatistics] = useState<ProductionPlanStatistics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Pagination and filtering state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState<ProductionPlanStatus | null>(null);
+  const [sortBy, setSortBy] = useState<string>('CreatedAt');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  
+  // Modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<ProductionPlan | null>(null);
@@ -41,37 +57,38 @@ const Production: React.FC = () => {
   const [viewingPlan, setViewingPlan] = useState<ProductionPlan | null>(null);
   const [showReceiveModal, setShowReceiveModal] = useState(false);
   const [receivingPlan, setReceivingPlan] = useState<ProductionPlan | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterBy, setFilterBy] = useState<'all' | 'draft' | 'planned' | 'in-progress' | 'completed' | 'can-produce'>('all');
-  const [sortBy, setSortBy] = useState<'name' | 'created' | 'status'>('created');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [currentPage, pageSize, searchTerm, statusFilter, sortBy, sortOrder]);
 
   const loadData = async () => {
-    setIsLoading(true);
-    setError(null);
     try {
-      const [plansResponse, statisticsResponse] = await Promise.all([
-        productionPlanApi.getAllPlans(),
+      setIsLoading(true);
+      const [pagedResponse, statsResponse] = await Promise.all([
+        productionPlanApi.getPlansPaged({
+          page: currentPage,
+          pageSize: pageSize,
+          searchTerm: searchTerm || undefined,
+          status: statusFilter ?? undefined,
+          sortBy: sortBy,
+          sortOrder: sortOrder
+        }),
         productionPlanApi.getStatistics()
       ]);
-      setPlans(plansResponse.data);
-      setStatistics(statisticsResponse.data);
-    } catch (error: any) {
-      console.error('Error loading production data:', error);
-      setError('Failed to load production data. Please try again.');
+      
+      setPagedData(pagedResponse.data);
+      setStatistics(statsResponse.data);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to load production data');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handlePlanCreated = (newPlan: ProductionPlan) => {
-    setPlans(prevPlans => [...prevPlans, newPlan]);
+  const handlePlanCreated = () => {
     setShowCreateModal(false);
-    loadData(); // Refresh statistics
+    loadData(); // Reload data
   };
 
   const handleExecutePlan = async (planId: number) => {
@@ -121,8 +138,7 @@ const Production: React.FC = () => {
     setEditingPlan(null);
   };
 
-  const handlePlanUpdated = (updatedPlan: ProductionPlan) => {
-    setPlans(prev => prev.map(plan => plan.id === updatedPlan.id ? updatedPlan : plan));
+  const handlePlanUpdated = () => {
     setShowEditModal(false);
     setEditingPlan(null);
     loadData();
@@ -148,64 +164,34 @@ const Production: React.FC = () => {
     setReceivingPlan(null);
   };
 
-  const handlePlanReceived = (updatedPlan: ProductionPlan) => {
-    setPlans(prev => prev.map(plan => plan.id === updatedPlan.id ? updatedPlan : plan));
+  const handlePlanReceived = () => {
     setShowReceiveModal(false);
     setReceivingPlan(null);
     loadData();
   };
 
-
-  const handleSort = (field: typeof sortBy) => {
-    if (sortBy === field) {
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      // Toggle sort order if clicking the same column
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortBy(field);
-      setSortOrder('asc');
+      // Set new column and default to descending
+      setSortBy(column);
+      setSortOrder('desc');
     }
+    setCurrentPage(1); // Reset to first page when sorting changes
   };
 
-  const filteredAndSortedPlans = plans
-    .filter(plan => {
-      // Search filter
-      const searchMatch = searchTerm === '' || 
-        plan.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        plan.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        plan.targetProductName.toLowerCase().includes(searchTerm.toLowerCase());
+  const getSortIcon = (column: string) => {
+    if (sortBy !== column) {
+      return <ArrowUpDown size={14} className="sort-icon inactive" />;
+    }
+    return sortOrder === 'asc' 
+      ? <ArrowUp size={14} className="sort-icon active" />
+      : <ArrowDown size={14} className="sort-icon active" />;
+  };
 
-      // Status filter
-      let statusMatch = true;
-      if (filterBy === 'draft') {
-        statusMatch = plan.status === ProductionPlanStatus.Draft;
-      } else if (filterBy === 'planned') {
-        statusMatch = plan.status === ProductionPlanStatus.Planned;
-      } else if (filterBy === 'in-progress') {
-        statusMatch = plan.status === ProductionPlanStatus.InProgress;
-      } else if (filterBy === 'completed') {
-        statusMatch = plan.status === ProductionPlanStatus.Completed;
-      } else if (filterBy === 'can-produce') {
-        statusMatch = plan.canProduce;
-      }
-
-      return searchMatch && statusMatch;
-    })
-    .sort((a, b) => {
-      let comparison = 0;
-      
-      switch (sortBy) {
-        case 'name':
-          comparison = a.name.localeCompare(b.name);
-          break;
-        case 'created':
-          comparison = new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime();
-          break;
-        case 'status':
-          comparison = a.status - b.status;
-          break;
-      }
-
-      return sortOrder === 'asc' ? comparison : -comparison;
-    });
+  const plans = pagedData?.items || [];
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -329,27 +315,38 @@ const Production: React.FC = () => {
       {/* Filters and Search */}
       <div className="production-controls">
         <div className="search-container">
-          <Search size={16} className="search-icon" />
-          <input
-            type="text"
-            placeholder="Search products..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
+          <div className="search-input-wrapper">
+            <Search size={20} className="search-icon" />
+            <input
+              type="text"
+              placeholder="Search plans..."
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reset to first page on search
+              }}
+              className="search-input"
+            />
+          </div>
         </div>
+        
+        {/* Status Filter */}
         <div className="filter-container">
-          <select 
-            value={filterBy} 
-            onChange={(e) => setFilterBy(e.target.value as typeof filterBy)}
+          <Filter size={20} className="filter-icon" />
+          <select
+            value={statusFilter ?? ''}
+            onChange={(e) => {
+              setStatusFilter(e.target.value ? Number(e.target.value) as ProductionPlanStatus : null);
+              setCurrentPage(1);
+            }}
             className="filter-select"
           >
-            <option value="all">All Plans</option>
-            <option value="draft">Draft</option>
-            <option value="planned">Planned</option>
-            <option value="in-progress">In Progress</option>
-            <option value="completed">Completed</option>
-            <option value="can-produce">Can Produce</option>
+            <option value="">All Status</option>
+            <option value={ProductionPlanStatus.Draft}>Draft</option>
+            <option value={ProductionPlanStatus.Planned}>Planned</option>
+            <option value={ProductionPlanStatus.InProgress}>In Progress</option>
+            <option value={ProductionPlanStatus.Completed}>Completed</option>
+            <option value={ProductionPlanStatus.Cancelled}>Cancelled</option>
           </select>
         </div>
       </div>
@@ -365,42 +362,42 @@ const Production: React.FC = () => {
         <table className="products-table">
           <thead>
             <tr>
-              <th 
-                className={`sortable ${sortBy === 'name' ? `sorted-${sortOrder}` : ''}`}
-                onClick={() => handleSort('name')}
-              >
-                Plan Name
+              <th className="sortable" onClick={() => handleSort('Name')}>
+                <div className="th-content">
+                  <span>Plan Name</span>
+                  {getSortIcon('Name')}
+                </div>
               </th>
               <th>Target Product</th>
               <th>Quantity</th>
               <th>Materials</th>
               <th>Time</th>
-              <th 
-                className={`sortable ${sortBy === 'status' ? `sorted-${sortOrder}` : ''}`}
-                onClick={() => handleSort('status')}
-              >
-                Status
+              <th className="sortable" onClick={() => handleSort('Status')}>
+                <div className="th-content">
+                  <span>Status</span>
+                  {getSortIcon('Status')}
+                </div>
               </th>
-              <th 
-                className={`sortable ${sortBy === 'created' ? `sorted-${sortOrder}` : ''}`}
-                onClick={() => handleSort('created')}
-              >
-                Created
+              <th className="sortable" onClick={() => handleSort('CreatedAt')}>
+                <div className="th-content">
+                  <span>Created</span>
+                  {getSortIcon('CreatedAt')}
+                </div>
               </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredAndSortedPlans.length === 0 ? (
+            {plans.length === 0 ? (
               <tr>
                 <td colSpan={8} className="no-products">
-                  {searchTerm || filterBy !== 'all' 
+                  {searchTerm || statusFilter !== null 
                     ? 'No production plans found matching your criteria.' 
                     : 'No production plans created. Create a plan to get started.'}
                 </td>
               </tr>
             ) : (
-              filteredAndSortedPlans.map((plan) => (
+              plans.map((plan) => (
                 <tr key={plan.id} className={plan.status === ProductionPlanStatus.Cancelled ? 'inactive-product' : ''}>
                   <td className="product-name-cell">
                     <div className="product-name">{plan.name}</div>
@@ -513,6 +510,91 @@ const Production: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {pagedData && pagedData.totalPages > 0 && (
+        <div className="pagination-container">
+          <div className="pagination-info">
+            Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} plans
+          </div>
+          
+          <div className="pagination-controls">
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(1)}
+              disabled={!pagedData.hasPreviousPage}
+            >
+              First
+            </button>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={!pagedData.hasPreviousPage}
+            >
+              <ChevronLeft size={16} />
+              Previous
+            </button>
+            
+            <div className="pagination-pages">
+              {Array.from({ length: Math.min(5, pagedData.totalPages) }, (_, i) => {
+                let pageNum;
+                if (pagedData.totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= pagedData.totalPages - 2) {
+                  pageNum = pagedData.totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    className={`pagination-page ${currentPage === pageNum ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={!pagedData.hasNextPage}
+            >
+              Next
+              <ChevronRight size={16} />
+            </button>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(pagedData.totalPages)}
+              disabled={!pagedData.hasNextPage}
+            >
+              Last
+            </button>
+          </div>
+          
+          <div className="page-size-selector">
+            <label>Show:</label>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span>per page</span>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       {showCreateModal && (

@@ -39,6 +39,76 @@ namespace ProductionManagement.API.Controllers
             return Ok(planInfos);
         }
 
+        [HttpGet("paged")]
+        [RequirePermission(Permissions.ViewProductionTab)]
+        public async Task<ActionResult<PagedResult<ProductionPlanInfo>>> GetPlansPaged([FromQuery] ProductionPlanPagedRequest request)
+        {
+            // Start with base query including related entities
+            var query = _context.ProductionPlans
+                .Include(p => p.CreatedByUser)
+                .Include(p => p.TargetProduct)
+                .Include(p => p.RequiredMaterials)
+                    .ThenInclude(m => m.RawMaterial)
+                .AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            {
+                var searchTerm = request.SearchTerm.ToLower();
+                query = query.Where(p =>
+                    p.Name.ToLower().Contains(searchTerm) ||
+                    (p.Description != null && p.Description.ToLower().Contains(searchTerm)) ||
+                    (p.TargetProduct != null && p.TargetProduct.Name.ToLower().Contains(searchTerm))
+                );
+            }
+
+            // Apply status filter
+            if (request.Status.HasValue)
+            {
+                query = query.Where(p => p.Status == request.Status.Value);
+            }
+
+            // Get total count before pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply sorting
+            query = request.SortBy.ToLower() switch
+            {
+                "name" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(p => p.Name)
+                    : query.OrderByDescending(p => p.Name),
+                "status" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(p => p.Status)
+                    : query.OrderByDescending(p => p.Status),
+                "createdat" or _ => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(p => p.CreatedAt)
+                    : query.OrderByDescending(p => p.CreatedAt)
+            };
+
+            // Apply pagination
+            var plans = await query
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            var planInfos = new List<ProductionPlanInfo>();
+            foreach (var plan in plans)
+            {
+                var planInfo = await MapToProductionPlanInfo(plan);
+                planInfos.Add(planInfo);
+            }
+
+            var pagedResult = new PagedResult<ProductionPlanInfo>
+            {
+                Items = planInfos,
+                TotalCount = totalCount,
+                Page = request.Page,
+                PageSize = request.PageSize
+            };
+
+            return Ok(pagedResult);
+        }
+
         [HttpGet("template/{finishedProductId}")]
         public async Task<ActionResult<ProductTemplateInfo>> GetProductTemplate(int finishedProductId)
         {

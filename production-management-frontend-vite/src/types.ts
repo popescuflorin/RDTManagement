@@ -587,6 +587,15 @@ export interface ProductionPlanStatistics {
   totalUnitsProduced: number;
 }
 
+export interface ProductionPlanPagedRequest {
+  page: number;
+  pageSize: number;
+  searchTerm?: string;
+  status?: ProductionPlanStatus;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
 // Product Template Types
 export interface ProductTemplate {
   id: number;
