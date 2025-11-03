@@ -596,6 +596,81 @@ export interface ProductionPlanPagedRequest {
   sortOrder?: 'asc' | 'desc';
 }
 
+// Recyclable Production Plan Types
+export interface CreateRecyclableProductionMaterialRequest {
+  rawMaterialId: number; // recyclable material id
+  requiredQuantity: number;
+}
+
+export interface CreateRecyclableProductionPlanRequest {
+  name: string;
+  description?: string;
+  targetRawMaterialId?: number; // existing raw material output
+  newRawMaterial?: CreateRawMaterialRequest; // create new raw material as output
+  quantityToProduce: number;
+  plannedStartDate?: string;
+  estimatedProductionTimeMinutes: number;
+  notes?: string;
+  requiredRecyclables: CreateRecyclableProductionMaterialRequest[];
+}
+
+export interface RecyclableProductionPlan {
+  id: number;
+  name: string;
+  description: string;
+  targetRawMaterialId: number;
+  targetRawMaterialName: string;
+  targetRawMaterialColor: string;
+  targetRawMaterialQuantityType: string;
+  quantityToProduce: number;
+  status: ProductionPlanStatus;
+  createdByUserId: number;
+  createdByUserName?: string;
+  startedByUserId?: number;
+  startedByUserName?: string;
+  completedByUserId?: number;
+  completedByUserName?: string;
+  createdAt: string;
+  plannedStartDate?: string;
+  startedAt?: string;
+  completedAt?: string;
+  estimatedCost: number;
+  actualCost?: number;
+  estimatedProductionTimeMinutes: number;
+  actualProductionTimeMinutes?: number;
+  notes?: string;
+  requiredRecyclables: Array<{
+    id: number;
+    recyclableProductionPlanId: number;
+    rawMaterialId: number;
+    materialName: string;
+    materialColor: string;
+    quantityType: string;
+    requiredQuantity: number;
+    actualQuantityUsed?: number;
+    availableQuantity: number;
+  }>;
+}
+
+export interface RecyclableProductionPlanPagedRequest {
+  page: number;
+  pageSize: number;
+  searchTerm?: string;
+  status?: ProductionPlanStatus;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface UpdateRecyclableProductionPlanRequest {
+  name: string;
+  description?: string;
+  quantityToProduce: number;
+  plannedStartDate?: string;
+  estimatedProductionTimeMinutes: number;
+  notes?: string;
+  requiredRecyclables: CreateRecyclableProductionMaterialRequest[];
+}
+
 // Product Template Types
 export interface ProductTemplate {
   id: number;

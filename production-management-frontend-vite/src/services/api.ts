@@ -22,9 +22,13 @@ import type {
   ProductionPlan,
   CreateProductionPlanRequest,
   UpdateProductionPlanRequest,
+  CreateRecyclableProductionPlanRequest,
   ExecuteProductionPlanRequest,
   ProductionPlanExecutionResult,
   ProductionPlanStatistics,
+  RecyclableProductionPlan,
+  RecyclableProductionPlanPagedRequest,
+  UpdateRecyclableProductionPlanRequest,
   Acquisition,
   AcquisitionStatistics,
   AcquisitionPagedRequest,
@@ -215,11 +219,20 @@ export const productionPlanApi = {
   getAllPlans: () => api.get<ProductionPlan[]>('/productionplan'),
   getPlansPaged: (params: import('../types').ProductionPlanPagedRequest) => 
     api.get<PagedResult<ProductionPlan>>('/productionplan/paged', { params }),
+  getRecyclablePlansPaged: (params: RecyclableProductionPlanPagedRequest) =>
+    api.get<PagedResult<RecyclableProductionPlan>>('/productionplan/recyclable/paged', { params }),
+  updateRecyclablePlan: (id: number, data: UpdateRecyclableProductionPlanRequest) =>
+    api.put<RecyclableProductionPlan>(`/productionplan/recyclable/${id}`, data),
+  cancelRecyclablePlan: (id: number) =>
+    api.post<RecyclableProductionPlan>(`/productionplan/recyclable/${id}/cancel`, {}),
+  executeRecyclablePlan: (id: number) =>
+    api.post(`/productionplan/recyclable/${id}/execute`, {}),
   getPlan: (id: number) => api.get<ProductionPlan>(`/productionplan/${id}`),
   getStatistics: () => api.get<ProductionPlanStatistics>('/productionplan/statistics'),
   getProductTemplate: (finishedProductId: number) => api.get<ProductTemplate>(`/productionplan/template/${finishedProductId}`),
   updateProductTemplate: (finishedProductId: number, templateData: UpdateProductTemplateRequest) => api.put<ProductTemplate>(`/productionplan/template/${finishedProductId}`, templateData),
   createPlan: (planData: CreateProductionPlanRequest) => api.post<ProductionPlan>('/productionplan', planData),
+  createRecyclablePlan: (planData: CreateRecyclableProductionPlanRequest) => api.post<ProductionPlan>('/productionplan/recyclable', planData),
   updatePlan: (id: number, planData: UpdateProductionPlanRequest) => api.put<ProductionPlan>(`/productionplan/${id}`, planData),
   deletePlan: (id: number) => api.delete(`/productionplan/${id}`),
   executePlan: (id: number, executionData: ExecuteProductionPlanRequest) => api.post<ProductionPlanExecutionResult>(`/productionplan/${id}/execute`, executionData),

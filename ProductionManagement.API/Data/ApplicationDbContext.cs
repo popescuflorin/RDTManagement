@@ -19,6 +19,8 @@ namespace ProductionManagement.API.Data
         public DbSet<ProductTemplateMaterial> ProductTemplateMaterials { get; set; }
         public DbSet<ProductionPlan> ProductionPlans { get; set; }
         public DbSet<ProductionPlanMaterial> ProductionPlanMaterials { get; set; }
+        public DbSet<RecyclableProductionPlan> RecyclableProductionPlans { get; set; }
+        public DbSet<RecyclablePlanMaterial> RecyclablePlanMaterials { get; set; }
         public DbSet<Acquisition> Acquisitions { get; set; }
         public DbSet<AcquisitionItem> AcquisitionItems { get; set; }
         public DbSet<ProcessedMaterial> ProcessedMaterials { get; set; }
@@ -249,6 +251,54 @@ namespace ProductionManagement.API.Data
                 entity.HasOne(e => e.ProductionPlan)
                     .WithMany(p => p.RequiredMaterials)
                     .HasForeignKey(e => e.ProductionPlanId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                entity.HasOne(e => e.RawMaterial)
+                    .WithMany()
+                    .HasForeignKey(e => e.RawMaterialId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // RecyclableProductionPlan configuration
+            modelBuilder.Entity<RecyclableProductionPlan>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Name).IsRequired().HasMaxLength(200);
+                entity.Property(e => e.QuantityToProduce).HasPrecision(18, 2);
+                entity.Property(e => e.EstimatedCost).HasPrecision(18, 2);
+                entity.Property(e => e.ActualCost).HasPrecision(18, 2);
+
+                entity.HasOne(e => e.TargetRawMaterial)
+                    .WithMany()
+                    .HasForeignKey(e => e.TargetRawMaterialId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.CreatedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.CreatedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.StartedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.StartedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.CompletedByUser)
+                    .WithMany()
+                    .HasForeignKey(e => e.CompletedByUserId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // RecyclablePlanMaterial configuration
+            modelBuilder.Entity<RecyclablePlanMaterial>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.RequiredQuantity).HasPrecision(18, 2);
+                entity.Property(e => e.ActualQuantityUsed).HasPrecision(18, 2);
+
+                entity.HasOne(e => e.RecyclableProductionPlan)
+                    .WithMany(p => p.RequiredRecyclables)
+                    .HasForeignKey(e => e.RecyclableProductionPlanId)
                     .OnDelete(DeleteBehavior.Cascade);
 
                 entity.HasOne(e => e.RawMaterial)
