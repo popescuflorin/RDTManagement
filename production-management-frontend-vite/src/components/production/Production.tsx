@@ -907,7 +907,7 @@ const Production: React.FC = () => {
                           )}
                           {(plan.status === ProductionPlanStatus.Draft || plan.status === ProductionPlanStatus.Planned) && (
                             <ProtectedButton
-                              requiredPermission={Permissions.ExecuteProduction}
+                              requiredPermission={Permissions.ExecuteProductionPlan}
                               className={`btn btn-sm btn-success ${!canProcessRec(plan) ? 'disabled' : ''}`}
                               title={canProcessRec(plan) ? 'Process Plan' : 'Cannot process - missing materials'}
                               onClick={() => canProcessRec(plan) && handleOpenProcessRec(plan)}

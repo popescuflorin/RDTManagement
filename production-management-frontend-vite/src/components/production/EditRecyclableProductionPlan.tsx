@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Plus, Trash2 } from 'lucide-react';
 import * as types from '../../types';
 import { inventoryApi, productionPlanApi } from '../../services/api';
@@ -40,12 +40,6 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
     };
     load();
   }, []);
-
-  const recyclableOptions = useMemo(() => allRecyclables.map(m => ({ value: m.id, label: `${m.name} (${m.color}) - ${m.quantityType}` })), [allRecyclables]);
-
-  const addMaterialRow = () => {
-    setMaterials(prev => [...prev, { rawMaterialId: '', requiredQuantity: '' }]);
-  };
 
   const removeMaterialRow = (index: number) => {
     setMaterials(prev => prev.filter((_, i) => i !== index));

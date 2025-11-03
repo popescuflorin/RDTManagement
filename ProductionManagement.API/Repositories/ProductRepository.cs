@@ -34,16 +34,16 @@ namespace ProductionManagement.API.Repositories
                 .ToListAsync();
         }
 
-        public async Task<decimal> GetTotalInventoryValueAsync()
+        public Task<decimal> GetTotalInventoryValueAsync()
         {
             // This will need to be calculated differently since Product doesn't have quantity
-            return 0; // Placeholder - will need to be implemented based on FinishedProduct records
+            return Task.FromResult<decimal>(0); // Placeholder - will need to be implemented based on FinishedProduct records
         }
 
-        public async Task<int> GetTotalProductionCountAsync()
+        public Task<int> GetTotalProductionCountAsync()
         {
             // This will need to be calculated differently since Product doesn't have quantity
-            return 0; // Placeholder - will need to be implemented based on FinishedProduct records
+            return Task.FromResult(0); // Placeholder - will need to be implemented based on FinishedProduct records
         }
     }
 }
