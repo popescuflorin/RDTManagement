@@ -135,6 +135,16 @@ export interface InventoryStatistics {
   }>;
 }
 
+export interface RawMaterialPagedRequest {
+  page: number;
+  pageSize: number;
+  searchTerm?: string;
+  type?: MaterialType;
+  isActive?: boolean;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
 // Production Management Types
 export interface Product {
   id: number;

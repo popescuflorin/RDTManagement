@@ -76,6 +76,91 @@ namespace ProductionManagement.API.Controllers
             return Ok(materialInfos);
         }
 
+        [HttpGet("paged")]
+        [RequirePermission(Permissions.ViewInventoryTab)]
+        public async Task<ActionResult<PagedResult<RawMaterialInfo>>> GetMaterialsPaged([FromQuery] RawMaterialPagedRequest request)
+        {
+            // Start with base query
+            var query = _context.RawMaterials.AsQueryable();
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            {
+                var searchTerm = request.SearchTerm.ToLower();
+                query = query.Where(m =>
+                    m.Name.ToLower().Contains(searchTerm) ||
+                    m.Color.ToLower().Contains(searchTerm) ||
+                    m.QuantityType.ToLower().Contains(searchTerm) ||
+                    (m.Description != null && m.Description.ToLower().Contains(searchTerm))
+                );
+            }
+
+            // Apply material type filter
+            if (request.Type.HasValue)
+            {
+                query = query.Where(m => m.Type == request.Type.Value);
+            }
+
+            // Apply active/inactive filter
+            if (request.IsActive.HasValue)
+            {
+                query = query.Where(m => m.IsActive == request.IsActive.Value);
+            }
+
+            // Get total count before pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply sorting
+            query = request.SortBy.ToLower() switch
+            {
+                "quantity" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(m => m.Quantity)
+                    : query.OrderByDescending(m => m.Quantity),
+                "updated" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(m => m.UpdatedAt)
+                    : query.OrderByDescending(m => m.UpdatedAt),
+                "name" or _ => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(m => m.Name).ThenBy(m => m.Color)
+                    : query.OrderByDescending(m => m.Name).ThenByDescending(m => m.Color)
+            };
+
+            // Apply pagination
+            var materials = await query
+                .Skip((request.Page - 1) * request.PageSize)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            // Calculate requested quantities for all materials in this page
+            var requestedQuantities = await CalculateRequestedQuantitiesAsync();
+
+            var materialInfos = materials.Select(m => new RawMaterialInfo
+            {
+                Id = m.Id,
+                Name = m.Name,
+                Color = m.Color,
+                Quantity = m.Quantity,
+                QuantityType = m.QuantityType,
+                CreatedAt = m.CreatedAt,
+                UpdatedAt = m.UpdatedAt,
+                MinimumStock = m.MinimumStock,
+                UnitCost = m.UnitCost,
+                Description = m.Description,
+                IsActive = m.IsActive,
+                Type = m.Type,
+                RequestedQuantity = requestedQuantities.ContainsKey(m.Id) ? requestedQuantities[m.Id] : 0
+            }).ToList();
+
+            var pagedResult = new PagedResult<RawMaterialInfo>
+            {
+                Items = materialInfos,
+                TotalCount = totalCount,
+                Page = request.Page,
+                PageSize = request.PageSize
+            };
+
+            return Ok(pagedResult);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<RawMaterialInfo>> GetMaterial(int id)
         {

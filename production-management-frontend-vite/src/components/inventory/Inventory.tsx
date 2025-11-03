@@ -9,10 +9,15 @@ import {
   CheckCircle,
   Eye,
   Loader2,
-  XCircle
+  XCircle,
+  ChevronLeft,
+  ChevronRight,
+  ArrowUpDown,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react';
 import { inventoryApi } from '../../services/api';
-import type { RawMaterial, InventoryStatistics } from '../../types';
+import type { RawMaterial, InventoryStatistics, PagedResult } from '../../types';
 import { MaterialType } from '../../types';
 import AddMaterial from './AddMaterial';
 import EditMaterial from './EditMaterial';
@@ -24,48 +29,60 @@ import { Permissions } from '../../hooks/usePermissions';
 import './Inventory.css';
 
 const Inventory: React.FC = () => {
-  const [materials, setMaterials] = useState<RawMaterial[]>([]);
+  const [pagedData, setPagedData] = useState<PagedResult<RawMaterial> | null>(null);
   const [statistics, setStatistics] = useState<InventoryStatistics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Pagination and filtering state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterBy, setFilterBy] = useState<MaterialType>(MaterialType.RawMaterial);
+  const [showInactive, setShowInactive] = useState(false);
+  const [sortBy, setSortBy] = useState<string>('Name');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  
+  // Modal state
   const [showAddModal, setShowAddModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showActivateModal, setShowActivateModal] = useState(false);
   const [selectedMaterial, setSelectedMaterial] = useState<RawMaterial | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterBy, setFilterBy] = useState<MaterialType>(MaterialType.RawMaterial);
-  const [showInactive, setShowInactive] = useState(false);
-  const [sortBy, setSortBy] = useState<'name' | 'quantity' | 'updated'>('name');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [currentPage, pageSize, searchTerm, filterBy, showInactive, sortBy, sortOrder]);
 
   const loadData = async () => {
-    setIsLoading(true);
-    setError(null);
     try {
-      const [materialsResponse, statisticsResponse] = await Promise.all([
-        inventoryApi.getAllMaterialsIncludingInactive(),
+      setIsLoading(true);
+      const [pagedResponse, statsResponse] = await Promise.all([
+        inventoryApi.getMaterialsPaged({
+          page: currentPage,
+          pageSize: pageSize,
+          searchTerm: searchTerm || undefined,
+          type: filterBy,
+          isActive: showInactive ? false : true,
+          sortBy: sortBy,
+          sortOrder: sortOrder
+        }),
         inventoryApi.getStatistics()
       ]);
-      setMaterials(materialsResponse.data);
-      setStatistics(statisticsResponse.data);
-    } catch (error: any) {
-      console.error('Error loading inventory data:', error);
-      setError('Failed to load inventory data. Please try again.');
+      
+      setPagedData(pagedResponse.data);
+      setStatistics(statsResponse.data);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to load inventory data');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleMaterialCreated = (newMaterial: RawMaterial) => {
-    setMaterials(prevMaterials => [...prevMaterials, newMaterial]);
+  const handleMaterialCreated = () => {
     setShowAddModal(false);
-    loadData(); // Refresh statistics
+    loadData(); // Reload data
   };
 
   const handleViewMaterial = (material: RawMaterial) => {
@@ -78,15 +95,10 @@ const Inventory: React.FC = () => {
     setShowEditModal(true);
   };
 
-  const handleMaterialUpdated = (updatedMaterial: RawMaterial) => {
-    setMaterials(prevMaterials => 
-      prevMaterials.map(material => 
-        material.id === updatedMaterial.id ? updatedMaterial : material
-      )
-    );
+  const handleMaterialUpdated = () => {
     setShowEditModal(false);
     setSelectedMaterial(null);
-    loadData(); // Refresh statistics
+    loadData(); // Reload data
   };
 
   const handleDeleteMaterial = (material: RawMaterial) => {
@@ -99,22 +111,16 @@ const Inventory: React.FC = () => {
     setShowActivateModal(true);
   };
 
-  const handleMaterialDeleted = (materialId: number) => {
-    setMaterials(prevMaterials => prevMaterials.filter(material => material.id !== materialId));
+  const handleMaterialDeleted = () => {
     setShowDeleteModal(false);
     setSelectedMaterial(null);
-    loadData(); // Refresh statistics
+    loadData(); // Reload data
   };
 
-  const handleMaterialActivated = (materialId: number) => {
-    setMaterials(prevMaterials => 
-      prevMaterials.map(material => 
-        material.id === materialId ? { ...material, isActive: true } : material
-      )
-    );
+  const handleMaterialActivated = () => {
     setShowActivateModal(false);
     setSelectedMaterial(null);
-    loadData(); // Refresh statistics
+    loadData(); // Reload data
   };
 
   const closeModals = () => {
@@ -125,49 +131,28 @@ const Inventory: React.FC = () => {
     setSelectedMaterial(null);
   };
 
-  const handleSort = (field: typeof sortBy) => {
-    if (sortBy === field) {
+  const handleSort = (column: string) => {
+    if (sortBy === column) {
+      // Toggle sort order if clicking the same column
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
-      setSortBy(field);
+      // Set new column and default to ascending
+      setSortBy(column);
       setSortOrder('asc');
     }
+    setCurrentPage(1); // Reset to first page when sorting changes
   };
 
-  const filteredAndSortedMaterials = materials
-    .filter(material => {
-      // Search filter
-      const searchMatch = searchTerm === '' || 
-        material.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        material.color.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        material.quantityType.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (material.description && material.description.toLowerCase().includes(searchTerm.toLowerCase()));
+  const getSortIcon = (column: string) => {
+    if (sortBy !== column) {
+      return <ArrowUpDown size={14} className="sort-icon inactive" />;
+    }
+    return sortOrder === 'asc' 
+      ? <ArrowUp size={14} className="sort-icon active" />
+      : <ArrowDown size={14} className="sort-icon active" />;
+  };
 
-      // Material type filter
-      const typeMatch = material.type === filterBy;
-
-      // Active/Inactive filter
-      const activeMatch = showInactive ? !material.isActive : material.isActive;
-
-      return searchMatch && typeMatch && activeMatch;
-    })
-    .sort((a, b) => {
-      let comparison = 0;
-      
-      switch (sortBy) {
-        case 'name':
-          comparison = a.name.localeCompare(b.name) || a.color.localeCompare(b.color);
-          break;
-        case 'quantity':
-          comparison = a.quantity - b.quantity;
-          break;
-        case 'updated':
-          comparison = new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime();
-          break;
-      }
-
-      return sortOrder === 'asc' ? comparison : -comparison;
-    });
+  const materials = pagedData?.items || [];
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -245,27 +230,54 @@ const Inventory: React.FC = () => {
             type="text"
             placeholder="Search materials..."
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1); // Reset to first page on search
+            }}
             className="search-input"
           />
         </div>
-        <div className="filter-container">
-          <select 
-            value={filterBy} 
-            onChange={(e) => setFilterBy(Number(e.target.value) as MaterialType)}
-            className="filter-select"
+        
+        {/* Type Filter Buttons */}
+        <div className="filter-buttons">
+          <button
+            className={`filter-btn ${filterBy === MaterialType.RawMaterial ? 'active' : ''}`}
+            onClick={() => {
+              setFilterBy(MaterialType.RawMaterial);
+              setCurrentPage(1);
+            }}
           >
-            <option value={MaterialType.RawMaterial}>Raw Materials</option>
-            <option value={MaterialType.RecyclableMaterial}>Recyclable Materials</option>
-            <option value={MaterialType.FinishedProduct}>Finished Products</option>
-          </select>
+            Raw Materials
+          </button>
+          <button
+            className={`filter-btn ${filterBy === MaterialType.RecyclableMaterial ? 'active' : ''}`}
+            onClick={() => {
+              setFilterBy(MaterialType.RecyclableMaterial);
+              setCurrentPage(1);
+            }}
+          >
+            Recyclable Materials
+          </button>
+          <button
+            className={`filter-btn ${filterBy === MaterialType.FinishedProduct ? 'active' : ''}`}
+            onClick={() => {
+              setFilterBy(MaterialType.FinishedProduct);
+              setCurrentPage(1);
+            }}
+          >
+            Finished Products
+          </button>
         </div>
+        
         <div className="checkbox-filter">
           <label className="checkbox-label">
             <input
               type="checkbox"
               checked={showInactive}
-              onChange={(e) => setShowInactive(e.target.checked)}
+              onChange={(e) => {
+                setShowInactive(e.target.checked);
+                setCurrentPage(1);
+              }}
             />
             <span>Show Inactive Materials</span>
           </label>
@@ -280,37 +292,37 @@ const Inventory: React.FC = () => {
 
       {/* Materials Table */}
       <div className="table-container">
-        <table className="materials-table">
+        <table className="inventory-materials-table">
           <thead>
             <tr>
-              <th 
-                className={`sortable ${sortBy === 'name' ? `sorted-${sortOrder}` : ''}`}
-                onClick={() => handleSort('name')}
-              >
-                Material
+              <th className="sortable" onClick={() => handleSort('Name')}>
+                <div className="th-content">
+                  <span>Material</span>
+                  {getSortIcon('Name')}
+                </div>
               </th>
               <th>Color</th>
-              <th 
-                className={`sortable ${sortBy === 'quantity' ? `sorted-${sortOrder}` : ''}`}
-                onClick={() => handleSort('quantity')}
-              >
-                In Stock
+              <th className="sortable" onClick={() => handleSort('Quantity')}>
+                <div className="th-content">
+                  <span>In Stock</span>
+                  {getSortIcon('Quantity')}
+                </div>
               </th>
               <th>Requested</th>
               <th>Available</th>
               <th>Min. Stock</th>
               <th>Status</th>
-              <th 
-                className={`sortable ${sortBy === 'updated' ? `sorted-${sortOrder}` : ''}`}
-                onClick={() => handleSort('updated')}
-              >
-                Last Updated
+              <th className="sortable" onClick={() => handleSort('Updated')}>
+                <div className="th-content">
+                  <span>Last Updated</span>
+                  {getSortIcon('Updated')}
+                </div>
               </th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody>
-            {filteredAndSortedMaterials.length === 0 ? (
+            {materials.length === 0 ? (
               <tr>
                 <td colSpan={10} className="no-materials">
                   {searchTerm 
@@ -319,7 +331,7 @@ const Inventory: React.FC = () => {
                 </td>
               </tr>
             ) : (
-              filteredAndSortedMaterials.map((material) => {
+              materials.map((material) => {
                 const availableQuantity = material.quantity - material.requestedQuantity;
                 const isInsufficient = availableQuantity < 0;
                 
@@ -417,6 +429,91 @@ const Inventory: React.FC = () => {
           </tbody>
         </table>
       </div>
+
+      {/* Pagination Controls */}
+      {pagedData && pagedData.totalPages > 0 && (
+        <div className="pagination-container">
+          <div className="pagination-info">
+            Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} materials
+          </div>
+          
+          <div className="pagination-controls">
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(1)}
+              disabled={!pagedData.hasPreviousPage}
+            >
+              First
+            </button>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(currentPage - 1)}
+              disabled={!pagedData.hasPreviousPage}
+            >
+              <ChevronLeft size={16} />
+              Previous
+            </button>
+            
+            <div className="pagination-pages">
+              {Array.from({ length: Math.min(5, pagedData.totalPages) }, (_, i) => {
+                let pageNum;
+                if (pagedData.totalPages <= 5) {
+                  pageNum = i + 1;
+                } else if (currentPage <= 3) {
+                  pageNum = i + 1;
+                } else if (currentPage >= pagedData.totalPages - 2) {
+                  pageNum = pagedData.totalPages - 4 + i;
+                } else {
+                  pageNum = currentPage - 2 + i;
+                }
+                
+                return (
+                  <button
+                    key={pageNum}
+                    className={`pagination-page ${currentPage === pageNum ? 'active' : ''}`}
+                    onClick={() => setCurrentPage(pageNum)}
+                  >
+                    {pageNum}
+                  </button>
+                );
+              })}
+            </div>
+            
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(currentPage + 1)}
+              disabled={!pagedData.hasNextPage}
+            >
+              Next
+              <ChevronRight size={16} />
+            </button>
+            <button
+              className="pagination-btn"
+              onClick={() => setCurrentPage(pagedData.totalPages)}
+              disabled={!pagedData.hasNextPage}
+            >
+              Last
+            </button>
+          </div>
+          
+          <div className="page-size-selector">
+            <label>Show:</label>
+            <select
+              value={pageSize}
+              onChange={(e) => {
+                setPageSize(Number(e.target.value));
+                setCurrentPage(1);
+              }}
+            >
+              <option value={10}>10</option>
+              <option value={25}>25</option>
+              <option value={50}>50</option>
+              <option value={100}>100</option>
+            </select>
+            <span>per page</span>
+          </div>
+        </div>
+      )}
 
       {/* Modals */}
       {showAddModal && (

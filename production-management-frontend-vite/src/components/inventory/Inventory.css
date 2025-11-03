@@ -242,67 +242,81 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border);
   overflow: hidden;
+  margin: 0 var(--space-2xl);
 }
 
-.materials-table {
+/* Table Styles */
+.inventory-materials-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.95rem;
+  font-size: var(--text-sm);
 }
 
-.materials-table th {
+.inventory-materials-table th {
   background: var(--primary-500);
   color: var(--text-inverse);
   padding: var(--space-lg) var(--space-md);
   text-align: left;
   font-weight: 600;
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.materials-table th.sortable {
+.inventory-materials-table th.sortable {
   cursor: pointer;
   user-select: none;
-  transition: background-color 0.2s ease;
-  position: relative;
+  transition: background var(--transition-fast);
 }
 
-.materials-table th.sortable:hover {
+.inventory-materials-table th.sortable:hover {
   background: var(--primary-600);
 }
 
-.materials-table th.sortable::after {
-  content: "⇅";
-  margin-left: 8px;
-  opacity: 0.6;
+.inventory-materials-table th .th-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  justify-content: space-between;
 }
 
-.materials-table th.sorted-asc::after {
-  content: "↑";
+.inventory-materials-table th .sort-icon {
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+}
+
+.inventory-materials-table th .sort-icon.inactive {
+  opacity: 0.4;
+}
+
+.inventory-materials-table th .sort-icon.active {
   opacity: 1;
+  color: var(--warning-200);
 }
 
-.materials-table th.sorted-desc::after {
-  content: "↓";
-  opacity: 1;
+.inventory-materials-table th.sortable:hover .sort-icon.inactive {
+  opacity: 0.7;
 }
 
-.materials-table td {
+.inventory-materials-table td {
   padding: var(--space-lg) var(--space-md);
   border-bottom: 1px solid var(--border);
   vertical-align: top;
 }
 
-.materials-table tr:hover {
+.inventory-materials-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.inventory-materials-table tbody tr:hover {
   background-color: var(--surface-hover);
 }
 
-.materials-table tr.inactive-material {
+.inventory-materials-table tr.inactive-material {
   opacity: 0.6;
 }
 
-.materials-table tr.inactive-material td {
+.inventory-materials-table tr.inactive-material td {
   background-color: #f8f9fa;
 }
 
@@ -385,7 +399,7 @@
   min-width: 100px;
 }
 
-.action-buttons
+.action-buttons {
   display: flex;
   gap: 8px;
   justify-content: center;
@@ -445,6 +459,148 @@
   font-style: italic;
 }
 
+/* Filter Buttons */
+.filter-buttons {
+  display: flex;
+  gap: var(--space-sm);
+  background: var(--surface-secondary);
+  padding: var(--space-xs);
+  border-radius: var(--radius-md);
+}
+
+.filter-btn {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  white-space: nowrap;
+}
+
+.filter-btn:hover {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.filter-btn.active {
+  background: var(--primary-600);
+  color: var(--text-inverse);
+  border-color: var(--primary-600);
+}
+
+/* Pagination Container */
+.pagination-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-xl) var(--space-2xl);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: var(--space-lg);
+}
+
+.pagination-info {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.pagination-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.pagination-btn:hover:not(:disabled) {
+  background: var(--primary-50);
+  border-color: var(--primary-600);
+  color: var(--primary-600);
+}
+
+.pagination-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.pagination-pages {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+.pagination-page {
+  min-width: 36px;
+  height: 36px;
+  padding: var(--space-sm);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.pagination-page:hover {
+  background: var(--primary-50);
+  border-color: var(--primary-600);
+  color: var(--primary-600);
+}
+
+.pagination-page.active {
+  background: var(--primary-600);
+  color: var(--text-inverse);
+  border-color: var(--primary-600);
+}
+
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.page-size-selector select {
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.page-size-selector select:hover {
+  border-color: var(--primary-600);
+}
+
+.page-size-selector select:focus {
+  outline: none;
+  border-color: var(--primary-600);
+  box-shadow: 0 0 0 3px var(--primary-50);
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .inventory-stats {
@@ -495,16 +651,45 @@
     min-width: auto;
   }
 
+  .pagination-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .pagination-info {
+    text-align: center;
+    order: 3;
+  }
+
+  .pagination-controls {
+    order: 1;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .page-size-selector {
+    order: 2;
+    justify-content: center;
+  }
+
+  .filter-buttons {
+    flex-direction: column;
+  }
+
+  .filter-btn {
+    width: 100%;
+  }
+
   .table-container {
     overflow-x: auto;
   }
 
-  .materials-table {
+  .inventory-materials-table {
     min-width: 800px;
   }
 
-  .materials-table th,
-  .materials-table td {
+  .inventory-materials-table th,
+  .inventory-materials-table td {
     padding: 12px 8px;
     font-size: 0.9rem;
   }
@@ -545,8 +730,8 @@
     font-size: 1.4rem;
   }
 
-  .materials-table th,
-  .materials-table td {
+  .inventory-materials-table th,
+  .inventory-materials-table td {
     padding: 10px 6px;
     font-size: 0.85rem;
   }
@@ -588,12 +773,12 @@
     border: 1px solid #333;
   }
 
-  .materials-table th {
+  .inventory-materials-table th {
     background: #f0f0f0 !important;
     color: #333 !important;
   }
 
-  .materials-table tr:hover {
+  .inventory-materials-table tr:hover {
     background-color: transparent;
   }
 }
