@@ -1,16 +1,10 @@
 name: Deploy Backend API
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - "ProductionManagement.API/**"
-      - ".github/workflows/backend-deploy.yml"
   workflow_dispatch:
 
 env:
-  AZURE_WEBAPP_NAME: your-app-service-name
+  AZURE_WEBAPP_NAME: ProductManagementApi
   DOTNET_VERSION: "9.0.x"
   WORKING_DIRECTORY: ProductionManagement.API
   DOTNET_PUBLISH_DIRECTORY: ${{ github.workspace }}/published
