@@ -98,20 +98,22 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment() 
-&& builder.Configuration.GetValue<bool>("EnableSwagger"))
+var enableSwagger = app.Environment.IsDevelopment() ||
+                    builder.Configuration.GetValue<bool>("EnableSwagger", false);
+
+if (enableSwagger)
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
 app.UseCors("AllowReactApp");
-app.MapGet("/healthz", () => Results.Ok("ok"));
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGet("/healthz", () => Results.Ok("ok"));
 
 app.Run();
