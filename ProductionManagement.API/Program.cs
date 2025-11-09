@@ -89,7 +89,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173", "https://purple-river-07ce36603.3.azurestaticapps.net")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
