@@ -1,0 +1,53 @@
+name: Deploy Backend API
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "ProductionManagement.API/**"
+      - ".github/workflows/backend-deploy.yml"
+  workflow_dispatch:
+
+env:
+  AZURE_WEBAPP_NAME: your-app-service-name
+  DOTNET_VERSION: "9.0.x"
+  WORKING_DIRECTORY: ProductionManagement.API
+  DOTNET_PUBLISH_DIRECTORY: ${{ github.workspace }}/published
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ env.DOTNET_VERSION }}
+
+      - name: Restore dependencies
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: dotnet restore
+
+      - name: Build
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run tests
+        if: false # TODO: set to true when test projects are available
+        run: dotnet test --configuration Release --no-build
+
+      - name: Publish
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: dotnet publish --configuration Release --no-build --output "${{ env.DOTNET_PUBLISH_DIRECTORY }}"
+
+      - name: Deploy to Azure App Service
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+          package: ${{ env.DOTNET_PUBLISH_DIRECTORY }}
+
