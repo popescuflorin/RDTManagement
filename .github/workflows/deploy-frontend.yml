@@ -6,7 +6,7 @@ on:
 env:
   NODE_VERSION: "20.x"
   WORKING_DIRECTORY: production-management-frontend-vite
-
+  VITE_API_BASE_URL: ${{ secrets.VITE_API_BASE_URL }}
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
