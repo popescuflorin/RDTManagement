@@ -450,13 +450,13 @@
 }
 
 .process-button {
-  background: #e8f4f8;
-  color: #0077b6;
+  background: var(--warning-100);
+  color: var(--warning-700);
 }
 
 .process-button:hover {
-  background: #d1e9f2;
-  color: #005f8a;
+  background: var(--warning-200);
+  color: var(--warning-800);
 }
 
 .delete-button {

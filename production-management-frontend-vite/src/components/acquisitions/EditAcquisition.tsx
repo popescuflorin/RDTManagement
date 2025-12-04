@@ -35,6 +35,7 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [materialError, setMaterialError] = useState<string | null>(null);
   
   // Form data
   const [title, setTitle] = useState('');
@@ -49,6 +50,7 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
   const [selectedTransportId, setSelectedTransportId] = useState<number | null>(null);
   const [transportSearchTerm, setTransportSearchTerm] = useState('');
   const [showTransportDropdown, setShowTransportDropdown] = useState(false);
+  const [transportNumberPlate, setTransportNumberPlate] = useState('');
   const [transportPhoneNumber, setTransportPhoneNumber] = useState('');
   const [transportDate, setTransportDate] = useState('');
   const [transportNotes, setTransportNotes] = useState('');
@@ -119,6 +121,7 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
     // Transport details
     setSelectedTransportId(acquisition.transportId || null);
     setTransportSearchTerm(acquisition.transportCarName || '');
+    setTransportNumberPlate(acquisition.transportNumberPlate || '');
     setTransportPhoneNumber(acquisition.transportPhoneNumber || '');
     setTransportDate(acquisition.transportDate ? acquisition.transportDate.split('T')[0] : '');
     setTransportNotes(acquisition.transportNotes || '');
@@ -175,7 +178,7 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
 
   const handleAddNewMaterial = () => {
     if (!newItem.name || !newItem.color || !newItem.unitOfMeasure || !newItem.quantity || newItem.quantity <= 0) {
-      setError('Please fill in all required fields for the new material');
+      setMaterialError('Please fill in all required fields for the new material');
       return;
     }
 
@@ -200,6 +203,14 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
     });
     setShowAddItemForm(false);
     setMaterialSearchTerm('');
+    setMaterialError(null);
+  };
+
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
+    }
   };
 
   const handleUpdateItem = (index: number, updates: Partial<AcquisitionItem>) => {
@@ -329,13 +340,20 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
     
     if (!value.trim()) {
       setSelectedTransportId(null);
+      setTransportNumberPlate('');
       setTransportPhoneNumber('');
     }
+  };
+
+  const handleTransportInputFocus = () => {
+    setShowTransportDropdown(true);
   };
 
   const handleTransportSelect = (transport: Transport) => {
     setSelectedTransportId(transport.id);
     setTransportSearchTerm(transport.carName);
+    // Ensure number plate is set correctly (handle null, undefined, or empty string)
+    setTransportNumberPlate(transport.numberPlate ?? '');
     setTransportPhoneNumber(transport.phoneNumber);
     setShowTransportDropdown(false);
   };
@@ -367,6 +385,7 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
       if (transportSearchTerm.trim() && !selectedTransportId && transportPhoneNumber.trim()) {
         const newTransportRequest: CreateTransportRequest = {
           carName: transportSearchTerm.trim(),
+          numberPlate: transportNumberPlate.trim() || undefined,
           phoneNumber: transportPhoneNumber.trim()
         };
         const transportResponse = await transportApi.createTransport(newTransportRequest);
@@ -530,10 +549,10 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                       id="transportCarName"
                       value={transportSearchTerm}
                       onChange={(e) => handleTransportSearchChange(e.target.value)}
-                      onFocus={() => setShowTransportDropdown(true)}
+                      onFocus={handleTransportInputFocus}
                       placeholder="Search or enter car/vehicle name"
                     />
-                    {showTransportDropdown && transportSearchTerm && (
+                    {showTransportDropdown && (
                       <div className="material-dropdown">
                         {filteredTransports.length > 0 ? (
                           filteredTransports.map((transport) => (
@@ -544,15 +563,22 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                             >
                               <div>
                                 <strong>{transport.carName}</strong>
-                                <small>{transport.phoneNumber}</small>
+                                {transport.numberPlate && <small> - {transport.numberPlate}</small>}
+                                <small> | {transport.phoneNumber}</small>
                               </div>
                             </div>
                           ))
-                        ) : (
+                        ) : transportSearchTerm ? (
                           <div className="material-option material-option-create">
                             <div>
                               <strong>Create new transport:</strong> {transportSearchTerm}
                               <small>Enter phone number and submit to create</small>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="material-option">
+                            <div>
+                              <small>Start typing to search or create a new transport</small>
                             </div>
                           </div>
                         )}
@@ -560,6 +586,18 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                     )}
                   </div>
                 </div>
+                <div className="form-group">
+                  <label htmlFor="transportNumberPlate">Number Plate</label>
+                  <input
+                    type="text"
+                    id="transportNumberPlate"
+                    value={transportNumberPlate}
+                    onChange={(e) => setTransportNumberPlate(e.target.value)}
+                    placeholder="Enter number plate (optional)"
+                  />
+                </div>
+              </div>
+              <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="transportPhoneNumber">Phone Number</label>
                   <input
@@ -570,8 +608,6 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                     placeholder="Enter phone number"
                   />
                 </div>
-              </div>
-              <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="transportDate">Transport Date</label>
                   <input
@@ -582,6 +618,8 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                     placeholder="Select transport date"
                   />
                 </div>
+              </div>
+              <div className="form-row">
                 <div className="form-group">
                   <label htmlFor="transportNotes">Transport Notes</label>
                   <input
@@ -746,6 +784,14 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
               </button>
             </div>
 
+            {/* Material Error Message */}
+            {materialError && (
+              <div className="error-message">
+                {materialError}
+                <button onClick={() => setMaterialError(null)}>×</button>
+              </div>
+            )}
+
             {/* Add Item Form */}
             {showAddItemForm && (
               <div className="add-item-form">
@@ -811,6 +857,7 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                       id="itemQuantity"
                       value={newItem.quantity || ''}
                       onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
+                      onWheel={handleWheel}
                       min="0"
                       step="0.01"
                       placeholder="0"
@@ -884,6 +931,7 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                               type="number"
                               value={item.quantity}
                               onChange={(e) => handleUpdateItem(index, { quantity: parseFloat(e.target.value) || 0 })}
+                              onWheel={handleWheel}
                               min="0"
                               step="0.01"
                             />

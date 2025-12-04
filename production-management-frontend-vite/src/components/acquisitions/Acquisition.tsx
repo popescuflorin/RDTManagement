@@ -470,9 +470,10 @@ const Acquisition: React.FC = () => {
                           <Package size={16} />
                         </ProtectedButton>
                       )}
-                      {acquisition.status === AcquisitionStatus.ReadyForProcessing && (
+                      {acquisition.status === AcquisitionStatus.ReadyForProcessing && 
+                       acquisition.type === AcqType.RecyclableMaterials && (
                         <ProtectedButton
-                          className="action-button process-button"
+                          className="action-button receive-button"
                           onClick={() => handleProcessAcquisition(acquisition)}
                           title="Process"
                           requiredPermission={Permissions.ProcessAcquisition}

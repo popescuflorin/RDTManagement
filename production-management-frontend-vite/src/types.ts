@@ -268,6 +268,7 @@ export type AcquisitionStatus = typeof AcquisitionStatus[keyof typeof Acquisitio
 export interface Transport {
   id: number;
   carName: string;
+  numberPlate?: string;
   phoneNumber: string;
   createdAt: string;
   updatedAt?: string;
@@ -275,11 +276,13 @@ export interface Transport {
 
 export interface CreateTransportRequest {
   carName: string;
+  numberPlate?: string;
   phoneNumber: string;
 }
 
 export interface UpdateTransportRequest {
   carName: string;
+  numberPlate?: string;
   phoneNumber: string;
 }
 
@@ -306,6 +309,7 @@ export interface Acquisition {
   // Transport details
   transportId?: number;
   transportCarName?: string;
+  transportNumberPlate?: string;
   transportPhoneNumber?: string;
   transportDate?: string;
   transportNotes?: string;
@@ -799,6 +803,7 @@ export interface Order {
   deliveryDate?: string;
   transportId?: number;
   transportCarName?: string;
+  transportNumberPlate?: string;
   transportPhoneNumber?: string;
   transportDate?: string;
   transportNotes?: string;

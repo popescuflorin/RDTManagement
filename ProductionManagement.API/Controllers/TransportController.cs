@@ -76,6 +76,7 @@ namespace ProductionManagement.API.Controllers
             var transport = new Transport
             {
                 CarName = request.CarName,
+                NumberPlate = request.NumberPlate,
                 PhoneNumber = request.PhoneNumber,
                 CreatedAt = DateTime.UtcNow,
                 IsActive = true
@@ -104,6 +105,7 @@ namespace ProductionManagement.API.Controllers
             }
 
             transport.CarName = request.CarName;
+            transport.NumberPlate = request.NumberPlate;
             transport.PhoneNumber = request.PhoneNumber;
             transport.UpdatedAt = DateTime.UtcNow;
 
@@ -135,6 +137,7 @@ namespace ProductionManagement.API.Controllers
             {
                 Id = transport.Id,
                 CarName = transport.CarName,
+                NumberPlate = transport.NumberPlate,
                 PhoneNumber = transport.PhoneNumber,
                 CreatedAt = transport.CreatedAt,
                 UpdatedAt = transport.UpdatedAt

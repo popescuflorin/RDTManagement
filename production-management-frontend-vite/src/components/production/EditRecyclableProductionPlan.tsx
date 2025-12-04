@@ -45,6 +45,13 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
     setMaterials(prev => prev.filter((_, i) => i !== index));
   };
 
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
+    }
+  };
+
   const updateMaterialRow = (index: number, field: 'rawMaterialId' | 'requiredQuantity', value: any) => {
     setMaterials(prev => prev.map((row, i) => i === index ? { ...row, [field]: value } : row));
   };
@@ -120,11 +127,11 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
               </div>
               <div className="form-group">
                 <label>Quantity to Produce</label>
-                <input type="number" min={0} step="0.01" value={quantityToProduce} onChange={(e) => setQuantityToProduce(Number(e.target.value))} />
+                <input type="number" min={0} step="0.01" value={quantityToProduce} onChange={(e) => setQuantityToProduce(Number(e.target.value))} onWheel={handleWheel} />
               </div>
               <div className="form-group">
                 <label>Estimated Time (min)</label>
-                <input type="number" min={1} step="1" value={estimatedProductionTimeMinutes} onChange={(e) => setEstimatedProductionTimeMinutes(Number(e.target.value))} />
+                <input type="number" min={1} step="1" value={estimatedProductionTimeMinutes} onChange={(e) => setEstimatedProductionTimeMinutes(Number(e.target.value))} onWheel={handleWheel} />
               </div>
             </div>
             <div className="form-group">
@@ -163,6 +170,7 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
                     step={0.01}
                     value={currentRecyclable.requiredQuantity}
                     onChange={(e) => setCurrentRecyclable(prev => ({ ...prev, requiredQuantity: parseFloat(e.target.value) || 0 }))}
+                    onWheel={handleWheel}
                   />
                 </div>
                 <div className="form-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
@@ -227,6 +235,7 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
                             placeholder="per unit"
                             value={row.requiredQuantity}
                             onChange={(e) => updateMaterialRow(idx, 'requiredQuantity', e.target.value === '' ? '' : Number(e.target.value))}
+                            onWheel={handleWheel}
                           />
                         </td>
                         <td>{totalNeed.toFixed(2)} {qtyType}</td>

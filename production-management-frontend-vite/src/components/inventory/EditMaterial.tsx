@@ -25,6 +25,13 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     setFormData(prev => ({
@@ -165,6 +172,7 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
                 name="quantity"
                 value={formData.quantity}
                 onChange={handleInputChange}
+                onWheel={handleWheel}
                 min="0"
                 step="0.01"
                 required
@@ -179,6 +187,7 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
                 name="minimumStock"
                 value={formData.minimumStock}
                 onChange={handleInputChange}
+                onWheel={handleWheel}
                 min="0"
                 step="0.01"
                 disabled={isLoading}

@@ -55,6 +55,13 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
     }
   };
 
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
+    }
+  };
+
   const handleNewMaterialChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     setNewMaterialData(prev => ({
@@ -259,6 +266,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                     name="quantity"
                     value={newMaterialData.quantity}
                     onChange={handleNewMaterialChange}
+                    onWheel={handleWheel}
                     min="0"
                     step="0.01"
                     required
@@ -273,6 +281,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                     name="minimumStock"
                     value={newMaterialData.minimumStock}
                     onChange={handleNewMaterialChange}
+                    onWheel={handleWheel}
                     min="0"
                     step="0.01"
                     disabled={isLoading}
@@ -353,6 +362,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                     name="quantityToAdd"
                     value={existingMaterialData.quantityToAdd}
                     onChange={handleExistingMaterialChange}
+                    onWheel={handleWheel}
                     min="0.01"
                     step="0.01"
                     placeholder={selectedExistingMaterial ? `Add ${selectedExistingMaterial.quantityType}` : 'Quantity'}

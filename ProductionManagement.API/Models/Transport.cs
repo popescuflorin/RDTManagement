@@ -11,6 +11,9 @@ namespace ProductionManagement.API.Models
         [StringLength(100)]
         public string CarName { get; set; } = string.Empty;
 
+        [StringLength(20)]
+        public string? NumberPlate { get; set; }
+
         [Required]
         [StringLength(20)]
         public string PhoneNumber { get; set; } = string.Empty;

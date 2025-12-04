@@ -41,6 +41,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [processingError, setProcessingError] = useState<string | null>(null);
   const [recyclableItems, setRecyclableItems] = useState<RecyclableItem[]>([]);
   const [processedMaterials, setProcessedMaterials] = useState<ProcessedMaterial[]>([]);
   const [availableRawMaterials, setAvailableRawMaterials] = useState<RawMaterial[]>([]);
@@ -95,10 +96,21 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
     setProcessedMaterials(processedMaterials.filter(m => m.id !== id));
   };
 
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
+    }
+  };
+
   const handleUpdateProcessedMaterial = (id: string, updates: Partial<ProcessedMaterial>) => {
     setProcessedMaterials(processedMaterials.map(m => 
       m.id === id ? { ...m, ...updates } : m
     ));
+    // Clear processing error when user updates material
+    if (processingError) {
+      setProcessingError(null);
+    }
   };
 
   const handleSelectExistingRawMaterial = (id: string, rawMaterialId: number) => {
@@ -120,14 +132,14 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
     
     // Validation
     if (processedMaterials.length === 0) {
-      setError('Please add at least one processed material');
+      setProcessingError('Please add at least one processed material');
       return;
     }
 
     // Validate all materials have required fields
     for (const material of processedMaterials) {
       if (!material.name || !material.color || material.quantity <= 0) {
-        setError('All processed materials must have a name, color, and valid quantity');
+        setProcessingError('All processed materials must have a name, color, and valid quantity');
         return;
       }
     }
@@ -148,7 +160,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
       const recyclableQty = recyclableQuantities.get(itemId) || 0;
       if (processedQty > recyclableQty) {
         const item = recyclableItems.find(i => i.id === itemId);
-        setError(`Total processed quantity for "${item?.name}" exceeds available quantity (${recyclableQty} ${item?.unitOfMeasure})`);
+        setProcessingError(`Total processed quantity for "${item?.name}" exceeds available quantity (${recyclableQty} ${item?.unitOfMeasure})`);
         return;
       }
     }
@@ -156,6 +168,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
     try {
       setIsLoading(true);
       setError(null);
+      setProcessingError(null);
 
       // TODO: Create API endpoint for processing recyclables
       // For now, we'll need to create this endpoint in the backend
@@ -279,6 +292,10 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                         <span className="summary-label">Vehicle:</span>
                         <span className="summary-value">{acquisition.transportCarName}</span>
                       </div>
+                      <div className="summary-row">
+                        <span className="summary-label">Number Plate:</span>
+                        <span className="summary-value">{acquisition.transportNumberPlate || 'Not set'}</span>
+                      </div>
                       {acquisition.transportPhoneNumber && (
                         <div className="summary-row">
                           <span className="summary-label">Phone:</span>
@@ -314,6 +331,14 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
           {/* Recyclable Materials & Processing */}
           <div className="form-section">
             <h3><Package size={20} /> Process Recyclable Materials</h3>
+
+            {/* Processing Error Message */}
+            {processingError && (
+              <div className="error-message">
+                {processingError}
+                <button onClick={() => setProcessingError(null)}>×</button>
+              </div>
+            )}
             
             {recyclableItems.map((item) => {
               const remainingQty = getRemainingQuantity(item);
@@ -375,6 +400,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                                 type="number"
                                 value={material.quantity}
                                 onChange={(e) => handleUpdateProcessedMaterial(material.id, { quantity: parseFloat(e.target.value) || 0 })}
+                                onWheel={handleWheel}
                                 min="0"
                                 step="0.01"
                                 required

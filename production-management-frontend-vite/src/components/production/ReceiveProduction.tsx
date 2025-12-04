@@ -81,6 +81,13 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
     });
   };
 
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
+    }
+  };
+
   const handleAddProducedMaterial = async () => {
     if (materialMode === 'existing') {
       if (currentMaterial.materialId === 0 || currentMaterial.quantity <= 0) {
@@ -367,6 +374,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                 id="actualQuantityProduced"
                 value={actualQuantityProduced}
                 onChange={(e) => setActualQuantityProduced(parseFloat(e.target.value) || 0)}
+                onWheel={handleWheel}
                 min="0.01"
                 step="0.01"
                 required
@@ -385,6 +393,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                 id="actualProductionTimeMinutes"
                 value={actualProductionTimeMinutes}
                 onChange={(e) => setActualProductionTimeMinutes(parseInt(e.target.value) || 0)}
+                onWheel={handleWheel}
                 min="0"
                 step="1"
                 disabled={isLoading}
@@ -479,6 +488,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                       id="materialQuantity"
                       value={currentMaterial.quantity}
                       onChange={(e) => setCurrentMaterial(prev => ({ ...prev, quantity: parseFloat(e.target.value) || 0 }))}
+                      onWheel={handleWheel}
                       min="0.01"
                       step="0.01"
                       disabled={isLoading}
@@ -566,6 +576,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                         id="newMaterialQuantity"
                         value={currentMaterial.quantity}
                         onChange={(e) => setCurrentMaterial(prev => ({ ...prev, quantity: parseFloat(e.target.value) || 0 }))}
+                        onWheel={handleWheel}
                         min="0.01"
                         step="0.01"
                         required
@@ -635,6 +646,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                             type="number"
                             value={material.quantity}
                             onChange={(e) => handleUpdateProducedMaterialQuantity(material.id, parseFloat(e.target.value) || 0)}
+                            onWheel={handleWheel}
                             min="0.01"
                             step="0.01"
                             className="quantity-input"

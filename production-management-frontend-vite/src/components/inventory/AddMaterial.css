@@ -282,6 +282,19 @@
   opacity: 0.6;
 }
 
+/* Remove spinner arrows from number inputs */
+.form-group input[type="number"]::-webkit-inner-spin-button,
+.form-group input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.form-group input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 .field-hint {
   font-size: var(--text-xs);
   color: var(--text-muted);

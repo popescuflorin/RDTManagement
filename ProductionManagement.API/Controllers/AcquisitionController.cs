@@ -827,6 +827,7 @@ namespace ProductionManagement.API.Controllers
                 DueDate = acquisition.DueDate,
                 TransportId = acquisition.TransportId,
                 TransportCarName = acquisition.Transport?.CarName,
+                TransportNumberPlate = acquisition.Transport?.NumberPlate,
                 TransportPhoneNumber = acquisition.Transport?.PhoneNumber,
                 TransportDate = acquisition.TransportDate,
                 TransportNotes = acquisition.TransportNotes,
@@ -925,6 +926,7 @@ namespace ProductionManagement.API.Controllers
 
                 // Get transport details if available
                 string? transportCarName = null;
+                string? transportNumberPlate = null;
                 string? transportPhoneNumber = null;
                 if (acquisition.TransportId.HasValue)
                 {
@@ -932,6 +934,7 @@ namespace ProductionManagement.API.Controllers
                     if (transport != null)
                     {
                         transportCarName = transport.CarName;
+                        transportNumberPlate = transport.NumberPlate;
                         transportPhoneNumber = transport.PhoneNumber;
                     }
                 }
@@ -973,6 +976,7 @@ namespace ProductionManagement.API.Controllers
                             supplierName: acquisition.SupplierName,
                             supplierContact: acquisition.SupplierContact,
                             transportCarName: transportCarName,
+                            transportNumberPlate: transportNumberPlate,
                             transportPhoneNumber: transportPhoneNumber,
                             transportDate: acquisition.TransportDate,
                             transportNotes: acquisition.TransportNotes,
@@ -1036,6 +1040,7 @@ namespace ProductionManagement.API.Controllers
 
                 // Get transport details if available
                 string? transportCarName = null;
+                string? transportNumberPlate = null;
                 string? transportPhoneNumber = null;
                 if (acquisition.TransportId.HasValue)
                 {
@@ -1043,6 +1048,7 @@ namespace ProductionManagement.API.Controllers
                     if (transport != null)
                     {
                         transportCarName = transport.CarName;
+                        transportNumberPlate = transport.NumberPlate;
                         transportPhoneNumber = transport.PhoneNumber;
                     }
                 }
@@ -1150,6 +1156,7 @@ namespace ProductionManagement.API.Controllers
                             supplierName: acquisition.SupplierName,
                             supplierContact: acquisition.SupplierContact,
                             transportCarName: transportCarName,
+                            transportNumberPlate: transportNumberPlate,
                             transportPhoneNumber: transportPhoneNumber,
                             transportDate: acquisition.TransportDate,
                             transportNotes: acquisition.TransportNotes,
@@ -1178,6 +1185,7 @@ namespace ProductionManagement.API.Controllers
 
                 // Get transport details if available
                 string? transportCarName = null;
+                string? transportNumberPlate = null;
                 string? transportPhoneNumber = null;
                 if (acquisition.TransportId.HasValue)
                 {
@@ -1185,6 +1193,7 @@ namespace ProductionManagement.API.Controllers
                     if (transport != null)
                     {
                         transportCarName = transport.CarName;
+                        transportNumberPlate = transport.NumberPlate;
                         transportPhoneNumber = transport.PhoneNumber;
                     }
                 }
@@ -1261,6 +1270,7 @@ namespace ProductionManagement.API.Controllers
                             supplierName: acquisition.SupplierName,
                             supplierContact: acquisition.SupplierContact,
                             transportCarName: transportCarName,
+                            transportNumberPlate: transportNumberPlate,
                             transportPhoneNumber: transportPhoneNumber,
                             transportDate: acquisition.TransportDate,
                             transportNotes: acquisition.TransportNotes,
@@ -1289,6 +1299,7 @@ namespace ProductionManagement.API.Controllers
                             supplierName: acquisition.SupplierName,
                             supplierContact: acquisition.SupplierContact,
                             transportCarName: transportCarName,
+                            transportNumberPlate: transportNumberPlate,
                             transportPhoneNumber: transportPhoneNumber,
                             transportDate: acquisition.TransportDate,
                             transportNotes: acquisition.TransportNotes,
@@ -1317,6 +1328,7 @@ namespace ProductionManagement.API.Controllers
 
                 // Get transport details if available
                 string? transportCarName = null;
+                string? transportNumberPlate = null;
                 string? transportPhoneNumber = null;
                 if (acquisition.TransportId.HasValue)
                 {
@@ -1324,6 +1336,7 @@ namespace ProductionManagement.API.Controllers
                     if (transport != null)
                     {
                         transportCarName = transport.CarName;
+                        transportNumberPlate = transport.NumberPlate;
                         transportPhoneNumber = transport.PhoneNumber;
                     }
                 }
@@ -1401,6 +1414,7 @@ namespace ProductionManagement.API.Controllers
                             supplierName: acquisition.SupplierName,
                             supplierContact: acquisition.SupplierContact,
                             transportCarName: transportCarName,
+                            transportNumberPlate: transportNumberPlate,
                             transportPhoneNumber: transportPhoneNumber,
                             transportDate: acquisition.TransportDate,
                             transportNotes: acquisition.TransportNotes,
@@ -1430,6 +1444,7 @@ namespace ProductionManagement.API.Controllers
                             supplierName: acquisition.SupplierName,
                             supplierContact: acquisition.SupplierContact,
                             transportCarName: transportCarName,
+                            transportNumberPlate: transportNumberPlate,
                             transportPhoneNumber: transportPhoneNumber,
                             transportDate: acquisition.TransportDate,
                             transportNotes: acquisition.TransportNotes,

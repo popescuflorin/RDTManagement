@@ -124,6 +124,10 @@ const ViewAcquisition: React.FC<ViewAcquisitionProps> = ({
                         <span className="summary-label">Vehicle:</span>
                         <span className="summary-value">{acquisition.transportCarName}</span>
                       </div>
+                      <div className="summary-row">
+                        <span className="summary-label">Number Plate:</span>
+                        <span className="summary-value">{acquisition.transportNumberPlate || 'Not set'}</span>
+                      </div>
                       {acquisition.transportPhoneNumber && (
                         <div className="summary-row">
                           <span className="summary-label">Phone:</span>

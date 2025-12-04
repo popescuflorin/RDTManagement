@@ -30,6 +30,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
   const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [materialsError, setMaterialsError] = useState<string | null>(null);
 
   const [formData, setFormData] = useState({
     name: plan.name,
@@ -78,6 +79,13 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
     setSelectedMaterials(materials);
   };
 
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
+    }
+  };
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
     
@@ -89,7 +97,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
 
   const handleAddMaterial = () => {
     if (currentMaterial.rawMaterialId === 0 || currentMaterial.requiredQuantity <= 0) {
-      setError('Please select a material and enter a valid quantity');
+      setMaterialsError('Please select a material and enter a valid quantity');
       return;
     }
 
@@ -98,7 +106,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
 
     // Check if material already added
     if (selectedMaterials.some(m => m.rawMaterialId === currentMaterial.rawMaterialId)) {
-      setError('Material already added');
+      setMaterialsError('Material already added');
       return;
     }
 
@@ -115,7 +123,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
 
     setSelectedMaterials(prev => [...prev, newSelection]);
     setCurrentMaterial({ rawMaterialId: 0, requiredQuantity: 1 });
-    setError(null);
+    setMaterialsError(null);
   };
 
   const handleRemoveMaterial = (id: string) => {
@@ -135,7 +143,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
 
     try {
       if (selectedMaterials.length === 0) {
-        setError('Please add at least one material');
+        setMaterialsError('Please add at least one material');
         setIsLoading(false);
         return;
       }
@@ -222,6 +230,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
                   name="quantityToProduce"
                   value={formData.quantityToProduce}
                   onChange={handleInputChange}
+                  onWheel={handleWheel}
                   min="0.01"
                   step="0.01"
                   required
@@ -236,6 +245,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
                   name="estimatedProductionTimeMinutes"
                   value={formData.estimatedProductionTimeMinutes}
                   onChange={handleInputChange}
+                  onWheel={handleWheel}
                   min="1"
                   step="1"
                   required
@@ -273,6 +283,14 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
           {/* Required Materials Section */}
           <div className="form-section">
             <h3>Required Materials (per unit)</h3>
+
+            {/* Materials Error Message */}
+            {materialsError && (
+              <div className="error-message">
+                {materialsError}
+                <button onClick={() => setMaterialsError(null)} style={{ marginLeft: '10px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px' }}>×</button>
+              </div>
+            )}
             
             <div className="add-material-section">
               <div className="form-row">
@@ -299,6 +317,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
                     id="materialQuantity"
                     value={currentMaterial.requiredQuantity}
                     onChange={(e) => setCurrentMaterial(prev => ({ ...prev, requiredQuantity: parseFloat(e.target.value) || 0 }))}
+                    onWheel={handleWheel}
                     min="0.01"
                     step="0.01"
                     disabled={isLoading}
@@ -348,6 +367,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
                               type="number"
                               value={material.requiredQuantity}
                               onChange={(e) => handleUpdateMaterialQuantity(material.id, parseFloat(e.target.value) || 0)}
+                              onWheel={handleWheel}
                               min="0.01"
                               step="0.01"
                               className="quantity-input"

@@ -256,6 +256,31 @@
   min-height: 80px;
 }
 
+/* Remove spinner arrows from number inputs */
+.form-group input[type="number"]::-webkit-inner-spin-button,
+.form-group input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.form-group input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.item-details .form-group input[type="number"]::-webkit-inner-spin-button,
+.item-details .form-group input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+.item-details .form-group input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
 /* Add Item Button */
 .add-item-button {
   display: inline-flex;

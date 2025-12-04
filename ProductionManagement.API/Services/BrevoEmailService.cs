@@ -103,6 +103,7 @@ public class BrevoEmailService : IEmailService
                         <div class='credentials'>
                             <h3>Your Login Credentials:</h3>
                             <p><strong>Email:</strong> {toEmail}</p>
+                            <p><strong>username:</strong> {userName}</p>
                             <p><strong>Temporary Password:</strong> {temporaryPassword}</p>
                         </div>
                         
@@ -243,6 +244,7 @@ public class BrevoEmailService : IEmailService
         string? supplierName = null,
         string? supplierContact = null,
         string? transportCarName = null,
+        string? transportNumberPlate = null,
         string? transportPhoneNumber = null,
         DateTime? transportDate = null,
         string? transportNotes = null,
@@ -288,6 +290,11 @@ public class BrevoEmailService : IEmailService
                         <div class='detail-row'>
                             <div class='detail-label'>Car Name:</div>
                             <div class='detail-value'>{transportCarName}</div>
+                        </div>" : "")}
+                        {(!string.IsNullOrEmpty(transportNumberPlate) ? $@"
+                        <div class='detail-row'>
+                            <div class='detail-label'>Number Plate:</div>
+                            <div class='detail-value'>{transportNumberPlate}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportPhoneNumber) ? $@"
                         <div class='detail-row'>
@@ -432,6 +439,7 @@ public class BrevoEmailService : IEmailService
         string? supplierName = null,
         string? supplierContact = null,
         string? transportCarName = null,
+        string? transportNumberPlate = null,
         string? transportPhoneNumber = null,
         DateTime? transportDate = null,
         string? transportNotes = null,
@@ -491,6 +499,11 @@ public class BrevoEmailService : IEmailService
                         <div class='detail-row'>
                             <div class='detail-label'>Car Name:</div>
                             <div class='detail-value'>{transportCarName}</div>
+                        </div>" : "")}
+                        {(!string.IsNullOrEmpty(transportNumberPlate) ? $@"
+                        <div class='detail-row'>
+                            <div class='detail-label'>Number Plate:</div>
+                            <div class='detail-value'>{transportNumberPlate}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportPhoneNumber) ? $@"
                         <div class='detail-row'>
@@ -663,6 +676,7 @@ public class BrevoEmailService : IEmailService
         string? supplierName = null,
         string? supplierContact = null,
         string? transportCarName = null,
+        string? transportNumberPlate = null,
         string? transportPhoneNumber = null,
         DateTime? transportDate = null,
         string? transportNotes = null,
@@ -708,6 +722,11 @@ public class BrevoEmailService : IEmailService
                         <div class='detail-row'>
                             <div class='detail-label'>Car Name:</div>
                             <div class='detail-value'>{transportCarName}</div>
+                        </div>" : "")}
+                        {(!string.IsNullOrEmpty(transportNumberPlate) ? $@"
+                        <div class='detail-row'>
+                            <div class='detail-label'>Number Plate:</div>
+                            <div class='detail-value'>{transportNumberPlate}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportPhoneNumber) ? $@"
                         <div class='detail-row'>
@@ -873,6 +892,7 @@ public class BrevoEmailService : IEmailService
         string? description = null,
         string? supplierName = null,
         string? supplierContact = null,
+        string? transportNumberPlate = null,
         string? transportCarName = null,
         string? transportPhoneNumber = null,
         DateTime? transportDate = null,
@@ -970,6 +990,7 @@ public class BrevoEmailService : IEmailService
                     <div style='color: #1565c0; font-weight: bold; margin-bottom: 8px;'>🚚 Transport Details</div>
                     <div style='color: #424242; line-height: 1.6;'>
                         <strong>Vehicle:</strong> {transportCarName}<br/>
+                        {(!string.IsNullOrEmpty(transportNumberPlate) ? $"<strong>Number Plate:</strong> {transportNumberPlate}<br/>" : "")}
                         {(string.IsNullOrEmpty(transportPhoneNumber) ? "" : $"<strong>Phone:</strong> {transportPhoneNumber}<br/>")}
                         {(transportDate.HasValue ? $"<strong>Date:</strong> {transportDate.Value:MMM dd, yyyy}<br/>" : "")}
                         {(string.IsNullOrEmpty(transportNotes) ? "" : $"<strong>Notes:</strong> {transportNotes}")}

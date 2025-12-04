@@ -94,6 +94,13 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
     setFormData(prev => ({ ...prev, [name]: type === 'number' ? parseFloat(value) || 0 : value }));
   };
 
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
+    }
+  };
+
   const handleNewRawChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
     setNewRawMaterial(prev => ({ ...prev, [name]: type === 'number' ? parseFloat(value) || 0 : value }));
@@ -244,7 +251,7 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
                   </div>
                   <div className="form-group">
                     <label htmlFor="newRawMinStock">Minimum Stock</label>
-                    <input type="number" id="newRawMinStock" name="minimumStock" value={newRawMaterial.minimumStock} onChange={handleNewRawChange} min={0} step={1} disabled={isLoading} />
+                    <input type="number" id="newRawMinStock" name="minimumStock" value={newRawMaterial.minimumStock} onChange={handleNewRawChange} onWheel={handleWheel} min={0} step={1} disabled={isLoading} />
                   </div>
                 </div>
                 <div className="form-group">
@@ -269,11 +276,11 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="quantityToProduce">Quantity to Produce *</label>
-                <input type="number" id="quantityToProduce" name="quantityToProduce" value={formData.quantityToProduce} onChange={handleInputChange} min={0.01} step={0.01} required disabled={isLoading} />
+                <input type="number" id="quantityToProduce" name="quantityToProduce" value={formData.quantityToProduce} onChange={handleInputChange} onWheel={handleWheel} min={0.01} step={0.01} required disabled={isLoading} />
               </div>
               <div className="form-group">
                 <label htmlFor="estimatedProductionTimeMinutes">Est. Time (minutes) *</label>
-                <input type="number" id="estimatedProductionTimeMinutes" name="estimatedProductionTimeMinutes" value={formData.estimatedProductionTimeMinutes} onChange={handleInputChange} min={1} step={1} required disabled={isLoading} />
+                <input type="number" id="estimatedProductionTimeMinutes" name="estimatedProductionTimeMinutes" value={formData.estimatedProductionTimeMinutes} onChange={handleInputChange} onWheel={handleWheel} min={1} step={1} required disabled={isLoading} />
               </div>
             </div>
             <div className="form-group">
@@ -304,7 +311,7 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
                 </div>
                 <div className="form-group">
                   <label htmlFor="recyclableQty">Quantity</label>
-                  <input type="number" id="recyclableQty" value={currentRecyclable.requiredQuantity} onChange={(e) => setCurrentRecyclable(prev => ({ ...prev, requiredQuantity: parseFloat(e.target.value) || 0 }))} min={0.01} step={0.01} disabled={isLoading} />
+                  <input type="number" id="recyclableQty" value={currentRecyclable.requiredQuantity} onChange={(e) => setCurrentRecyclable(prev => ({ ...prev, requiredQuantity: parseFloat(e.target.value) || 0 }))} onWheel={handleWheel} min={0.01} step={0.01} disabled={isLoading} />
                 </div>
                 <div className="form-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
                   <button type="button" onClick={handleAddRecyclable} className="btn btn-secondary" disabled={isLoading}>+ Add</button>
@@ -339,7 +346,7 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
                             </div>
                           </td>
                           <td>
-                            <input type="number" value={m.requiredQuantity} onChange={(e) => handleUpdateRecyclableQty(m.id, parseFloat(e.target.value) || 0)} min={0.01} step={0.01} className="quantity-input" disabled={isLoading} />
+                            <input type="number" value={m.requiredQuantity} onChange={(e) => handleUpdateRecyclableQty(m.id, parseFloat(e.target.value) || 0)} onWheel={handleWheel} min={0.01} step={0.01} className="quantity-input" disabled={isLoading} />
                             {m.quantityType}
                           </td>
                           <td>{totalNeeded.toFixed(2)} {m.quantityType}</td>

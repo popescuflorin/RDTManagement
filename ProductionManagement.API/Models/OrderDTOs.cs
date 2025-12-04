@@ -85,6 +85,7 @@ namespace ProductionManagement.API.Models
         public DateTime? DeliveryDate { get; set; }
         public int? TransportId { get; set; }
         public string? TransportCarName { get; set; }
+        public string? TransportNumberPlate { get; set; }
         public string? TransportPhoneNumber { get; set; }
         public DateTime? TransportDate { get; set; }
         public string? TransportNotes { get; set; }

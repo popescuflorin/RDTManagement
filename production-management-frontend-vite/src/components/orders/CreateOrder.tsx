@@ -61,6 +61,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
   const [transportSearchTerm, setTransportSearchTerm] = useState('');
   const [showTransportDropdown, setShowTransportDropdown] = useState(false);
   const [showNewTransportForm, setShowNewTransportForm] = useState(false);
+  const [transportNumberPlate, setTransportNumberPlate] = useState('');
   const [transportPhoneNumber, setTransportPhoneNumber] = useState('');
   const [transportDate, setTransportDate] = useState(() => {
     const today = new Date();
@@ -69,6 +70,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
   const [transportNotes, setTransportNotes] = useState('');
   const [newTransportData, setNewTransportData] = useState<CreateTransportRequest>({
     carName: '',
+    numberPlate: '',
     phoneNumber: ''
   });
 
@@ -106,6 +108,13 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
       setClients(clientsResponse.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load data');
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
     }
   };
 
@@ -272,14 +281,18 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
       setShowNewTransportForm(false);
       setNewTransportData({
         carName: '',
+        numberPlate: '',
         phoneNumber: ''
       });
+      setTransportNumberPlate('');
     }
   };
 
   const handleTransportSelect = (transport: Transport) => {
     setSelectedTransportId(transport.id);
     setTransportSearchTerm(transport.carName);
+    // Ensure number plate is set correctly (handle null, undefined, or empty string)
+    setTransportNumberPlate(transport.numberPlate ?? '');
     setTransportPhoneNumber(transport.phoneNumber);
     setShowTransportDropdown(false);
     setShowNewTransportForm(false);
@@ -592,7 +605,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                       disabled={isLoading}
                       placeholder="Search or enter car/vehicle name"
                     />
-                    {showTransportDropdown && transportSearchTerm && (
+                    {showTransportDropdown && (
                       <div className="dropdown-menu">
                         {filteredTransports.length > 0 ? (
                           filteredTransports.map(transport => (
@@ -601,14 +614,18 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                               className="dropdown-item"
                               onClick={() => handleTransportSelect(transport)}
                             >
-                              <div className="dropdown-item-name">{transport.carName}</div>
+                              <div className="dropdown-item-name">{transport.carName}{transport.numberPlate ? ` - ${transport.numberPlate}` : ''}</div>
                               <div className="dropdown-item-detail">{transport.phoneNumber}</div>
                             </div>
                           ))
-                        ) : (
+                        ) : transportSearchTerm ? (
                           <div className="dropdown-item">
                             <div className="dropdown-item-name">Create new transport: {transportSearchTerm}</div>
                             <div className="dropdown-item-detail">Enter phone number and submit to create</div>
+                          </div>
+                        ) : (
+                          <div className="dropdown-item">
+                            <div className="dropdown-item-name">Start typing to search or create a new transport</div>
                           </div>
                         )}
                       </div>
@@ -616,6 +633,19 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                   </div>
                 </div>
               </div>
+              <div className="form-group">
+                <label htmlFor="transportNumberPlate">Number Plate</label>
+                <input
+                  type="text"
+                  id="transportNumberPlate"
+                  value={transportNumberPlate}
+                  onChange={(e) => setTransportNumberPlate(e.target.value)}
+                  disabled={isLoading}
+                  placeholder="Enter number plate (optional)"
+                />
+              </div>
+            </div>
+            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="transportPhoneNumber">Phone Number</label>
                 <input
@@ -627,9 +657,6 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                   placeholder="Enter phone number"
                 />
               </div>
-            </div>
-
-            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="transportDate">Transport Date</label>
                 <input
@@ -662,6 +689,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                     setShowNewTransportForm(true);
                     setNewTransportData({
                       carName: transportSearchTerm.trim(),
+                      numberPlate: transportNumberPlate.trim() || undefined,
                       phoneNumber: transportPhoneNumber.trim()
                     });
                   }}
@@ -687,6 +715,19 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                       placeholder="Enter car name"
                     />
                   </div>
+                  <div className="form-group">
+                    <label htmlFor="newTransportNumberPlate">Number Plate</label>
+                    <input
+                      type="text"
+                      id="newTransportNumberPlate"
+                      value={newTransportData.numberPlate || ''}
+                      onChange={(e) => setNewTransportData({ ...newTransportData, numberPlate: e.target.value })}
+                      disabled={isLoading}
+                      placeholder="Enter number plate (optional)"
+                    />
+                  </div>
+                </div>
+                <div className="form-row">
                   <div className="form-group">
                     <label htmlFor="newTransportPhoneNumber">Phone Number *</label>
                     <input
@@ -847,6 +888,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                       id="itemQuantity"
                       value={newItem.quantity}
                       onChange={(e) => setNewItem(prev => ({ ...prev, quantity: parseFloat(e.target.value) || 0 }))}
+                      onWheel={handleWheel}
                       min="0.01"
                       step="0.01"
                       required
@@ -904,6 +946,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                             type="number"
                             value={item.quantity}
                             onChange={(e) => handleUpdateItemQuantity(item.id, parseFloat(e.target.value) || 0)}
+                            onWheel={handleWheel}
                             min="0.01"
                             step="0.01"
                             className="quantity-input"

@@ -494,6 +494,7 @@ namespace ProductionManagement.API.Controllers
                 DeliveryDate = order.DeliveryDate,
                 TransportId = order.TransportId,
                 TransportCarName = order.Transport?.CarName,
+                TransportNumberPlate = order.Transport?.NumberPlate,
                 TransportPhoneNumber = order.Transport?.PhoneNumber,
                 TransportDate = order.TransportDate,
                 TransportNotes = order.TransportNotes,

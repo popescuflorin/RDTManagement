@@ -9,6 +9,9 @@ namespace ProductionManagement.API.Models
         [StringLength(100)]
         public string CarName { get; set; } = string.Empty;
 
+        [StringLength(20)]
+        public string? NumberPlate { get; set; }
+
         [Required]
         [StringLength(20)]
         public string PhoneNumber { get; set; } = string.Empty;
@@ -20,6 +23,9 @@ namespace ProductionManagement.API.Models
         [StringLength(100)]
         public string CarName { get; set; } = string.Empty;
 
+        [StringLength(20)]
+        public string? NumberPlate { get; set; }
+
         [Required]
         [StringLength(20)]
         public string PhoneNumber { get; set; } = string.Empty;
@@ -30,6 +36,7 @@ namespace ProductionManagement.API.Models
     {
         public int Id { get; set; }
         public string CarName { get; set; } = string.Empty;
+        public string? NumberPlate { get; set; }
         public string PhoneNumber { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

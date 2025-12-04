@@ -32,6 +32,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
   const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [materialsError, setMaterialsError] = useState<string | null>(null);
   const [showNewProductForm, setShowNewProductForm] = useState(false);
   const [templateLoaded, setTemplateLoaded] = useState(false);
   const [originalTemplate, setOriginalTemplate] = useState<MaterialSelection[]>([]);
@@ -85,6 +86,13 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
     } catch (error: any) {
       console.error('Error loading data:', error);
       setError('Failed to load materials');
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
     }
   };
 
@@ -172,7 +180,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
 
   const handleAddMaterial = () => {
     if (currentMaterial.rawMaterialId === 0 || currentMaterial.requiredQuantity <= 0) {
-      setError('Please select a material and enter a valid quantity');
+      setMaterialsError('Please select a material and enter a valid quantity');
       return;
     }
 
@@ -181,7 +189,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
 
     // Check if material already added
     if (selectedMaterials.some(m => m.rawMaterialId === currentMaterial.rawMaterialId)) {
-      setError('Material already added');
+      setMaterialsError('Material already added');
       return;
     }
 
@@ -198,7 +206,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
 
     setSelectedMaterials(prev => [...prev, newSelection]);
     setCurrentMaterial({ rawMaterialId: 0, requiredQuantity: 1 });
-    setError(null);
+    setMaterialsError(null);
   };
 
   const handleRemoveMaterial = (id: string) => {
@@ -243,7 +251,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
 
     try {
       if (selectedMaterials.length === 0) {
-        setError('Please add at least one material');
+        setMaterialsError('Please add at least one material');
         setIsLoading(false);
         return;
       }
@@ -411,6 +419,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                       name="minimumStock"
                       value={newProduct.minimumStock}
                       onChange={handleNewProductChange}
+                      onWheel={handleWheel}
                       min="0"
                       step="1"
                       disabled={isLoading}
@@ -473,6 +482,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                   name="quantityToProduce"
                   value={formData.quantityToProduce}
                   onChange={handleInputChange}
+                  onWheel={handleWheel}
                   min="0.01"
                   step="0.01"
                   required
@@ -487,6 +497,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                   name="estimatedProductionTimeMinutes"
                   value={formData.estimatedProductionTimeMinutes}
                   onChange={handleInputChange}
+                  onWheel={handleWheel}
                   min="1"
                   step="1"
                   required
@@ -531,6 +542,14 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                 </span>
               )}
             </div>
+
+            {/* Materials Error Message */}
+            {materialsError && (
+              <div className="error-message">
+                {materialsError}
+                <button onClick={() => setMaterialsError(null)} style={{ marginLeft: '10px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px' }}>×</button>
+              </div>
+            )}
             
             <div className="add-material-section">
               <div className="form-row">
@@ -557,6 +576,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                     id="materialQuantity"
                     value={currentMaterial.requiredQuantity}
                     onChange={(e) => setCurrentMaterial(prev => ({ ...prev, requiredQuantity: parseFloat(e.target.value) || 0 }))}
+                    onWheel={handleWheel}
                     min="0.01"
                     step="0.01"
                     disabled={isLoading}
@@ -606,6 +626,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                               type="number"
                               value={material.requiredQuantity}
                               onChange={(e) => handleUpdateMaterialQuantity(material.id, parseFloat(e.target.value) || 0)}
+                              onWheel={handleWheel}
                               min="0.01"
                               step="0.01"
                               className="quantity-input"

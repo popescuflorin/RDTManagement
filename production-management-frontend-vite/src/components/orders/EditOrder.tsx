@@ -61,6 +61,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
   const [selectedTransportId, setSelectedTransportId] = useState<number | null>(null);
   const [transportSearchTerm, setTransportSearchTerm] = useState('');
   const [showTransportDropdown, setShowTransportDropdown] = useState(false);
+  const [transportNumberPlate, setTransportNumberPlate] = useState('');
   const [transportPhoneNumber, setTransportPhoneNumber] = useState('');
   const [transportDate, setTransportDate] = useState('');
   const [transportNotes, setTransportNotes] = useState('');
@@ -124,6 +125,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
     // Transport details
     setSelectedTransportId(order.transportId || null);
     setTransportSearchTerm(order.transportCarName || '');
+    setTransportNumberPlate(order.transportNumberPlate || '');
     setTransportPhoneNumber(order.transportPhoneNumber || '');
     setTransportDate(order.transportDate ? order.transportDate.split('T')[0] : '');
     setTransportNotes(order.transportNotes || '');
@@ -160,6 +162,13 @@ const EditOrder: React.FC<EditOrderProps> = ({
       setClients(clientsResponse.data);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load data');
+    }
+  };
+
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
     }
   };
 
@@ -320,6 +329,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
     
     if (!value.trim()) {
       setSelectedTransportId(null);
+      setTransportNumberPlate('');
       setTransportPhoneNumber('');
     }
   };
@@ -327,6 +337,8 @@ const EditOrder: React.FC<EditOrderProps> = ({
   const handleTransportSelect = (transport: Transport) => {
     setSelectedTransportId(transport.id);
     setTransportSearchTerm(transport.carName);
+    // Ensure number plate is set correctly (handle null, undefined, or empty string)
+    setTransportNumberPlate(transport.numberPlate ?? '');
     setTransportPhoneNumber(transport.phoneNumber);
     setShowTransportDropdown(false);
   };
@@ -345,6 +357,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
     try {
       const newTransportRequest: CreateTransportRequest = {
         carName: transportSearchTerm.trim(),
+        numberPlate: transportNumberPlate.trim() || undefined,
         phoneNumber: transportPhoneNumber.trim()
       };
       const response = await transportApi.createTransport(newTransportRequest);
@@ -696,7 +709,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
                     onFocus={() => setShowTransportDropdown(true)}
                     placeholder="Search or enter car/vehicle name"
                   />
-                  {showTransportDropdown && transportSearchTerm && (
+                  {showTransportDropdown && (
                     <div className="material-dropdown">
                       {filteredTransports.length > 0 ? (
                         filteredTransports.map((transport) => (
@@ -707,15 +720,22 @@ const EditOrder: React.FC<EditOrderProps> = ({
                           >
                             <div>
                               <strong>{transport.carName}</strong>
+                              {transport.numberPlate && <small> - {transport.numberPlate}</small>}
                               <small>{transport.phoneNumber}</small>
                             </div>
                           </div>
                         ))
-                      ) : (
+                      ) : transportSearchTerm ? (
                         <div className="material-option material-option-create">
                           <div>
                             <strong>Create new transport:</strong> {transportSearchTerm}
                             <small>Enter phone number and submit to create</small>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="material-option">
+                          <div>
+                            <small>Start typing to search or create a new transport</small>
                           </div>
                         </div>
                       )}
@@ -723,6 +743,18 @@ const EditOrder: React.FC<EditOrderProps> = ({
                   )}
                 </div>
               </div>
+              <div className="form-group">
+                <label htmlFor="transportNumberPlate">Number Plate</label>
+                <input
+                  type="text"
+                  id="transportNumberPlate"
+                  value={transportNumberPlate}
+                  onChange={(e) => setTransportNumberPlate(e.target.value)}
+                  placeholder="Enter number plate (optional)"
+                />
+              </div>
+            </div>
+            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="transportPhoneNumber">Phone Number</label>
                 <input
@@ -835,6 +867,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
                       id="itemQuantity"
                       value={newItem.quantity || ''}
                       onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
+                      onWheel={handleWheel}
                       min="0"
                       step="0.01"
                       placeholder="0"
@@ -884,6 +917,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
                               type="number"
                               value={item.quantity}
                               onChange={(e) => handleUpdateItem(index, { quantity: parseFloat(e.target.value) || 0 })}
+                              onWheel={handleWheel}
                               min="0"
                               step="0.01"
                             />

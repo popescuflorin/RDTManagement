@@ -54,6 +54,13 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
     setItems(receivedItems);
   };
 
+  const handleWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    // Prevent number input from changing value when scrolling
+    if (e.currentTarget.type === 'number') {
+      e.currentTarget.blur();
+    }
+  };
+
   const handleUpdateReceivedQuantity = (index: number, quantity: number) => {
     setItems(items.map((item, i) => 
       i === index ? { ...item, receivedQuantity: quantity } : item
@@ -201,6 +208,12 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
                         <span className="summary-label">Vehicle:</span>
                         <span className="summary-value">{acquisition.transportCarName}</span>
                       </div>
+                      {acquisition.transportNumberPlate && (
+                        <div className="summary-row">
+                          <span className="summary-label">Number Plate:</span>
+                          <span className="summary-value">{acquisition.transportNumberPlate}</span>
+                        </div>
+                      )}
                       {acquisition.transportPhoneNumber && (
                         <div className="summary-row">
                           <span className="summary-label">Phone:</span>
@@ -272,6 +285,7 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
                           type="number"
                           value={item.receivedQuantity}
                           onChange={(e) => handleUpdateReceivedQuantity(index, parseFloat(e.target.value) || 0)}
+                          onWheel={handleWheel}
                           min="0"
                           step="0.01"
                           placeholder="Enter received quantity"
