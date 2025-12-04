@@ -672,7 +672,7 @@
 }
 
 .remaining-quantity .over-processed strong {
-  color: var(--error-600);
+  color: var(--warning-700);
 }
 
 .processed-materials-list {

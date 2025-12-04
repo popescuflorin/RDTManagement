@@ -81,7 +81,7 @@ const ProcessOrder: React.FC<ProcessOrderProps> = ({
             <AlertTriangle size={20} className="warning-icon" />
             <p>
               Processing this order will subtract {order.orderMaterials.length} product(s) from inventory 
-              and change the order status to <strong>Processing</strong>.
+              and change the order status to <strong>Done</strong>.
             </p>
           </div>
 

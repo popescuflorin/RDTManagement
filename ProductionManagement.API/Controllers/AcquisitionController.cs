@@ -608,21 +608,6 @@ namespace ProductionManagement.API.Controllers
                 }
             }
 
-            // Validate quantities don't exceed available recyclable quantities
-            var recyclableQuantities = acquisition.Items.ToDictionary(i => i.Id, i => i.EffectiveQuantity);
-            var processedQuantities = request.Materials
-                .GroupBy(m => m.RecyclableItemId)
-                .ToDictionary(g => g.Key, g => g.Sum(m => m.Quantity));
-
-            foreach (var (itemId, processedQty) in processedQuantities)
-            {
-                if (processedQty > recyclableQuantities[itemId])
-                {
-                    var item = acquisition.Items.First(i => i.Id == itemId);
-                    return BadRequest($"Total processed quantity for '{item.Name}' exceeds available quantity ({recyclableQuantities[itemId]} {item.QuantityType})");
-                }
-            }
-
             // Process materials: create new or add to existing raw materials
             foreach (var material in request.Materials)
             {

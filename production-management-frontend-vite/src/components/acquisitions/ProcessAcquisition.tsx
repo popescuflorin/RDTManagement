@@ -144,27 +144,6 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
       }
     }
 
-    // Check that total processed quantities don't exceed recyclable quantities
-    const recyclableQuantities = new Map<number, number>();
-    recyclableItems.forEach(item => {
-      recyclableQuantities.set(item.id, item.quantity);
-    });
-
-    const processedQuantities = new Map<number, number>();
-    processedMaterials.forEach(material => {
-      const current = processedQuantities.get(material.recyclableItemId) || 0;
-      processedQuantities.set(material.recyclableItemId, current + material.quantity);
-    });
-
-    for (const [itemId, processedQty] of processedQuantities.entries()) {
-      const recyclableQty = recyclableQuantities.get(itemId) || 0;
-      if (processedQty > recyclableQty) {
-        const item = recyclableItems.find(i => i.id === itemId);
-        setProcessingError(`Total processed quantity for "${item?.name}" exceeds available quantity (${recyclableQty} ${item?.unitOfMeasure})`);
-        return;
-      }
-    }
-
     try {
       setIsLoading(true);
       setError(null);
@@ -354,6 +333,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                     <div className="remaining-quantity">
                       <span className={remainingQty === 0 ? 'fully-processed' : remainingQty < 0 ? 'over-processed' : ''}>
                         Remaining: <strong>{remainingQty} {item.unitOfMeasure}</strong>
+                        {remainingQty < 0 && <span style={{ marginLeft: '8px', fontSize: '0.85em', color: 'var(--warning-700)' }}>(Over-processing allowed)</span>}
                       </span>
                     </div>
                   </div>

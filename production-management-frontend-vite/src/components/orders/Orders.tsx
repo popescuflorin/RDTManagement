@@ -178,7 +178,7 @@ const Orders: React.FC = () => {
     const statusConfig = {
       [OrderStatus.Draft]: { label: 'Draft', className: 'status-draft' },
       [OrderStatus.Pending]: { label: 'Pending', className: 'status-pending' },
-      [OrderStatus.Processing]: { label: 'Processing', className: 'status-processing' },
+      [OrderStatus.Processing]: { label: 'Done', className: 'status-processing' },
       [OrderStatus.Shipped]: { label: 'Shipped', className: 'status-shipped' },
       [OrderStatus.Delivered]: { label: 'Delivered', className: 'status-delivered' },
       [OrderStatus.Cancelled]: { label: 'Cancelled', className: 'status-cancelled' }
@@ -292,7 +292,7 @@ const Orders: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.processingOrders}</div>
-              <div className="stat-label">Processing</div>
+              <div className="stat-label">Done</div>
             </div>
           </div>
           <div className="stat-card">
@@ -357,7 +357,7 @@ const Orders: React.FC = () => {
             <option value="">All Status</option>
             <option value={OrderStatus.Draft}>Draft</option>
             <option value={OrderStatus.Pending}>Pending</option>
-            <option value={OrderStatus.Processing}>Processing</option>
+            <option value={OrderStatus.Processing}>Done</option>
             <option value={OrderStatus.Shipped}>Shipped</option>
             <option value={OrderStatus.Delivered}>Delivered</option>
             <option value={OrderStatus.Cancelled}>Cancelled</option>
@@ -436,6 +436,9 @@ const Orders: React.FC = () => {
                     {order.transportCarName ? (
                       <div className="transport-info">
                         <div>{order.transportCarName}</div>
+                        {order.transportNumberPlate && (
+                          <div className="transport-number-plate">{order.transportNumberPlate}</div>
+                        )}
                         {order.transportPhoneNumber && (
                           <div className="transport-phone">{order.transportPhoneNumber}</div>
                         )}

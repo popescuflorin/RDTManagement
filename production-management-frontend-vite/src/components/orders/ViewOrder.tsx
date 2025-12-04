@@ -14,7 +14,7 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
     const statusConfig = {
       [OrderStatus.Draft]: { label: 'Draft', className: 'status-draft', color: '#6b7280' },
       [OrderStatus.Pending]: { label: 'Pending', className: 'status-pending', color: '#f59e0b' },
-      [OrderStatus.Processing]: { label: 'Processing', className: 'status-processing', color: '#3b82f6' },
+      [OrderStatus.Processing]: { label: 'Done', className: 'status-processing', color: '#3b82f6' },
       [OrderStatus.Shipped]: { label: 'Shipped', className: 'status-shipped', color: '#8b5cf6' },
       [OrderStatus.Delivered]: { label: 'Delivered', className: 'status-delivered', color: '#10b981' },
       [OrderStatus.Cancelled]: { label: 'Cancelled', className: 'status-cancelled', color: '#ef4444' }
@@ -216,6 +216,13 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
                   <label>Vehicle Name</label>
                   <div className="info-value">{order.transportCarName}</div>
                 </div>
+
+                {order.transportNumberPlate && (
+                  <div className="info-item">
+                    <label>Number Plate</label>
+                    <div className="info-value">{order.transportNumberPlate}</div>
+                  </div>
+                )}
 
                 {order.transportPhoneNumber && (
                   <div className="info-item">
