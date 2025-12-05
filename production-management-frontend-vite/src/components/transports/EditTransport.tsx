@@ -64,7 +64,7 @@ const EditTransport: React.FC<EditTransportProps> = ({
 
       const request: UpdateTransportRequest = {
         carName: formData.carName.trim(),
-        numberPlate: formData.numberPlate.trim() || undefined,
+        numberPlate: formData.numberPlate?.trim() || undefined,
         phoneNumber: formData.phoneNumber.trim()
       };
 

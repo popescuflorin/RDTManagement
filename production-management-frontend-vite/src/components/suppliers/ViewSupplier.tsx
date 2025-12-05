@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Supplier } from '../../types';
-import { X, Building2, Mail, Phone, MapPin, FileText, Calendar, User } from 'lucide-react';
+import { X, Building2, Mail, Phone, MapPin, Calendar, User } from 'lucide-react';
 import './CreateSupplier.css';
 
 interface ViewSupplierProps {

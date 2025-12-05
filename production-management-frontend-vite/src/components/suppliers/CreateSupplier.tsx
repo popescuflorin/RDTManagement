@@ -54,17 +54,17 @@ const CreateSupplier: React.FC<CreateSupplierProps> = ({
 
       const request: CreateSupplierRequest = {
         name: formData.name.trim(),
-        description: formData.description.trim() || undefined,
-        contactPerson: formData.contactPerson.trim() || undefined,
-        email: formData.email.trim() || undefined,
-        phone: formData.phone.trim() || undefined,
-        address: formData.address.trim() || undefined,
-        city: formData.city.trim() || undefined,
-        postalCode: formData.postalCode.trim() || undefined,
-        country: formData.country.trim() || undefined,
-        taxId: formData.taxId.trim() || undefined,
-        registrationNumber: formData.registrationNumber.trim() || undefined,
-        notes: formData.notes.trim() || undefined
+        description: formData.description?.trim() || undefined,
+        contactPerson: formData.contactPerson?.trim() || undefined,
+        email: formData.email?.trim() || undefined,
+        phone: formData.phone?.trim() || undefined,
+        address: formData.address?.trim() || undefined,
+        city: formData.city?.trim() || undefined,
+        postalCode: formData.postalCode?.trim() || undefined,
+        country: formData.country?.trim() || undefined,
+        taxId: formData.taxId?.trim() || undefined,
+        registrationNumber: formData.registrationNumber?.trim() || undefined,
+        notes: formData.notes?.trim() || undefined
       };
 
       await supplierApi.createSupplier(request);

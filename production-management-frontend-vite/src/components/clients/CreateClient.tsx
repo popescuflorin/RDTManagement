@@ -51,14 +51,14 @@ const CreateClient: React.FC<CreateClientProps> = ({
 
       const request: CreateClientRequest = {
         name: formData.name.trim(),
-        contactPerson: formData.contactPerson.trim() || undefined,
-        email: formData.email.trim() || undefined,
-        phone: formData.phone.trim() || undefined,
-        address: formData.address.trim() || undefined,
-        city: formData.city.trim() || undefined,
-        postalCode: formData.postalCode.trim() || undefined,
-        country: formData.country.trim() || undefined,
-        notes: formData.notes.trim() || undefined
+        contactPerson: formData.contactPerson?.trim() || undefined,
+        email: formData.email?.trim() || undefined,
+        phone: formData.phone?.trim() || undefined,
+        address: formData.address?.trim() || undefined,
+        city: formData.city?.trim() || undefined,
+        postalCode: formData.postalCode?.trim() || undefined,
+        country: formData.country?.trim() || undefined,
+        notes: formData.notes?.trim() || undefined
       };
 
       await clientApi.createClient(request);

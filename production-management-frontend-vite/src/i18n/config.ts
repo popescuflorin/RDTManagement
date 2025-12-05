@@ -94,8 +94,6 @@ i18n
       order: ['localStorage', 'navigator'],
       caches: ['localStorage'],
       lookupLocalStorage: 'i18nextLng',
-      // If no language is found in localStorage or navigator, use Romanian
-      fallbackLng: 'ro',
     },
   });
 
