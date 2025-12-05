@@ -45,6 +45,13 @@ namespace ProductionManagement.API.Models
         public const string DeactivateUser = "Users.Deactivate";
         public const string ActivateUser = "Users.Activate";
 
+        // Transport
+        public const string ViewTransportsTab = "Transports.ViewTab";
+        public const string CreateTransport = "Transports.Create";
+        public const string ViewTransport = "Transports.View";
+        public const string EditTransport = "Transports.Edit";
+        public const string DeleteTransport = "Transports.Delete";
+
         // Roles & Permissions
         public const string ViewRolesTab = "Roles.ViewTab";
         public const string ManageRolePermissions = "Roles.ManagePermissions";
@@ -73,6 +80,9 @@ namespace ProductionManagement.API.Models
                 // Users
                 ViewUsersTab, CreateUser, EditUser, ViewUser,
                 DeactivateUser, ActivateUser,
+                
+                // Transport
+                ViewTransportsTab, CreateTransport, ViewTransport, EditTransport, DeleteTransport,
                 
                 // Roles
                 ViewRolesTab, ManageRolePermissions
@@ -130,6 +140,14 @@ namespace ProductionManagement.API.Models
                     new PermissionInfo { Key = ViewUser, Name = "View User", Description = "View user details" },
                     new PermissionInfo { Key = DeactivateUser, Name = "Deactivate User", Description = "Deactivate user accounts" },
                     new PermissionInfo { Key = ActivateUser, Name = "Activate User", Description = "Activate inactive users" }
+                },
+                ["Transport"] = new List<PermissionInfo>
+                {
+                    new PermissionInfo { Key = ViewTransportsTab, Name = "View Transports Tab", Description = "Access to the transport management module" },
+                    new PermissionInfo { Key = CreateTransport, Name = "Create Transport", Description = "Create new transport vehicles" },
+                    new PermissionInfo { Key = ViewTransport, Name = "View Transport", Description = "View transport details" },
+                    new PermissionInfo { Key = EditTransport, Name = "Edit Transport", Description = "Edit existing transport vehicles" },
+                    new PermissionInfo { Key = DeleteTransport, Name = "Delete Transport", Description = "Delete transport vehicles" }
                 },
                 ["Roles & Permissions"] = new List<PermissionInfo>
                 {

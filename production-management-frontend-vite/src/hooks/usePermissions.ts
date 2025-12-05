@@ -44,6 +44,13 @@ export const Permissions = {
   DeactivateUser: 'Users.Deactivate',
   ActivateUser: 'Users.Activate',
 
+  // Transport
+  ViewTransportsTab: 'Transports.ViewTab',
+  CreateTransport: 'Transports.Create',
+  ViewTransport: 'Transports.View',
+  EditTransport: 'Transports.Edit',
+  DeleteTransport: 'Transports.Delete',
+
   // Roles
   ViewRolesTab: 'Roles.ViewTab',
   ManageRolePermissions: 'Roles.ManagePermissions',

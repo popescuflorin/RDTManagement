@@ -286,6 +286,36 @@ export interface UpdateTransportRequest {
   phoneNumber: string;
 }
 
+export interface TransportPagedRequest {
+  page: number;
+  pageSize: number;
+  searchTerm?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
+export interface TransportRecord {
+  id: number;
+  type: 'Acquisition' | 'Order';
+  carName: string;
+  numberPlate?: string;
+  phoneNumber?: string;
+  transportDate?: string;
+  relatedEntityName: string;
+  relatedEntityId: number;
+  status: string;
+  createdAt: string;
+}
+
+export interface TransportRecordsPagedRequest {
+  page: number;
+  pageSize: number;
+  searchTerm?: string;
+  type?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
 export interface Acquisition {
   id: number;
   title: string;

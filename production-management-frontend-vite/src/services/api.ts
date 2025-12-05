@@ -43,6 +43,9 @@ import type {
   Transport,
   CreateTransportRequest,
   UpdateTransportRequest,
+  TransportPagedRequest,
+  TransportRecord,
+  TransportRecordsPagedRequest,
   ProductTemplate,
   UpdateProductTemplateRequest,
   Order,
@@ -267,9 +270,13 @@ export const supplierApi = {
 // Transport API
 export const transportApi = {
   getAllTransports: () => api.get<Transport[]>('/transport'),
+  getTransportsPaged: (params: TransportPagedRequest) => 
+    api.get<PagedResult<Transport>>('/transport/paged', { params }),
   getTransport: (id: number) => api.get<Transport>(`/transport/${id}`),
   getTransportByCarName: (carName: string) => api.get<Transport>(`/transport/by-car-name/${encodeURIComponent(carName)}`),
   searchTransports: (searchTerm: string) => api.get<Transport[]>(`/transport/search?searchTerm=${encodeURIComponent(searchTerm)}`),
+  getTransportRecordsPaged: (params: TransportRecordsPagedRequest) =>
+    api.get<PagedResult<TransportRecord>>('/transport/records/paged', { params }),
   createTransport: (transportData: CreateTransportRequest) => api.post<Transport>('/transport', transportData),
   updateTransport: (id: number, transportData: UpdateTransportRequest) => api.put<Transport>(`/transport/${id}`, transportData),
   deleteTransport: (id: number) => api.delete(`/transport/${id}`),
