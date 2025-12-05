@@ -51,6 +51,7 @@ namespace ProductionManagement.API.Controllers
             var query = _context.Orders
                 .Include(o => o.Client)
                 .Include(o => o.Transport)
+                .Include(o => o.AssignedTo)
                 .Include(o => o.OrderMaterials)
                 .AsQueryable();
 
@@ -185,6 +186,7 @@ namespace ProductionManagement.API.Controllers
                 TransportId = request.TransportId,
                 TransportDate = request.TransportDate,
                 TransportNotes = request.TransportNotes,
+                AssignedToUserId = request.AssignedToUserId,
                 CreatedByUserName = usernameClaim,
                 CreatedAt = DateTime.UtcNow
             };
@@ -256,6 +258,11 @@ namespace ProductionManagement.API.Controllers
             if (request.ExpectedDeliveryDate.HasValue) order.ExpectedDeliveryDate = request.ExpectedDeliveryDate;
             if (request.TransportDate.HasValue) order.TransportDate = request.TransportDate;
             if (request.TransportNotes != null) order.TransportNotes = request.TransportNotes;
+            
+            // Update assigned user - allow setting or clearing (null)
+            // Note: In C#, nullable int? can be null (not set) or have a value
+            // We'll always update if the property is present in the request
+            order.AssignedToUserId = request.AssignedToUserId;
 
             // Update transport
             if (request.TransportId.HasValue)
@@ -498,6 +505,10 @@ namespace ProductionManagement.API.Controllers
                 TransportPhoneNumber = order.Transport?.PhoneNumber,
                 TransportDate = order.TransportDate,
                 TransportNotes = order.TransportNotes,
+                AssignedToUserId = order.AssignedToUserId,
+                AssignedToUserName = order.AssignedTo != null 
+                    ? $"{order.AssignedTo.FirstName} {order.AssignedTo.LastName}" 
+                    : null,
                 CreatedByUserName = order.CreatedByUserName,
                 CreatedAt = order.CreatedAt,
                 UpdatedAt = order.UpdatedAt,

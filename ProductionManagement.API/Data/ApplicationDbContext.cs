@@ -371,6 +371,11 @@ namespace ProductionManagement.API.Data
                     .WithMany(t => t.Orders)
                     .HasForeignKey(e => e.TransportId)
                     .OnDelete(DeleteBehavior.Restrict);
+
+                entity.HasOne(e => e.AssignedTo)
+                    .WithMany()
+                    .HasForeignKey(e => e.AssignedToUserId)
+                    .OnDelete(DeleteBehavior.SetNull);
             });
 
             // OrderMaterial configuration

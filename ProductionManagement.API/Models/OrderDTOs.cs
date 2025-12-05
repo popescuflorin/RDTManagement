@@ -25,6 +25,8 @@ namespace ProductionManagement.API.Models
         [StringLength(500)]
         public string? TransportNotes { get; set; }
 
+        public int? AssignedToUserId { get; set; }
+
         public List<CreateOrderMaterialRequest> OrderMaterials { get; set; } = new List<CreateOrderMaterialRequest>();
     }
 
@@ -60,6 +62,8 @@ namespace ProductionManagement.API.Models
         [StringLength(500)]
         public string? TransportNotes { get; set; }
 
+        public int? AssignedToUserId { get; set; }
+
         public List<CreateOrderMaterialRequest>? OrderMaterials { get; set; }
     }
 
@@ -89,6 +93,8 @@ namespace ProductionManagement.API.Models
         public string? TransportPhoneNumber { get; set; }
         public DateTime? TransportDate { get; set; }
         public string? TransportNotes { get; set; }
+        public int? AssignedToUserId { get; set; }
+        public string? AssignedToUserName { get; set; }
         public string CreatedByUserName { get; set; } = string.Empty;
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }

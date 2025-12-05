@@ -846,6 +846,8 @@ export interface Order {
   transportPhoneNumber?: string;
   transportDate?: string;
   transportNotes?: string;
+  assignedToUserId?: number;
+  assignedToUserName?: string;
   createdByUserName: string;
   createdAt: string;
   updatedAt?: string;
@@ -874,6 +876,7 @@ export interface CreateOrderRequest {
   transportId?: number;
   transportDate?: string;
   transportNotes?: string;
+  assignedToUserId?: number;
   orderMaterials: CreateOrderMaterialRequest[];
 }
 
@@ -892,6 +895,7 @@ export interface UpdateOrderRequest {
   transportId?: number;
   transportDate?: string;
   transportNotes?: string;
+  assignedToUserId?: number;
   orderMaterials?: CreateOrderMaterialRequest[];
 }
 

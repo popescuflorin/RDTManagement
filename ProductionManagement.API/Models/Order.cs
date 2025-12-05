@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ProductionManagement.API.Models
 {
@@ -41,6 +42,11 @@ namespace ProductionManagement.API.Models
 
         [StringLength(500)]
         public string? TransportNotes { get; set; }
+
+        public int? AssignedToUserId { get; set; }
+
+        [ForeignKey("AssignedToUserId")]
+        public virtual User? AssignedTo { get; set; }
 
         public string CreatedByUserName { get; set; } = string.Empty;
 

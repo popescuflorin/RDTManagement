@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { orderApi, inventoryApi, transportApi, clientApi } from '../../services/api';
-import type { RawMaterial, CreateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest } from '../../types';
+import { orderApi, inventoryApi, transportApi, clientApi, userApi } from '../../services/api';
+import type { RawMaterial, CreateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest, User } from '../../types';
 import { MaterialType } from '../../types';
 import { X, Plus, Trash2, UserCircle, Truck, Package } from 'lucide-react';
 import './CreateOrder.css';
@@ -28,6 +28,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
   const [finishedProducts, setFinishedProducts] = useState<RawMaterial[]>([]);
   const [transports, setTransports] = useState<Transport[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -44,6 +45,9 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
   const [selectedClientId, setSelectedClientId] = useState<number | null>(null);
   const [clientContact, setClientContact] = useState('');
   const [showCreateClient, setShowCreateClient] = useState(false);
+  
+  // User assignment
+  const [selectedAssignedUserId, setSelectedAssignedUserId] = useState<number | null>(null);
   const [newClientData, setNewClientData] = useState<CreateClientRequest>({
     name: '',
     contactPerson: '',
@@ -106,6 +110,17 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
       // Load clients
       const clientsResponse = await clientApi.getAllClients();
       setClients(clientsResponse.data);
+
+      // Load users
+      const usersResponse = await userApi.getAllUsers();
+      setUsers(usersResponse.data);
+      
+      // Set default assigned user to current user
+      const currentUser = localStorage.getItem('user');
+      if (currentUser) {
+        const userData = JSON.parse(currentUser);
+        setSelectedAssignedUserId(userData.id);
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load data');
     }
@@ -377,6 +392,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
         transportId: transportId || undefined,
         transportDate: transportDate || undefined,
         transportNotes: transportNotes.trim() || undefined,
+        assignedToUserId: selectedAssignedUserId || undefined,
         orderMaterials: items.map(item => ({
           rawMaterialId: item.rawMaterialId,
           quantity: item.quantity
@@ -424,6 +440,25 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
           {/* Client Information Section */}
           <div className="form-section">
             <h3><UserCircle size={20} /> Client</h3>
+
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="assignedUser">Assigned To</label>
+                <select
+                  id="assignedUser"
+                  value={selectedAssignedUserId || ''}
+                  onChange={(e) => setSelectedAssignedUserId(e.target.value ? parseInt(e.target.value) : null)}
+                  disabled={isLoading}
+                >
+                  <option value="">No Assignment</option>
+                  {users.map((user) => (
+                    <option key={user.id} value={user.id}>
+                      {user.firstName} {user.lastName} ({user.username})
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
             <div className="form-row">
               <div className="form-group">

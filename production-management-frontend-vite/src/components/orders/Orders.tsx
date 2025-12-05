@@ -394,6 +394,7 @@ const Orders: React.FC = () => {
               <th>Items</th>
               <th>Total Value</th>
               <th>Transport</th>
+              <th>Assigned To</th>
               <th className="sortable" onClick={() => handleSort('Status')}>
                 <div className="th-content">
                   <span>Status</span>
@@ -406,7 +407,7 @@ const Orders: React.FC = () => {
           <tbody>
             {orders.length === 0 ? (
               <tr>
-                <td colSpan={10} className="no-data">
+                <td colSpan={11} className="no-data">
                   {searchTerm || statusFilter !== null 
                     ? 'No orders found matching your criteria' 
                     : 'No orders found. Create your first order!'}
@@ -445,6 +446,7 @@ const Orders: React.FC = () => {
                       </div>
                     ) : '—'}
                   </td>
+                  <td>{order.assignedToUserName || '—'}</td>
                   <td>{getStatusBadge(order.status)}</td>
                   <td className="actions-cell">
                     <div className="action-buttons">

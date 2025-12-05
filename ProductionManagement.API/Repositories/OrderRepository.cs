@@ -17,6 +17,7 @@ namespace ProductionManagement.API.Repositories
                 .Include(o => o.OrderMaterials)
                     .ThenInclude(om => om.RawMaterial)
                 .Include(o => o.Transport)
+                .Include(o => o.AssignedTo)
                 .Where(o => o.Status != OrderStatus.Cancelled)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
@@ -29,6 +30,7 @@ namespace ProductionManagement.API.Repositories
                 .Include(o => o.OrderMaterials)
                     .ThenInclude(om => om.RawMaterial)
                 .Include(o => o.Transport)
+                .Include(o => o.AssignedTo)
                 .FirstOrDefaultAsync(o => o.Id == id);
         }
 
@@ -39,6 +41,7 @@ namespace ProductionManagement.API.Repositories
                 .Include(o => o.OrderMaterials)
                     .ThenInclude(om => om.RawMaterial)
                 .Include(o => o.Transport)
+                .Include(o => o.AssignedTo)
                 .OrderByDescending(o => o.CreatedAt)
                 .ToListAsync();
         }
