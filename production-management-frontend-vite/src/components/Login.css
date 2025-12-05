@@ -11,6 +11,13 @@
   width: 100vw;
 }
 
+.login-language-switcher {
+  position: absolute;
+  top: var(--space-xl);
+  right: var(--space-xl);
+  z-index: 100;
+}
+
 .login-container::before {
   content: '';
   position: absolute;

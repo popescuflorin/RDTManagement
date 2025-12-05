@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Order } from '../../types';
 import { OrderStatus } from '../../types';
 import { X, Package, UserCircle, Truck, FileText, MapPin, Phone, Mail } from 'lucide-react';
@@ -10,16 +11,18 @@ interface ViewOrderProps {
 }
 
 const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
+  const { t } = useTranslation(['orders', 'common']);
+  
   const getStatusInfo = (status: OrderStatus) => {
     const statusConfig = {
-      [OrderStatus.Draft]: { label: 'Draft', className: 'status-draft', color: '#6b7280' },
-      [OrderStatus.Pending]: { label: 'Pending', className: 'status-pending', color: '#f59e0b' },
-      [OrderStatus.Processing]: { label: 'Done', className: 'status-processing', color: '#3b82f6' },
-      [OrderStatus.Shipped]: { label: 'Shipped', className: 'status-shipped', color: '#8b5cf6' },
-      [OrderStatus.Delivered]: { label: 'Delivered', className: 'status-delivered', color: '#10b981' },
-      [OrderStatus.Cancelled]: { label: 'Cancelled', className: 'status-cancelled', color: '#ef4444' }
+      [OrderStatus.Draft]: { label: t('status.draft'), className: 'status-draft', color: '#6b7280' },
+      [OrderStatus.Pending]: { label: t('status.pending'), className: 'status-pending', color: '#f59e0b' },
+      [OrderStatus.Processing]: { label: t('status.processing'), className: 'status-processing', color: '#3b82f6' },
+      [OrderStatus.Shipped]: { label: t('status.shipped'), className: 'status-shipped', color: '#8b5cf6' },
+      [OrderStatus.Delivered]: { label: t('status.delivered'), className: 'status-delivered', color: '#10b981' },
+      [OrderStatus.Cancelled]: { label: t('status.cancelled'), className: 'status-cancelled', color: '#ef4444' }
     };
-    return statusConfig[status] || { label: 'Unknown', className: 'status-draft', color: '#6b7280' };
+    return statusConfig[status] || { label: t('status.unknown', { defaultValue: 'Unknown' }), className: 'status-draft', color: '#6b7280' };
   };
 
   const formatDate = (dateString: string) => {
@@ -56,7 +59,7 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
           <div className="header-content">
             <div className="header-title">
               <Package className="header-icon" />
-              <h2>Order Details</h2>
+              <h2>{t('orderDetails')}</h2>
             </div>
             <button className="close-button" onClick={onClose}>
               <X size={20} />
@@ -74,54 +77,54 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
           <div className="info-section">
             <div className="section-header">
               <Package className="section-icon" />
-              <h3>Order Overview</h3>
+              <h3>{t('view.orderOverview', { defaultValue: 'Order Overview' })}</h3>
             </div>
             
             <div className="info-grid">
               <div className="info-item">
-                <label>Order ID</label>
+                <label>{t('table.orderId')}</label>
                 <div className="info-value">#{order.id}</div>
               </div>
               
               <div className="info-item">
-                <label>Order Date</label>
+                <label>{t('orderDate')}</label>
                 <div className="info-value">{formatDate(order.orderDate)}</div>
               </div>
 
               {order.expectedDeliveryDate && (
                 <div className="info-item">
-                  <label>Expected Delivery</label>
+                  <label>{t('expectedDeliveryDate')}</label>
                   <div className="info-value">{formatDate(order.expectedDeliveryDate)}</div>
                 </div>
               )}
 
               {order.deliveryDate && (
                 <div className="info-item">
-                  <label>Delivery Date</label>
+                  <label>{t('deliveryDate')}</label>
                   <div className="info-value">{formatDate(order.deliveryDate)}</div>
                 </div>
               )}
 
               <div className="info-item">
-                <label>Total Value</label>
+                <label>{t('totalValue')}</label>
                 <div className="info-value info-value-primary">{formatCurrency(order.totalValue)}</div>
               </div>
 
               <div className="info-item">
-                <label>Items Count</label>
-                <div className="info-value">{order.orderMaterials.length} item(s)</div>
+                <label>{t('view.itemsCount', { defaultValue: 'Items Count' })}</label>
+                <div className="info-value">{order.orderMaterials.length} {t('items', { defaultValue: 'item(s)' })}</div>
               </div>
 
               {order.description && (
                 <div className="info-item full-width">
-                  <label>Description</label>
+                  <label>{t('common:labels.description')}</label>
                   <div className="info-value">{order.description}</div>
                 </div>
               )}
 
               {order.notes && (
                 <div className="info-item full-width">
-                  <label>Notes</label>
+                  <label>{t('common:labels.notes')}</label>
                   <div className="info-value">{order.notes}</div>
                 </div>
               )}
@@ -132,18 +135,18 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
           <div className="info-section">
             <div className="section-header">
               <UserCircle className="section-icon" />
-              <h3>Client Information</h3>
+              <h3>{t('view.clientInformation', { defaultValue: 'Client Information' })}</h3>
             </div>
             
             <div className="info-grid">
               <div className="info-item">
-                <label>Client Name</label>
+                <label>{t('table.clientName')}</label>
                 <div className="info-value">{order.clientName}</div>
               </div>
 
               {order.clientContactPerson && (
                 <div className="info-item">
-                  <label>Contact Person</label>
+                  <label>{t('form.contactPerson')}</label>
                   <div className="info-value">{order.clientContactPerson}</div>
                 </div>
               )}
@@ -152,7 +155,7 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
                 <div className="info-item">
                   <label>
                     <Mail size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
-                    Email
+                    {t('common:labels.email')}
                   </label>
                   <div className="info-value">{order.clientEmail}</div>
                 </div>
@@ -162,7 +165,7 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
                 <div className="info-item">
                   <label>
                     <Phone size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
-                    Phone
+                    {t('common:labels.phone')}
                   </label>
                   <div className="info-value">{order.clientPhone}</div>
                 </div>
@@ -172,7 +175,7 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
                 <div className="info-item full-width">
                   <label>
                     <MapPin size={14} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'middle' }} />
-                    Address
+                    {t('common:labels.address')}
                   </label>
                   <div className="info-value">{order.clientAddress}</div>
                 </div>
@@ -181,7 +184,7 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
               <div className="info-item">
                 {order.clientCity && (
                   <>
-                    <label>City</label>
+                    <label>{t('common:labels.city')}</label>
                     <div className="info-value">{order.clientCity}</div>
                   </>
                 )}
@@ -189,14 +192,14 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
 
               {order.clientPostalCode && (
                 <div className="info-item">
-                  <label>Postal Code</label>
+                  <label>{t('common:labels.postalCode')}</label>
                   <div className="info-value">{order.clientPostalCode}</div>
                 </div>
               )}
 
               {order.clientCountry && (
                 <div className="info-item">
-                  <label>Country</label>
+                  <label>{t('common:labels.country')}</label>
                   <div className="info-value">{order.clientCountry}</div>
                 </div>
               )}
@@ -208,39 +211,39 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
             <div className="info-section">
               <div className="section-header">
                 <Truck className="section-icon" />
-                <h3>Transport Details</h3>
+                <h3>{t('form.transportDetails')}</h3>
               </div>
               
               <div className="info-grid">
                 <div className="info-item">
-                  <label>Vehicle Name</label>
+                  <label>{t('view.vehicleName', { defaultValue: 'Vehicle Name' })}</label>
                   <div className="info-value">{order.transportCarName}</div>
                 </div>
 
                 {order.transportNumberPlate && (
                   <div className="info-item">
-                    <label>Number Plate</label>
+                    <label>{t('form.numberPlate')}</label>
                     <div className="info-value">{order.transportNumberPlate}</div>
                   </div>
                 )}
 
                 {order.transportPhoneNumber && (
                   <div className="info-item">
-                    <label>Phone Number</label>
+                    <label>{t('form.phoneNumber')}</label>
                     <div className="info-value">{order.transportPhoneNumber}</div>
                   </div>
                 )}
 
                 {order.transportDate && (
                   <div className="info-item">
-                    <label>Transport Date</label>
+                    <label>{t('form.transportDate')}</label>
                     <div className="info-value">{formatDate(order.transportDate)}</div>
                   </div>
                 )}
 
                 {order.transportNotes && (
                   <div className="info-item full-width">
-                    <label>Transport Notes</label>
+                    <label>{t('form.transportNotes')}</label>
                     <div className="info-value">{order.transportNotes}</div>
                   </div>
                 )}
@@ -252,21 +255,21 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
           <div className="info-section">
             <div className="section-header">
               <Package className="section-icon" />
-              <h3>Order Items</h3>
+              <h3>{t('view.orderItems', { defaultValue: 'Order Items' })}</h3>
             </div>
             
             {order.orderMaterials.length === 0 ? (
-              <div className="no-items-message">No items in this order.</div>
+              <div className="no-items-message">{t('view.noItems', { defaultValue: 'No items in this order.' })}</div>
             ) : (
               <div className="items-table-container">
                 <table className="items-table">
                   <thead>
                     <tr>
-                      <th>Product</th>
-                      <th>Color</th>
-                      <th>Quantity</th>
-                      <th>Unit Price</th>
-                      <th>Total Price</th>
+                      <th>{t('form.product')}</th>
+                      <th>{t('form.color')}</th>
+                      <th>{t('form.itemQuantity')}</th>
+                      <th>{t('form.unitPrice')}</th>
+                      <th>{t('form.totalPrice')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -282,7 +285,7 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
                   </tbody>
                   <tfoot>
                     <tr>
-                      <td colSpan={4} className="total-label">Total Order Value:</td>
+                      <td colSpan={4} className="total-label">{t('view.totalOrderValue', { defaultValue: 'Total Order Value' })}:</td>
                       <td className="total-value">{formatCurrency(order.totalValue)}</td>
                     </tr>
                   </tfoot>
@@ -295,23 +298,23 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
           <div className="info-section">
             <div className="section-header">
               <FileText className="section-icon" />
-              <h3>Additional Information</h3>
+              <h3>{t('view.additionalInformation', { defaultValue: 'Additional Information' })}</h3>
             </div>
             
             <div className="info-grid">
               <div className="info-item">
-                <label>Created By</label>
+                <label>{t('common:labels.createdBy')}</label>
                 <div className="info-value">{order.createdByUserName}</div>
               </div>
 
               <div className="info-item">
-                <label>Created At</label>
+                <label>{t('common:labels.createdAt')}</label>
                 <div className="info-value">{formatDateTime(order.createdAt)}</div>
               </div>
 
               {order.updatedAt && (
                 <div className="info-item">
-                  <label>Last Updated</label>
+                  <label>{t('view.lastUpdated', { defaultValue: 'Last Updated' })}</label>
                   <div className="info-value">{formatDateTime(order.updatedAt)}</div>
                 </div>
               )}
@@ -325,7 +328,7 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ order, onClose }) => {
             onClick={onClose}
             className="btn btn-secondary"
           >
-            Close
+            {t('common:buttons.close')}
           </button>
         </div>
       </div>

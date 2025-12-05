@@ -1,0 +1,15 @@
+ {
+  "menu": {
+    "dashboard": "Dashboard",
+    "acquisitions": "Acquisitions",
+    "inventory": "Inventory",
+    "production": "Production",
+    "orders": "Orders",
+    "transports": "Transports",
+    "clients": "Clients",
+    "suppliers": "Suppliers",
+    "users": "User Management",
+    "logout": "Logout"
+  }
+}
+

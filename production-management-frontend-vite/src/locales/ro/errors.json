@@ -1,0 +1,8 @@
+{
+  "generic": "A apărut o eroare",
+  "network": "Eroare de rețea. Vă rugăm să verificați conexiunea.",
+  "unauthorized": "Nu sunteți autorizat să efectuați această acțiune",
+  "notFound": "Resursa nu a fost găsită",
+  "serverError": "Eroare de server. Vă rugăm să încercați din nou mai târziu."
+}
+

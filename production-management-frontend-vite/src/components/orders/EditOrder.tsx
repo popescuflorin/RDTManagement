@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { orderApi, inventoryApi, transportApi, clientApi, userApi } from '../../services/api';
 import type { RawMaterial, UpdateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest, Order, User } from '../../types';
 import { MaterialType } from '../../types';
@@ -29,6 +30,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
   onSuccess,
   order
 }) => {
+  const { t } = useTranslation(['orders', 'common']);
   const [finishedProducts, setFinishedProducts] = useState<RawMaterial[]>([]);
   const [transports, setTransports] = useState<Transport[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -172,7 +174,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
       const usersResponse = await userApi.getAllUsers();
       setUsers(usersResponse.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load data');
+      setError(err.response?.data?.message || t('common:messages.error', { defaultValue: 'Failed to load data' }));
     }
   };
 
@@ -185,19 +187,19 @@ const EditOrder: React.FC<EditOrderProps> = ({
 
   const handleAddItem = () => {
     if (newItem.rawMaterialId === 0 || newItem.quantity <= 0) {
-      setError('Please select a material and enter a valid quantity');
+      setError(t('messages.selectMaterial'));
       return;
     }
 
     const material = finishedProducts.find(m => m.id === newItem.rawMaterialId);
     if (!material) {
-      setError('Material not found');
+      setError(t('messages.materialNotFound', { defaultValue: 'Material not found' }));
       return;
     }
 
     // Check if material is already added
     if (items.some(item => item.rawMaterialId === newItem.rawMaterialId)) {
-      setError('Material already added to order');
+      setError(t('messages.materialExists'));
       return;
     }
 
@@ -294,7 +296,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
 
   const handleCreateClient = async () => {
     if (!newClientData.name?.trim()) {
-      setError('Client name is required');
+      setError(t('messages.clientNameRequired'));
       return;
     }
 
@@ -330,7 +332,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
         notes: ''
       });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create client');
+      setError(err.response?.data?.message || t('messages.failedToCreateClient'));
     }
   };
 
@@ -356,12 +358,12 @@ const EditOrder: React.FC<EditOrderProps> = ({
 
   const handleCreateNewTransport = async () => {
     if (!transportSearchTerm.trim()) {
-      setError('Transport car name is required');
+      setError(t('messages.transportCarNameRequired'));
       return;
     }
 
     if (!transportPhoneNumber.trim()) {
-      setError('Transport phone number is required');
+      setError(t('messages.transportPhoneRequired'));
       return;
     }
 
@@ -384,7 +386,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
       setShowTransportDropdown(false);
       setError(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create transport');
+      setError(err.response?.data?.message || t('messages.failedToCreateTransport'));
     }
   };
 
@@ -396,12 +398,12 @@ const EditOrder: React.FC<EditOrderProps> = ({
     e.preventDefault();
     
     if (!selectedClientId) {
-      setError('Please select or create a client');
+      setError(t('messages.selectClient'));
       return;
     }
 
     if (items.length === 0) {
-      setError('At least one item is required');
+      setError(t('messages.addItems'));
       return;
     }
 
@@ -441,7 +443,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update order');
+      setError(err.response?.data?.message || t('messages.orderUpdated', { defaultValue: 'Failed to update order' }));
     } finally {
       setIsLoading(false);
     }
@@ -466,7 +468,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
           <div className="header-content">
             <div className="header-title">
               <Package className="header-icon" />
-              <h2>Edit Order</h2>
+              <h2>{t('editOrder')}</h2>
             </div>
             <button className="close-button" onClick={handleClose}>
               <X size={20} />
@@ -484,24 +486,24 @@ const EditOrder: React.FC<EditOrderProps> = ({
 
           {/* Basic Information */}
           <div className="form-section">
-            <h3><FileText size={20} />Information</h3>
+            <h3><FileText size={20} />{t('common:labels.information', { defaultValue: 'Information' })}</h3>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="description">Description</label>
+                <label htmlFor="description">{t('common:labels.description')}</label>
                 <input
                   type="text"
                   id="description"
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Enter order description"
+                  placeholder={t('form.descriptionPlaceholder')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="status">Status</label>
+                <label htmlFor="status">{t('common:labels.status')}</label>
                 <input
                   type="text"
                   id="status"
-                  value={order.statusLabel || 'Draft'}
+                  value={order.statusLabel || t('status.draft')}
                   disabled
                   className="disabled-field"
                 />
@@ -510,34 +512,34 @@ const EditOrder: React.FC<EditOrderProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="orderDate">Order Date</label>
+                <label htmlFor="orderDate">{t('orderDate')}</label>
                 <input
                   type="date"
                   id="orderDate"
                   value={orderDate}
                   onChange={(e) => setOrderDate(e.target.value)}
-                  placeholder="Select order date"
+                  placeholder={t('form.orderDatePlaceholder', { defaultValue: 'Select order date' })}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="expectedDeliveryDate">Expected Delivery Date</label>
+                <label htmlFor="expectedDeliveryDate">{t('expectedDeliveryDate')}</label>
                 <input
                   type="date"
                   id="expectedDeliveryDate"
                   value={expectedDeliveryDate}
                   onChange={(e) => setExpectedDeliveryDate(e.target.value)}
-                  placeholder="Select expected delivery date"
+                  placeholder={t('form.expectedDeliveryDatePlaceholder', { defaultValue: 'Select expected delivery date' })}
                 />
               </div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="notes">Notes</label>
+              <label htmlFor="notes">{t('common:labels.notes')}</label>
               <textarea
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="Additional notes"
+                placeholder={t('common:labels.notes', { defaultValue: 'Additional notes' })}
                 rows={3}
               />
             </div>
@@ -545,18 +547,18 @@ const EditOrder: React.FC<EditOrderProps> = ({
 
           {/* Client Information Section */}
           <div className="form-section">
-            <h3><UserCircle size={20} /> Client</h3>
+            <h3><UserCircle size={20} /> {t('client')}</h3>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="assignedUser">Assigned To</label>
+                <label htmlFor="assignedUser">{t('assignedTo')}</label>
                 <select
                   id="assignedUser"
                   value={selectedAssignedUserId || ''}
                   onChange={(e) => setSelectedAssignedUserId(e.target.value ? parseInt(e.target.value) : null)}
                   disabled={isLoading}
                 >
-                  <option value="">No Assignment</option>
+                  <option value="">{t('common:labels.noAssignment')}</option>
                   {users.map((user) => (
                     <option key={user.id} value={user.id}>
                       {user.firstName} {user.lastName} ({user.username})
@@ -568,31 +570,31 @@ const EditOrder: React.FC<EditOrderProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="client">Client *</label>
+                <label htmlFor="client">{t('client')} *</label>
                 <select
                   id="client"
                   value={selectedClientId || 'none'}
                   onChange={(e) => handleClientChange(e.target.value)}
                   disabled={isLoading}
                 >
-                  <option value="none">No Client</option>
+                  <option value="none">{t('form.noClient')}</option>
                   {clients.map((client) => (
                     <option key={client.id} value={client.id}>
                       {client.name}
                     </option>
                   ))}
-                  <option value="new">+ Create New Client</option>
+                  <option value="new">+ {t('form.createNewClient')}</option>
                 </select>
               </div>
               <div className="form-group">
-                <label htmlFor="clientContact">Client Contact</label>
+                <label htmlFor="clientContact">{t('clientContact')}</label>
                 <input
                   type="text"
                   id="clientContact"
                   value={clientContact}
                   onChange={(e) => setClientContact(e.target.value)}
                   disabled={isLoading}
-                  placeholder="Contact information"
+                  placeholder={t('form.clientContactPlaceholder')}
                 />
               </div>
             </div>
@@ -600,106 +602,106 @@ const EditOrder: React.FC<EditOrderProps> = ({
             {/* Create New Client Form */}
             {showCreateClient && (
               <div className="supplier-creation-form">
-                <h4>Create New Client</h4>
+                <h4>{t('form.createNewClient')}</h4>
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="clientName">Client Name *</label>
+                    <label htmlFor="clientName">{t('form.clientName')} *</label>
                     <input
                       type="text"
                       id="clientName"
                       value={newClientData.name || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, name: e.target.value })}
-                      placeholder="Enter client name"
+                      placeholder={t('form.clientNamePlaceholder')}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="clientContactPerson">Contact Person</label>
+                    <label htmlFor="clientContactPerson">{t('form.contactPerson')}</label>
                     <input
                       type="text"
                       id="clientContactPerson"
                       value={newClientData.contactPerson || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, contactPerson: e.target.value })}
-                      placeholder="Contact person name"
+                      placeholder={t('form.contactPersonPlaceholder')}
                     />
                   </div>
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="clientPhone">Phone</label>
+                    <label htmlFor="clientPhone">{t('common:labels.phone')}</label>
                     <input
                       type="text"
                       id="clientPhone"
                       value={newClientData.phone || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, phone: e.target.value })}
-                      placeholder="Phone number"
+                      placeholder={t('common:labels.phone', { defaultValue: 'Phone number' })}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="clientEmail">Email</label>
+                    <label htmlFor="clientEmail">{t('common:labels.email')}</label>
                     <input
                       type="email"
                       id="clientEmail"
                       value={newClientData.email || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, email: e.target.value })}
-                      placeholder="Email address"
+                      placeholder={t('common:labels.email', { defaultValue: 'Email address' })}
                     />
                   </div>
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="clientAddress">Address</label>
+                    <label htmlFor="clientAddress">{t('common:labels.address')}</label>
                     <input
                       type="text"
                       id="clientAddress"
                       value={newClientData.address || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, address: e.target.value })}
-                      placeholder="Street address"
+                      placeholder={t('common:labels.address', { defaultValue: 'Street address' })}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="clientCity">City</label>
+                    <label htmlFor="clientCity">{t('common:labels.city')}</label>
                     <input
                       type="text"
                       id="clientCity"
                       value={newClientData.city || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, city: e.target.value })}
-                      placeholder="City"
+                      placeholder={t('common:labels.city', { defaultValue: 'City' })}
                     />
                   </div>
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="clientPostalCode">Postal Code</label>
+                    <label htmlFor="clientPostalCode">{t('common:labels.postalCode')}</label>
                     <input
                       type="text"
                       id="clientPostalCode"
                       value={newClientData.postalCode || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, postalCode: e.target.value })}
-                      placeholder="Postal code"
+                      placeholder={t('common:labels.postalCode', { defaultValue: 'Postal code' })}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="clientCountry">Country</label>
+                    <label htmlFor="clientCountry">{t('common:labels.country')}</label>
                     <input
                       type="text"
                       id="clientCountry"
                       value={newClientData.country || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, country: e.target.value })}
-                      placeholder="Country"
+                      placeholder={t('common:labels.country', { defaultValue: 'Country' })}
                     />
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="clientNotes">Notes</label>
+                  <label htmlFor="clientNotes">{t('common:labels.notes')}</label>
                   <textarea
                     id="clientNotes"
                     value={newClientData.notes || ''}
                     onChange={(e) => setNewClientData({ ...newClientData, notes: e.target.value })}
-                    placeholder="Additional notes"
+                    placeholder={t('common:labels.notes', { defaultValue: 'Additional notes' })}
                     rows={2}
                   />
                 </div>
@@ -711,14 +713,14 @@ const EditOrder: React.FC<EditOrderProps> = ({
                     onClick={handleCreateClient}
                   >
                     <UserCircle size={16} />
-                    Create Client
+                    {t('form.createClient')}
                   </button>
                   <button
                     type="button"
                     className="cancel-button"
                     onClick={() => setShowCreateClient(false)}
                   >
-                    Cancel
+                    {t('common:buttons.cancel')}
                   </button>
                 </div>
               </div>
@@ -727,10 +729,10 @@ const EditOrder: React.FC<EditOrderProps> = ({
 
           {/* Transport Details Section */}
           <div className="form-section">
-            <h3><Truck size={20} /> Transport Details</h3>
+            <h3><Truck size={20} /> {t('form.transportDetails')}</h3>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="transportCarName">Car Name</label>
+                <label htmlFor="transportCarName">{t('form.carName')}</label>
                 <div className="transport-search-container">
                   <input
                     type="text"
@@ -738,7 +740,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
                     value={transportSearchTerm}
                     onChange={(e) => handleTransportSearchChange(e.target.value)}
                     onFocus={() => setShowTransportDropdown(true)}
-                    placeholder="Search or enter car/vehicle name"
+                    placeholder={t('transport.searchPlaceholder')}
                   />
                   {showTransportDropdown && (
                     <div className="material-dropdown">
@@ -759,14 +761,14 @@ const EditOrder: React.FC<EditOrderProps> = ({
                       ) : transportSearchTerm ? (
                         <div className="material-option material-option-create">
                           <div>
-                            <strong>Create new transport:</strong> {transportSearchTerm}
-                            <small>Enter phone number and submit to create</small>
+                            <strong>{t('transport.createNew')}:</strong> {transportSearchTerm}
+                            <small>{t('transport.enterPhoneNumber')}</small>
                           </div>
                         </div>
                       ) : (
                         <div className="material-option">
                           <div>
-                            <small>Start typing to search or create a new transport</small>
+                            <small>{t('transport.startTyping')}</small>
                           </div>
                         </div>
                       )}
@@ -775,25 +777,25 @@ const EditOrder: React.FC<EditOrderProps> = ({
                 </div>
               </div>
               <div className="form-group">
-                <label htmlFor="transportNumberPlate">Number Plate</label>
+                <label htmlFor="transportNumberPlate">{t('form.numberPlate')}</label>
                 <input
                   type="text"
                   id="transportNumberPlate"
                   value={transportNumberPlate}
                   onChange={(e) => setTransportNumberPlate(e.target.value)}
-                  placeholder="Enter number plate (optional)"
+                  placeholder={t('transport.numberPlatePlaceholder')}
                 />
               </div>
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="transportPhoneNumber">Phone Number</label>
+                <label htmlFor="transportPhoneNumber">{t('form.phoneNumber')}</label>
                 <input
                   type="tel"
                   id="transportPhoneNumber"
                   value={transportPhoneNumber}
                   onChange={(e) => setTransportPhoneNumber(e.target.value)}
-                  placeholder="Enter phone number"
+                  placeholder={t('transport.phoneNumberPlaceholder')}
                 />
                 {transportSearchTerm.trim() && !selectedTransportId && transportPhoneNumber.trim() && (
                   <button
@@ -802,30 +804,30 @@ const EditOrder: React.FC<EditOrderProps> = ({
                     onClick={handleCreateNewTransport}
                     style={{ marginTop: '8px' }}
                   >
-                    Create New Transport
+                    {t('form.createNewTransport')}
                   </button>
                 )}
               </div>
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="transportDate">Transport Date</label>
+                <label htmlFor="transportDate">{t('form.transportDate')}</label>
                 <input
                   type="date"
                   id="transportDate"
                   value={transportDate}
                   onChange={(e) => setTransportDate(e.target.value)}
-                  placeholder="Select transport date"
+                  placeholder={t('form.transportDatePlaceholder', { defaultValue: 'Select transport date' })}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="transportNotes">Transport Notes</label>
+                <label htmlFor="transportNotes">{t('form.transportNotes')}</label>
                 <input
                   type="text"
                   id="transportNotes"
                   value={transportNotes}
                   onChange={(e) => setTransportNotes(e.target.value)}
-                  placeholder="Additional transport notes"
+                  placeholder={t('transport.transportNotesPlaceholder')}
                 />
               </div>
             </div>
@@ -834,14 +836,14 @@ const EditOrder: React.FC<EditOrderProps> = ({
           {/* Products Section */}
           <div className="form-section">
             <div className="section-header">
-              <h3><Package size={20} /> Products</h3>
+              <h3><Package size={20} /> {t('form.products')}</h3>
               <button
                 type="button"
                 className="add-item-button"
                 onClick={() => setShowAddItemForm(!showAddItemForm)}
               >
                 <Plus size={20} />
-                Add Product
+                {t('form.addProduct')}
               </button>
             </div>
 
@@ -850,7 +852,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
               <div className="add-item-form">
                 <div className="form-row">
                   <div className="form-group material-search-group">
-                    <label htmlFor="materialSearch">Product Name *</label>
+                    <label htmlFor="materialSearch">{t('form.productName')} *</label>
                     <div className="material-search-container">
                       <input
                         type="text"
@@ -858,7 +860,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
                         value={materialSearchTerm}
                         onChange={handleMaterialSearchChange}
                         onFocus={() => setShowMaterialDropdown(true)}
-                        placeholder="Search for finished product..."
+                        placeholder={t('form.searchFinishedProducts')}
                         className="material-search-input"
                       />
                       {showMaterialDropdown && (
@@ -875,13 +877,13 @@ const EditOrder: React.FC<EditOrderProps> = ({
                                   <span className="material-color">({material.color})</span>
                                 </div>
                                 <div className="material-option-details">
-                                  {material.quantity} {material.quantityType} available
+                                  {material.quantity} {material.quantityType} {t('form.available', { defaultValue: 'available' }).toLowerCase()}
                                 </div>
                               </div>
                             ))
                           ) : (
                             <div className="material-option no-results">
-                              No products found
+                              {t('form.noProductsFound', { defaultValue: 'No products found' })}
                             </div>
                           )}
                         </div>
@@ -892,7 +894,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="itemQuantity">Quantity *</label>
+                    <label htmlFor="itemQuantity">{t('form.itemQuantity')} *</label>
                     <input
                       type="number"
                       id="itemQuantity"
@@ -912,7 +914,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
                     className="save-item-button"
                     onClick={handleAddItem}
                   >
-                    Add Product
+                    {t('form.addProduct')}
                   </button>
                   <button
                     type="button"
@@ -923,7 +925,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
                       setNewItem({ rawMaterialId: 0, quantity: 1 });
                     }}
                   >
-                    Cancel
+                    {t('common:buttons.cancel')}
                   </button>
                 </div>
               </div>
@@ -932,18 +934,18 @@ const EditOrder: React.FC<EditOrderProps> = ({
             {/* Selected Items */}
             {items.length > 0 && (
               <div className="selected-items">
-                <h4>Selected Products ({items.length})</h4>
+                <h4>{t('form.selectedProducts')} ({items.length})</h4>
                 <div className="items-list">
                   {items.map((item, index) => (
                     <div key={index} className="item-card">
                       <div className="item-info">
                         <div className="item-name">{item.materialName}</div>
-                        <div className="item-color">Color: {item.materialColor}</div>
+                        <div className="item-color">{t('form.color')}: {item.materialColor}</div>
                       </div>
                       <div className="item-details">
                         <div className="form-row">
                           <div className="form-group">
-                            <label>Quantity</label>
+                            <label>{t('form.itemQuantity')}</label>
                             <input
                               type="number"
                               value={item.quantity}
@@ -954,7 +956,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
                             />
                           </div>
                           <div className="form-group">
-                            <label>Unit</label>
+                            <label>{t('form.unit', { defaultValue: 'Unit' })}</label>
                             <input
                               type="text"
                               value={item.quantityType}
@@ -964,7 +966,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
                           </div>
                         </div>
                         <div className="item-total">
-                          Unit Price: ${item.unitPrice.toFixed(2)} | Total: ${item.totalPrice.toFixed(2)}
+                          {t('form.unitPrice')}: ${item.unitPrice.toFixed(2)} | {t('form.totalPrice')}: ${item.totalPrice.toFixed(2)}
                         </div>
                       </div>
                       <button
@@ -984,7 +986,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
             {items.length > 0 && (
               <div className="total-cost">
                 <strong>
-                  Total Items: {items.length} | Total Value: ${totalValue.toFixed(2)}
+                  {t('form.totalItems')}: {items.length} | {t('form.totalValue')}: ${totalValue.toFixed(2)}
                 </strong>
               </div>
             )}
@@ -997,14 +999,14 @@ const EditOrder: React.FC<EditOrderProps> = ({
               className="cancel-button"
               onClick={handleClose}
             >
-              Cancel
+              {t('common:buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading || !selectedClientId || items.length === 0}
             >
-              {isLoading ? 'Updating...' : 'Update Order'}
+              {isLoading ? t('form.updating') : t('form.updateOrder')}
             </button>
           </div>
         </form>

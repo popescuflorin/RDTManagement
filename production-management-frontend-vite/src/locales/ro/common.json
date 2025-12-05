@@ -1,0 +1,68 @@
+{
+  "buttons": {
+    "create": "Creează",
+    "edit": "Editează",
+    "delete": "Șterge",
+    "save": "Salvează",
+    "cancel": "Anulează",
+    "close": "Închide",
+    "submit": "Trimite",
+    "add": "Adaugă",
+    "remove": "Elimină",
+    "search": "Caută",
+    "filter": "Filtrează",
+    "view": "Vizualizează",
+    "process": "Procesează",
+    "receive": "Primește",
+    "update": "Actualizează",
+    "confirm": "Confirmă",
+    "back": "Înapoi",
+    "next": "Următor",
+    "previous": "Anterior",
+    "first": "Primul",
+    "last": "Ultimul"
+  },
+  "labels": {
+    "name": "Nume",
+    "email": "Email",
+    "phone": "Telefon",
+    "address": "Adresă",
+    "city": "Oraș",
+    "country": "Țară",
+    "postalCode": "Cod poștal",
+    "description": "Descriere",
+    "notes": "Note",
+    "status": "Status",
+    "date": "Dată",
+    "quantity": "Cantitate",
+    "price": "Preț",
+    "total": "Total",
+    "actions": "Acțiuni",
+    "createdAt": "Creat la",
+    "updatedAt": "Actualizat la",
+    "createdBy": "Creat de",
+    "assignedTo": "Atribuit la",
+    "noAssignment": "Fără atribuire"
+  },
+  "messages": {
+    "loading": "Se încarcă...",
+    "noData": "Nu există date disponibile",
+    "noResults": "Nu s-au găsit rezultate",
+    "saving": "Se salvează...",
+    "saved": "Salvat cu succes",
+    "deleted": "Șters cu succes",
+    "error": "A apărut o eroare",
+    "confirmDelete": "Sigur doriți să ștergeți acest element?",
+    "required": "Acest câmp este obligatoriu",
+    "optional": "Opțional"
+  },
+  "status": {
+    "active": "Activ",
+    "inactive": "Inactiv",
+    "draft": "Ciornă",
+    "pending": "În așteptare",
+    "completed": "Finalizat",
+    "cancelled": "Anulat"
+  }
+}
+

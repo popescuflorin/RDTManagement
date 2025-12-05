@@ -1,0 +1,10 @@
+{
+  "required": "Acest câmp este obligatoriu",
+  "invalidEmail": "Vă rugăm să introduceți o adresă de email validă",
+  "invalidPhone": "Vă rugăm să introduceți un număr de telefon valid",
+  "minLength": "Lungimea minimă este de {{min}} caractere",
+  "maxLength": "Lungimea maximă este de {{max}} caractere",
+  "minValue": "Valoarea minimă este {{min}}",
+  "maxValue": "Valoarea maximă este {{max}}"
+}
+

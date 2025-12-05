@@ -1,0 +1,15 @@
+{
+  "menu": {
+    "dashboard": "Panou de control",
+    "acquisitions": "Achiziții",
+    "inventory": "Inventar",
+    "production": "Producție",
+    "orders": "Comenzi",
+    "transports": "Transporturi",
+    "clients": "Clienți",
+    "suppliers": "Furnizori",
+    "users": "Utilizatori",
+    "logout": "Deconectare"
+  }
+}
+

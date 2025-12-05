@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Order } from '../../types';
 import './CancelOrderModal.css';
 
@@ -15,16 +16,24 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
   onConfirm,
   isLoading
 }) => {
+  const { t } = useTranslation(['orders', 'common']);
+  
   return (
     <div className="cancel-order-overlay" onClick={onClose}>
       <div className="cancel-order-modal" onClick={(e) => e.stopPropagation()}>
         <div className="cancel-order-header">
-          <h2>Cancel Order</h2>
+          <h2>{t('cancelOrder')}</h2>
         </div>
 
         <div className="cancel-order-content">
-          <p>Are you sure you want to cancel order #{order.id} for {order.clientName}?</p>
-          <p className="warning-text">This will mark the order as cancelled and it cannot be modified.</p>
+          <p>{t('view.cancelOrderConfirmation', { 
+            defaultValue: 'Are you sure you want to cancel order #{{orderId}} for {{clientName}}?',
+            orderId: order.id,
+            clientName: order.clientName
+          })}</p>
+          <p className="warning-text">{t('view.cancelOrderWarning', { 
+            defaultValue: 'This will mark the order as cancelled and it cannot be modified.'
+          })}</p>
         </div>
 
         <div className="cancel-order-actions">
@@ -34,7 +43,7 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
             className="cancel-button"
             disabled={isLoading}
           >
-            No
+            {t('view.no', { defaultValue: 'No' })}
           </button>
           <button
             type="button"
@@ -42,7 +51,7 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
             className="delete-button"
             disabled={isLoading}
           >
-            {isLoading ? 'Cancelling...' : 'Yes, Cancel Order'}
+            {isLoading ? t('view.cancelling', { defaultValue: 'Cancelling...' }) : t('view.yesCancelOrder', { defaultValue: 'Yes, Cancel Order' })}
           </button>
         </div>
       </div>

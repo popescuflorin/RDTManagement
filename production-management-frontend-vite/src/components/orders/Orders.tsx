@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { orderApi, inventoryApi } from '../../services/api';
 import type { Order, OrderStatistics, RawMaterial, PagedResult } from '../../types';
 import { OrderStatus } from '../../types';
@@ -13,6 +14,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import './Orders.css';
 
 const Orders: React.FC = () => {
+  const { t } = useTranslation(['orders', 'common']);
   const [pagedData, setPagedData] = useState<PagedResult<Order> | null>(null);
   const [statistics, setStatistics] = useState<OrderStatistics | null>(null);
   const [inventory, setInventory] = useState<RawMaterial[]>([]);
@@ -71,7 +73,7 @@ const Orders: React.FC = () => {
       setPagedData(pagedResponse.data);
       setStatistics(statsResponse.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load order data');
+      setError(err.response?.data?.message || t('common:messages.error'));
     } finally {
       setIsLoading(false);
     }
@@ -176,12 +178,12 @@ const Orders: React.FC = () => {
 
   const getStatusBadge = (status: OrderStatus) => {
     const statusConfig = {
-      [OrderStatus.Draft]: { label: 'Draft', className: 'status-draft' },
-      [OrderStatus.Pending]: { label: 'Pending', className: 'status-pending' },
-      [OrderStatus.Processing]: { label: 'Done', className: 'status-processing' },
-      [OrderStatus.Shipped]: { label: 'Shipped', className: 'status-shipped' },
-      [OrderStatus.Delivered]: { label: 'Delivered', className: 'status-delivered' },
-      [OrderStatus.Cancelled]: { label: 'Cancelled', className: 'status-cancelled' }
+      [OrderStatus.Draft]: { label: t('status.draft'), className: 'status-draft' },
+      [OrderStatus.Pending]: { label: t('status.pending'), className: 'status-pending' },
+      [OrderStatus.Processing]: { label: t('status.processing'), className: 'status-processing' },
+      [OrderStatus.Shipped]: { label: t('status.shipped'), className: 'status-shipped' },
+      [OrderStatus.Delivered]: { label: t('status.delivered'), className: 'status-delivered' },
+      [OrderStatus.Cancelled]: { label: t('status.cancelled'), className: 'status-cancelled' }
     };
 
     const config = statusConfig[status];
@@ -234,7 +236,7 @@ const Orders: React.FC = () => {
     return (
       <div className="orders-loading">
         <Loader2 size={32} className="animate-spin" />
-        <p>Loading orders...</p>
+        <p>{t('common:messages.loading')}</p>
       </div>
     );
   }
@@ -244,7 +246,7 @@ const Orders: React.FC = () => {
       <div className="orders-header">
         <h1>
           <Package size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-          Orders
+          {t('title')}
         </h1>
         <ProtectedButton
           requiredPermission={Permissions.CreateOrder}
@@ -252,7 +254,7 @@ const Orders: React.FC = () => {
           onClick={handleCreateOrder}
         >
           <Plus size={16} />
-          Create New Order
+          {t('createOrder')}
         </ProtectedButton>
       </div>
 
@@ -265,7 +267,7 @@ const Orders: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.totalOrders}</div>
-              <div className="stat-label">Total Orders</div>
+              <div className="stat-label">{t('statistics.totalOrders')}</div>
             </div>
           </div>
           <div className="stat-card">
@@ -274,7 +276,7 @@ const Orders: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.draftOrders}</div>
-              <div className="stat-label">Draft</div>
+              <div className="stat-label">{t('statistics.draftOrders')}</div>
             </div>
           </div>
           <div className="stat-card">
@@ -283,7 +285,7 @@ const Orders: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.pendingOrders}</div>
-              <div className="stat-label">Pending</div>
+              <div className="stat-label">{t('statistics.pendingOrders')}</div>
             </div>
           </div>
           <div className="stat-card">
@@ -292,7 +294,7 @@ const Orders: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.processingOrders}</div>
-              <div className="stat-label">Done</div>
+              <div className="stat-label">{t('statistics.processingOrders')}</div>
             </div>
           </div>
           <div className="stat-card">
@@ -301,7 +303,7 @@ const Orders: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.shippedOrders}</div>
-              <div className="stat-label">Shipped</div>
+              <div className="stat-label">{t('statistics.shippedOrders')}</div>
             </div>
           </div>
           <div className="stat-card">
@@ -310,7 +312,7 @@ const Orders: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.deliveredOrders}</div>
-              <div className="stat-label">Delivered</div>
+              <div className="stat-label">{t('statistics.deliveredOrders')}</div>
             </div>
           </div>
           <div className="stat-card stat-card-primary">
@@ -319,7 +321,7 @@ const Orders: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{formatCurrency(statistics.totalOrderValue)}</div>
-              <div className="stat-label">Total Value</div>
+              <div className="stat-label">{t('statistics.totalOrderValue')}</div>
             </div>
           </div>
         </div>
@@ -332,7 +334,7 @@ const Orders: React.FC = () => {
             <Search size={20} className="search-icon" />
             <input
               type="text"
-              placeholder="Search by client name, email, or phone..."
+              placeholder={t('table.searchPlaceholder', { defaultValue: 'Search by client name, email, or phone...' })}
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -354,13 +356,13 @@ const Orders: React.FC = () => {
             }}
             className="filter-select"
           >
-            <option value="">All Status</option>
-            <option value={OrderStatus.Draft}>Draft</option>
-            <option value={OrderStatus.Pending}>Pending</option>
-            <option value={OrderStatus.Processing}>Done</option>
-            <option value={OrderStatus.Shipped}>Shipped</option>
-            <option value={OrderStatus.Delivered}>Delivered</option>
-            <option value={OrderStatus.Cancelled}>Cancelled</option>
+            <option value="">{t('table.allStatus', { defaultValue: 'All Status' })}</option>
+            <option value={OrderStatus.Draft}>{t('status.draft')}</option>
+            <option value={OrderStatus.Pending}>{t('status.pending')}</option>
+            <option value={OrderStatus.Processing}>{t('status.processing')}</option>
+            <option value={OrderStatus.Shipped}>{t('status.shipped')}</option>
+            <option value={OrderStatus.Delivered}>{t('status.delivered')}</option>
+            <option value={OrderStatus.Cancelled}>{t('status.cancelled')}</option>
           </select>
         </div>
       </div>
@@ -376,32 +378,32 @@ const Orders: React.FC = () => {
         <table className="orders-table">
           <thead>
             <tr>
-              <th>Order ID</th>
-              <th>Client Name</th>
-              <th>Contact</th>
+              <th>{t('table.orderId')}</th>
+              <th>{t('table.clientName')}</th>
+              <th>{t('table.contact')}</th>
               <th className="sortable" onClick={() => handleSort('OrderDate')}>
                 <div className="th-content">
-                  <span>Order Date</span>
+                  <span>{t('orderDate')}</span>
                   {getSortIcon('OrderDate')}
                 </div>
               </th>
               <th className="sortable" onClick={() => handleSort('ExpectedDeliveryDate')}>
                 <div className="th-content">
-                  <span>Expected Delivery</span>
+                  <span>{t('expectedDeliveryDate')}</span>
                   {getSortIcon('ExpectedDeliveryDate')}
                 </div>
               </th>
-              <th>Items</th>
-              <th>Total Value</th>
-              <th>Transport</th>
-              <th>Assigned To</th>
+              <th>{t('items')}</th>
+              <th>{t('totalValue')}</th>
+              <th>{t('table.transport')}</th>
+              <th>{t('assignedTo')}</th>
               <th className="sortable" onClick={() => handleSort('Status')}>
                 <div className="th-content">
-                  <span>Status</span>
+                  <span>{t('common:labels.status')}</span>
                   {getSortIcon('Status')}
                 </div>
               </th>
-              <th>Actions</th>
+              <th>{t('common:labels.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -409,8 +411,8 @@ const Orders: React.FC = () => {
               <tr>
                 <td colSpan={11} className="no-data">
                   {searchTerm || statusFilter !== null 
-                    ? 'No orders found matching your criteria' 
-                    : 'No orders found. Create your first order!'}
+                    ? t('table.noMatchingOrders')
+                    : t('table.noOrders')}
                 </td>
               </tr>
             ) : (
@@ -431,7 +433,7 @@ const Orders: React.FC = () => {
                   <td>
                     {order.expectedDeliveryDate ? formatDate(order.expectedDeliveryDate) : '—'}
                   </td>
-                  <td>{order.orderMaterials.length} item(s)</td>
+                  <td>{order.orderMaterials.length} {t('items', { defaultValue: 'item(s)' })}</td>
                   <td className="currency-cell">{formatCurrency(order.totalValue)}</td>
                   <td>
                     {order.transportCarName ? (
@@ -453,7 +455,7 @@ const Orders: React.FC = () => {
                       <ProtectedButton
                         requiredPermission={Permissions.ViewOrder}
                         className="btn btn-sm btn-info"
-                        title="View Order"
+                        title={t('viewOrder')}
                         onClick={() => handleViewOrder(order)}
                       >
                         <Eye size={16} />
@@ -462,7 +464,7 @@ const Orders: React.FC = () => {
                         <ProtectedButton
                           requiredPermission={Permissions.EditOrder}
                           className="btn btn-sm btn-primary"
-                          title="Edit Order"
+                          title={t('editOrder')}
                           onClick={() => handleEditOrder(order)}
                         >
                           <Edit size={16} />
@@ -472,8 +474,8 @@ const Orders: React.FC = () => {
                         const stockCheck = hasInsufficientStock(order);
                         const isDisabled = stockCheck.hasIssue;
                         const title = isDisabled 
-                          ? `Insufficient stock:\n${stockCheck.insufficientItems.join('\n')}`
-                          : 'Process Order';
+                          ? `${t('messages.insufficientStock')}:\n${stockCheck.insufficientItems.join('\n')}`
+                          : t('processOrder');
                         
                         return (
                           <ProtectedButton
@@ -492,7 +494,7 @@ const Orders: React.FC = () => {
                         <ProtectedButton
                           requiredPermission={Permissions.CancelOrder}
                           className="btn btn-sm btn-danger"
-                          title="Cancel Order"
+                          title={t('cancelOrder')}
                           onClick={() => handleCancelOrder(order)}
                         >
                           <XCircle size={16} />
@@ -511,7 +513,11 @@ const Orders: React.FC = () => {
       {pagedData && pagedData.totalPages > 0 && (
         <div className="pagination-container">
           <div className="pagination-info">
-            Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} orders
+            {t('table.paginationInfo', { 
+              start: ((pagedData.page - 1) * pagedData.pageSize) + 1,
+              end: Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount),
+              total: pagedData.totalCount
+            })}
           </div>
           
           <div className="pagination-controls">
@@ -520,7 +526,7 @@ const Orders: React.FC = () => {
               onClick={() => setCurrentPage(1)}
               disabled={!pagedData.hasPreviousPage}
             >
-              First
+              {t('common:buttons.first')}
             </button>
             <button
               className="pagination-btn"
@@ -528,7 +534,7 @@ const Orders: React.FC = () => {
               disabled={!pagedData.hasPreviousPage}
             >
               <ChevronLeft size={16} />
-              Previous
+              {t('common:buttons.previous')}
             </button>
             
             <div className="pagination-pages">
@@ -561,7 +567,7 @@ const Orders: React.FC = () => {
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={!pagedData.hasNextPage}
             >
-              Next
+              {t('common:buttons.next')}
               <ChevronRight size={16} />
             </button>
             <button
@@ -569,12 +575,12 @@ const Orders: React.FC = () => {
               onClick={() => setCurrentPage(pagedData.totalPages)}
               disabled={!pagedData.hasNextPage}
             >
-              Last
+              {t('common:buttons.last')}
             </button>
           </div>
           
           <div className="page-size-selector">
-            <label>Show:</label>
+            <label>{t('table.show', { defaultValue: 'Show:' })}</label>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -587,7 +593,7 @@ const Orders: React.FC = () => {
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span>per page</span>
+            <span>{t('table.perPage', { defaultValue: 'per page' })}</span>
           </div>
         </div>
       )}

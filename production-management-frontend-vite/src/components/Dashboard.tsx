@@ -250,13 +250,6 @@ const Dashboard: React.FC = () => {
                 Create User
               </button>
             )}
-            <button 
-              onClick={handleDebugClaims} 
-              className="btn btn-secondary"
-            >
-              <Bug size={16} />
-              Debug Claims
-            </button>
             <button onClick={handleLogout} className="btn btn-danger">
               <LogOut size={16} />
               Logout

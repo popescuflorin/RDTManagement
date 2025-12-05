@@ -1,0 +1,22 @@
+{
+  "title": "Acquisitions",
+  "createAcquisition": "Create New Acquisition",
+  "editAcquisition": "Edit Acquisition",
+  "viewAcquisition": "View Acquisition",
+  "receiveAcquisition": "Receive Acquisition",
+  "processAcquisition": "Process Acquisition",
+  "acquisitionDetails": "Acquisition Details",
+  "type": {
+    "rawMaterials": "Raw Materials",
+    "recyclableMaterials": "Recyclable Materials"
+  },
+  "status": {
+    "draft": "Draft",
+    "pending": "Pending",
+    "readyForProcessing": "Ready for Processing",
+    "processing": "Processing",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  }
+}
+

@@ -12,7 +12,9 @@ import {
   ChevronLeft, 
   ChevronRight 
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { usePermissions, Permissions } from '../hooks/usePermissions';
+import LanguageSwitcher from './LanguageSwitcher';
 import './Sidebar.css';
 
 interface SidebarProps {
@@ -38,59 +40,60 @@ const Sidebar: React.FC<SidebarProps> = ({
   userRole
 }) => {
   const { hasPermission } = usePermissions();
+  const { t } = useTranslation('navigation');
 
   const menuItems: MenuItem[] = [
     {
       id: 'dashboard',
-      label: 'Dashboard',
+      label: t('menu.dashboard'),
       icon: BarChart3
       // Dashboard is accessible to everyone
     },
     {
       id: 'users',
-      label: 'User Management',
+      label: t('menu.users'),
       icon: Users,
       requiredPermission: Permissions.ViewUsersTab
     },
     {
       id: 'acquisitions',
-      label: 'Acquisitions',
+      label: t('menu.acquisitions'),
       icon: ShoppingCart,
       requiredPermission: Permissions.ViewAcquisitionsTab
     },
     {
       id: 'inventory',
-      label: 'Inventory',
+      label: t('menu.inventory'),
       icon: Package,
       requiredPermission: Permissions.ViewInventoryTab
     },
     {
       id: 'production',
-      label: 'Production',
+      label: t('menu.production'),
       icon: Factory,
       requiredPermission: Permissions.ViewProductionTab
     },
     {
       id: 'orders',
-      label: 'Orders',
+      label: t('menu.orders'),
       icon: ClipboardList,
       requiredPermission: Permissions.ViewOrdersTab
     },
     {
       id: 'transports',
-      label: 'Transports',
+      label: t('menu.transports'),
       icon: Truck,
       requiredPermission: Permissions.ViewTransportsTab
     },
     {
       id: 'clients',
-      label: 'Clients',
+      label: t('menu.clients'),
       icon: UserCircle,
       requiredPermission: Permissions.ViewClientsTab
     },
     {
       id: 'suppliers',
-      label: 'Suppliers',
+      label: t('menu.suppliers'),
       icon: Building2,
       requiredPermission: Permissions.ViewSuppliersTab
     }
@@ -140,6 +143,7 @@ const Sidebar: React.FC<SidebarProps> = ({
 
       {!isCollapsed && (
         <div className="sidebar-footer">
+          <LanguageSwitcher />
           <div className="sidebar-user-info">
             <span className="user-role-badge">{userRole}</span>
           </div>

@@ -1,0 +1,12 @@
+{
+  "title": "Welcome Back",
+  "subtitle": "Sign in to your account",
+  "username": "Username",
+  "password": "Password",
+  "usernamePlaceholder": "Enter your username",
+  "passwordPlaceholder": "Enter your password",
+  "loginButton": "Sign In",
+  "loggingIn": "Signing in...",
+  "loginFailed": "Login failed. Please try again."
+}
+

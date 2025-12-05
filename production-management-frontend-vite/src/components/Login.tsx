@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { authApi } from '../services/api';
 import type { LoginRequest } from '../types.js';
+import LanguageSwitcher from './LanguageSwitcher';
 import './Login.css';
 
 const Login: React.FC = () => {
+  const { t } = useTranslation('login');
   const [formData, setFormData] = useState<LoginRequest>({
     username: '',
     password: ''
@@ -38,7 +41,7 @@ const Login: React.FC = () => {
       // Redirect to dashboard
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      setError(err.response?.data?.message || t('loginFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -46,10 +49,13 @@ const Login: React.FC = () => {
 
   return (
     <div className="login-container">
+      <div className="login-language-switcher">
+        <LanguageSwitcher />
+      </div>
       <div className="login-card">
         <div className="login-header">
-          <h1>Welcome Back</h1>
-          <p>Sign in to your account</p>
+          <h1>{t('title')}</h1>
+          <p>{t('subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit} className="login-form">
@@ -60,7 +66,7 @@ const Login: React.FC = () => {
           )}
 
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">{t('username')}</label>
             <input
               type="text"
               id="username"
@@ -68,12 +74,12 @@ const Login: React.FC = () => {
               value={formData.username}
               onChange={handleChange}
               required
-              placeholder="Enter your username"
+              placeholder={t('usernamePlaceholder')}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t('password')}</label>
             <input
               type="password"
               id="password"
@@ -81,7 +87,7 @@ const Login: React.FC = () => {
               value={formData.password}
               onChange={handleChange}
               required
-              placeholder="Enter your password"
+              placeholder={t('passwordPlaceholder')}
             />
           </div>
 
@@ -91,7 +97,7 @@ const Login: React.FC = () => {
               className="btn btn-primary btn-lg"
               disabled={isLoading}
             >
-              {isLoading ? 'Signing In...' : 'Sign In'}
+              {isLoading ? t('loggingIn') : t('loginButton')}
             </button>
           </div>
         </form>

@@ -1,0 +1,22 @@
+{
+  "title": "Achiziții",
+  "createAcquisition": "Creează achiziție nouă",
+  "editAcquisition": "Editează achiziție",
+  "viewAcquisition": "Vizualizează achiziție",
+  "receiveAcquisition": "Primește achiziție",
+  "processAcquisition": "Procesează achiziție",
+  "acquisitionDetails": "Detalii achiziție",
+  "type": {
+    "rawMaterials": "Materii prime",
+    "recyclableMaterials": "Materiale reciclabile"
+  },
+  "status": {
+    "draft": "Ciornă",
+    "pending": "În așteptare",
+    "readyForProcessing": "Gata pentru procesare",
+    "processing": "În procesare",
+    "completed": "Finalizat",
+    "cancelled": "Anulat"
+  }
+}
+

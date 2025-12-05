@@ -1,0 +1,12 @@
+{
+  "title": "Bun venit înapoi",
+  "subtitle": "Conectează-te la contul tău",
+  "username": "Nume utilizator",
+  "password": "Parolă",
+  "usernamePlaceholder": "Introdu numele de utilizator",
+  "passwordPlaceholder": "Introdu parola",
+  "loginButton": "Conectează-te",
+  "loggingIn": "Se conectează...",
+  "loginFailed": "Conectarea a eșuat. Vă rugăm să încercați din nou."
+}
+

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { orderApi, inventoryApi, transportApi, clientApi, userApi } from '../../services/api';
 import type { RawMaterial, CreateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest, User } from '../../types';
 import { MaterialType } from '../../types';
@@ -25,6 +26,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
   onClose,
   onOrderCreated
 }) => {
+  const { t } = useTranslation(['orders', 'common']);
   const [finishedProducts, setFinishedProducts] = useState<RawMaterial[]>([]);
   const [transports, setTransports] = useState<Transport[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
@@ -122,7 +124,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
         setSelectedAssignedUserId(userData.id);
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load data');
+      setError(err.response?.data?.message || t('common:messages.error', { defaultValue: 'Failed to load data' }));
     }
   };
 
@@ -135,19 +137,19 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
 
   const handleAddItem = () => {
     if (newItem.rawMaterialId === 0 || newItem.quantity <= 0) {
-      setError('Please select a material and enter a valid quantity');
+      setError(t('messages.selectMaterial'));
       return;
     }
 
     const material = finishedProducts.find(m => m.id === newItem.rawMaterialId);
     if (!material) {
-      setError('Material not found');
+      setError(t('messages.materialNotFound'));
       return;
     }
 
     // Check if material is already added
     if (items.some(item => item.rawMaterialId === newItem.rawMaterialId)) {
-      setError('Material already added to order');
+      setError(t('messages.materialExists'));
       return;
     }
 
@@ -245,7 +247,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
 
   const handleCreateClient = async () => {
     if (!newClientData.name?.trim()) {
-      setError('Client name is required');
+      setError(t('messages.clientNameRequired', { defaultValue: 'Client name is required' }));
       return;
     }
 
@@ -282,7 +284,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
         notes: ''
       });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create client');
+      setError(err.response?.data?.message || t('messages.failedToCreateClient', { defaultValue: 'Failed to create client' }));
     }
   };
 
@@ -315,12 +317,12 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
 
   const handleCreateNewTransport = async () => {
     if (!newTransportData.carName.trim()) {
-      setError('Transport car name is required');
+      setError(t('messages.transportCarNameRequired', { defaultValue: 'Transport car name is required' }));
       return;
     }
 
     if (!newTransportData.phoneNumber.trim()) {
-      setError('Transport phone number is required');
+      setError(t('messages.transportPhoneRequired', { defaultValue: 'Transport phone number is required' }));
       return;
     }
 
@@ -340,7 +342,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
       setShowTransportDropdown(false);
       setError(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create transport');
+      setError(err.response?.data?.message || t('messages.failedToCreateTransport', { defaultValue: 'Failed to create transport' }));
     } finally {
       setIsLoading(false);
     }
@@ -354,12 +356,12 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
     e.preventDefault();
 
     if (!selectedClientId) {
-      setError('Please select or create a client');
+      setError(t('messages.selectClient'));
       return;
     }
 
     if (items.length === 0) {
-      setError('At least one item is required');
+      setError(t('messages.addItems'));
       return;
     }
 
@@ -368,7 +370,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
       setError(null);
 
       if (!selectedClientId) {
-        setError('Please select a client');
+        setError(t('messages.selectClient'));
         return;
       }
 
@@ -379,7 +381,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
         const response = await transportApi.createTransport(newTransportData);
         transportId = response.data.id;
       } else if (transportSearchTerm.trim() && !selectedTransportId) {
-        setError('Please select an existing transport or fill in the new transport form');
+        setError(t('messages.selectTransport', { defaultValue: 'Please select an existing transport or fill in the new transport form' }));
         return;
       }
 
@@ -404,7 +406,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
       onClose();
     } catch (err: any) {
       console.error('Error creating order:', err);
-      setError(err.response?.data?.message || 'Failed to create order');
+      setError(err.response?.data?.message || t('messages.orderCreated', { defaultValue: 'Failed to create order' }));
     } finally {
       setIsLoading(false);
     }
@@ -422,7 +424,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
           <div className="header-content">
             <div className="header-title">
               <Package className="header-icon" />
-              <h2>Create New Order</h2>
+              <h2>{t('createOrder')}</h2>
             </div>
             <button className="close-button" onClick={onClose}>
               <X size={20} />
@@ -439,18 +441,18 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
 
           {/* Client Information Section */}
           <div className="form-section">
-            <h3><UserCircle size={20} /> Client</h3>
+            <h3><UserCircle size={20} /> {t('client')}</h3>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="assignedUser">Assigned To</label>
+                <label htmlFor="assignedUser">{t('assignedTo')}</label>
                 <select
                   id="assignedUser"
                   value={selectedAssignedUserId || ''}
                   onChange={(e) => setSelectedAssignedUserId(e.target.value ? parseInt(e.target.value) : null)}
                   disabled={isLoading}
                 >
-                  <option value="">No Assignment</option>
+                  <option value="">{t('common:labels.noAssignment')}</option>
                   {users.map((user) => (
                     <option key={user.id} value={user.id}>
                       {user.firstName} {user.lastName} ({user.username})
@@ -462,31 +464,31 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="client">Client *</label>
+                <label htmlFor="client">{t('client')} *</label>
                 <select
                   id="client"
                   value={selectedClientId || 'none'}
                   onChange={(e) => handleClientChange(e.target.value)}
                   disabled={isLoading}
                 >
-                  <option value="none">No Client</option>
+                  <option value="none">{t('form.noClient', { defaultValue: 'No Client' })}</option>
                   {clients.map((client) => (
                     <option key={client.id} value={client.id}>
                       {client.name}
                     </option>
                   ))}
-                  <option value="new">+ Create New Client</option>
+                  <option value="new">+ {t('form.createNewClient')}</option>
                 </select>
               </div>
               <div className="form-group">
-                <label htmlFor="clientContact">Client Contact</label>
+                <label htmlFor="clientContact">{t('clientContact')}</label>
                 <input
                   type="text"
                   id="clientContact"
                   value={clientContact}
                   onChange={(e) => setClientContact(e.target.value)}
                   disabled={isLoading}
-                  placeholder="Contact information"
+                  placeholder={t('form.clientContactPlaceholder', { defaultValue: 'Contact information' })}
                 />
               </div>
             </div>
@@ -494,106 +496,106 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
             {/* Create New Client Form */}
             {showCreateClient && (
               <div className="supplier-creation-form">
-                <h4>Create New Client</h4>
+                <h4>{t('form.createNewClient')}</h4>
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="clientName">Client Name *</label>
+                    <label htmlFor="clientName">{t('form.clientName')} *</label>
                     <input
                       type="text"
                       id="clientName"
                       value={newClientData.name || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, name: e.target.value })}
-                      placeholder="Enter client name"
+                      placeholder={t('form.clientNamePlaceholder', { defaultValue: 'Enter client name' })}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="clientContactPerson">Contact Person</label>
+                    <label htmlFor="clientContactPerson">{t('form.contactPerson')}</label>
                     <input
                       type="text"
                       id="clientContactPerson"
                       value={newClientData.contactPerson || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, contactPerson: e.target.value })}
-                      placeholder="Contact person name"
+                      placeholder={t('form.contactPersonPlaceholder', { defaultValue: 'Contact person name' })}
                     />
                   </div>
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="clientPhone">Phone</label>
+                    <label htmlFor="clientPhone">{t('common:labels.phone')}</label>
                     <input
                       type="text"
                       id="clientPhone"
                       value={newClientData.phone || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, phone: e.target.value })}
-                      placeholder="Phone number"
+                      placeholder={t('common:labels.phone', { defaultValue: 'Phone number' })}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="clientEmail">Email</label>
+                    <label htmlFor="clientEmail">{t('common:labels.email')}</label>
                     <input
                       type="email"
                       id="clientEmail"
                       value={newClientData.email || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, email: e.target.value })}
-                      placeholder="Email address"
+                      placeholder={t('common:labels.email', { defaultValue: 'Email address' })}
                     />
                   </div>
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="clientAddress">Address</label>
+                    <label htmlFor="clientAddress">{t('common:labels.address')}</label>
                     <input
                       type="text"
                       id="clientAddress"
                       value={newClientData.address || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, address: e.target.value })}
-                      placeholder="Street address"
+                      placeholder={t('common:labels.address', { defaultValue: 'Street address' })}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="clientCity">City</label>
+                    <label htmlFor="clientCity">{t('common:labels.city')}</label>
                     <input
                       type="text"
                       id="clientCity"
                       value={newClientData.city || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, city: e.target.value })}
-                      placeholder="City"
+                      placeholder={t('common:labels.city', { defaultValue: 'City' })}
                     />
                   </div>
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="clientPostalCode">Postal Code</label>
+                    <label htmlFor="clientPostalCode">{t('common:labels.postalCode')}</label>
                     <input
                       type="text"
                       id="clientPostalCode"
                       value={newClientData.postalCode || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, postalCode: e.target.value })}
-                      placeholder="Postal code"
+                      placeholder={t('common:labels.postalCode', { defaultValue: 'Postal code' })}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="clientCountry">Country</label>
+                    <label htmlFor="clientCountry">{t('common:labels.country')}</label>
                     <input
                       type="text"
                       id="clientCountry"
                       value={newClientData.country || ''}
                       onChange={(e) => setNewClientData({ ...newClientData, country: e.target.value })}
-                      placeholder="Country"
+                      placeholder={t('common:labels.country', { defaultValue: 'Country' })}
                     />
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="clientNotes">Notes</label>
+                  <label htmlFor="clientNotes">{t('common:labels.notes')}</label>
                   <textarea
                     id="clientNotes"
                     value={newClientData.notes || ''}
                     onChange={(e) => setNewClientData({ ...newClientData, notes: e.target.value })}
-                    placeholder="Additional notes"
+                    placeholder={t('common:labels.notes', { defaultValue: 'Additional notes' })}
                     rows={2}
                   />
                 </div>
@@ -605,14 +607,14 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                     onClick={handleCreateClient}
                   >
                     <UserCircle size={16} />
-                    Create Client
+                    {t('form.createClient', { defaultValue: 'Create Client' })}
                   </button>
                   <button
                     type="button"
                     className="cancel-button"
                     onClick={() => setShowCreateClient(false)}
                   >
-                    Cancel
+                    {t('common:buttons.cancel')}
                   </button>
                 </div>
               </div>
@@ -623,12 +625,12 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
           <div className="form-section">
             <div className="section-header">
               <Truck className="section-icon" />
-              <h3>Transport Details</h3>
+              <h3>{t('form.transportDetails')}</h3>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="transportCarName">Car Name</label>
+                <label htmlFor="transportCarName">{t('form.carName')}</label>
                 <div className="transport-search-container">
                   <div className="search-input-wrapper">
                     <input
@@ -638,7 +640,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                       onChange={handleTransportSearchChange}
                       onFocus={() => setShowTransportDropdown(true)}
                       disabled={isLoading}
-                      placeholder="Search or enter car/vehicle name"
+                      placeholder={t('transport.searchPlaceholder')}
                     />
                     {showTransportDropdown && (
                       <div className="dropdown-menu">
@@ -655,12 +657,12 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                           ))
                         ) : transportSearchTerm ? (
                           <div className="dropdown-item">
-                            <div className="dropdown-item-name">Create new transport: {transportSearchTerm}</div>
-                            <div className="dropdown-item-detail">Enter phone number and submit to create</div>
+                            <div className="dropdown-item-name">{t('transport.createNew')}: {transportSearchTerm}</div>
+                            <div className="dropdown-item-detail">{t('transport.enterPhoneNumber')}</div>
                           </div>
                         ) : (
                           <div className="dropdown-item">
-                            <div className="dropdown-item-name">Start typing to search or create a new transport</div>
+                            <div className="dropdown-item-name">{t('transport.startTyping')}</div>
                           </div>
                         )}
                       </div>
@@ -669,31 +671,31 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                 </div>
               </div>
               <div className="form-group">
-                <label htmlFor="transportNumberPlate">Number Plate</label>
+                <label htmlFor="transportNumberPlate">{t('form.numberPlate')}</label>
                 <input
                   type="text"
                   id="transportNumberPlate"
                   value={transportNumberPlate}
                   onChange={(e) => setTransportNumberPlate(e.target.value)}
                   disabled={isLoading}
-                  placeholder="Enter number plate (optional)"
+                  placeholder={t('transport.numberPlatePlaceholder')}
                 />
               </div>
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="transportPhoneNumber">Phone Number</label>
+                <label htmlFor="transportPhoneNumber">{t('form.phoneNumber')}</label>
                 <input
                   type="tel"
                   id="transportPhoneNumber"
                   value={transportPhoneNumber}
                   onChange={(e) => setTransportPhoneNumber(e.target.value)}
                   disabled={isLoading}
-                  placeholder="Enter phone number"
+                  placeholder={t('transport.phoneNumberPlaceholder')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="transportDate">Transport Date</label>
+                <label htmlFor="transportDate">{t('form.transportDate')}</label>
                 <input
                   type="date"
                   id="transportDate"
@@ -703,14 +705,14 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="transportNotes">Transport Notes</label>
+                <label htmlFor="transportNotes">{t('form.transportNotes')}</label>
                 <input
                   type="text"
                   id="transportNotes"
                   value={transportNotes}
                   onChange={(e) => setTransportNotes(e.target.value)}
                   disabled={isLoading}
-                  placeholder="Additional transport notes"
+                  placeholder={t('transport.transportNotesPlaceholder')}
                 />
               </div>
             </div>
@@ -731,7 +733,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                   disabled={isLoading}
                 >
                   <Plus size={16} />
-                  Create New Transport "{transportSearchTerm.trim()}"
+                  {t('form.createNewTransport')} "{transportSearchTerm.trim()}"
                 </button>
               </div>
             )}
@@ -740,38 +742,38 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
               <div className="add-item-form" style={{ marginTop: 'var(--space-lg)' }}>
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="newTransportCarName">Car Name *</label>
+                    <label htmlFor="newTransportCarName">{t('form.carName')} *</label>
                     <input
                       type="text"
                       id="newTransportCarName"
                       value={newTransportData.carName}
                       onChange={(e) => setNewTransportData({ ...newTransportData, carName: e.target.value })}
                       disabled={isLoading}
-                      placeholder="Enter car name"
+                      placeholder={t('transport.carNamePlaceholder')}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="newTransportNumberPlate">Number Plate</label>
+                    <label htmlFor="newTransportNumberPlate">{t('form.numberPlate')}</label>
                     <input
                       type="text"
                       id="newTransportNumberPlate"
                       value={newTransportData.numberPlate || ''}
                       onChange={(e) => setNewTransportData({ ...newTransportData, numberPlate: e.target.value })}
                       disabled={isLoading}
-                      placeholder="Enter number plate (optional)"
+                      placeholder={t('transport.numberPlatePlaceholder')}
                     />
                   </div>
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="newTransportPhoneNumber">Phone Number *</label>
+                    <label htmlFor="newTransportPhoneNumber">{t('form.phoneNumber')} *</label>
                     <input
                       type="text"
                       id="newTransportPhoneNumber"
                       value={newTransportData.phoneNumber}
                       onChange={(e) => setNewTransportData({ ...newTransportData, phoneNumber: e.target.value })}
                       disabled={isLoading}
-                      placeholder="Enter phone number"
+                      placeholder={t('transport.phoneNumberPlaceholder')}
                     />
                   </div>
                 </div>
@@ -785,7 +787,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                       disabled={isLoading || !newTransportData.carName.trim() || !newTransportData.phoneNumber.trim()}
                     >
                       <Plus size={16} />
-                      Create Transport
+                      {t('form.createNewTransport')}
                     </button>
                     <button
                       type="button"
@@ -799,7 +801,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                       }}
                       disabled={isLoading}
                     >
-                      Cancel
+                      {t('common:buttons.cancel')}
                     </button>
                   </div>
                 </div>
@@ -811,12 +813,12 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
           <div className="form-section">
             <div className="section-header">
               <Package className="section-icon" />
-              <h3>Order Details</h3>
+              <h3>{t('form.orderDetails')}</h3>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="orderDate">Order Date *</label>
+                <label htmlFor="orderDate">{t('orderDate')} *</label>
                 <input
                   type="date"
                   id="orderDate"
@@ -827,7 +829,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="expectedDeliveryDate">Expected Delivery Date</label>
+                <label htmlFor="expectedDeliveryDate">{t('expectedDeliveryDate')}</label>
                 <input
                   type="date"
                   id="expectedDeliveryDate"
@@ -839,26 +841,26 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="description">Description</label>
+              <label htmlFor="description">{t('common:labels.description')}</label>
               <textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 rows={2}
                 disabled={isLoading}
-                placeholder="Order description..."
+                placeholder={t('form.descriptionPlaceholder', { defaultValue: 'Order description...' })}
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="notes">Notes</label>
+              <label htmlFor="notes">{t('common:labels.notes')}</label>
               <textarea
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={2}
                 disabled={isLoading}
-                placeholder="Additional notes..."
+                placeholder={t('common:labels.notes', { defaultValue: 'Additional notes...' })}
               />
             </div>
           </div>
@@ -867,7 +869,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
           <div className="form-section">
             <div className="section-header">
               <Package className="section-icon" />
-              <h3>Order Items (Finished Products)</h3>
+              <h3>{t('form.orderItems')}</h3>
             </div>
 
             {!showAddItemForm ? (
@@ -878,12 +880,12 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                 disabled={isLoading}
               >
                 <Plus size={16} />
-                Add Finished Product
+                {t('form.addProduct')}
               </button>
             ) : (
               <div className="add-item-form">
                 <div className="form-group">
-                  <label htmlFor="materialSearch">Select Finished Product</label>
+                  <label htmlFor="materialSearch">{t('form.selectProduct')}</label>
                   <div className="search-input-wrapper">
                     <input
                       type="text"
@@ -892,7 +894,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                       onChange={handleMaterialSearchChange}
                       onFocus={() => setShowMaterialDropdown(true)}
                       disabled={isLoading}
-                      placeholder="Search finished products..."
+                      placeholder={t('form.searchFinishedProducts')}
                     />
                     {showMaterialDropdown && filteredMaterials.length > 0 && (
                       <div className="dropdown-menu">
@@ -906,7 +908,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                               {material.name} ({material.color})
                             </div>
                             <div className="dropdown-item-detail">
-                              Available: {material.quantity} {material.quantityType}
+                              {t('form.available')}: {material.quantity} {material.quantityType}
                             </div>
                           </div>
                         ))}
@@ -917,7 +919,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="itemQuantity">Quantity *</label>
+                    <label htmlFor="itemQuantity">{t('form.itemQuantity')} *</label>
                     <input
                       type="number"
                       id="itemQuantity"
@@ -938,7 +940,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                       disabled={isLoading}
                     >
                       <Plus size={16} />
-                      Add
+                      {t('common:buttons.add')}
                     </button>
                     <button
                       type="button"
@@ -951,7 +953,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                       disabled={isLoading}
                       style={{ marginLeft: '8px' }}
                     >
-                      Cancel
+                      {t('common:buttons.cancel')}
                     </button>
                   </div>
                 </div>
@@ -963,12 +965,12 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                 <table>
                   <thead>
                     <tr>
-                      <th>Product</th>
-                      <th>Color</th>
-                      <th>Quantity</th>
-                      <th>Unit Price</th>
-                      <th>Total Price</th>
-                      <th>Actions</th>
+                      <th>{t('form.product')}</th>
+                      <th>{t('form.color')}</th>
+                      <th>{t('form.itemQuantity')}</th>
+                      <th>{t('form.unitPrice')}</th>
+                      <th>{t('form.totalPrice')}</th>
+                      <th>{t('common:labels.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -1007,7 +1009,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                   <tfoot>
                     <tr>
                       <td colSpan={4} style={{ textAlign: 'right', fontWeight: 600 }}>
-                        Total Value:
+                        {t('form.totalValue')}:
                       </td>
                       <td style={{ fontWeight: 700, color: 'var(--primary-600)' }}>
                         ${totalValue.toFixed(2)}
@@ -1027,14 +1029,14 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
               className="btn btn-secondary"
               disabled={isLoading}
             >
-              Cancel
+              {t('common:buttons.cancel')}
             </button>
             <button
               type="submit"
               className="btn btn-primary"
               disabled={isLoading || items.length === 0}
             >
-              {isLoading ? 'Creating...' : 'Create Order'}
+              {isLoading ? t('form.creating') : t('form.createOrder')}
             </button>
           </div>
         </form>
