@@ -42,7 +42,8 @@
     "updatedAt": "Actualizat la",
     "createdBy": "Creat de",
     "assignedTo": "Atribuit la",
-    "noAssignment": "Fără atribuire"
+    "noAssignment": "Fără atribuire",
+    "available": "disponibil"
   },
   "messages": {
     "loading": "Se încarcă...",

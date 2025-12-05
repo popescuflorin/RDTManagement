@@ -1,7 +1,163 @@
 {
   "title": "Clienți",
-  "createClient": "Creează client nou",
-  "editClient": "Editează client",
-  "viewClient": "Vizualizează client"
+  "clients": {
+    "title": "Clienți",
+    "buttons": {
+      "createNewClient": "Creează Client Nou"
+    },
+    "search": {
+      "placeholder": "Caută după nume, contact, email, telefon, oraș sau țară..."
+    },
+    "filters": {
+      "showInactive": "Afișează Inactivi"
+    },
+    "table": {
+      "id": "ID",
+      "name": "Nume",
+      "contact": "Contact",
+      "location": "Locație",
+      "totalOrders": "Total Comenzi",
+      "totalValue": "Valoare Totală",
+      "status": "Status",
+      "createdAt": "Creat La",
+      "actions": "Acțiuni"
+    },
+    "status": {
+      "active": "Activ",
+      "inactive": "Inactiv"
+    },
+    "tooltips": {
+      "viewClient": "Vezi Client",
+      "editClient": "Editează Client",
+      "deactivateClient": "Dezactivează Client"
+    },
+    "empty": {
+      "noClientsFound": "Nu s-au găsit clienți care să corespundă criteriilor",
+      "noClientsCreateFirst": "Nu s-au găsit clienți. Creează primul client!"
+    },
+    "loading": {
+      "loadingClients": "Se încarcă clienții..."
+    },
+    "pagination": {
+      "showing": "Se afișează {{start}} până la {{end}} din {{total}} clienți",
+      "first": "Primul",
+      "previous": "Anterior",
+      "next": "Următor",
+      "last": "Ultimul",
+      "show": "Afișează:",
+      "perPage": "pe pagină"
+    },
+    "summary": {
+      "totalClients": "Total Clienți:",
+      "active": "Activi:",
+      "inactive": "Inactivi:",
+      "of": "din"
+    },
+    "messages": {
+      "failedToLoadClients": "Eșec la încărcarea clienților",
+      "failedToDeactivateClient": "Eșec la dezactivarea clientului",
+      "confirmDeactivate": "Ești sigur că vrei să dezactivezi clientul \"{{name}}\"?",
+      "notSet": "—"
+    }
+  },
+  "createClient": {
+    "title": "Creează Client Nou",
+    "fields": {
+      "clientName": "Nume Client",
+      "contactPerson": "Persoană Contact",
+      "email": "Email",
+      "phone": "Telefon",
+      "address": "Adresă",
+      "city": "Oraș",
+      "postalCode": "Cod Poștal",
+      "country": "Țară",
+      "notes": "Notițe"
+    },
+    "placeholders": {
+      "clientName": "Introdu nume client",
+      "contactPerson": "Introdu nume persoană contact",
+      "email": "Introdu adresă email",
+      "phone": "Introdu număr telefon",
+      "address": "Introdu adresă stradă",
+      "city": "Introdu oraș",
+      "postalCode": "Introdu cod poștal",
+      "country": "Introdu țară",
+      "notes": "Notițe opționale despre client..."
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "createClient": "Creează Client",
+      "creating": "Se creează..."
+    },
+    "messages": {
+      "clientNameRequired": "Numele clientului este obligatoriu",
+      "failedToCreate": "Eșec la crearea clientului"
+    }
+  },
+  "editClient": {
+    "title": "Editează Client",
+    "fields": {
+      "clientName": "Nume Client",
+      "contactPerson": "Persoană Contact",
+      "email": "Email",
+      "phone": "Telefon",
+      "address": "Adresă",
+      "city": "Oraș",
+      "postalCode": "Cod Poștal",
+      "country": "Țară",
+      "notes": "Notițe",
+      "active": "Activ"
+    },
+    "placeholders": {
+      "clientName": "Introdu nume client",
+      "contactPerson": "Introdu nume persoană contact",
+      "email": "Introdu adresă email",
+      "phone": "Introdu număr telefon",
+      "address": "Introdu adresă stradă",
+      "city": "Introdu oraș",
+      "postalCode": "Introdu cod poștal",
+      "country": "Introdu țară",
+      "notes": "Notițe opționale despre client..."
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "updateClient": "Actualizează Client",
+      "updating": "Se actualizează..."
+    },
+    "messages": {
+      "clientNameRequired": "Numele clientului este obligatoriu",
+      "failedToUpdate": "Eșec la actualizarea clientului"
+    }
+  },
+  "viewClient": {
+    "title": "Detalii Client",
+    "sections": {
+      "basicInformation": "Informații de Bază",
+      "contactInformation": "Informații Contact",
+      "address": "Adresă",
+      "statistics": "Statistici",
+      "notes": "Notițe",
+      "metadata": "Metadate"
+    },
+    "fields": {
+      "name": "Nume",
+      "contactPerson": "Persoană Contact",
+      "status": "Status",
+      "email": "Email",
+      "phone": "Telefon",
+      "streetAddress": "Adresă Stradă",
+      "city": "Oraș",
+      "postalCode": "Cod Poștal",
+      "country": "Țară",
+      "totalOrders": "Total Comenzi",
+      "totalOrderValue": "Valoare Totală Comenzi",
+      "lastOrderDate": "Dată Ultimă Comandă",
+      "createdBy": "Creat De",
+      "createdAt": "Creat La",
+      "updatedAt": "Actualizat La"
+    },
+    "buttons": {
+      "close": "Închide"
+    }
+  }
 }
-

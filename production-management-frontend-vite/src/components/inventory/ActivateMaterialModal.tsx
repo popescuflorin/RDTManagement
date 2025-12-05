@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { inventoryApi } from '../../services/api';
 import type { RawMaterial } from '../../types';
 import { MaterialType } from '../../types';
@@ -15,6 +16,7 @@ const ActivateMaterialModal: React.FC<ActivateMaterialModalProps> = ({
   onClose, 
   onMaterialActivated 
 }) => {
+  const { t } = useTranslation(['inventory', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +34,7 @@ const ActivateMaterialModal: React.FC<ActivateMaterialModalProps> = ({
       onClose();
     } catch (error: any) {
       console.error('Error activating material:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to activate material. Please try again.';
+      const errorMessage = error.response?.data?.message || t('activate.messages.failedToActivate');
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -51,7 +53,7 @@ const ActivateMaterialModal: React.FC<ActivateMaterialModalProps> = ({
     <div className="activate-material-overlay">
       <div className="activate-material-modal">
         <div className="activate-material-header">
-          <h2>✅ Activate Material</h2>
+          <h2>✅ {t('activate.title')}</h2>
           <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
         </div>
 
@@ -63,37 +65,40 @@ const ActivateMaterialModal: React.FC<ActivateMaterialModalProps> = ({
           )}
 
           <p className="confirmation-text">
-            Are you sure you want to activate this material? The material will be marked as active 
-            and will appear in active inventory lists.
+            {t('activate.confirmationText')}
           </p>
 
           <div className="material-summary">
-            <h3>Material Details:</h3>
+            <h3>{t('activate.materialDetails')}</h3>
             <div className="summary-details">
               <div className="summary-item">
-                <span className="label">Name:</span>
+                <span className="label">{t('activate.labels.name')}</span>
                 <span className="value">{material.name} ({material.color})</span>
               </div>
               <div className="summary-item">
-                <span className="label">Type:</span>
+                <span className="label">{t('activate.labels.type')}</span>
                 <span className="value">
-                  {material.type === MaterialType.RawMaterial ? 'Raw Material' : 'Recyclable Material'}
+                  {material.type === MaterialType.RawMaterial 
+                    ? t('filters.rawMaterials')
+                    : material.type === MaterialType.RecyclableMaterial
+                    ? t('filters.recyclableMaterials')
+                    : t('filters.finishedProducts')}
                 </span>
               </div>
               <div className="summary-item">
-                <span className="label">Current Stock:</span>
+                <span className="label">{t('activate.labels.currentStock')}</span>
                 <span className="value">
                   {material.quantity.toLocaleString()} {material.quantityType}
                 </span>
               </div>
               <div className="summary-item">
-                <span className="label">Minimum Stock:</span>
+                <span className="label">{t('activate.labels.minimumStock')}</span>
                 <span className="value">
                   {material.minimumStock.toLocaleString()} {material.quantityType}
                 </span>
               </div>
               <div className="summary-item">
-                <span className="label">Last Updated:</span>
+                <span className="label">{t('activate.labels.lastUpdated')}</span>
                 <span className="value">{formatDate(material.updatedAt)}</span>
               </div>
             </div>
@@ -101,7 +106,7 @@ const ActivateMaterialModal: React.FC<ActivateMaterialModalProps> = ({
 
           {material.description && (
             <div className="material-description-section">
-              <strong>Description:</strong>
+              <strong>{t('activate.labels.description')}</strong>
               <p>{material.description}</p>
             </div>
           )}
@@ -109,8 +114,7 @@ const ActivateMaterialModal: React.FC<ActivateMaterialModalProps> = ({
           <div className="info-section">
             <div className="info-icon">ℹ️</div>
             <div className="info-text">
-              <strong>Note:</strong> Once activated, this material will be available for use in production 
-              and will appear in all active inventory lists.
+              <strong>{t('common:labels.notes', { defaultValue: 'Note' })}:</strong> {t('activate.note')}
             </div>
           </div>
         </div>
@@ -122,7 +126,7 @@ const ActivateMaterialModal: React.FC<ActivateMaterialModalProps> = ({
             className="btn btn-secondary"
             disabled={isLoading}
           >
-            Cancel
+            {t('activate.buttons.cancel')}
           </button>
           <button
             type="button"
@@ -130,7 +134,7 @@ const ActivateMaterialModal: React.FC<ActivateMaterialModalProps> = ({
             className="btn btn-success"
             disabled={isLoading}
           >
-            {isLoading ? 'Activating...' : 'Activate Material'}
+            {isLoading ? t('activate.buttons.activating') : t('activate.buttons.activateMaterial')}
           </button>
         </div>
       </div>

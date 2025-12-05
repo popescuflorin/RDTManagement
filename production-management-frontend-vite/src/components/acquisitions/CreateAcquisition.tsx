@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { acquisitionApi, inventoryApi, supplierApi, transportApi, userApi } from '../../services/api';
 import type { RawMaterial, CreateAcquisitionRequest, Supplier, CreateSupplierRequest, Transport, CreateTransportRequest, User } from '../../types';
 import { AcquisitionType, MaterialType } from '../../types';
@@ -27,6 +28,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
   onClose,
   onSuccess
 }) => {
+  const { t } = useTranslation(['acquisitions', 'common']);
   const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>([]);
   const [suppliers, setSuppliers] = useState<Supplier[]>([]);
   const [transports, setTransports] = useState<Transport[]>([]);
@@ -144,7 +146,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
       const response = await inventoryApi.getAllMaterials();
       setRawMaterials(response.data);
     } catch (err: any) {
-      setError('Failed to load raw materials');
+      setError(t('form.messages.failedToLoadMaterials'));
     }
   };
 
@@ -153,7 +155,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
       const response = await supplierApi.getAllSuppliers();
       setSuppliers(response.data);
     } catch (err: any) {
-      setError('Failed to load suppliers');
+      setError(t('form.messages.failedToLoadSuppliers'));
     }
   };
 
@@ -162,7 +164,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
       const response = await transportApi.getAllTransports();
       setTransports(response.data);
     } catch (err: any) {
-      setError('Failed to load transports');
+      setError(t('form.messages.failedToLoadTransports'));
     }
   };
 
@@ -178,7 +180,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
         setSelectedAssignedUserId(userData.id);
       }
     } catch (err: any) {
-      setError('Failed to load users');
+      setError(t('form.messages.failedToLoadUsers'));
     }
   };
 
@@ -251,7 +253,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
 
   const handleAddNewMaterial = () => {
     if (!newItem.name || !newItem.color || !newItem.unitOfMeasure || !newItem.quantity || newItem.quantity <= 0) {
-      setMaterialError('Please fill in all required fields for the new material');
+      setMaterialError(t('form.messages.fillRequiredFields'));
       return;
     }
 
@@ -330,7 +332,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
 
   const handleCreateSupplier = async () => {
     if (!newSupplier.name?.trim()) {
-      setError('Supplier name is required');
+      setError(t('form.messages.supplierNameRequired'));
       return;
     }
 
@@ -365,7 +367,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
         country: ''
       });
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create supplier');
+      setError(err.response?.data?.message || t('form.messages.failedToCreateSupplier'));
     }
   };
 
@@ -437,12 +439,12 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
     e.preventDefault();
     
     if (!title.trim()) {
-      setError('Title is required');
+      setError(t('form.messages.titleRequired'));
       return;
     }
 
     if (items.length === 0) {
-      setError('At least one item is required');
+      setError(t('form.messages.atLeastOneItem'));
       return;
     }
 
@@ -495,7 +497,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create acquisition');
+      setError(err.response?.data?.message || t('form.messages.failedToCreateAcquisition'));
     } finally {
       setIsLoading(false);
     }
@@ -517,7 +519,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
     <div className="modal-backdrop" onClick={handleBackdropClick}>
       <div className="modal-content create-acquisition-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Create New Acquisition</h2>
+          <h2>{t('form.createTitle')}</h2>
           <button className="close-button" onClick={handleClose}>
             <X size={24} />
           </button>
@@ -534,35 +536,35 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
 
           {/* Basic Information */}
           <div className="form-section">
-            <h3><FileText size={20} />Information</h3>
+            <h3><FileText size={20} />{t('form.sections.information')}</h3>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="title">Details *</label>
+                <label htmlFor="title">{t('form.fields.details')} *</label>
                 <input
                   type="text"
                   id="title"
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   required
-                  placeholder="Enter acquisition title"
+                  placeholder={t('form.placeholders.enterTitle')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="type">Type</label>
+                <label htmlFor="type">{t('form.fields.type')}</label>
                 <select
                   id="type"
                   value={acquisitionType}
                   onChange={(e) => setAcquisitionType(Number(e.target.value) as AcquisitionType)}
                 >
-                  <option value={AcquisitionType.RawMaterials}>Raw Materials</option>
-                  <option value={AcquisitionType.RecyclableMaterials}>Recyclable Materials</option>
+                  <option value={AcquisitionType.RawMaterials}>{t('type.rawMaterials')}</option>
+                  <option value={AcquisitionType.RecyclableMaterials}>{t('type.recyclableMaterials')}</option>
                 </select>
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="assignedUser"><UserCircle size={16} style={{display: 'inline', marginRight: '4px'}} /> Assigned User</label>
+                <label htmlFor="assignedUser"><UserCircle size={16} style={{display: 'inline', marginRight: '4px'}} /> {t('form.fields.assignedUser')}</label>
                 <select
                   id="assignedUser"
                   value={selectedAssignedUserId || ''}
@@ -578,35 +580,35 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
             </div>
 
             <div className="form-group">
-              <label htmlFor="description">Description</label>
+              <label htmlFor="description">{t('form.fields.description')}</label>
               <textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter acquisition description"
+                placeholder={t('form.placeholders.enterDescription')}
                 rows={3}
               />
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="dueDate">Due Date</label>
+                <label htmlFor="dueDate">{t('form.fields.dueDate')}</label>
                 <input
                   type="date"
                   id="dueDate"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  placeholder="Select due date"
+                  placeholder={t('form.placeholders.selectDueDate')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="notes">Notes</label>
+                <label htmlFor="notes">{t('form.fields.notes')}</label>
                 <input
                   type="text"
                   id="notes"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder="Additional notes"
+                  placeholder={t('form.placeholders.additionalNotes')}
                 />
               </div>
             </div>
@@ -614,10 +616,10 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
 
           {/* Transport Details Section */}
           <div className="form-section">
-            <h3><Truck size={20} /> Transport Details</h3>
+            <h3><Truck size={20} /> {t('form.sections.transportDetails')}</h3>
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="transportCarName">Car Name</label>
+                  <label htmlFor="transportCarName">{t('form.fields.carName')}</label>
                   <div className="material-search-container">
                     <input
                       type="text"
@@ -625,7 +627,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                       value={transportSearchTerm}
                       onChange={(e) => handleTransportSearchChange(e.target.value)}
                       onFocus={handleTransportInputFocus}
-                      placeholder="Search or enter car/vehicle name"
+                      placeholder={t('form.placeholders.searchOrEnterCar')}
                     />
                     {showTransportDropdown && (
                       <div className="material-dropdown">
@@ -646,14 +648,14 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                         ) : transportSearchTerm ? (
                           <div className="material-option material-option-create">
                             <div>
-                              <strong>Create new transport:</strong> {transportSearchTerm}
-                              <small>Enter phone number and submit to create</small>
+                              <strong>{t('form.options.createNewTransport')}</strong> {transportSearchTerm}
+                              <small>{t('form.options.enterPhoneToCreate')}</small>
                             </div>
                           </div>
                         ) : (
                           <div className="material-option">
                             <div>
-                              <small>Start typing to search or create a new transport</small>
+                              <small>{t('form.options.startTypingTransport')}</small>
                             </div>
                           </div>
                         )}
@@ -662,35 +664,35 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                   </div>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="transportNumberPlate">Number Plate</label>
+                  <label htmlFor="transportNumberPlate">{t('form.fields.numberPlate')}</label>
                   <input
                     type="text"
                     id="transportNumberPlate"
                     value={transportNumberPlate}
                     onChange={(e) => setTransportNumberPlate(e.target.value)}
-                    placeholder="Enter number plate (optional)"
+                    placeholder={t('form.placeholders.enterNumberPlate')}
                   />
                 </div>
               </div>
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="transportPhoneNumber">Phone Number</label>
+                  <label htmlFor="transportPhoneNumber">{t('form.fields.phoneNumber')}</label>
                   <input
                     type="tel"
                     id="transportPhoneNumber"
                     value={transportPhoneNumber}
                     onChange={(e) => setTransportPhoneNumber(e.target.value)}
-                    placeholder="Enter phone number"
+                    placeholder={t('form.placeholders.enterPhoneNumber')}
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="transportDate">Transport Date</label>
+                  <label htmlFor="transportDate">{t('form.fields.transportDate')}</label>
                   <input
                     type="date"
                     id="transportDate"
                     value={transportDate}
                     onChange={(e) => setTransportDate(e.target.value)}
-                    placeholder="Select transport date"
+                    placeholder={t('form.placeholders.selectTransportDate')}
                   />
                 </div>
               </div>
@@ -698,32 +700,32 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
 
           {/* Supplier Section */}
           <div className="form-section">
-            <h3><Building2 size={20} /> Supplier</h3>
+            <h3><Building2 size={20} /> {t('form.sections.supplier')}</h3>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="supplier">Supplier</label>
+                <label htmlFor="supplier">{t('form.sections.supplier')}</label>
                 <select
                   id="supplier"
                   value={selectedSupplierId || 'none'}
                   onChange={(e) => handleSupplierChange(e.target.value)}
                 >
-                  <option value="none">No Supplier</option>
+                  <option value="none">{t('form.options.noSupplier')}</option>
                   {suppliers.map((supplier) => (
                     <option key={supplier.id} value={supplier.id}>
                       {supplier.name}
                     </option>
                   ))}
-                  <option value="new">+ Create New Supplier</option>
+                  <option value="new">+ {t('form.options.createNewSupplier')}</option>
                 </select>
               </div>
               <div className="form-group">
-                <label htmlFor="supplierContact">Supplier Contact</label>
+                <label htmlFor="supplierContact">{t('form.fields.supplierContact')}</label>
                 <input
                   type="text"
                   id="supplierContact"
                   value={supplierContact}
                   onChange={(e) => setSupplierContact(e.target.value)}
-                  placeholder="Contact information"
+                  placeholder={t('form.placeholders.contactInformation')}
                 />
               </div>
             </div>
@@ -731,84 +733,84 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
             {/* Create New Supplier Form */}
             {showCreateSupplier && (
               <div className="supplier-creation-form">
-                <h4>Create New Supplier</h4>
+                <h4>{t('form.labels.createNewSupplier')}</h4>
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="supplierName">Supplier Name *</label>
+                    <label htmlFor="supplierName">{t('form.fields.supplierName')} *</label>
                     <input
                       type="text"
                       id="supplierName"
                       value={newSupplier.name || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, name: e.target.value })}
-                      placeholder="Enter supplier name"
+                      placeholder={t('form.placeholders.enterSupplierName')}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="supplierContactPerson">Contact Person</label>
+                    <label htmlFor="supplierContactPerson">{t('form.fields.contactPerson')}</label>
                     <input
                       type="text"
                       id="supplierContactPerson"
                       value={newSupplier.contactPerson || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, contactPerson: e.target.value })}
-                      placeholder="Contact person name"
+                      placeholder={t('form.placeholders.contactPersonName')}
                     />
                   </div>
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="supplierPhone">Phone</label>
+                    <label htmlFor="supplierPhone">{t('form.fields.phone')}</label>
                     <input
                       type="text"
                       id="supplierPhone"
                       value={newSupplier.phone || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, phone: e.target.value })}
-                      placeholder="Phone number"
+                      placeholder={t('form.placeholders.phoneNumber')}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="supplierEmail">Email</label>
+                    <label htmlFor="supplierEmail">{t('form.fields.email')}</label>
                     <input
                       type="email"
                       id="supplierEmail"
                       value={newSupplier.email || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, email: e.target.value })}
-                      placeholder="Email address"
+                      placeholder={t('form.placeholders.emailAddress')}
                     />
                   </div>
                 </div>
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="supplierAddress">Address</label>
+                    <label htmlFor="supplierAddress">{t('form.fields.address')}</label>
                     <input
                       type="text"
                       id="supplierAddress"
                       value={newSupplier.address || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, address: e.target.value })}
-                      placeholder="Street address"
+                      placeholder={t('form.placeholders.streetAddress')}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="supplierCity">City</label>
+                    <label htmlFor="supplierCity">{t('form.fields.city')}</label>
                     <input
                       type="text"
                       id="supplierCity"
                       value={newSupplier.city || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, city: e.target.value })}
-                      placeholder="City"
+                      placeholder={t('form.placeholders.city')}
                     />
                   </div>
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="supplierCountry">Country</label>
+                  <label htmlFor="supplierCountry">{t('form.fields.country')}</label>
                   <input
                     type="text"
                     id="supplierCountry"
                     value={newSupplier.country || ''}
                     onChange={(e) => setNewSupplier({ ...newSupplier, country: e.target.value })}
-                    placeholder="Country"
+                    placeholder={t('form.placeholders.country')}
                   />
                 </div>
 
@@ -819,14 +821,14 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                     onClick={handleCreateSupplier}
                   >
                     <Building2 size={16} />
-                     Create Supplier
+                     {t('form.labels.createNewSupplier')}
                   </button>
                   <button
                     type="button"
                     className="cancel-button"
                     onClick={() => setShowCreateSupplier(false)}
                   >
-                    Cancel
+                    {t('form.buttons.cancel')}
                   </button>
                 </div>
               </div>
@@ -836,14 +838,14 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
           {/* Materials Section */}
           <div className="form-section">
             <div className="section-header">
-              <h3><Package size={20} /> Materials</h3>
+              <h3><Package size={20} /> {t('form.sections.materials')}</h3>
               <button
                 type="button"
                 className="add-item-button"
                 onClick={() => setShowAddItemForm(!showAddItemForm)}
               >
                 <Plus size={20} />
-                Add Material
+                {t('form.buttons.addMaterial')}
               </button>
             </div>
 
@@ -860,7 +862,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
               <div className="add-item-form">
                 <div className="form-row">
                   <div className="form-group material-search-group">
-                    <label htmlFor="materialSearch">Material Name *</label>
+                    <label htmlFor="materialSearch">{t('form.fields.materialName')} *</label>
                     <div className="material-search-container">
                       <input
                         type="text"
@@ -868,7 +870,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                         value={materialSearchTerm}
                         onChange={handleMaterialSearchChange}
                         onFocus={() => setShowMaterialDropdown(true)}
-                        placeholder="Search for material or enter new name..."
+                        placeholder={t('form.placeholders.searchOrCreateMaterial')}
                         className="material-search-input"
                       />
                       {showMaterialDropdown && (
@@ -885,13 +887,13 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                                   <span className="material-color">({material.color})</span>
                                 </div>
                                 <div className="material-option-details">
-                                  {material.quantity} {material.quantityType} available
+                                  {material.quantity} {material.quantityType} {t('common:labels.available')}
                                 </div>
                               </div>
                             ))
                           ) : (
                             <div className="material-option no-results">
-                              No materials found - will create new material
+                              {t('form.messages.noMaterialsFound')}
                             </div>
                           )}
                         </div>
@@ -899,13 +901,13 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                     </div>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="itemColor">Color *</label>
+                    <label htmlFor="itemColor">{t('form.fields.color')} *</label>
                     <input
                       type="text"
                       id="itemColor"
                       value={newItem.color || ''}
                       onChange={(e) => setNewItem({ ...newItem, color: e.target.value })}
-                      placeholder="Enter material color"
+                      placeholder={t('form.placeholders.enterMaterialColor')}
                       disabled={!newItem.isNew}
                       className={!newItem.isNew ? 'disabled-field' : ''}
                     />
@@ -914,7 +916,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
 
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="itemQuantity">Quantity *</label>
+                    <label htmlFor="itemQuantity">{t('form.fields.quantity')} *</label>
                     <input
                       type="number"
                       id="itemQuantity"
@@ -927,13 +929,13 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="itemUnit">Unit of Measure *</label>
+                    <label htmlFor="itemUnit">{t('form.fields.unitOfMeasure')} *</label>
                     <input
                       type="text"
                       id="itemUnit"
                       value={newItem.unitOfMeasure || ''}
                       onChange={(e) => setNewItem({ ...newItem, unitOfMeasure: e.target.value })}
-                      placeholder="e.g., kg, liters, pieces"
+                      placeholder={t('form.placeholders.unitExample')}
                       disabled={!newItem.isNew}
                       className={!newItem.isNew ? 'disabled-field' : ''}
                     />
@@ -941,12 +943,12 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="itemDescription">Description</label>
+                  <label htmlFor="itemDescription">{t('form.fields.itemDescription')}</label>
                   <textarea
                     id="itemDescription"
                     value={newItem.description || ''}
                     onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                    placeholder="Material description"
+                    placeholder={t('form.placeholders.materialDescription')}
                     rows={2}
                     disabled={!newItem.isNew}
                     className={!newItem.isNew ? 'disabled-field' : ''}
@@ -959,14 +961,14 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                     className="save-item-button"
                     onClick={handleAddNewMaterial}
                   >
-                    Add Material
+                    {t('form.buttons.addMaterial')}
                   </button>
                   <button
                     type="button"
                     className="cancel-button"
                     onClick={() => setShowAddItemForm(false)}
                   >
-                    Cancel
+                    {t('form.buttons.cancel')}
                   </button>
                 </div>
               </div>
@@ -976,13 +978,13 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
             {/* Selected Items */}
             {items.length > 0 && (
               <div className="selected-items">
-                <h4>Selected Materials ({items.length})</h4>
+                <h4>{t('form.labels.selectedMaterials')} ({items.length})</h4>
                 <div className="items-list">
                   {items.map((item) => (
                     <div key={item.id} className="item-card">
                       <div className="item-info">
                         <div className="item-name">{item.name}</div>
-                        <div className="item-color">Color: {item.color}</div>
+                        <div className="item-color">{t('form.itemCard.color')}: {item.color}</div>
                         {item.description && (
                           <div className="item-description">{item.description}</div>
                         )}
@@ -990,7 +992,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                       <div className="item-details">
                         <div className="form-row">
                           <div className="form-group">
-                            <label>Quantity</label>
+                            <label>{t('form.itemCard.quantity')}</label>
                             <input
                               type="number"
                               value={item.quantity}
@@ -1001,7 +1003,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                             />
                           </div>
                           <div className="form-group">
-                            <label>Unit</label>
+                            <label>{t('form.itemCard.unit')}</label>
                             <input
                               type="text"
                               value={item.unitOfMeasure}
@@ -1013,30 +1015,30 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                         </div>
                         <div className="form-row">
                           <div className="form-group">
-                            <label>Color</label>
+                            <label>{t('form.itemCard.color')}</label>
                             <input
                               type="text"
                               value={item.color}
                               onChange={(e) => handleUpdateItem(item.id, { color: e.target.value })}
-                              placeholder="Enter color"
+                              placeholder={t('form.placeholders.enterColor')}
                               disabled={true}
                               className={!item.isNew ? 'disabled-field' : ''}
                             />
                           </div>
                         </div>
                         <div className="form-group">
-                          <label>Description</label>
+                          <label>{t('form.fields.itemDescription')}</label>
                           <textarea
                             value={item.description}
                             onChange={(e) => handleUpdateItem(item.id, { description: e.target.value })}
-                            placeholder="Material description"
+                            placeholder={t('form.placeholders.materialDescription')}
                             rows={2}
                             disabled={true}
                             className={!item.isNew ? 'disabled-field' : ''}
                           />
                         </div>
                         <div className="item-total">
-                          Quantity: {item.quantity} {item.unitOfMeasure}
+                          {t('form.itemCard.quantity')}: {item.quantity} {item.unitOfMeasure}
                         </div>
                       </div>
                       <button
@@ -1056,7 +1058,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
             {items.length > 0 && (
               <div className="total-cost">
                 <strong>
-                  Total Items: {items.length} materials selected
+                  {t('form.labels.totalItems')}: {items.length} {t('form.labels.materialsSelected')}
                 </strong>
               </div>
             )}
@@ -1069,14 +1071,14 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
               className="cancel-button"
               onClick={handleClose}
             >
-              Cancel
+              {t('form.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading || !title.trim() || items.length === 0}
             >
-              {isLoading ? 'Creating...' : 'Create Acquisition'}
+              {isLoading ? t('form.buttons.creating') : t('form.buttons.create')}
             </button>
           </div>
         </form>

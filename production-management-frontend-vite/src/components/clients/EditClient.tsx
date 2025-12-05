@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { clientApi } from '../../services/api';
 import type { Client, UpdateClientRequest } from '../../types';
 import { X, UserCircle } from 'lucide-react';
@@ -17,6 +18,7 @@ const EditClient: React.FC<EditClientProps> = ({
   onSuccess,
   client
 }) => {
+  const { t } = useTranslation(['clients', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<UpdateClientRequest>({
@@ -63,7 +65,7 @@ const EditClient: React.FC<EditClientProps> = ({
     e.preventDefault();
     
     if (!formData.name?.trim()) {
-      setError('Client name is required');
+      setError(t('editClient.messages.clientNameRequired'));
       return;
     }
 
@@ -88,7 +90,7 @@ const EditClient: React.FC<EditClientProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update client');
+      setError(err.response?.data?.message || t('editClient.messages.failedToUpdate'));
     } finally {
       setIsLoading(false);
     }
@@ -106,7 +108,7 @@ const EditClient: React.FC<EditClientProps> = ({
         <div className="modal-header">
           <h2>
             <UserCircle size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            Edit Client
+            {t('editClient.title')}
           </h2>
           <button className="close-button" onClick={onClose}>
             <X size={24} />
@@ -124,14 +126,14 @@ const EditClient: React.FC<EditClientProps> = ({
           <div className="form-section">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="name">Client Name *</label>
+                <label htmlFor="name">{t('editClient.fields.clientName')} *</label>
                 <input
                   type="text"
                   id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Enter client name"
+                  placeholder={t('editClient.placeholders.clientName')}
                   required
                 />
               </div>
@@ -139,105 +141,105 @@ const EditClient: React.FC<EditClientProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="contactPerson">Contact Person</label>
+                <label htmlFor="contactPerson">{t('editClient.fields.contactPerson')}</label>
                 <input
                   type="text"
                   id="contactPerson"
                   name="contactPerson"
                   value={formData.contactPerson}
                   onChange={handleChange}
-                  placeholder="Enter contact person name"
+                  placeholder={t('editClient.placeholders.contactPerson')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t('editClient.fields.email')}</label>
                 <input
                   type="email"
                   id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter email address"
+                  placeholder={t('editClient.placeholders.email')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="phone">Phone</label>
+                <label htmlFor="phone">{t('editClient.fields.phone')}</label>
                 <input
                   type="text"
                   id="phone"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="Enter phone number"
+                  placeholder={t('editClient.placeholders.phone')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="address">Address</label>
+                <label htmlFor="address">{t('editClient.fields.address')}</label>
                 <input
                   type="text"
                   id="address"
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="Enter street address"
+                  placeholder={t('editClient.placeholders.address')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="city">City</label>
+                <label htmlFor="city">{t('editClient.fields.city')}</label>
                 <input
                   type="text"
                   id="city"
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  placeholder="Enter city"
+                  placeholder={t('editClient.placeholders.city')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="postalCode">Postal Code</label>
+                <label htmlFor="postalCode">{t('editClient.fields.postalCode')}</label>
                 <input
                   type="text"
                   id="postalCode"
                   name="postalCode"
                   value={formData.postalCode}
                   onChange={handleChange}
-                  placeholder="Enter postal code"
+                  placeholder={t('editClient.placeholders.postalCode')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="country">Country</label>
+                <label htmlFor="country">{t('editClient.fields.country')}</label>
                 <input
                   type="text"
                   id="country"
                   name="country"
                   value={formData.country}
                   onChange={handleChange}
-                  placeholder="Enter country"
+                  placeholder={t('editClient.placeholders.country')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="notes">Notes</label>
+                <label htmlFor="notes">{t('editClient.fields.notes')}</label>
                 <textarea
                   id="notes"
                   name="notes"
                   value={formData.notes}
                   onChange={handleChange}
-                  placeholder="Optional notes about the client..."
+                  placeholder={t('editClient.placeholders.notes')}
                   rows={3}
                 />
               </div>
@@ -252,7 +254,7 @@ const EditClient: React.FC<EditClientProps> = ({
                     checked={formData.isActive}
                     onChange={handleChange}
                   />
-                  <span>Active</span>
+                  <span>{t('editClient.fields.active')}</span>
                 </label>
               </div>
             </div>
@@ -265,14 +267,14 @@ const EditClient: React.FC<EditClientProps> = ({
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              {t('editClient.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading}
             >
-              {isLoading ? 'Updating...' : 'Update Client'}
+              {isLoading ? t('editClient.buttons.updating') : t('editClient.buttons.updateClient')}
             </button>
           </div>
         </form>

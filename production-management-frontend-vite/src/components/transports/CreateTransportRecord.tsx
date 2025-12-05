@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { acquisitionApi, orderApi, transportApi } from '../../services/api';
 import type { Acquisition, Order, Transport, UpdateAcquisitionRequest, UpdateOrderRequest } from '../../types';
 import { AcquisitionStatus, OrderStatus } from '../../types';
@@ -16,6 +17,7 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
   onClose,
   onSuccess
 }) => {
+  const { t } = useTranslation(['transports', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingData, setIsLoadingData] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -64,7 +66,7 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
       setDraftOrders(orderDrafts);
       setTransports(transportsResponse.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load data');
+      setError(err.response?.data?.message || t('createTransportRecord.messages.failedToLoadData'));
     } finally {
       setIsLoadingData(false);
     }
@@ -115,7 +117,7 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
 
     const totalSelected = selectedAcquisitionIds.size + selectedOrderIds.size;
     if (totalSelected === 0 || !selectedTransportId) {
-      setError('Please select at least one entity and a transport');
+      setError(t('createTransportRecord.messages.pleaseSelectEntityAndTransport'));
       return;
     }
 
@@ -187,7 +189,7 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to assign transport to one or more entities');
+      setError(err.response?.data?.message || t('createTransportRecord.messages.failedToAssign'));
     } finally {
       setIsLoading(false);
     }
@@ -208,7 +210,7 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
         <div className="modal-header">
           <h2>
             <Truck size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            Create Transport Record
+            {t('createTransportRecord.title')}
           </h2>
           <button className="close-button" onClick={onClose}>
             <X size={24} />
@@ -226,16 +228,16 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
           {isLoadingData ? (
             <div className="loading-container">
               <Loader2 size={32} className="animate-spin" />
-              <p>Loading draft entities...</p>
+              <p>{t('createTransportRecord.messages.loadingDraftEntities')}</p>
             </div>
           ) : (
             <>
               {/* Entity Selection */}
               <div className="form-section">
-                <h3>Select Entities</h3>
+                <h3>{t('createTransportRecord.sections.selectEntities')}</h3>
                 {totalSelected > 0 && (
                   <div className="selection-summary">
-                    <strong>{totalSelected}</strong> {totalSelected === 1 ? 'entity' : 'entities'} selected
+                    <strong>{totalSelected}</strong> {t('createTransportRecord.labels.entitiesSelected', { count: totalSelected })}
                   </div>
                 )}
 
@@ -245,14 +247,14 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
                     <div className="entity-category-header">
                       <h4>
                         <FileText size={18} />
-                        Acquisitions ({draftAcquisitions.length})
+                        {t('createTransportRecord.labels.acquisitions')} ({draftAcquisitions.length})
                       </h4>
                       <button
                         type="button"
                         className="select-all-btn"
                         onClick={handleSelectAllAcquisitions}
                       >
-                        {selectedAcquisitionIds.size === draftAcquisitions.length ? 'Deselect All' : 'Select All'}
+                        {selectedAcquisitionIds.size === draftAcquisitions.length ? t('createTransportRecord.labels.deselectAll') : t('createTransportRecord.labels.selectAll')}
                       </button>
                     </div>
                     <div className="entity-list">
@@ -272,7 +274,7 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
                           <div className="entity-info">
                             <strong>#{acq.id} - {acq.title}</strong>
                             <span className="entity-details">
-                              {acq.type === 0 ? 'Raw Materials' : 'Recyclable Materials'} • {acq.totalItems} item(s)
+                              {acq.type === 0 ? t('createTransportRecord.labels.rawMaterials') : t('createTransportRecord.labels.recyclableMaterials')} • {acq.totalItems} {t('createTransportRecord.labels.items')}
                             </span>
                           </div>
                         </div>
@@ -287,14 +289,14 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
                     <div className="entity-category-header">
                       <h4>
                         <ClipboardList size={18} />
-                        Orders ({draftOrders.length})
+                        {t('createTransportRecord.labels.orders')} ({draftOrders.length})
                       </h4>
                       <button
                         type="button"
                         className="select-all-btn"
                         onClick={handleSelectAllOrders}
                       >
-                        {selectedOrderIds.size === draftOrders.length ? 'Deselect All' : 'Select All'}
+                        {selectedOrderIds.size === draftOrders.length ? t('createTransportRecord.labels.deselectAll') : t('createTransportRecord.labels.selectAll')}
                       </button>
                     </div>
                     <div className="entity-list">
@@ -314,7 +316,7 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
                           <div className="entity-info">
                             <strong>#{order.id} - {order.clientName}</strong>
                             <span className="entity-details">
-                              {order.orderMaterials.length} item(s) • ${order.totalValue.toFixed(2)}
+                              {order.orderMaterials.length} {t('createTransportRecord.labels.items')} • ${order.totalValue.toFixed(2)}
                             </span>
                           </div>
                         </div>
@@ -324,23 +326,23 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
                 )}
 
                 {draftAcquisitions.length === 0 && draftOrders.length === 0 && (
-                  <div className="no-entities">No draft entities available</div>
+                  <div className="no-entities">{t('createTransportRecord.messages.noDraftEntities')}</div>
                 )}
               </div>
 
               {/* Transport Selection */}
               {totalSelected > 0 && (
                 <div className="form-section">
-                  <h3>Select Transport</h3>
+                  <h3>{t('createTransportRecord.sections.selectTransport')}</h3>
                   <div className="form-group">
-                    <label htmlFor="transportId">Transport Vehicle *</label>
+                    <label htmlFor="transportId">{t('createTransportRecord.fields.transportVehicle')} *</label>
                     <select
                       id="transportId"
                       value={selectedTransportId || ''}
                       onChange={(e) => setSelectedTransportId(Number(e.target.value) || null)}
                       required
                     >
-                      <option value="">Select a transport...</option>
+                      <option value="">{t('createTransportRecord.placeholders.selectTransport')}</option>
                       {transports.map(transport => (
                         <option key={transport.id} value={transport.id}>
                           {transport.carName} {transport.numberPlate ? `(${transport.numberPlate})` : ''} - {transport.phoneNumber}
@@ -350,9 +352,9 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
                     {selectedTransport && (
                       <div className="transport-details">
                         <small>
-                          <strong>Car:</strong> {selectedTransport.carName} | 
-                          <strong> Plate:</strong> {selectedTransport.numberPlate || 'N/A'} | 
-                          <strong> Phone:</strong> {selectedTransport.phoneNumber}
+                          <strong>{t('createTransportRecord.labels.car')}</strong> {selectedTransport.carName} | 
+                          <strong> {t('createTransportRecord.labels.plate')}</strong> {selectedTransport.numberPlate || t('createTransportRecord.labels.notAvailable')} | 
+                          <strong> {t('createTransportRecord.labels.phone')}</strong> {selectedTransport.phoneNumber}
                         </small>
                       </div>
                     )}
@@ -360,7 +362,7 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label htmlFor="transportDate">Transport Date</label>
+                      <label htmlFor="transportDate">{t('createTransportRecord.fields.transportDate')}</label>
                       <input
                         type="date"
                         id="transportDate"
@@ -372,12 +374,12 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label htmlFor="transportNotes">Transport Notes</label>
+                      <label htmlFor="transportNotes">{t('createTransportRecord.fields.transportNotes')}</label>
                       <textarea
                         id="transportNotes"
                         value={transportNotes}
                         onChange={(e) => setTransportNotes(e.target.value)}
-                        placeholder="Optional notes about the transport..."
+                        placeholder={t('createTransportRecord.placeholders.transportNotes')}
                         rows={3}
                       />
                     </div>
@@ -394,14 +396,16 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
               onClick={onClose}
               disabled={isLoading || isLoadingData}
             >
-              Cancel
+              {t('createTransportRecord.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading || isLoadingData || totalSelected === 0 || !selectedTransportId}
             >
-              {isLoading ? `Assigning to ${totalSelected} ${totalSelected === 1 ? 'entity' : 'entities'}...` : `Assign Transport to ${totalSelected} ${totalSelected === 1 ? 'Entity' : 'Entities'}`}
+              {isLoading 
+                ? t('createTransportRecord.labels.assigningTo', { count: totalSelected })
+                : t('createTransportRecord.labels.assignTransportTo', { count: totalSelected })}
             </button>
           </div>
         </form>

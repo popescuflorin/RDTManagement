@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { acquisitionApi } from '../../services/api';
 import type { Acquisition, ReceiveAcquisitionRequest } from '../../types';
 import { AcquisitionType } from '../../types';
@@ -29,6 +30,7 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
   onSuccess,
   acquisition
 }) => {
+  const { t } = useTranslation(['acquisitions', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [items, setItems] = useState<ReceivedItem[]>([]);
@@ -73,7 +75,7 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
     // Validate that all received quantities are valid
     const hasInvalidQuantity = items.some(item => item.receivedQuantity < 0);
     if (hasInvalidQuantity) {
-      setError('Received quantities cannot be negative');
+      setError(t('receive.messages.quantitiesCannotBeNegative'));
       return;
     }
 
@@ -93,7 +95,7 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to receive acquisition');
+      setError(err.response?.data?.message || t('receive.messages.failedToReceive'));
     } finally {
       setIsLoading(false);
     }
@@ -110,21 +112,21 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
   if (!isOpen) return null;
 
   const getTypeLabel = (type: AcquisitionType) => {
-    return type === AcquisitionType.RawMaterials ? 'Raw Materials' : 'Recyclable Materials';
+    return type === AcquisitionType.RawMaterials ? t('type.rawMaterials') : t('type.recyclableMaterials');
   };
 
   const getModalTitle = () => {
     if (acquisition.type === AcquisitionType.RawMaterials) {
-      return 'Receive Raw Materials';
+      return t('receive.title.rawMaterials');
     }
-    return 'Receive & Clean Recyclable Materials';
+    return t('receive.title.recyclableMaterials');
   };
 
   const getSubmitButtonLabel = () => {
     if (acquisition.type === AcquisitionType.RawMaterials) {
-      return 'Receive & Add to Inventory';
+      return t('receive.buttons.receiveAndAdd');
     }
-    return 'Mark Ready for Processing';
+    return t('receive.buttons.markReadyForProcessing');
   };
 
   return (
@@ -149,46 +151,45 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
           {/* Info Message for Recyclable Materials */}
           {acquisition.type === AcquisitionType.RecyclableMaterials && (
             <div className="info-message">
-              <strong>Note:</strong> Recyclable materials will be marked as "Ready for Processing" after this step. 
-              They will NOT be added to inventory until after the processing/cleaning stage is complete.
+              <strong>{t('common:labels.notes', { defaultValue: 'Note' })}:</strong> {t('receive.messages.recyclableMaterialsNote')}
             </div>
           )}
 
           {/* Acquisition Details - Compact Summary */}
           <div className="form-section">
-            <h3><FileText size={20} /> Acquisition Details</h3>
+            <h3><FileText size={20} /> {t('receive.sections.acquisitionDetails')}</h3>
             <div className="acquisition-summary">
               <div className="summary-row">
-                <span className="summary-label">Title:</span>
+                <span className="summary-label">{t('view.labels.title')}:</span>
                 <span className="summary-value">{acquisition.title}</span>
               </div>
               <div className="summary-row">
-                <span className="summary-label">Type:</span>
+                <span className="summary-label">{t('view.labels.type')}:</span>
                 <span className="summary-value">{getTypeLabel(acquisition.type)}</span>
               </div>
               {acquisition.description && (
                 <div className="summary-row">
-                  <span className="summary-label">Description:</span>
+                  <span className="summary-label">{t('view.labels.description')}:</span>
                   <span className="summary-value">{acquisition.description}</span>
                 </div>
               )}
               <div className="summary-row">
-                <span className="summary-label"><UserCircle size={14} style={{display: 'inline', marginRight: '4px'}} />Assigned To:</span>
-                <span className="summary-value">{acquisition.assignedToUserName || 'Unassigned'}</span>
+                <span className="summary-label"><UserCircle size={14} style={{display: 'inline', marginRight: '4px'}} />{t('view.labels.assignedTo')}:</span>
+                <span className="summary-value">{acquisition.assignedToUserName || t('view.labels.unassigned')}</span>
               </div>
               <div className="summary-row">
-                <span className="summary-label">Created By:</span>
-                <span className="summary-value">{acquisition.createdByUserName} on {new Date(acquisition.createdAt).toLocaleDateString()}</span>
+                <span className="summary-label">{t('view.labels.createdBy')}:</span>
+                <span className="summary-value">{acquisition.createdByUserName} {t('view.labels.on')} {new Date(acquisition.createdAt).toLocaleDateString()}</span>
               </div>
               {acquisition.dueDate && (
                 <div className="summary-row">
-                  <span className="summary-label">Due Date:</span>
+                  <span className="summary-label">{t('view.labels.dueDate')}:</span>
                   <span className="summary-value">{new Date(acquisition.dueDate).toLocaleDateString()}</span>
                 </div>
               )}
               {acquisition.notes && (
                 <div className="summary-row">
-                  <span className="summary-label">Notes:</span>
+                  <span className="summary-label">{t('view.labels.notes')}:</span>
                   <span className="summary-value">{acquisition.notes}</span>
                 </div>
               )}
@@ -202,33 +203,33 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
                 {/* Transport Details */}
                 {acquisition.transportCarName && (
                   <div className="details-column">
-                    <h4><Truck size={18} /> Transport</h4>
+                    <h4><Truck size={18} /> {t('view.sections.transport')}</h4>
                     <div className="acquisition-summary">
                       <div className="summary-row">
-                        <span className="summary-label">Vehicle:</span>
+                        <span className="summary-label">{t('view.labels.vehicle')}:</span>
                         <span className="summary-value">{acquisition.transportCarName}</span>
                       </div>
                       {acquisition.transportNumberPlate && (
                         <div className="summary-row">
-                          <span className="summary-label">Number Plate:</span>
+                          <span className="summary-label">{t('view.labels.numberPlate')}:</span>
                           <span className="summary-value">{acquisition.transportNumberPlate}</span>
                         </div>
                       )}
                       {acquisition.transportPhoneNumber && (
                         <div className="summary-row">
-                          <span className="summary-label">Phone:</span>
+                          <span className="summary-label">{t('view.labels.phone')}:</span>
                           <span className="summary-value">{acquisition.transportPhoneNumber}</span>
                         </div>
                       )}
                       {acquisition.transportDate && (
                         <div className="summary-row">
-                          <span className="summary-label">Date:</span>
+                          <span className="summary-label">{t('view.labels.date')}:</span>
                           <span className="summary-value">{new Date(acquisition.transportDate).toLocaleDateString()}</span>
                         </div>
                       )}
                       {acquisition.transportNotes && (
                         <div className="summary-row">
-                          <span className="summary-label">Notes:</span>
+                          <span className="summary-label">{t('view.labels.transportNotes')}:</span>
                           <span className="summary-value">{acquisition.transportNotes}</span>
                         </div>
                       )}
@@ -239,15 +240,15 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
                 {/* Supplier Details */}
                 {acquisition.supplierName && (
                   <div className="details-column">
-                    <h4><Building2 size={18} /> Supplier</h4>
+                    <h4><Building2 size={18} /> {t('view.sections.supplier')}</h4>
                     <div className="acquisition-summary">
                       <div className="summary-row">
-                        <span className="summary-label">Name:</span>
+                        <span className="summary-label">{t('view.labels.name')}:</span>
                         <span className="summary-value">{acquisition.supplierName}</span>
                       </div>
                       {acquisition.supplierContact && (
                         <div className="summary-row">
-                          <span className="summary-label">Contact:</span>
+                          <span className="summary-label">{t('view.labels.contact')}:</span>
                           <span className="summary-value">{acquisition.supplierContact}</span>
                         </div>
                       )}
@@ -260,18 +261,18 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
 
           {/* Materials - With Received Quantity */}
           <div className="form-section">
-            <h3><Package size={20} /> Materials to Receive</h3>
+            <h3><Package size={20} /> {t('receive.sections.materialsToReceive')}</h3>
             <div className="received-items">
               {items.map((item, index) => (
                 <div key={item.id} className="item-card">
                   <div className="item-info">
                     <div className="item-name">{item.name}</div>
-                    <div className="item-color">Color: {item.color}</div>
+                    <div className="item-color">{t('form.itemCard.color')}: {item.color}</div>
                   </div>
                   <div className="item-details">
                     <div className="form-row">
                       <div className="form-group">
-                        <label>Ordered Quantity</label>
+                        <label>{t('receive.labels.orderedQuantity')}</label>
                         <input
                           type="number"
                           value={item.orderedQuantity}
@@ -280,7 +281,7 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
                         />
                       </div>
                       <div className="form-group">
-                        <label>Received Quantity *</label>
+                        <label>{t('receive.labels.receivedQuantity')} *</label>
                         <input
                           type="number"
                           value={item.receivedQuantity}
@@ -288,13 +289,13 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
                           onWheel={handleWheel}
                           min="0"
                           step="0.01"
-                          placeholder="Enter received quantity"
+                          placeholder={t('receive.labels.enterReceivedQuantity')}
                         />
                       </div>
                     </div>
                     <div className="form-row">
                       <div className="form-group">
-                        <label>Unit of Measure</label>
+                        <label>{t('receive.labels.unitOfMeasure')}</label>
                         <input
                           type="text"
                           value={item.unitOfMeasure}
@@ -305,9 +306,9 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
                     </div>
                     <div className="item-summary">
                       <div className={`quantity-status ${item.receivedQuantity === item.orderedQuantity ? 'complete' : item.receivedQuantity > item.orderedQuantity ? 'excess' : 'partial'}`}>
-                        {item.receivedQuantity === item.orderedQuantity && '✓ Complete'}
-                        {item.receivedQuantity > item.orderedQuantity && '⚠ Excess received'}
-                        {item.receivedQuantity < item.orderedQuantity && '⚠ Partial delivery'}
+                        {item.receivedQuantity === item.orderedQuantity && t('receive.labels.complete')}
+                        {item.receivedQuantity > item.orderedQuantity && t('receive.labels.excessReceived')}
+                        {item.receivedQuantity < item.orderedQuantity && t('receive.labels.partialDelivery')}
                       </div>
                     </div>
                   </div>
@@ -318,13 +319,13 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
             {/* Reception Summary */}
             <div className="reception-summary">
               <div className="summary-item">
-                <strong>Total Items:</strong> {items.length}
+                <strong>{t('receive.labels.totalItems')}:</strong> {items.length}
               </div>
               <div className="summary-item">
-                <strong>Total Ordered:</strong> {items.reduce((sum, item) => sum + item.orderedQuantity, 0).toFixed(2)} units
+                <strong>{t('receive.labels.totalOrdered')}:</strong> {items.reduce((sum, item) => sum + item.orderedQuantity, 0).toFixed(2)} {t('receive.labels.units')}
               </div>
               <div className="summary-item">
-                <strong>Total Receiving:</strong> {items.reduce((sum, item) => sum + item.receivedQuantity, 0).toFixed(2)} units
+                <strong>{t('receive.labels.totalReceiving')}:</strong> {items.reduce((sum, item) => sum + item.receivedQuantity, 0).toFixed(2)} {t('receive.labels.units')}
               </div>
             </div>
           </div>
@@ -336,14 +337,14 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
               className="cancel-button"
               onClick={handleClose}
             >
-              Cancel
+              {t('receive.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading}
             >
-              {isLoading ? 'Processing...' : getSubmitButtonLabel()}
+              {isLoading ? t('receive.buttons.processing') : getSubmitButtonLabel()}
             </button>
           </div>
         </form>

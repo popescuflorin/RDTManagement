@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { productionPlanApi, inventoryApi } from '../../services/api';
 import type { 
   CreateProductionPlanRequest, 
@@ -28,6 +29,7 @@ interface MaterialSelection {
 }
 
 const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, onPlanCreated }) => {
+  const { t } = useTranslation(['production', 'common']);
   const [finishedProducts, setFinishedProducts] = useState<RawMaterial[]>([]);
   const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -85,7 +87,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
       setRawMaterials(rawMats);
     } catch (error: any) {
       console.error('Error loading data:', error);
-      setError('Failed to load materials');
+      setError(t('createPlan.messages.failedToLoadMaterials'));
     }
   };
 
@@ -180,7 +182,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
 
   const handleAddMaterial = () => {
     if (currentMaterial.rawMaterialId === 0 || currentMaterial.requiredQuantity <= 0) {
-      setMaterialsError('Please select a material and enter a valid quantity');
+      setMaterialsError(t('createPlan.messages.pleaseSelectMaterialAndQuantity'));
       return;
     }
 
@@ -189,7 +191,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
 
     // Check if material already added
     if (selectedMaterials.some(m => m.rawMaterialId === currentMaterial.rawMaterialId)) {
-      setMaterialsError('Material already added');
+      setMaterialsError(t('createPlan.messages.materialAlreadyAdded'));
       return;
     }
 
@@ -251,7 +253,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
 
     try {
       if (selectedMaterials.length === 0) {
-        setMaterialsError('Please add at least one material');
+        setMaterialsError(t('createPlan.messages.pleaseAddAtLeastOneMaterial'));
         setIsLoading(false);
         return;
       }
@@ -274,7 +276,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
       if (showNewProductForm) {
         // Creating a new product
         if (!newProduct.name || !newProduct.color || !newProduct.quantityType) {
-          setError('Please fill in all required fields for the new product');
+          setError(t('createPlan.messages.pleaseFillAllRequiredFields'));
           setIsLoading(false);
           return;
         }
@@ -282,7 +284,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
       } else {
         // Using existing product
         if (formData.targetProductId === 0) {
-          setError('Please select a finished product');
+          setError(t('createPlan.messages.pleaseSelectFinishedProduct'));
           setIsLoading(false);
           return;
         }
@@ -312,7 +314,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
       onClose();
     } catch (error: any) {
       console.error('Error creating production plan:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to create production plan. Please try again.';
+      const errorMessage = error.response?.data?.message || t('createPlan.messages.failedToCreate');
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -325,7 +327,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
     <div className="create-production-plan-overlay">
       <div className="create-production-plan-modal">
         <div className="create-production-plan-header">
-          <h2>📋 Create Production Plan</h2>
+          <h2>📋 {t('createPlan.title')}</h2>
           <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
         </div>
 
@@ -338,10 +340,10 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
 
           {/* Target Product Section */}
           <div className="form-section">
-            <h3>Target Product</h3>
+            <h3>{t('createPlan.sections.targetProduct')}</h3>
             
             <div className="form-group">
-              <label htmlFor="targetProductId">Select Finished Product *</label>
+              <label htmlFor="targetProductId">{t('createPlan.fields.selectFinishedProduct')} *</label>
               <select
                 id="targetProductId"
                 name="targetProductId"
@@ -350,13 +352,13 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                 required
                 disabled={isLoading}
               >
-                <option value={0}>-- Select a product --</option>
+                <option value={0}>{t('createPlan.fields.selectProduct')}</option>
                 {finishedProducts.map(product => (
                   <option key={product.id} value={product.id}>
-                    {product.name} ({product.color}) - Current Stock: {product.quantity} {product.quantityType}
+                    {product.name} ({product.color}) - {t('createPlan.labels.currentStock')} {product.quantity} {product.quantityType}
                   </option>
                 ))}
-                <option value="new">✨ Create New Product</option>
+                <option value="new">{t('createPlan.fields.createNewProduct')}</option>
               </select>
             </div>
 
@@ -365,27 +367,27 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
               <div className="new-product-form">
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="newProductName">Product Name *</label>
+                    <label htmlFor="newProductName">{t('createPlan.fields.productName')} *</label>
                     <input
                       type="text"
                       id="newProductName"
                       name="name"
                       value={newProduct.name}
                       onChange={handleNewProductChange}
-                      placeholder="e.g., Custom Chair, Table"
+                      placeholder={t('createPlan.placeholders.productName')}
                       required
                       disabled={isLoading}
                     />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="newProductColor">Color *</label>
+                    <label htmlFor="newProductColor">{t('createPlan.fields.color')} *</label>
                     <input
                       type="text"
                       id="newProductColor"
                       name="color"
                       value={newProduct.color}
                       onChange={handleNewProductChange}
-                      placeholder="e.g., Brown, White"
+                      placeholder={t('createPlan.placeholders.color')}
                       required
                       disabled={isLoading}
                     />
@@ -393,14 +395,14 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="newProductQuantityType">Unit Type *</label>
+                    <label htmlFor="newProductQuantityType">{t('createPlan.fields.unitType')} *</label>
                     <input
                       type="text"
                       id="newProductQuantityType"
                       name="quantityType"
                       value={newProduct.quantityType}
                       onChange={handleNewProductChange}
-                      placeholder="e.g., pieces, kg"
+                      placeholder={t('createPlan.placeholders.unitType')}
                       required
                       disabled={isLoading}
                       list="quantityTypeOptions"
@@ -412,7 +414,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                     </datalist>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="newProductMinimumStock">Minimum Stock</label>
+                    <label htmlFor="newProductMinimumStock">{t('createPlan.fields.minimumStock')}</label>
                     <input
                       type="number"
                       id="newProductMinimumStock"
@@ -427,13 +429,13 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                   </div>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="newProductDescription">Description</label>
+                  <label htmlFor="newProductDescription">{t('createPlan.fields.description')}</label>
                   <textarea
                     id="newProductDescription"
                     name="description"
                     value={newProduct.description}
                     onChange={handleNewProductChange}
-                    placeholder="Optional description..."
+                    placeholder={t('createPlan.placeholders.description')}
                     rows={2}
                     disabled={isLoading}
                   />
@@ -444,30 +446,30 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
 
           {/* Plan Details Section */}
           <div className="form-section">
-            <h3>Plan Details</h3>
+            <h3>{t('createPlan.sections.planDetails')}</h3>
             
             <div className="form-group">
-              <label htmlFor="name">Plan Name *</label>
+              <label htmlFor="name">{t('createPlan.fields.planName')} *</label>
               <input
                 type="text"
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder="e.g., Weekly Production Batch"
+                placeholder={t('createPlan.placeholders.planName')}
                 required
                 disabled={isLoading}
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="description">Description</label>
+              <label htmlFor="description">{t('createPlan.fields.description')}</label>
               <textarea
                 id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Optional description..."
+                placeholder={t('createPlan.placeholders.description')}
                 rows={2}
                 disabled={isLoading}
               />
@@ -475,7 +477,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="quantityToProduce">Quantity to Produce *</label>
+                <label htmlFor="quantityToProduce">{t('createPlan.fields.quantityToProduce')} *</label>
                 <input
                   type="number"
                   id="quantityToProduce"
@@ -490,7 +492,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="estimatedProductionTimeMinutes">Est. Time (minutes) *</label>
+                <label htmlFor="estimatedProductionTimeMinutes">{t('createPlan.fields.estimatedTimeMinutes')} *</label>
                 <input
                   type="number"
                   id="estimatedProductionTimeMinutes"
@@ -507,7 +509,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
             </div>
 
             <div className="form-group">
-              <label htmlFor="plannedStartDate">Planned Start Date</label>
+              <label htmlFor="plannedStartDate">{t('createPlan.fields.plannedStartDate')}</label>
               <input
                 type="date"
                 id="plannedStartDate"
@@ -519,13 +521,13 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
             </div>
 
             <div className="form-group">
-              <label htmlFor="notes">Notes</label>
+              <label htmlFor="notes">{t('createPlan.fields.notes')}</label>
               <textarea
                 id="notes"
                 name="notes"
                 value={formData.notes}
                 onChange={handleInputChange}
-                placeholder="Optional notes..."
+                placeholder={t('createPlan.placeholders.notes')}
                 rows={2}
                 disabled={isLoading}
               />
@@ -535,10 +537,10 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
           {/* Required Materials Section */}
           <div className="form-section">
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <h3>Required Materials (per unit)</h3>
+              <h3>{t('createPlan.sections.requiredMaterials')}</h3>
               {templateLoaded && (
                 <span className="template-loaded-badge">
-                  ✓ Production template loaded
+                  {t('createPlan.labels.templateLoaded')}
                 </span>
               )}
             </div>
@@ -554,23 +556,23 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
             <div className="add-material-section">
               <div className="form-row">
                 <div className="form-group" style={{ flex: 2 }}>
-                  <label htmlFor="currentMaterial">Select Material</label>
+                  <label htmlFor="currentMaterial">{t('createPlan.fields.selectMaterial')}</label>
                   <select
                     id="currentMaterial"
                     value={currentMaterial.rawMaterialId}
                     onChange={(e) => setCurrentMaterial(prev => ({ ...prev, rawMaterialId: parseInt(e.target.value) }))}
                     disabled={isLoading}
                   >
-                    <option value={0}>-- Select a raw material --</option>
+                    <option value={0}>{t('createPlan.fields.selectRawMaterial')}</option>
                     {rawMaterials.map(material => (
                       <option key={material.id} value={material.id}>
-                        {material.name} ({material.color}) - Available: {material.quantity} {material.quantityType}
+                        {material.name} ({material.color}) - {t('createPlan.labels.available')} {material.quantity} {material.quantityType}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="materialQuantity">Quantity</label>
+                  <label htmlFor="materialQuantity">{t('createPlan.fields.quantity')}</label>
                   <input
                     type="number"
                     id="materialQuantity"
@@ -589,7 +591,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                     className="btn btn-secondary"
                     disabled={isLoading}
                   >
-                    + Add
+                    {t('createPlan.buttons.add')}
                   </button>
                 </div>
               </div>
@@ -597,16 +599,16 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
 
             {selectedMaterials.length > 0 && (
               <div className="selected-materials">
-                <h4>Selected Materials:</h4>
+                <h4>{t('createPlan.labels.selectedMaterials')}</h4>
                 <table className="materials-table">
                   <thead>
                     <tr>
-                      <th>Material</th>
-                      <th>Required (per unit)</th>
-                      <th>Total Need</th>
-                      <th>Available</th>
-                      <th>Status</th>
-                      <th>Actions</th>
+                      <th>{t('createPlan.table.material')}</th>
+                      <th>{t('createPlan.table.requiredPerUnit')}</th>
+                      <th>{t('createPlan.table.totalNeed')}</th>
+                      <th>{t('createPlan.table.available')}</th>
+                      <th>{t('createPlan.table.status')}</th>
+                      <th>{t('createPlan.table.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -638,7 +640,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                           <td>{material.availableQuantity.toFixed(2)} {material.quantityType}</td>
                           <td>
                             <span className={`status-badge ${isAvailable ? 'status-available' : 'status-insufficient'}`}>
-                              {isAvailable ? '✓ Available' : '⚠ Insufficient'}
+                              {isAvailable ? t('createPlan.status.available') : t('createPlan.status.insufficient')}
                             </span>
                           </td>
                           <td>
@@ -648,7 +650,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                               className="btn btn-sm btn-danger"
                               disabled={isLoading}
                             >
-                              Remove
+                              {t('createPlan.buttons.remove')}
                             </button>
                           </td>
                         </tr>
@@ -666,8 +668,8 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
               <div className="template-update-notice">
                 <span className="notice-icon">ℹ️</span>
                 <div className="notice-content">
-                  <strong>Template Changes Detected</strong>
-                  <p>You have modified the materials or quantities from the original template.</p>
+                  <strong>{t('createPlan.labels.templateChangesDetected')}</strong>
+                  <p>{t('createPlan.labels.templateChangesDescription')}</p>
                 </div>
               </div>
               <label className="template-update-checkbox">
@@ -677,7 +679,7 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
                   onChange={(e) => setUpdateTemplate(e.target.checked)}
                   disabled={isLoading}
                 />
-                <span>Update the product template with these changes</span>
+                <span>{t('createPlan.labels.updateTemplate')}</span>
               </label>
             </div>
           )}
@@ -689,14 +691,14 @@ const CreateProductionPlan: React.FC<CreateProductionPlanProps> = ({ onClose, on
               className="btn btn-secondary"
               disabled={isLoading}
             >
-              Cancel
+              {t('createPlan.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="btn btn-primary"
               disabled={isLoading || selectedMaterials.length === 0}
             >
-              {isLoading ? 'Creating...' : 'Create Production Plan'}
+              {isLoading ? t('createPlan.buttons.creating') : t('createPlan.buttons.createProductionPlan')}
             </button>
           </div>
         </form>

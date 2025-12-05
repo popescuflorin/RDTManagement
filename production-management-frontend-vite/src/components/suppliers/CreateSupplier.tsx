@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supplierApi } from '../../services/api';
 import type { CreateSupplierRequest } from '../../types';
 import { X, Building2 } from 'lucide-react';
@@ -13,6 +14,7 @@ const CreateSupplier: React.FC<CreateSupplierProps> = ({
   onClose,
   onSupplierCreated
 }) => {
+  const { t } = useTranslation(['suppliers', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateSupplierRequest>({
@@ -42,7 +44,7 @@ const CreateSupplier: React.FC<CreateSupplierProps> = ({
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      setError('Supplier name is required');
+      setError(t('createSupplier.messages.supplierNameRequired'));
       return;
     }
 
@@ -69,7 +71,7 @@ const CreateSupplier: React.FC<CreateSupplierProps> = ({
       onSupplierCreated();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create supplier');
+      setError(err.response?.data?.message || t('createSupplier.messages.failedToCreate'));
     } finally {
       setIsLoading(false);
     }
@@ -85,7 +87,7 @@ const CreateSupplier: React.FC<CreateSupplierProps> = ({
         <div className="modal-header">
           <h2>
             <Building2 size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            Create New Supplier
+            {t('createSupplier.title')}
           </h2>
           <button className="close-button" onClick={onClose}>
             <X size={24} />
@@ -103,14 +105,14 @@ const CreateSupplier: React.FC<CreateSupplierProps> = ({
           <div className="form-section">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="name">Supplier Name *</label>
+                <label htmlFor="name">{t('createSupplier.fields.supplierName')} *</label>
                 <input
                   type="text"
                   id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Enter supplier name"
+                  placeholder={t('createSupplier.placeholders.supplierName')}
                   required
                 />
               </div>
@@ -118,13 +120,13 @@ const CreateSupplier: React.FC<CreateSupplierProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="description">Description</label>
+                <label htmlFor="description">{t('createSupplier.fields.description')}</label>
                 <textarea
                   id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Enter supplier description"
+                  placeholder={t('createSupplier.placeholders.description')}
                   rows={2}
                 />
               </div>
@@ -132,130 +134,130 @@ const CreateSupplier: React.FC<CreateSupplierProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="contactPerson">Contact Person</label>
+                <label htmlFor="contactPerson">{t('createSupplier.fields.contactPerson')}</label>
                 <input
                   type="text"
                   id="contactPerson"
                   name="contactPerson"
                   value={formData.contactPerson}
                   onChange={handleChange}
-                  placeholder="Enter contact person name"
+                  placeholder={t('createSupplier.placeholders.contactPerson')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t('createSupplier.fields.email')}</label>
                 <input
                   type="email"
                   id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter email address"
+                  placeholder={t('createSupplier.placeholders.email')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="phone">Phone</label>
+                <label htmlFor="phone">{t('createSupplier.fields.phone')}</label>
                 <input
                   type="text"
                   id="phone"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="Enter phone number"
+                  placeholder={t('createSupplier.placeholders.phone')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="address">Address</label>
+                <label htmlFor="address">{t('createSupplier.fields.address')}</label>
                 <input
                   type="text"
                   id="address"
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="Enter street address"
+                  placeholder={t('createSupplier.placeholders.address')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="city">City</label>
+                <label htmlFor="city">{t('createSupplier.fields.city')}</label>
                 <input
                   type="text"
                   id="city"
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  placeholder="Enter city"
+                  placeholder={t('createSupplier.placeholders.city')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="postalCode">Postal Code</label>
+                <label htmlFor="postalCode">{t('createSupplier.fields.postalCode')}</label>
                 <input
                   type="text"
                   id="postalCode"
                   name="postalCode"
                   value={formData.postalCode}
                   onChange={handleChange}
-                  placeholder="Enter postal code"
+                  placeholder={t('createSupplier.placeholders.postalCode')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="country">Country</label>
+                <label htmlFor="country">{t('createSupplier.fields.country')}</label>
                 <input
                   type="text"
                   id="country"
                   name="country"
                   value={formData.country}
                   onChange={handleChange}
-                  placeholder="Enter country"
+                  placeholder={t('createSupplier.placeholders.country')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="taxId">Tax ID</label>
+                <label htmlFor="taxId">{t('createSupplier.fields.taxId')}</label>
                 <input
                   type="text"
                   id="taxId"
                   name="taxId"
                   value={formData.taxId}
                   onChange={handleChange}
-                  placeholder="Enter tax ID"
+                  placeholder={t('createSupplier.placeholders.taxId')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="registrationNumber">Registration Number</label>
+                <label htmlFor="registrationNumber">{t('createSupplier.fields.registrationNumber')}</label>
                 <input
                   type="text"
                   id="registrationNumber"
                   name="registrationNumber"
                   value={formData.registrationNumber}
                   onChange={handleChange}
-                  placeholder="Enter registration number"
+                  placeholder={t('createSupplier.placeholders.registrationNumber')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="notes">Notes</label>
+                <label htmlFor="notes">{t('createSupplier.fields.notes')}</label>
                 <textarea
                   id="notes"
                   name="notes"
                   value={formData.notes}
                   onChange={handleChange}
-                  placeholder="Optional notes about the supplier..."
+                  placeholder={t('createSupplier.placeholders.notes')}
                   rows={3}
                 />
               </div>
@@ -269,14 +271,14 @@ const CreateSupplier: React.FC<CreateSupplierProps> = ({
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              {t('createSupplier.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading}
             >
-              {isLoading ? 'Creating...' : 'Create Supplier'}
+              {isLoading ? t('createSupplier.buttons.creating') : t('createSupplier.buttons.createSupplier')}
             </button>
           </div>
         </form>

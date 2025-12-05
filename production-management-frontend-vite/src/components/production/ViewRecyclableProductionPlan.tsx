@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Package,
   Clock,
@@ -19,20 +20,21 @@ interface ViewRecyclableProductionPlanProps {
 }
 
 const ViewRecyclableProductionPlan: React.FC<ViewRecyclableProductionPlanProps> = ({ plan, onClose }) => {
+  const { t } = useTranslation(['production', 'common']);
   const getStatusInfo = (status: ProductionPlanStatus) => {
     switch (status) {
       case ProductionPlanStatus.Draft:
-        return { label: 'Draft', color: 'status-draft', icon: FileText };
+        return { label: t('status.draft'), color: 'status-draft', icon: FileText };
       case ProductionPlanStatus.Planned:
-        return { label: 'Planned', color: 'status-planned', icon: Calendar };
+        return { label: t('status.planned'), color: 'status-planned', icon: Calendar };
       case ProductionPlanStatus.InProgress:
-        return { label: 'In Progress', color: 'status-in-progress', icon: Clock };
+        return { label: t('status.inProgress'), color: 'status-in-progress', icon: Clock };
       case ProductionPlanStatus.Completed:
-        return { label: 'Completed', color: 'status-completed', icon: CheckCircle };
+        return { label: t('status.completed'), color: 'status-completed', icon: CheckCircle };
       case ProductionPlanStatus.Cancelled:
-        return { label: 'Cancelled', color: 'status-cancelled', icon: X };
+        return { label: t('status.cancelled'), color: 'status-cancelled', icon: X };
       default:
-        return { label: 'Unknown', color: 'status-draft', icon: FileText };
+        return { label: t('status.unknown'), color: 'status-draft', icon: FileText };
     }
   };
 
@@ -64,7 +66,7 @@ const ViewRecyclableProductionPlan: React.FC<ViewRecyclableProductionPlanProps> 
           <div className="header-content">
             <div className="header-title">
               <Eye className="header-icon" />
-              <h2>Recyclable Plan Details</h2>
+              <h2>{t('viewPlan.recyclableTitle')}</h2>
             </div>
             <button className="close-button" onClick={onClose}>
               <X size={20} />
@@ -83,21 +85,21 @@ const ViewRecyclableProductionPlan: React.FC<ViewRecyclableProductionPlanProps> 
           <div className="info-section">
             <div className="section-header">
               <Package className="section-icon" />
-              <h3>Plan Overview</h3>
+              <h3>{t('viewPlan.sections.planOverview')}</h3>
             </div>
             <div className="info-grid">
               <div className="info-item">
-                <label>Plan Name</label>
+                <label>{t('viewPlan.fields.planName')}</label>
                 <div className="info-value">{plan.name}</div>
               </div>
               {plan.description && (
                 <div className="info-item full-width">
-                  <label>Description</label>
+                  <label>{t('viewPlan.fields.description')}</label>
                   <div className="info-value">{plan.description}</div>
                 </div>
               )}
               <div className="info-item">
-                <label>Target Raw Material</label>
+                <label>{t('viewPlan.fields.targetRawMaterial')}</label>
                 <div className="info-value">
                   <div className="product-info">
                     <span className="product-name">{plan.targetRawMaterialName}</span>
@@ -106,7 +108,7 @@ const ViewRecyclableProductionPlan: React.FC<ViewRecyclableProductionPlanProps> 
                 </div>
               </div>
               <div className="info-item">
-                <label>Quantity to Produce</label>
+                <label>{t('viewPlan.fields.quantityToProduce')}</label>
                 <div className="info-value">{plan.quantityToProduce} {plan.targetRawMaterialQuantityType}</div>
               </div>
             </div>
@@ -116,32 +118,32 @@ const ViewRecyclableProductionPlan: React.FC<ViewRecyclableProductionPlanProps> 
           <div className="info-section">
             <div className="section-header">
               <Clock className="section-icon" />
-              <h3>Timing</h3>
+              <h3>{t('viewPlan.sections.timing')}</h3>
             </div>
             <div className="info-grid">
               <div className="info-item">
-                <label>Estimated Production Time</label>
-                <div className="info-value">{plan.estimatedProductionTimeMinutes} min</div>
+                <label>{t('viewPlan.fields.estimatedProductionTime')}</label>
+                <div className="info-value">{plan.estimatedProductionTimeMinutes} {t('viewPlan.labels.min')}</div>
               </div>
               {plan.plannedStartDate && (
                 <div className="info-item">
-                  <label>Planned Start Date</label>
+                  <label>{t('viewPlan.fields.plannedStartDate')}</label>
                   <div className="info-value">{formatDate(plan.plannedStartDate)}</div>
                 </div>
               )}
               <div className="info-item">
-                <label>Created</label>
+                <label>{t('viewPlan.fields.created')}</label>
                 <div className="info-value">{formatDateTime(plan.createdAt)}</div>
               </div>
               {plan.startedAt && (
                 <div className="info-item">
-                  <label>Started At</label>
+                  <label>{t('viewPlan.fields.startedAt')}</label>
                   <div className="info-value">{formatDateTime(plan.startedAt)}</div>
                 </div>
               )}
               {plan.completedAt && (
                 <div className="info-item">
-                  <label>Completed At</label>
+                  <label>{t('viewPlan.fields.completedAt')}</label>
                   <div className="info-value">{formatDateTime(plan.completedAt)}</div>
                 </div>
               )}
@@ -152,17 +154,17 @@ const ViewRecyclableProductionPlan: React.FC<ViewRecyclableProductionPlanProps> 
           <div className="info-section">
             <div className="section-header">
               <Package className="section-icon" />
-              <h3>Required Recyclables</h3>
+              <h3>{t('viewPlan.sections.requiredRecyclables')}</h3>
             </div>
             <div className="materials-container">
               <table className="materials-table">
                 <thead>
                   <tr>
-                    <th>Material</th>
-                    <th>Required (per unit)</th>
-                    <th>Total Need</th>
-                    <th>Available</th>
-                    <th>Status</th>
+                    <th>{t('viewPlan.table.material')}</th>
+                    <th>{t('viewPlan.table.requiredPerUnit')}</th>
+                    <th>{t('viewPlan.table.totalNeed')}</th>
+                    <th>{t('viewPlan.table.available')}</th>
+                    <th>{t('viewPlan.table.status')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -186,12 +188,12 @@ const ViewRecyclableProductionPlan: React.FC<ViewRecyclableProductionPlanProps> 
                             {isAvailable ? (
                               <>
                                 <CheckCircle size={14} />
-                                <span>Available</span>
+                                <span>{t('viewPlan.status.available')}</span>
                               </>
                             ) : (
                               <>
                                 <AlertTriangle size={14} />
-                                <span>Short {shortage.toFixed(2)}</span>
+                                <span>{t('viewPlan.status.short', { amount: shortage.toFixed(2) })}</span>
                               </>
                             )}
                           </div>
@@ -209,7 +211,7 @@ const ViewRecyclableProductionPlan: React.FC<ViewRecyclableProductionPlanProps> 
             <div className="info-section">
               <div className="section-header">
                 <FileText className="section-icon" />
-                <h3>Notes</h3>
+                <h3>{t('viewPlan.sections.notes')}</h3>
               </div>
               <div className="notes-content">{plan.notes}</div>
             </div>
@@ -217,7 +219,7 @@ const ViewRecyclableProductionPlan: React.FC<ViewRecyclableProductionPlanProps> 
         </div>
 
         <div className="view-production-plan-footer">
-          <button className="btn btn-secondary" onClick={onClose}>Close</button>
+          <button className="btn btn-secondary" onClick={onClose}>{t('viewPlan.buttons.close')}</button>
         </div>
       </div>
     </div>

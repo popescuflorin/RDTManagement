@@ -1,5 +1,222 @@
 {
   "title": "Utilizatori",
-  "manageUsers": "Gestionare utilizatori"
+  "manageUsers": "Gestionare utilizatori",
+  "userManagement": {
+    "title": "Gestionare Utilizatori și Roluri",
+    "subtitle": "Gestionează utilizatorii sistemului, rolurile și permisiunile",
+    "tabs": {
+      "users": "Utilizatori",
+      "roles": "Roluri și Permisiuni"
+    },
+    "buttons": {
+      "addNewUser": "Adaugă Utilizator Nou",
+      "createNewRole": "Creează Rol Nou",
+      "tryAgain": "Încearcă Din Nou"
+    },
+    "search": {
+      "placeholder": "Caută utilizatori după nume, email, nume de utilizator sau rol...",
+      "usersFound": "{{count}} utilizator găsit",
+      "usersFound_plural": "{{count}} utilizatori găsiți"
+    },
+    "table": {
+      "avatar": "Avatar",
+      "name": "Nume",
+      "username": "Nume Utilizator",
+      "email": "Email",
+      "role": "Rol",
+      "lastLogin": "Ultima Autentificare",
+      "status": "Status",
+      "actions": "Acțiuni",
+      "roleColumn": "Rol",
+      "description": "Descriere",
+      "permissionsCount": "Număr Permisiuni",
+      "users": "Utilizatori"
+    },
+    "status": {
+      "active": "Activ",
+      "inactive": "Inactiv"
+    },
+    "tooltips": {
+      "editUser": "Editează Utilizator",
+      "deactivateUser": "Dezactivează Utilizator",
+      "activateUser": "Activează Utilizator",
+      "viewDetails": "Vezi Detalii",
+      "editPermissions": "Editează Permisiuni"
+    },
+    "empty": {
+      "noUsersFound": "Nu s-au găsit utilizatori",
+      "noUsersMatch": "Nu există utilizatori care să corespundă \"{{searchTerm}}\". Încearcă să ajustezi căutarea.",
+      "noUsersInSystem": "Nu există încă utilizatori în sistem.",
+      "addFirstUser": "Adaugă Primul Utilizator",
+      "noRolesFound": "Nu s-au găsit roluri",
+      "noRolesConfigured": "Nu există roluri configurate în sistem."
+    },
+    "loading": {
+      "loadingUsers": "Se încarcă utilizatorii...",
+      "loadingRoles": "Se încarcă rolurile..."
+    },
+    "messages": {
+      "failedToLoadUsers": "Eșec la încărcarea utilizatorilor. Te rugăm să încerci din nou.",
+      "never": "Niciodată"
+    },
+    "labels": {
+      "id": "ID:",
+      "permissions": "permisiuni",
+      "users": "utilizatori",
+      "noDescription": "Nu există descriere disponibilă"
+    }
+  },
+  "adminRegister": {
+    "title": "Creează Cont Utilizator Nou",
+    "fields": {
+      "firstName": "Prenume",
+      "lastName": "Nume",
+      "username": "Nume Utilizator",
+      "email": "Email",
+      "password": "Parolă",
+      "role": "Rol"
+    },
+    "placeholders": {
+      "firstName": "Introdu prenume",
+      "lastName": "Introdu nume",
+      "username": "Introdu nume utilizator",
+      "email": "Introdu adresă email",
+      "password": "Introdu parolă"
+    },
+    "labels": {
+      "enableEmailNotifications": "Activează Notificări Email",
+      "emailNotificationsDescription": "Utilizatorul va primi notificări email pentru achiziții și evenimente sistem",
+      "selectRole": "Selectează un rol",
+      "loadingRoles": "Se încarcă rolurile...",
+      "noRolesAvailable": "Nu există roluri disponibile"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "createUser": "Creează Utilizator",
+      "creating": "Se creează...",
+      "loading": "Se încarcă..."
+    },
+    "messages": {
+      "failedToLoadRoles": "Eșec la încărcarea rolurilor. Te rugăm să încerci din nou.",
+      "failedToCreateUser": "Eșec la crearea utilizatorului. Te rugăm să încerci din nou."
+    }
+  },
+  "editUser": {
+    "title": "Editează Utilizator",
+    "fields": {
+      "firstName": "Prenume",
+      "lastName": "Nume",
+      "username": "Nume Utilizator",
+      "email": "Email",
+      "role": "Rol"
+    },
+    "labels": {
+      "enableEmailNotifications": "Activează Notificări Email",
+      "emailNotificationsDescription": "Utilizatorul va primi notificări email pentru achiziții și evenimente sistem",
+      "selectRole": "Selectează Rol"
+    },
+    "roleOptions": {
+      "admin": "Admin",
+      "manager": "Manager",
+      "user": "Utilizator"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "updateUser": "Actualizează Utilizator",
+      "updating": "Se actualizează..."
+    },
+    "messages": {
+      "failedToUpdateUser": "Eșec la actualizarea utilizatorului. Te rugăm să încerci din nou."
+    }
+  },
+  "activateUser": {
+    "title": "Activează Utilizator",
+    "confirmation": "Ești sigur că vrei să activezi acest cont de utilizator?",
+    "labels": {
+      "role": "Rol:"
+    },
+    "info": {
+      "title": "Activarea acestui utilizator va:",
+      "restoreAccess": "Restabili accesul lor la sistem",
+      "allowLogin": "Le permite să se autentifice din nou",
+      "enablePermissions": "Activează toate permisiunile lor anterioare"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "activateUser": "Activează Utilizator",
+      "activating": "Se activează..."
+    },
+    "messages": {
+      "failedToActivateUser": "Eșec la activarea utilizatorului. Te rugăm să încerci din nou."
+    }
+  },
+  "deleteConfirmation": {
+    "title": "Dezactivează Utilizator",
+    "confirmation": "Ești sigur că vrei să dezactivezi acest cont de utilizator?",
+    "labels": {
+      "role": "Rol:"
+    },
+    "warning": {
+      "title": "Avertisment:",
+      "deactivatingWill": "Dezactivarea acestui utilizator va:",
+      "blockAccess": "Bloca accesul lor la sistem",
+      "preventLogin": "Le împiedica să se autentifice",
+      "keepData": "Păstra datele lor pentru păstrarea înregistrărilor",
+      "canReactivate": "Poate fi reactivat mai târziu prin editarea utilizatorului"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "deactivateUser": "Dezactivează Utilizator",
+      "deactivating": "Se dezactivează..."
+    },
+    "messages": {
+      "failedToDeleteUser": "Eșec la ștergerea utilizatorului. Te rugăm să încerci din nou."
+    }
+  },
+  "createRole": {
+    "title": "Creează Rol Nou",
+    "fields": {
+      "roleName": "Nume Rol",
+      "description": "Descriere"
+    },
+    "placeholders": {
+      "roleName": "ex: Supraveghetor, Operator, Analist",
+      "description": "Descriere scurtă a scopului și responsabilităților acestui rol"
+    },
+    "labels": {
+      "assignPermissions": "Atribuie Permisiuni",
+      "selected": "Selectate",
+      "of": "din",
+      "permissions": "permisiuni",
+      "loadingPermissions": "Se încarcă permisiunile..."
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "createRole": "Creează Rol",
+      "creating": "Se creează..."
+    },
+    "messages": {
+      "roleNameRequired": "Numele rolului este obligatoriu",
+      "failedToLoadPermissions": "Eșec la încărcarea permisiunilor",
+      "failedToCreateRole": "Eșec la crearea rolului"
+    }
+  },
+  "editRolePermissions": {
+    "title": "Editează Permisiuni {{role}}",
+    "labels": {
+      "selected": "Selectate",
+      "of": "din",
+      "permissions": "permisiuni",
+      "loadingPermissions": "Se încarcă permisiunile..."
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "savePermissions": "Salvează Permisiuni",
+      "saving": "Se salvează..."
+    },
+    "messages": {
+      "failedToLoadPermissions": "Eșec la încărcarea permisiunilor",
+      "failedToSavePermissions": "Eșec la salvarea permisiunilor"
+    }
+  }
 }
-

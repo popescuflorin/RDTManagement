@@ -1,6 +1,154 @@
 {
   "title": "Transports",
-  "createTransport": "Create New Transport Vehicle",
-  "editTransport": "Edit Transport"
+  "transports": {
+    "title": "Transports",
+    "tabs": {
+      "transportVehicles": "Transport Vehicles",
+      "transportRecords": "Transport Records"
+    },
+    "buttons": {
+      "createNewTransportVehicle": "Create New Transport Vehicle",
+      "createTransportRecord": "Create Transport Record"
+    },
+    "search": {
+      "vehicles": "Search by car name, number plate, or phone...",
+      "records": "Search by car name, number plate, phone, or related entity..."
+    },
+    "table": {
+      "id": "ID",
+      "carName": "Car Name",
+      "numberPlate": "Number Plate",
+      "phoneNumber": "Phone Number",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At",
+      "actions": "Actions",
+      "type": "Type",
+      "relatedEntity": "Related Entity",
+      "transportDate": "Transport Date",
+      "status": "Status"
+    },
+    "tooltips": {
+      "editTransport": "Edit Transport",
+      "deleteTransport": "Delete Transport"
+    },
+    "empty": {
+      "noTransportsFound": "No transports found matching your search",
+      "noTransportsCreateFirst": "No transports found. Create your first transport!",
+      "noRecordsFound": "No transport records found matching your search",
+      "noRecords": "No transport records found."
+    },
+    "loading": {
+      "loadingTransports": "Loading transports...",
+      "loadingRecords": "Loading transport records..."
+    },
+    "pagination": {
+      "showing": "Showing {{start}} to {{end}} of {{total}} transports",
+      "showingRecords": "Showing {{start}} to {{end}} of {{total}} records",
+      "first": "First",
+      "previous": "Previous",
+      "next": "Next",
+      "last": "Last",
+      "show": "Show:",
+      "perPage": "per page"
+    },
+    "messages": {
+      "failedToLoadTransports": "Failed to load transports",
+      "failedToDeleteTransport": "Failed to delete transport",
+      "failedToLoadRecords": "Failed to load transport records",
+      "confirmDelete": "Are you sure you want to delete transport \"{{carName}}\"?",
+      "notSet": "—"
+    }
+  },
+  "createTransport": {
+    "title": "Create New Transport Vehicle",
+    "fields": {
+      "carName": "Car Name",
+      "numberPlate": "Number Plate",
+      "phoneNumber": "Phone Number"
+    },
+    "placeholders": {
+      "carName": "Enter car name",
+      "numberPlate": "Enter number plate (optional)",
+      "phoneNumber": "Enter phone number"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "createTransport": "Create Transport",
+      "creating": "Creating..."
+    },
+    "messages": {
+      "carNameRequired": "Car name is required",
+      "phoneNumberRequired": "Phone number is required",
+      "failedToCreate": "Failed to create transport"
+    }
+  },
+  "editTransport": {
+    "title": "Edit Transport",
+    "fields": {
+      "carName": "Car Name",
+      "numberPlate": "Number Plate",
+      "phoneNumber": "Phone Number"
+    },
+    "placeholders": {
+      "carName": "Enter car name",
+      "numberPlate": "Enter number plate (optional)",
+      "phoneNumber": "Enter phone number"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "updateTransport": "Update Transport",
+      "updating": "Updating..."
+    },
+    "messages": {
+      "carNameRequired": "Car name is required",
+      "phoneNumberRequired": "Phone number is required",
+      "failedToUpdate": "Failed to update transport"
+    }
+  },
+  "createTransportRecord": {
+    "title": "Create Transport Record",
+    "sections": {
+      "selectEntities": "Select Entities",
+      "selectTransport": "Select Transport"
+    },
+    "fields": {
+      "transportVehicle": "Transport Vehicle",
+      "transportDate": "Transport Date",
+      "transportNotes": "Transport Notes"
+    },
+    "placeholders": {
+      "selectTransport": "Select a transport...",
+      "transportNotes": "Optional notes about the transport..."
+    },
+    "labels": {
+      "entitiesSelected": "{{count}} entity selected",
+      "entitiesSelected_plural": "{{count}} entities selected",
+      "acquisitions": "Acquisitions",
+      "orders": "Orders",
+      "selectAll": "Select All",
+      "deselectAll": "Deselect All",
+      "rawMaterials": "Raw Materials",
+      "recyclableMaterials": "Recyclable Materials",
+      "items": "item(s)",
+      "car": "Car:",
+      "plate": "Plate:",
+      "phone": "Phone:",
+      "notAvailable": "N/A",
+      "assigningTo_one": "Assigning to {{count}} entity...",
+      "assigningTo_other": "Assigning to {{count}} entities...",
+      "assignTransportTo_one": "Assign Transport to {{count}} Entity",
+      "assignTransportTo_other": "Assign Transport to {{count}} Entities"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "assignTransport": "Assign Transport"
+    },
+    "messages": {
+      "loadingDraftEntities": "Loading draft entities...",
+      "noDraftEntities": "No draft entities available",
+      "pleaseSelectEntityAndTransport": "Please select at least one entity and a transport",
+      "failedToLoadData": "Failed to load data",
+      "failedToAssign": "Failed to assign transport to one or more entities"
+    }
+  }
 }
-

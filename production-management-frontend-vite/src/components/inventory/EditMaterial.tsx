@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { inventoryApi } from '../../services/api';
 import type { RawMaterial, UpdateRawMaterialRequest } from '../../types';
 import { MaterialType } from '../../types';
@@ -11,6 +12,7 @@ interface EditMaterialProps {
 }
 
 const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMaterialUpdated }) => {
+  const { t } = useTranslation(['inventory', 'common']);
   const [formData, setFormData] = useState<UpdateRawMaterialRequest>({
     name: material.name,
     color: material.color,
@@ -53,7 +55,7 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
       onClose();
     } catch (error: any) {
       console.error('Error updating material:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to update material. Please try again.';
+      const errorMessage = error.response?.data?.message || t('edit.messages.failedToUpdate');
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -66,7 +68,7 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
     <div className="edit-material-overlay">
       <div className="edit-material-modal">
         <div className="edit-material-header">
-          <h2>✏️ Edit Material</h2>
+          <h2>✏️ {t('edit.title')}</h2>
           <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
         </div>
 
@@ -78,20 +80,24 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
           )}
 
           <div className="material-summary">
-            <h3>Current Material:</h3>
+            <h3>{t('edit.currentMaterial')}</h3>
             <div className="summary-details">
               <div className="summary-item">
-                <span className="label">Name:</span>
+                <span className="label">{t('form.labels.name')}</span>
                 <span className="value">{material.name} ({material.color})</span>
               </div>
               <div className="summary-item">
-                <span className="label">Type:</span>
+                <span className="label">{t('form.labels.type')}</span>
                 <span className="value">
-                  {material.type === MaterialType.RawMaterial ? 'Raw Material' : 'Recyclable Material'}
+                  {material.type === MaterialType.RawMaterial 
+                    ? t('filters.rawMaterials')
+                    : material.type === MaterialType.RecyclableMaterial
+                    ? t('filters.recyclableMaterials')
+                    : t('filters.finishedProducts')}
                 </span>
               </div>
               <div className="summary-item">
-                <span className="label">Last Updated:</span>
+                <span className="label">{t('edit.fields.lastUpdated')}</span>
                 <span className="value">{new Date(material.updatedAt).toLocaleDateString()}</span>
               </div>
             </div>
@@ -99,27 +105,27 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="name">Material Name *</label>
+              <label htmlFor="name">{t('form.fields.materialName')} *</label>
               <input
                 type="text"
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder="e.g., Steel Sheets, Paint, Screws"
+                placeholder={t('form.placeholders.materialName')}
                 required
                 disabled={isLoading}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="color">Color *</label>
+              <label htmlFor="color">{t('form.fields.color')} *</label>
               <input
                 type="text"
                 id="color"
                 name="color"
                 value={formData.color}
                 onChange={handleInputChange}
-                placeholder="e.g., Silver, Black, Red"
+                placeholder={t('form.placeholders.color')}
                 required
                 disabled={isLoading}
               />
@@ -128,7 +134,7 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="type">Material Type *</label>
+              <label htmlFor="type">{t('form.fields.materialType')} *</label>
               <select
                 id="type"
                 name="type"
@@ -137,20 +143,20 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
                 required
                 disabled={isLoading}
               >
-                <option value={MaterialType.RawMaterial}>Raw Material</option>
-                <option value={MaterialType.RecyclableMaterial}>Recyclable Material</option>
-                <option value={MaterialType.FinishedProduct}>Finished Product</option>
+                <option value={MaterialType.RawMaterial}>{t('filters.rawMaterials')}</option>
+                <option value={MaterialType.RecyclableMaterial}>{t('filters.recyclableMaterials')}</option>
+                <option value={MaterialType.FinishedProduct}>{t('filters.finishedProducts')}</option>
               </select>
             </div>
             <div className="form-group">
-              <label htmlFor="quantityType">Unit Type *</label>
+              <label htmlFor="quantityType">{t('form.fields.unitType')} *</label>
               <input
                 type="text"
                 id="quantityType"
                 name="quantityType"
                 value={formData.quantityType}
                 onChange={handleInputChange}
-                placeholder="e.g., kg, liters, pieces"
+                placeholder={t('form.placeholders.unitType')}
                 required
                 disabled={isLoading}
                 list="quantityTypeOptions"
@@ -165,7 +171,7 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="quantity">Current Quantity *</label>
+              <label htmlFor="quantity">{t('edit.fields.currentQuantity')} *</label>
               <input
                 type="number"
                 id="quantity"
@@ -180,7 +186,7 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
               />
             </div>
             <div className="form-group">
-              <label htmlFor="minimumStock">Minimum Stock Level</label>
+              <label htmlFor="minimumStock">{t('form.fields.minimumStockLevel')}</label>
               <input
                 type="number"
                 id="minimumStock"
@@ -196,13 +202,13 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
           </div>
 
           <div className="form-group">
-            <label htmlFor="description">Description</label>
+            <label htmlFor="description">{t('form.fields.description')}</label>
             <textarea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              placeholder="Optional description of the material..."
+              placeholder={t('form.placeholders.description')}
               rows={3}
               disabled={isLoading}
             />
@@ -216,8 +222,8 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
               </div>
               <div className="indicator-text">
                 {formData.quantity <= formData.minimumStock 
-                  ? `Low Stock Warning! (${formData.quantity} ≤ ${formData.minimumStock})`
-                  : `Stock Level OK (${formData.quantity} > ${formData.minimumStock})`
+                  ? t('edit.stockIndicators.lowStockWarning', { quantity: formData.quantity, minimum: formData.minimumStock })
+                  : t('edit.stockIndicators.stockLevelOk', { quantity: formData.quantity, minimum: formData.minimumStock })
                 }
               </div>
             </div>
@@ -230,14 +236,14 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
               className="btn btn-secondary"
               disabled={isLoading}
             >
-              Cancel
+              {t('edit.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="btn btn-primary"
               disabled={isLoading}
             >
-              {isLoading ? 'Updating...' : 'Update Material'}
+              {isLoading ? t('edit.buttons.updating') : t('edit.buttons.updateMaterial')}
             </button>
           </div>
         </form>

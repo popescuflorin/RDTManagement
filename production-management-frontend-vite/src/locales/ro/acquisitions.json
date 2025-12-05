@@ -1,11 +1,70 @@
 {
   "title": "Achiziții",
-  "createAcquisition": "Creează achiziție nouă",
-  "editAcquisition": "Editează achiziție",
-  "viewAcquisition": "Vizualizează achiziție",
-  "receiveAcquisition": "Primește achiziție",
-  "processAcquisition": "Procesează achiziție",
-  "acquisitionDetails": "Detalii achiziție",
+  "subtitle": "Gestionează comenzile și achizițiile de materii prime",
+  "createAcquisition": "Creează Achiziție",
+  "editAcquisition": "Editează Achiziție",
+  "viewAcquisition": "Vizualizează Achiziție",
+  "receiveAcquisition": "Primește Achiziție",
+  "processAcquisition": "Procesează Achiziție",
+  "acquisitionDetails": "Detalii Achiziție",
+  "loading": "Se încarcă achizițiile...",
+  "searchPlaceholder": "Caută achiziții...",
+  "allTypes": "Toate Tipurile",
+  "allStatus": "Toate Statusurile",
+  "table": {
+    "title": "Titlu",
+    "type": "Tip",
+    "status": "Status",
+    "assignedTo": "Atribuit Lui",
+    "supplier": "Furnizor",
+    "items": "Articole",
+    "dueDate": "Data Scadenței",
+    "created": "Creat",
+    "actions": "Acțiuni"
+  },
+  "emptyState": {
+    "noAcquisitions": "Nu s-au găsit achiziții",
+    "noMatches": "Nicio achiziție nu se potrivește cu filtrele tale",
+    "getStarted": "Creează prima ta achiziție pentru a începe"
+  },
+  "statistics": {
+    "totalAcquisitions": "Total Achiziții",
+    "draft": "Ciornă",
+    "received": "Primit"
+  },
+  "tableContent": {
+    "items": "articole",
+    "units": "unități",
+    "unassigned": "Neatribuit",
+    "by": "de"
+  },
+  "pagination": {
+    "showing": "Se afișează {{start}} până la {{end}} din {{total}} achiziții",
+    "first": "Primul",
+    "previous": "Anterior",
+    "next": "Următor",
+    "last": "Ultimul",
+    "show": "Afișează:",
+    "perPage": "pe pagină"
+  },
+  "deleteModal": {
+    "title": "Anulează Achiziția",
+    "confirmation": "Ești sigur că vrei să anulezi \"{{title}}\"?",
+    "warning": "Aceasta va marca achiziția ca anulată și nu poate fi primită.",
+    "goBack": "Înapoi",
+    "confirm": "Anulează Achiziția"
+  },
+  "messages": {
+    "failedToLoad": "Eșec la încărcarea datelor achiziției",
+    "failedToCancel": "Eșec la anularea achiziției"
+  },
+  "actions": {
+    "view": "Vizualizează",
+    "edit": "Editează",
+    "receive": "Primește",
+    "process": "Procesează",
+    "delete": "Șterge"
+  },
   "type": {
     "rawMaterials": "Materii prime",
     "recyclableMaterials": "Materiale reciclabile"
@@ -16,7 +75,242 @@
     "readyForProcessing": "Gata pentru procesare",
     "processing": "În procesare",
     "completed": "Finalizat",
-    "cancelled": "Anulat"
+    "cancelled": "Anulat",
+    "received": "Primit"
+  },
+  "form": {
+    "createTitle": "Creează Achiziție Nouă",
+    "editTitle": "Editează Achiziție",
+    "sections": {
+      "information": "Informații",
+      "transportDetails": "Detalii Transport",
+      "supplier": "Furnizor",
+      "materials": "Materiale"
+    },
+    "fields": {
+      "details": "Detalii",
+      "type": "Tip",
+      "assignedUser": "Utilizator Atribuit",
+      "description": "Descriere",
+      "dueDate": "Data Scadenței",
+      "notes": "Note",
+      "carName": "Nume Mașină",
+      "numberPlate": "Număr Înmatriculare",
+      "phoneNumber": "Număr Telefon",
+      "transportDate": "Data Transport",
+      "transportNotes": "Note Transport",
+      "supplierName": "Nume Furnizor",
+      "supplierContact": "Contact Furnizor",
+      "contactPerson": "Persoană Contact",
+      "phone": "Telefon",
+      "email": "Email",
+      "address": "Adresă",
+      "city": "Oraș",
+      "country": "Țară",
+      "materialName": "Nume Material",
+      "color": "Culoare",
+      "quantity": "Cantitate",
+      "unitOfMeasure": "Unitate Măsură",
+      "itemDescription": "Descriere"
+    },
+    "placeholders": {
+      "enterTitle": "Introdu numele achiziției",
+      "enterDescription": "Introdu descrierea achiziției",
+      "selectDueDate": "Selectează data scadenței",
+      "additionalNotes": "Note suplimentare",
+      "searchOrEnterCar": "Caută sau introdu numele mașinii/vehiculului",
+      "enterNumberPlate": "Introdu numărul de înmatriculare (opțional)",
+      "enterPhoneNumber": "Introdu numărul de telefon",
+      "selectTransportDate": "Selectează data transportului",
+      "additionalTransportNotes": "Note suplimentare transport",
+      "contactInformation": "Informații contact",
+      "enterSupplierName": "Introdu numele furnizorului",
+      "contactPersonName": "Nume persoană contact",
+      "phoneNumber": "Număr telefon",
+      "emailAddress": "Adresă email",
+      "streetAddress": "Adresă stradă",
+      "city": "Oraș",
+      "postalCode": "Cod poștal",
+      "country": "Țară",
+      "searchOrCreateMaterial": "Caută sau creează material nou",
+      "enterMaterialColor": "Introdu culoarea materialului",
+      "enterColor": "Introdu culoare",
+      "materialDescription": "Descriere material",
+      "unitExample": "ex: kg, litri, bucăți"
+    },
+    "options": {
+      "noSupplier": "Fără Furnizor",
+      "createNewSupplier": "Creează Furnizor Nou",
+      "createNewTransport": "Creează transport nou:",
+      "startTypingTransport": "Începe să scrii pentru a căuta sau crea un transport nou",
+      "enterPhoneToCreate": "Introdu numărul de telefon și trimite pentru a crea"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "create": "Creează Achiziție",
+      "creating": "Se creează...",
+      "update": "Actualizează Achiziție",
+      "updating": "Se actualizează...",
+      "addMaterial": "Adaugă Material",
+      "addNewMaterial": "Adaugă Material Nou"
+    },
+    "labels": {
+      "selectedMaterials": "Materiale Selectate",
+      "totalItems": "Total Articole",
+      "materialsSelected": "materiale selectate",
+      "createNewSupplier": "Creează Furnizor Nou"
+    },
+    "messages": {
+      "titleRequired": "Titlul este obligatoriu",
+      "atLeastOneItem": "Cel puțin un articol este obligatoriu",
+      "fillRequiredFields": "Te rugăm să completezi toate câmpurile obligatorii pentru materialul nou",
+      "supplierNameRequired": "Numele furnizorului este obligatoriu",
+      "failedToLoadMaterials": "Eșec la încărcarea materiilor prime",
+      "failedToLoadSuppliers": "Eșec la încărcarea furnizorilor",
+      "failedToLoadTransports": "Eșec la încărcarea transporturilor",
+      "failedToLoadUsers": "Eșec la încărcarea utilizatorilor",
+      "failedToCreateSupplier": "Eșec la crearea furnizorului",
+      "failedToCreateAcquisition": "Eșec la crearea achiziției",
+      "failedToUpdateAcquisition": "Eșec la actualizarea achiziției",
+      "noMaterialsFound": "Nu s-au găsit materiale - se va crea material nou"
+    },
+    "itemCard": {
+      "color": "Culoare",
+      "quantity": "Cantitate",
+      "unit": "Unitate"
+    }
+  },
+  "view": {
+    "title": "Vizualizează Achiziție",
+    "sections": {
+      "acquisitionDetails": "Detalii Achiziție",
+      "transport": "Transport",
+      "supplier": "Furnizor",
+      "materials": "Materiale",
+      "recyclableMaterialsInitial": "Materiale Reciclabile (Stare Inițială)",
+      "processedRawMaterials": "Materii Prime Procesate (Rezultat)",
+      "changeHistory": "Istoric Modificări"
+    },
+    "labels": {
+      "title": "Titlu",
+      "status": "Status",
+      "type": "Tip",
+      "description": "Descriere",
+      "assignedTo": "Atribuit Lui",
+      "createdBy": "Creat De",
+      "receivedBy": "Primit De",
+      "dueDate": "Data Scadenței",
+      "notes": "Note",
+      "vehicle": "Vehicul",
+      "numberPlate": "Număr Înmatriculare",
+      "phone": "Telefon",
+      "date": "Dată",
+      "transportNotes": "Note",
+      "name": "Nume",
+      "contact": "Contact",
+      "orderedQuantity": "Cantitate Comandată",
+      "receivedQuantity": "Cantitate Primită",
+      "unitOfMeasure": "Unitate Măsură",
+      "ordered": "Comandat",
+      "received": "Primit",
+      "totalItems": "Total Articole",
+      "totalQuantity": "Total Cantitate",
+      "totalCost": "Cost Total",
+      "units": "unități",
+      "totalProcessedItems": "Total Articole Procesate",
+      "totalOutputQuantity": "Total Cantitate Rezultat",
+      "quantity": "Cantitate",
+      "total": "Total",
+      "changes": "Modificări",
+      "notSet": "Nu este setat",
+      "unassigned": "Neatribuit",
+      "on": "pe",
+      "completeDelivery": "✓ Livrare Completă",
+      "partialDelivery": "⚠ Livrare Parțială",
+      "excessReceived": "⚠ Exces Primit"
+    },
+    "messages": {
+      "processedMaterialsInfo": "Aceste materii prime au fost produse din materialele reciclabile de mai sus prin etapa de procesare."
+    },
+    "buttons": {
+      "close": "Închide"
+    }
+  },
+  "receive": {
+    "title": {
+      "rawMaterials": "Primește Materii Prime",
+      "recyclableMaterials": "Primește și Curăță Materiale Reciclabile"
+    },
+    "sections": {
+      "acquisitionDetails": "Detalii Achiziție",
+      "materialsToReceive": "Materiale de Primit"
+    },
+    "labels": {
+      "orderedQuantity": "Cantitate Comandată",
+      "receivedQuantity": "Cantitate Primită",
+      "unitOfMeasure": "Unitate Măsură",
+      "enterReceivedQuantity": "Introdu cantitatea primită",
+      "complete": "✓ Complet",
+      "excessReceived": "⚠ Exces primit",
+      "partialDelivery": "⚠ Livrare parțială",
+      "totalItems": "Total Articole",
+      "totalOrdered": "Total Comandat",
+      "totalReceiving": "Total de Primit",
+      "units": "unități"
+    },
+    "messages": {
+      "recyclableMaterialsNote": "Materialele reciclabile vor fi marcate ca \"Gata pentru Procesare\" după acest pas. Ele NU vor fi adăugate în inventar până după ce etapa de procesare/curățare este completă.",
+      "quantitiesCannotBeNegative": "Cantitățile primite nu pot fi negative",
+      "failedToReceive": "Eșec la primirea achiziției"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "receiveAndAdd": "Primește și Adaugă în Inventar",
+      "markReadyForProcessing": "Marchează Gata pentru Procesare",
+      "processing": "Se procesează..."
+    }
+  },
+  "process": {
+    "title": "Procesează Materiale Reciclabile",
+    "sections": {
+      "acquisitionDetails": "Detalii Achiziție",
+      "processRecyclableMaterials": "Procesează Materiale Reciclabile"
+    },
+    "labels": {
+      "assignedTo": "Atribuit Lui",
+      "receivedBy": "Primit De",
+      "color": "Culoare",
+      "available": "Disponibil",
+      "remaining": "Rămas",
+      "overProcessingAllowed": "(Procesare excesivă permisă)",
+      "selectRawMaterialOrCreate": "Selectează Materie Primă sau Creează Nouă",
+      "selectOrCreateNew": "-- Selectează sau Creează Nouă --",
+      "createNewRawMaterial": "➕ Creează Materie Primă Nouă",
+      "existingRawMaterials": "Materii Prime Existente",
+      "quantity": "Cantitate",
+      "materialName": "Nume Material",
+      "enterMaterialName": "Introdu numele materialului",
+      "enterColor": "Introdu culoare",
+      "unitOfMeasure": "Unitate Măsură",
+      "descriptionOptional": "Descriere (Opțional)",
+      "enterDescription": "Introdu descriere",
+      "selected": "Selectat",
+      "remove": "Elimină",
+      "addProcessedMaterial": "Adaugă Material Procesat",
+      "na": "N/A"
+    },
+    "messages": {
+      "processingInstructionsLabel": "Instrucțiuni Procesare",
+      "processingInstructions": "Transformă materialele reciclabile în materii prime specificând materialele și cantitățile rezultate. Poți selecta materii prime existente sau crea altele noi. Materialele procesate vor fi adăugate în inventarul tău.",
+      "pleaseAddAtLeastOne": "Te rugăm să adaugi cel puțin un material procesat",
+      "allProcessedMaterialsMustHave": "Toate materialele procesate trebuie să aibă un nume, culoare și cantitate validă",
+      "failedToLoadData": "Eșec la încărcarea datelor",
+      "failedToProcess": "Eșec la procesarea achiziției"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "completeProcessing": "Finalizează Procesarea și Adaugă în Inventar",
+      "processing": "Se procesează..."
+    }
   }
 }
-

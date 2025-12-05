@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Building2, 
   Plus, 
@@ -23,6 +24,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import './Suppliers.css';
 
 const Suppliers: React.FC = () => {
+  const { t } = useTranslation(['suppliers', 'common']);
   const [pagedData, setPagedData] = useState<PagedResult<Supplier> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +74,7 @@ const Suppliers: React.FC = () => {
       });
       setPagedData(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load suppliers');
+      setError(err.response?.data?.message || t('suppliers.messages.failedToLoadSuppliers'));
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +117,7 @@ const Suppliers: React.FC = () => {
   };
 
   const handleDeleteSupplier = async (supplier: Supplier) => {
-    if (!window.confirm(`Are you sure you want to deactivate supplier "${supplier.name}"?`)) {
+    if (!window.confirm(t('suppliers.messages.confirmDeactivate', { name: supplier.name }))) {
       return;
     }
 
@@ -124,7 +126,7 @@ const Suppliers: React.FC = () => {
       await supplierApi.deleteSupplier(supplier.id);
       await loadData();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to deactivate supplier');
+      setError(err.response?.data?.message || t('suppliers.messages.failedToDeactivateSupplier'));
     } finally {
       setIsDeleting(false);
     }
@@ -151,7 +153,7 @@ const Suppliers: React.FC = () => {
     return (
       <div className="suppliers-loading">
         <Loader2 size={32} className="animate-spin" />
-        <p>Loading suppliers...</p>
+        <p>{t('suppliers.loading.loadingSuppliers')}</p>
       </div>
     );
   }
@@ -161,7 +163,7 @@ const Suppliers: React.FC = () => {
       <div className="suppliers-header">
         <h1>
           <Building2 size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-          Suppliers
+          {t('suppliers.title')}
         </h1>
         <ProtectedButton
           requiredPermission={Permissions.CreateSupplier}
@@ -169,7 +171,7 @@ const Suppliers: React.FC = () => {
           onClick={handleCreateSupplier}
         >
           <Plus size={16} />
-          Create New Supplier
+          {t('suppliers.buttons.createNewSupplier')}
         </ProtectedButton>
       </div>
 
@@ -180,7 +182,7 @@ const Suppliers: React.FC = () => {
             <Search size={20} className="search-icon" />
             <input
               type="text"
-              placeholder="Search by name, description, contact, email, phone, city, country, tax ID, or registration number..."
+              placeholder={t('suppliers.search.placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -198,7 +200,7 @@ const Suppliers: React.FC = () => {
                 setCurrentPage(1); // Reset to first page on filter change
               }}
             />
-            <span>Show Inactive</span>
+            <span>{t('suppliers.filters.showInactive')}</span>
           </label>
         </div>
       </div>
@@ -215,15 +217,15 @@ const Suppliers: React.FC = () => {
         <table className="suppliers-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Contact</th>
-              <th>Location</th>
-              <th>Total Acquisitions</th>
-              <th>Total Value</th>
-              <th>Status</th>
-              <th>Created At</th>
-              <th>Actions</th>
+              <th>{t('suppliers.table.id')}</th>
+              <th>{t('suppliers.table.name')}</th>
+              <th>{t('suppliers.table.contact')}</th>
+              <th>{t('suppliers.table.location')}</th>
+              <th>{t('suppliers.table.totalAcquisitions')}</th>
+              <th>{t('suppliers.table.totalValue')}</th>
+              <th>{t('suppliers.table.status')}</th>
+              <th>{t('suppliers.table.createdAt')}</th>
+              <th>{t('suppliers.table.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -231,8 +233,8 @@ const Suppliers: React.FC = () => {
               <tr>
                 <td colSpan={9} className="no-data">
                   {searchTerm || showInactive
-                    ? 'No suppliers found matching your criteria' 
-                    : 'No suppliers found. Create your first supplier!'}
+                    ? t('suppliers.empty.noSuppliersFound')
+                    : t('suppliers.empty.noSuppliersCreateFirst')}
                 </td>
               </tr>
             ) : (
@@ -262,7 +264,7 @@ const Suppliers: React.FC = () => {
                           {supplier.phone}
                         </div>
                       )}
-                      {!supplier.email && !supplier.phone && <span className="no-contact">—</span>}
+                      {!supplier.email && !supplier.phone && <span className="no-contact">{t('suppliers.messages.notSet')}</span>}
                     </div>
                   </td>
                   <td>
@@ -272,14 +274,14 @@ const Suppliers: React.FC = () => {
                         {[supplier.city, supplier.country].filter(Boolean).join(', ')}
                       </div>
                     ) : (
-                      <span>—</span>
+                      <span>{t('suppliers.messages.notSet')}</span>
                     )}
                   </td>
                   <td>{supplier.totalAcquisitions}</td>
                   <td className="currency-cell">{formatCurrency(supplier.totalAcquisitionValue)}</td>
                   <td>
                     <span className={`status-badge ${supplier.isActive ? 'status-active' : 'status-inactive'}`}>
-                      {supplier.isActive ? 'Active' : 'Inactive'}
+                      {supplier.isActive ? t('suppliers.status.active') : t('suppliers.status.inactive')}
                     </span>
                   </td>
                   <td>{formatDate(supplier.createdAt)}</td>
@@ -288,7 +290,7 @@ const Suppliers: React.FC = () => {
                       <ProtectedButton
                         requiredPermission={Permissions.ViewSupplier}
                         className="btn btn-sm btn-primary"
-                        title="View Supplier"
+                        title={t('suppliers.tooltips.viewSupplier')}
                         onClick={() => handleViewSupplier(supplier)}
                       >
                         <Eye size={16} />
@@ -296,7 +298,7 @@ const Suppliers: React.FC = () => {
                       <ProtectedButton
                         requiredPermission={Permissions.EditSupplier}
                         className="btn btn-sm btn-primary"
-                        title="Edit Supplier"
+                        title={t('suppliers.tooltips.editSupplier')}
                         onClick={() => handleEditSupplier(supplier)}
                       >
                         <Edit size={16} />
@@ -305,7 +307,7 @@ const Suppliers: React.FC = () => {
                         <ProtectedButton
                           requiredPermission={Permissions.DeleteSupplier}
                           className="btn btn-sm btn-danger"
-                          title="Deactivate Supplier"
+                          title={t('suppliers.tooltips.deactivateSupplier')}
                           onClick={() => handleDeleteSupplier(supplier)}
                           disabled={isDeleting}
                         >
@@ -325,7 +327,11 @@ const Suppliers: React.FC = () => {
       {pagedData && pagedData.totalPages > 0 && (
         <div className="pagination-container">
           <div className="pagination-info">
-            Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} suppliers
+            {t('suppliers.pagination.showing', {
+              start: ((pagedData.page - 1) * pagedData.pageSize) + 1,
+              end: Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount),
+              total: pagedData.totalCount
+            })}
           </div>
           
           <div className="pagination-controls">
@@ -334,7 +340,7 @@ const Suppliers: React.FC = () => {
               onClick={() => setCurrentPage(1)}
               disabled={!pagedData.hasPreviousPage}
             >
-              First
+              {t('suppliers.pagination.first')}
             </button>
             <button
               className="pagination-btn"
@@ -342,7 +348,7 @@ const Suppliers: React.FC = () => {
               disabled={!pagedData.hasPreviousPage}
             >
               <ChevronLeft size={16} />
-              Previous
+              {t('suppliers.pagination.previous')}
             </button>
             
             <div className="pagination-pages">
@@ -375,7 +381,7 @@ const Suppliers: React.FC = () => {
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={!pagedData.hasNextPage}
             >
-              Next
+              {t('suppliers.pagination.next')}
               <ChevronRight size={16} />
             </button>
             <button
@@ -383,12 +389,12 @@ const Suppliers: React.FC = () => {
               onClick={() => setCurrentPage(pagedData.totalPages)}
               disabled={!pagedData.hasNextPage}
             >
-              Last
+              {t('suppliers.pagination.last')}
             </button>
           </div>
           
           <div className="page-size-selector">
-            <label>Show:</label>
+            <label>{t('suppliers.pagination.show')}</label>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -401,7 +407,7 @@ const Suppliers: React.FC = () => {
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span>per page</span>
+            <span>{t('suppliers.pagination.perPage')}</span>
           </div>
         </div>
       )}
@@ -410,13 +416,13 @@ const Suppliers: React.FC = () => {
       {pagedData && (
         <div className="suppliers-summary">
           <div className="summary-item">
-            <strong>Total Suppliers:</strong> {pagedData.totalCount}
+            <strong>{t('suppliers.summary.totalSuppliers')}</strong> {pagedData.totalCount}
           </div>
           <div className="summary-item">
-            <strong>Active:</strong> {suppliers.filter(s => s.isActive).length} of {pagedData.totalCount}
+            <strong>{t('suppliers.summary.active')}</strong> {suppliers.filter(s => s.isActive).length} {t('suppliers.summary.of')} {pagedData.totalCount}
           </div>
           <div className="summary-item">
-            <strong>Inactive:</strong> {suppliers.filter(s => !s.isActive).length} of {pagedData.totalCount}
+            <strong>{t('suppliers.summary.inactive')}</strong> {suppliers.filter(s => !s.isActive).length} {t('suppliers.summary.of')} {pagedData.totalCount}
           </div>
         </div>
       )}

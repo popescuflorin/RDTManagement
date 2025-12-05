@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { ProductionPlan } from '../../types';
 import './CancelProductionPlanModal.css';
 
@@ -15,16 +16,17 @@ const CancelProductionPlanModal: React.FC<CancelProductionPlanModalProps> = ({
   onConfirm,
   isLoading
 }) => {
+  const { t } = useTranslation(['production', 'common']);
   return (
     <div className="cancel-plan-overlay" onClick={onClose}>
       <div className="cancel-plan-modal" onClick={(e) => e.stopPropagation()}>
         <div className="cancel-plan-header">
-          <h2>Cancel Production Plan</h2>
+          <h2>{t('cancelPlan.title')}</h2>
         </div>
 
         <div className="cancel-plan-content">
-          <p>Are you sure you want to cancel "{plan.name}"?</p>
-          <p className="warning-text">This will mark the plan as cancelled and it cannot be executed.</p>
+          <p>{t('cancelPlan.confirmation', { planName: plan.name })}</p>
+          <p className="warning-text">{t('cancelPlan.warning')}</p>
         </div>
 
         <div className="cancel-plan-actions">
@@ -34,7 +36,7 @@ const CancelProductionPlanModal: React.FC<CancelProductionPlanModalProps> = ({
             className="cancel-button"
             disabled={isLoading}
           >
-            Go Back
+            {t('cancelPlan.buttons.goBack')}
           </button>
           <button
             type="button"
@@ -42,7 +44,7 @@ const CancelProductionPlanModal: React.FC<CancelProductionPlanModalProps> = ({
             className="delete-button"
             disabled={isLoading}
           >
-            {isLoading ? 'Cancelling...' : 'Cancel Plan'}
+            {isLoading ? t('cancelPlan.buttons.cancelling') : t('cancelPlan.buttons.cancelPlan')}
           </button>
         </div>
       </div>

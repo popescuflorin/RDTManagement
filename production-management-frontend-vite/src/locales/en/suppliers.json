@@ -1,7 +1,179 @@
 {
   "title": "Suppliers",
-  "createSupplier": "Create New Supplier",
-  "editSupplier": "Edit Supplier",
-  "viewSupplier": "View Supplier"
+  "suppliers": {
+    "title": "Suppliers",
+    "buttons": {
+      "createNewSupplier": "Create New Supplier"
+    },
+    "search": {
+      "placeholder": "Search by name, description, contact, email, phone, city, country, tax ID, or registration number..."
+    },
+    "filters": {
+      "showInactive": "Show Inactive"
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "contact": "Contact",
+      "location": "Location",
+      "totalAcquisitions": "Total Acquisitions",
+      "totalValue": "Total Value",
+      "status": "Status",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "tooltips": {
+      "viewSupplier": "View Supplier",
+      "editSupplier": "Edit Supplier",
+      "deactivateSupplier": "Deactivate Supplier"
+    },
+    "empty": {
+      "noSuppliersFound": "No suppliers found matching your criteria",
+      "noSuppliersCreateFirst": "No suppliers found. Create your first supplier!"
+    },
+    "loading": {
+      "loadingSuppliers": "Loading suppliers..."
+    },
+    "pagination": {
+      "showing": "Showing {{start}} to {{end}} of {{total}} suppliers",
+      "first": "First",
+      "previous": "Previous",
+      "next": "Next",
+      "last": "Last",
+      "show": "Show:",
+      "perPage": "per page"
+    },
+    "summary": {
+      "totalSuppliers": "Total Suppliers:",
+      "active": "Active:",
+      "inactive": "Inactive:",
+      "of": "of"
+    },
+    "messages": {
+      "failedToLoadSuppliers": "Failed to load suppliers",
+      "failedToDeactivateSupplier": "Failed to deactivate supplier",
+      "confirmDeactivate": "Are you sure you want to deactivate supplier \"{{name}}\"?",
+      "notSet": "—"
+    }
+  },
+  "createSupplier": {
+    "title": "Create New Supplier",
+    "fields": {
+      "supplierName": "Supplier Name",
+      "description": "Description",
+      "contactPerson": "Contact Person",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "taxId": "Tax ID",
+      "registrationNumber": "Registration Number",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "supplierName": "Enter supplier name",
+      "description": "Enter supplier description",
+      "contactPerson": "Enter contact person name",
+      "email": "Enter email address",
+      "phone": "Enter phone number",
+      "address": "Enter street address",
+      "city": "Enter city",
+      "postalCode": "Enter postal code",
+      "country": "Enter country",
+      "taxId": "Enter tax ID",
+      "registrationNumber": "Enter registration number",
+      "notes": "Optional notes about the supplier..."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "createSupplier": "Create Supplier",
+      "creating": "Creating..."
+    },
+    "messages": {
+      "supplierNameRequired": "Supplier name is required",
+      "failedToCreate": "Failed to create supplier"
+    }
+  },
+  "editSupplier": {
+    "title": "Edit Supplier",
+    "fields": {
+      "supplierName": "Supplier Name",
+      "description": "Description",
+      "contactPerson": "Contact Person",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "taxId": "Tax ID",
+      "registrationNumber": "Registration Number",
+      "notes": "Notes",
+      "active": "Active"
+    },
+    "placeholders": {
+      "supplierName": "Enter supplier name",
+      "description": "Enter supplier description",
+      "contactPerson": "Enter contact person name",
+      "email": "Enter email address",
+      "phone": "Enter phone number",
+      "address": "Enter street address",
+      "city": "Enter city",
+      "postalCode": "Enter postal code",
+      "country": "Enter country",
+      "taxId": "Enter tax ID",
+      "registrationNumber": "Enter registration number",
+      "notes": "Optional notes about the supplier..."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "updateSupplier": "Update Supplier",
+      "updating": "Updating..."
+    },
+    "messages": {
+      "supplierNameRequired": "Supplier name is required",
+      "failedToUpdate": "Failed to update supplier"
+    }
+  },
+  "viewSupplier": {
+    "title": "Supplier Details",
+    "sections": {
+      "basicInformation": "Basic Information",
+      "contactInformation": "Contact Information",
+      "address": "Address",
+      "businessInformation": "Business Information",
+      "statistics": "Statistics",
+      "notes": "Notes",
+      "metadata": "Metadata"
+    },
+    "fields": {
+      "name": "Name",
+      "description": "Description",
+      "contactPerson": "Contact Person",
+      "status": "Status",
+      "email": "Email",
+      "phone": "Phone",
+      "streetAddress": "Street Address",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "taxId": "Tax ID",
+      "registrationNumber": "Registration Number",
+      "totalAcquisitions": "Total Acquisitions",
+      "totalAcquisitionValue": "Total Acquisition Value",
+      "lastAcquisitionDate": "Last Acquisition Date",
+      "createdBy": "Created By",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At"
+    },
+    "buttons": {
+      "close": "Close"
+    }
+  }
 }
-

@@ -1,11 +1,70 @@
 {
   "title": "Acquisitions",
-  "createAcquisition": "Create New Acquisition",
+  "subtitle": "Manage raw material orders and acquisitions",
+  "createAcquisition": "Create Acquisition",
   "editAcquisition": "Edit Acquisition",
   "viewAcquisition": "View Acquisition",
   "receiveAcquisition": "Receive Acquisition",
   "processAcquisition": "Process Acquisition",
   "acquisitionDetails": "Acquisition Details",
+  "loading": "Loading acquisitions...",
+  "searchPlaceholder": "Search acquisitions...",
+  "allTypes": "All Types",
+  "allStatus": "All Status",
+  "table": {
+    "title": "Title",
+    "type": "Type",
+    "status": "Status",
+    "assignedTo": "Assigned To",
+    "supplier": "Supplier",
+    "items": "Items",
+    "dueDate": "Due Date",
+    "created": "Created",
+    "actions": "Actions"
+  },
+  "emptyState": {
+    "noAcquisitions": "No acquisitions found",
+    "noMatches": "No acquisitions match your filters",
+    "getStarted": "Create your first acquisition to get started"
+  },
+  "statistics": {
+    "totalAcquisitions": "Total Acquisitions",
+    "draft": "Draft",
+    "received": "Received"
+  },
+  "tableContent": {
+    "items": "items",
+    "units": "units",
+    "unassigned": "Unassigned",
+    "by": "by"
+  },
+  "pagination": {
+    "showing": "Showing {{start}} to {{end}} of {{total}} acquisitions",
+    "first": "First",
+    "previous": "Previous",
+    "next": "Next",
+    "last": "Last",
+    "show": "Show:",
+    "perPage": "per page"
+  },
+  "deleteModal": {
+    "title": "Cancel Acquisition",
+    "confirmation": "Are you sure you want to cancel \"{{title}}\"?",
+    "warning": "This will mark the acquisition as cancelled and it cannot be received.",
+    "goBack": "Go Back",
+    "confirm": "Cancel Acquisition"
+  },
+  "messages": {
+    "failedToLoad": "Failed to load acquisition data",
+    "failedToCancel": "Failed to cancel acquisition"
+  },
+  "actions": {
+    "view": "View",
+    "edit": "Edit",
+    "receive": "Receive",
+    "process": "Process",
+    "delete": "Delete"
+  },
   "type": {
     "rawMaterials": "Raw Materials",
     "recyclableMaterials": "Recyclable Materials"
@@ -16,7 +75,242 @@
     "readyForProcessing": "Ready for Processing",
     "processing": "Processing",
     "completed": "Completed",
-    "cancelled": "Cancelled"
+    "cancelled": "Cancelled",
+    "received": "Received"
+  },
+  "form": {
+    "createTitle": "Create New Acquisition",
+    "editTitle": "Edit Acquisition",
+    "sections": {
+      "information": "Information",
+      "transportDetails": "Transport Details",
+      "supplier": "Supplier",
+      "materials": "Materials"
+    },
+    "fields": {
+      "details": "Details",
+      "type": "Type",
+      "assignedUser": "Assigned User",
+      "description": "Description",
+      "dueDate": "Due Date",
+      "notes": "Notes",
+      "carName": "Car Name",
+      "numberPlate": "Number Plate",
+      "phoneNumber": "Phone Number",
+      "transportDate": "Transport Date",
+      "transportNotes": "Transport Notes",
+      "supplierName": "Supplier Name",
+      "supplierContact": "Supplier Contact",
+      "contactPerson": "Contact Person",
+      "phone": "Phone",
+      "email": "Email",
+      "address": "Address",
+      "city": "City",
+      "country": "Country",
+      "materialName": "Material Name",
+      "color": "Color",
+      "quantity": "Quantity",
+      "unitOfMeasure": "Unit of Measure",
+      "itemDescription": "Description"
+    },
+    "placeholders": {
+      "enterTitle": "Enter acquisition title",
+      "enterDescription": "Enter acquisition description",
+      "selectDueDate": "Select due date",
+      "additionalNotes": "Additional notes",
+      "searchOrEnterCar": "Search or enter car/vehicle name",
+      "enterNumberPlate": "Enter number plate (optional)",
+      "enterPhoneNumber": "Enter phone number",
+      "selectTransportDate": "Select transport date",
+      "additionalTransportNotes": "Additional transport notes",
+      "contactInformation": "Contact information",
+      "enterSupplierName": "Enter supplier name",
+      "contactPersonName": "Contact person name",
+      "phoneNumber": "Phone number",
+      "emailAddress": "Email address",
+      "streetAddress": "Street address",
+      "city": "City",
+      "postalCode": "Postal code",
+      "country": "Country",
+      "searchOrCreateMaterial": "Search or create new material",
+      "enterMaterialColor": "Enter material color",
+      "enterColor": "Enter color",
+      "materialDescription": "Material description",
+      "unitExample": "e.g., kg, liters, pieces"
+    },
+    "options": {
+      "noSupplier": "No Supplier",
+      "createNewSupplier": "Create New Supplier",
+      "createNewTransport": "Create new transport:",
+      "startTypingTransport": "Start typing to search or create a new transport",
+      "enterPhoneToCreate": "Enter phone number and submit to create"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "create": "Create Acquisition",
+      "creating": "Creating...",
+      "update": "Update Acquisition",
+      "updating": "Updating...",
+      "addMaterial": "Add Material",
+      "addNewMaterial": "Add New Material"
+    },
+    "labels": {
+      "selectedMaterials": "Selected Materials",
+      "totalItems": "Total Items",
+      "materialsSelected": "materials selected",
+      "createNewSupplier": "Create New Supplier"
+    },
+    "messages": {
+      "titleRequired": "Title is required",
+      "atLeastOneItem": "At least one item is required",
+      "fillRequiredFields": "Please fill in all required fields for the new material",
+      "supplierNameRequired": "Supplier name is required",
+      "failedToLoadMaterials": "Failed to load raw materials",
+      "failedToLoadSuppliers": "Failed to load suppliers",
+      "failedToLoadTransports": "Failed to load transports",
+      "failedToLoadUsers": "Failed to load users",
+      "failedToCreateSupplier": "Failed to create supplier",
+      "failedToCreateAcquisition": "Failed to create acquisition",
+      "failedToUpdateAcquisition": "Failed to update acquisition",
+      "noMaterialsFound": "No materials found - will create new material"
+    },
+    "itemCard": {
+      "color": "Color",
+      "quantity": "Quantity",
+      "unit": "Unit"
+    }
+  },
+  "view": {
+    "title": "View Acquisition",
+    "sections": {
+      "acquisitionDetails": "Acquisition Details",
+      "transport": "Transport",
+      "supplier": "Supplier",
+      "materials": "Materials",
+      "recyclableMaterialsInitial": "Recyclable Materials (Initial State)",
+      "processedRawMaterials": "Processed Raw Materials (Output)",
+      "changeHistory": "Change History"
+    },
+    "labels": {
+      "title": "Title",
+      "status": "Status",
+      "type": "Type",
+      "description": "Description",
+      "assignedTo": "Assigned To",
+      "createdBy": "Created By",
+      "receivedBy": "Received By",
+      "dueDate": "Due Date",
+      "notes": "Notes",
+      "vehicle": "Vehicle",
+      "numberPlate": "Number Plate",
+      "phone": "Phone",
+      "date": "Date",
+      "transportNotes": "Notes",
+      "name": "Name",
+      "contact": "Contact",
+      "orderedQuantity": "Ordered Quantity",
+      "receivedQuantity": "Received Quantity",
+      "unitOfMeasure": "Unit of Measure",
+      "ordered": "Ordered",
+      "received": "Received",
+      "totalItems": "Total Items",
+      "totalQuantity": "Total Quantity",
+      "totalCost": "Total Cost",
+      "units": "units",
+      "totalProcessedItems": "Total Processed Items",
+      "totalOutputQuantity": "Total Output Quantity",
+      "quantity": "Quantity",
+      "total": "Total",
+      "changes": "Changes",
+      "notSet": "Not set",
+      "unassigned": "Unassigned",
+      "on": "on",
+      "completeDelivery": "✓ Complete Delivery",
+      "partialDelivery": "⚠ Partial Delivery",
+      "excessReceived": "⚠ Excess Received"
+    },
+    "messages": {
+      "processedMaterialsInfo": "These raw materials were produced from the recyclable materials above through the processing stage."
+    },
+    "buttons": {
+      "close": "Close"
+    }
+  },
+  "receive": {
+    "title": {
+      "rawMaterials": "Receive Raw Materials",
+      "recyclableMaterials": "Receive & Clean Recyclable Materials"
+    },
+    "sections": {
+      "acquisitionDetails": "Acquisition Details",
+      "materialsToReceive": "Materials to Receive"
+    },
+    "labels": {
+      "orderedQuantity": "Ordered Quantity",
+      "receivedQuantity": "Received Quantity",
+      "unitOfMeasure": "Unit of Measure",
+      "enterReceivedQuantity": "Enter received quantity",
+      "complete": "✓ Complete",
+      "excessReceived": "⚠ Excess received",
+      "partialDelivery": "⚠ Partial delivery",
+      "totalItems": "Total Items",
+      "totalOrdered": "Total Ordered",
+      "totalReceiving": "Total Receiving",
+      "units": "units"
+    },
+    "messages": {
+      "recyclableMaterialsNote": "Recyclable materials will be marked as \"Ready for Processing\" after this step. They will NOT be added to inventory until after the processing/cleaning stage is complete.",
+      "quantitiesCannotBeNegative": "Received quantities cannot be negative",
+      "failedToReceive": "Failed to receive acquisition"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "receiveAndAdd": "Receive & Add to Inventory",
+      "markReadyForProcessing": "Mark Ready for Processing",
+      "processing": "Processing..."
+    }
+  },
+  "process": {
+    "title": "Process Recyclable Materials",
+    "sections": {
+      "acquisitionDetails": "Acquisition Details",
+      "processRecyclableMaterials": "Process Recyclable Materials"
+    },
+    "labels": {
+      "assignedTo": "Assigned To",
+      "receivedBy": "Received By",
+      "color": "Color",
+      "available": "Available",
+      "remaining": "Remaining",
+      "overProcessingAllowed": "(Over-processing allowed)",
+      "selectRawMaterialOrCreate": "Select Raw Material or Create New",
+      "selectOrCreateNew": "-- Select or Create New --",
+      "createNewRawMaterial": "➕ Create New Raw Material",
+      "existingRawMaterials": "Existing Raw Materials",
+      "quantity": "Quantity",
+      "materialName": "Material Name",
+      "enterMaterialName": "Enter material name",
+      "enterColor": "Enter color",
+      "unitOfMeasure": "Unit of Measure",
+      "descriptionOptional": "Description (Optional)",
+      "enterDescription": "Enter description",
+      "selected": "Selected",
+      "remove": "Remove",
+      "addProcessedMaterial": "Add Processed Material",
+      "na": "N/A"
+    },
+    "messages": {
+      "processingInstructionsLabel": "Processing Instructions",
+      "processingInstructions": "Transform recyclable materials into raw materials by specifying the output materials and quantities. You can select existing raw materials or create new ones. The processed materials will be added to your inventory.",
+      "pleaseAddAtLeastOne": "Please add at least one processed material",
+      "allProcessedMaterialsMustHave": "All processed materials must have a name, color, and valid quantity",
+      "failedToLoadData": "Failed to load data",
+      "failedToProcess": "Failed to process acquisition"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "completeProcessing": "Complete Processing & Add to Inventory",
+      "processing": "Processing..."
+    }
   }
 }
-

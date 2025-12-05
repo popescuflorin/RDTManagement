@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Supplier } from '../../types';
 import { X, Building2, Mail, Phone, MapPin, FileText, Calendar, User } from 'lucide-react';
 import './CreateSupplier.css';
@@ -14,6 +15,7 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
   onClose,
   supplier
 }) => {
+  const { t } = useTranslation(['suppliers', 'common']);
   const handleBackdropClick = (e: React.MouseEvent) => {
     e.stopPropagation();
   };
@@ -41,7 +43,7 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
         <div className="modal-header">
           <h2>
             <Building2 size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            Supplier Details
+            {t('viewSupplier.title')}
           </h2>
           <button className="close-button" onClick={onClose}>
             <X size={24} />
@@ -50,29 +52,29 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
 
         <div className="supplier-view-content">
           <div className="view-section">
-            <h3>Basic Information</h3>
+            <h3>{t('viewSupplier.sections.basicInformation')}</h3>
             <div className="view-grid">
               <div className="view-item">
-                <label>Name</label>
+                <label>{t('viewSupplier.fields.name')}</label>
                 <div className="view-value">{supplier.name}</div>
               </div>
               {supplier.description && (
                 <div className="view-item full-width">
-                  <label>Description</label>
+                  <label>{t('viewSupplier.fields.description')}</label>
                   <div className="view-value">{supplier.description}</div>
                 </div>
               )}
               {supplier.contactPerson && (
                 <div className="view-item">
-                  <label>Contact Person</label>
+                  <label>{t('viewSupplier.fields.contactPerson')}</label>
                   <div className="view-value">{supplier.contactPerson}</div>
                 </div>
               )}
               <div className="view-item">
-                <label>Status</label>
+                <label>{t('viewSupplier.fields.status')}</label>
                 <div className="view-value">
                   <span className={`status-badge ${supplier.isActive ? 'status-active' : 'status-inactive'}`}>
-                    {supplier.isActive ? 'Active' : 'Inactive'}
+                    {supplier.isActive ? t('suppliers.status.active') : t('suppliers.status.inactive')}
                   </span>
                 </div>
               </div>
@@ -80,17 +82,17 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
           </div>
 
           <div className="view-section">
-            <h3>Contact Information</h3>
+            <h3>{t('viewSupplier.sections.contactInformation')}</h3>
             <div className="view-grid">
               {supplier.email && (
                 <div className="view-item">
-                  <label><Mail size={14} style={{ display: 'inline', marginRight: '4px' }} />Email</label>
+                  <label><Mail size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.email')}</label>
                   <div className="view-value">{supplier.email}</div>
                 </div>
               )}
               {supplier.phone && (
                 <div className="view-item">
-                  <label><Phone size={14} style={{ display: 'inline', marginRight: '4px' }} />Phone</label>
+                  <label><Phone size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.phone')}</label>
                   <div className="view-value">{supplier.phone}</div>
                 </div>
               )}
@@ -98,29 +100,29 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
           </div>
 
           <div className="view-section">
-            <h3>Address</h3>
+            <h3>{t('viewSupplier.sections.address')}</h3>
             <div className="view-grid">
               {supplier.address && (
                 <div className="view-item full-width">
-                  <label>Street Address</label>
+                  <label>{t('viewSupplier.fields.streetAddress')}</label>
                   <div className="view-value">{supplier.address}</div>
                 </div>
               )}
               {supplier.city && (
                 <div className="view-item">
-                  <label>City</label>
+                  <label>{t('viewSupplier.fields.city')}</label>
                   <div className="view-value">{supplier.city}</div>
                 </div>
               )}
               {supplier.postalCode && (
                 <div className="view-item">
-                  <label>Postal Code</label>
+                  <label>{t('viewSupplier.fields.postalCode')}</label>
                   <div className="view-value">{supplier.postalCode}</div>
                 </div>
               )}
               {supplier.country && (
                 <div className="view-item">
-                  <label><MapPin size={14} style={{ display: 'inline', marginRight: '4px' }} />Country</label>
+                  <label><MapPin size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.country')}</label>
                   <div className="view-value">{supplier.country}</div>
                 </div>
               )}
@@ -128,17 +130,17 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
           </div>
 
           <div className="view-section">
-            <h3>Business Information</h3>
+            <h3>{t('viewSupplier.sections.businessInformation')}</h3>
             <div className="view-grid">
               {supplier.taxId && (
                 <div className="view-item">
-                  <label>Tax ID</label>
+                  <label>{t('viewSupplier.fields.taxId')}</label>
                   <div className="view-value">{supplier.taxId}</div>
                 </div>
               )}
               {supplier.registrationNumber && (
                 <div className="view-item">
-                  <label>Registration Number</label>
+                  <label>{t('viewSupplier.fields.registrationNumber')}</label>
                   <div className="view-value">{supplier.registrationNumber}</div>
                 </div>
               )}
@@ -146,19 +148,19 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
           </div>
 
           <div className="view-section">
-            <h3>Statistics</h3>
+            <h3>{t('viewSupplier.sections.statistics')}</h3>
             <div className="view-grid">
               <div className="view-item">
-                <label>Total Acquisitions</label>
+                <label>{t('viewSupplier.fields.totalAcquisitions')}</label>
                 <div className="view-value">{supplier.totalAcquisitions}</div>
               </div>
               <div className="view-item">
-                <label>Total Acquisition Value</label>
+                <label>{t('viewSupplier.fields.totalAcquisitionValue')}</label>
                 <div className="view-value">{formatCurrency(supplier.totalAcquisitionValue)}</div>
               </div>
               {supplier.lastAcquisitionDate && (
                 <div className="view-item">
-                  <label>Last Acquisition Date</label>
+                  <label>{t('viewSupplier.fields.lastAcquisitionDate')}</label>
                   <div className="view-value">{formatDate(supplier.lastAcquisitionDate)}</div>
                 </div>
               )}
@@ -167,7 +169,7 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
 
           {supplier.notes && (
             <div className="view-section">
-              <h3>Notes</h3>
+              <h3>{t('viewSupplier.sections.notes')}</h3>
               <div className="view-item full-width">
                 <div className="view-value">{supplier.notes}</div>
               </div>
@@ -175,19 +177,19 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
           )}
 
           <div className="view-section">
-            <h3>Metadata</h3>
+            <h3>{t('viewSupplier.sections.metadata')}</h3>
             <div className="view-grid">
               <div className="view-item">
-                <label><User size={14} style={{ display: 'inline', marginRight: '4px' }} />Created By</label>
+                <label><User size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.createdBy')}</label>
                 <div className="view-value">{supplier.createdByUserName}</div>
               </div>
               <div className="view-item">
-                <label><Calendar size={14} style={{ display: 'inline', marginRight: '4px' }} />Created At</label>
+                <label><Calendar size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.createdAt')}</label>
                 <div className="view-value">{formatDate(supplier.createdAt)}</div>
               </div>
               {supplier.updatedAt && (
                 <div className="view-item">
-                  <label><Calendar size={14} style={{ display: 'inline', marginRight: '4px' }} />Updated At</label>
+                  <label><Calendar size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.updatedAt')}</label>
                   <div className="view-value">{formatDate(supplier.updatedAt)}</div>
                 </div>
               )}
@@ -201,7 +203,7 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
             className="cancel-button"
             onClick={onClose}
           >
-            Close
+            {t('viewSupplier.buttons.close')}
           </button>
         </div>
       </div>

@@ -1,7 +1,179 @@
 {
   "title": "Furnizori",
-  "createSupplier": "Creează furnizor nou",
-  "editSupplier": "Editează furnizor",
-  "viewSupplier": "Vizualizează furnizor"
+  "suppliers": {
+    "title": "Furnizori",
+    "buttons": {
+      "createNewSupplier": "Creează Furnizor Nou"
+    },
+    "search": {
+      "placeholder": "Caută după nume, descriere, contact, email, telefon, oraș, țară, CUI sau număr înregistrare..."
+    },
+    "filters": {
+      "showInactive": "Afișează Inactivi"
+    },
+    "table": {
+      "id": "ID",
+      "name": "Nume",
+      "contact": "Contact",
+      "location": "Locație",
+      "totalAcquisitions": "Total Achiziții",
+      "totalValue": "Valoare Totală",
+      "status": "Status",
+      "createdAt": "Creat La",
+      "actions": "Acțiuni"
+    },
+    "status": {
+      "active": "Activ",
+      "inactive": "Inactiv"
+    },
+    "tooltips": {
+      "viewSupplier": "Vezi Furnizor",
+      "editSupplier": "Editează Furnizor",
+      "deactivateSupplier": "Dezactivează Furnizor"
+    },
+    "empty": {
+      "noSuppliersFound": "Nu s-au găsit furnizori care să corespundă criteriilor",
+      "noSuppliersCreateFirst": "Nu s-au găsit furnizori. Creează primul furnizor!"
+    },
+    "loading": {
+      "loadingSuppliers": "Se încarcă furnizorii..."
+    },
+    "pagination": {
+      "showing": "Se afișează {{start}} până la {{end}} din {{total}} furnizori",
+      "first": "Primul",
+      "previous": "Anterior",
+      "next": "Următor",
+      "last": "Ultimul",
+      "show": "Afișează:",
+      "perPage": "pe pagină"
+    },
+    "summary": {
+      "totalSuppliers": "Total Furnizori:",
+      "active": "Activi:",
+      "inactive": "Inactivi:",
+      "of": "din"
+    },
+    "messages": {
+      "failedToLoadSuppliers": "Eșec la încărcarea furnizorilor",
+      "failedToDeactivateSupplier": "Eșec la dezactivarea furnizorului",
+      "confirmDeactivate": "Ești sigur că vrei să dezactivezi furnizorul \"{{name}}\"?",
+      "notSet": "—"
+    }
+  },
+  "createSupplier": {
+    "title": "Creează Furnizor Nou",
+    "fields": {
+      "supplierName": "Nume Furnizor",
+      "description": "Descriere",
+      "contactPerson": "Persoană Contact",
+      "email": "Email",
+      "phone": "Telefon",
+      "address": "Adresă",
+      "city": "Oraș",
+      "postalCode": "Cod Poștal",
+      "country": "Țară",
+      "taxId": "CUI",
+      "registrationNumber": "Număr Înregistrare",
+      "notes": "Notițe"
+    },
+    "placeholders": {
+      "supplierName": "Introdu nume furnizor",
+      "description": "Introdu descriere furnizor",
+      "contactPerson": "Introdu nume persoană contact",
+      "email": "Introdu adresă email",
+      "phone": "Introdu număr telefon",
+      "address": "Introdu adresă stradă",
+      "city": "Introdu oraș",
+      "postalCode": "Introdu cod poștal",
+      "country": "Introdu țară",
+      "taxId": "Introdu CUI",
+      "registrationNumber": "Introdu număr înregistrare",
+      "notes": "Notițe opționale despre furnizor..."
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "createSupplier": "Creează Furnizor",
+      "creating": "Se creează..."
+    },
+    "messages": {
+      "supplierNameRequired": "Numele furnizorului este obligatoriu",
+      "failedToCreate": "Eșec la crearea furnizorului"
+    }
+  },
+  "editSupplier": {
+    "title": "Editează Furnizor",
+    "fields": {
+      "supplierName": "Nume Furnizor",
+      "description": "Descriere",
+      "contactPerson": "Persoană Contact",
+      "email": "Email",
+      "phone": "Telefon",
+      "address": "Adresă",
+      "city": "Oraș",
+      "postalCode": "Cod Poștal",
+      "country": "Țară",
+      "taxId": "CUI",
+      "registrationNumber": "Număr Înregistrare",
+      "notes": "Notițe",
+      "active": "Activ"
+    },
+    "placeholders": {
+      "supplierName": "Introdu nume furnizor",
+      "description": "Introdu descriere furnizor",
+      "contactPerson": "Introdu nume persoană contact",
+      "email": "Introdu adresă email",
+      "phone": "Introdu număr telefon",
+      "address": "Introdu adresă stradă",
+      "city": "Introdu oraș",
+      "postalCode": "Introdu cod poștal",
+      "country": "Introdu țară",
+      "taxId": "Introdu CUI",
+      "registrationNumber": "Introdu număr înregistrare",
+      "notes": "Notițe opționale despre furnizor..."
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "updateSupplier": "Actualizează Furnizor",
+      "updating": "Se actualizează..."
+    },
+    "messages": {
+      "supplierNameRequired": "Numele furnizorului este obligatoriu",
+      "failedToUpdate": "Eșec la actualizarea furnizorului"
+    }
+  },
+  "viewSupplier": {
+    "title": "Detalii Furnizor",
+    "sections": {
+      "basicInformation": "Informații de Bază",
+      "contactInformation": "Informații Contact",
+      "address": "Adresă",
+      "businessInformation": "Informații Afaceri",
+      "statistics": "Statistici",
+      "notes": "Notițe",
+      "metadata": "Metadate"
+    },
+    "fields": {
+      "name": "Nume",
+      "description": "Descriere",
+      "contactPerson": "Persoană Contact",
+      "status": "Status",
+      "email": "Email",
+      "phone": "Telefon",
+      "streetAddress": "Adresă Stradă",
+      "city": "Oraș",
+      "postalCode": "Cod Poștal",
+      "country": "Țară",
+      "taxId": "CUI",
+      "registrationNumber": "Număr Înregistrare",
+      "totalAcquisitions": "Total Achiziții",
+      "totalAcquisitionValue": "Valoare Totală Achiziții",
+      "lastAcquisitionDate": "Dată Ultimă Achiziție",
+      "createdBy": "Creat De",
+      "createdAt": "Creat La",
+      "updatedAt": "Actualizat La"
+    },
+    "buttons": {
+      "close": "Închide"
+    }
+  }
 }
-

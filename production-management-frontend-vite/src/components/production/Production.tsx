@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Factory, 
   Package, 
@@ -39,6 +40,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import './Production.css';
 
 const Production: React.FC = () => {
+  const { t } = useTranslation(['production', 'common']);
   const [pagedData, setPagedData] = useState<PagedResult<ProductionPlan> | null>(null);
   const [recPagedData, setRecPagedData] = useState<PagedResult<RecyclableProductionPlan> | null>(null);
   const [statistics, setStatistics] = useState<ProductionPlanStatistics | null>(null);
@@ -105,7 +107,7 @@ const Production: React.FC = () => {
       setPagedData(pagedResponse.data);
       setStatistics(statsResponse.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load production data');
+      setError(err.response?.data?.message || t('messages.failedToLoad'));
     } finally {
       setIsLoading(false);
     }
@@ -125,7 +127,7 @@ const Production: React.FC = () => {
       });
       setRecPagedData(pagedResponse.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load recyclable plans');
+      setError(err.response?.data?.message || t('messages.failedToLoadRecyclablePlans'));
     } finally {
       setIsLoading(false);
     }
@@ -142,7 +144,7 @@ const Production: React.FC = () => {
       loadData(); // Refresh all data after starting
     } catch (error: any) {
       console.error('Error starting plan:', error);
-      setError(error.response?.data?.message || 'Failed to start production plan');
+      setError(error.response?.data?.message || t('messages.failedToStart'));
     }
   };
 
@@ -331,17 +333,17 @@ const Production: React.FC = () => {
   const getStatusLabel = (status: ProductionPlanStatus) => {
     switch (status) {
       case ProductionPlanStatus.Draft:
-        return 'Draft';
+        return t('status.draft');
       case ProductionPlanStatus.Planned:
-        return 'Planned';
+        return t('status.planned');
       case ProductionPlanStatus.InProgress:
-        return 'In Progress';
+        return t('status.inProgress');
       case ProductionPlanStatus.Completed:
-        return 'Completed';
+        return t('status.completed');
       case ProductionPlanStatus.Cancelled:
-        return 'Cancelled';
+        return t('status.cancelled');
       default:
-        return 'Unknown';
+        return t('status.unknown');
     }
   };
 
@@ -366,7 +368,7 @@ const Production: React.FC = () => {
     return (
       <div className="production-loading">
         <Loader2 size={32} className="animate-spin" />
-        <p>Loading production data...</p>
+        <p>{t('loading')}</p>
       </div>
     );
   }
@@ -377,9 +379,9 @@ const Production: React.FC = () => {
         <div className="header-left">
           <h1>
             <Factory size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-            Production Management
+            {t('productionManagement')}
           </h1>
-          <p>Manage raw material and recyclable material processing</p>
+          <p>{t('subtitle')}</p>
         </div>
         <div className="header-right">
           {activeTab === 'rawMaterial' && (
@@ -389,7 +391,7 @@ const Production: React.FC = () => {
               onClick={() => setShowCreateModal(true)}
             >
               <Plus size={16} />
-              Create Production Plan
+              {t('buttons.createProductionPlan')}
             </ProtectedButton>
           )}
           {activeTab === 'recyclable' && (
@@ -399,7 +401,7 @@ const Production: React.FC = () => {
               onClick={() => setShowCreateRecycleModal(true)}
             >
               <Plus size={16} />
-              Create Recyclables Plan
+              {t('buttons.createRecyclablesPlan')}
             </ProtectedButton>
           )}
         </div>
@@ -412,14 +414,14 @@ const Production: React.FC = () => {
           onClick={() => setActiveTab('rawMaterial')}
         >
           <Package size={18} />
-          Raw Material Processing
+          {t('tabs.rawMaterialProcessing')}
         </button>
         <button
           className={`tab-button ${activeTab === 'recyclable' ? 'active' : ''}`}
           onClick={() => setActiveTab('recyclable')}
         >
           <Recycle size={18} />
-          Recyclable Materials Processing
+          {t('tabs.recyclableMaterialsProcessing')}
         </button>
       </div>
 
@@ -432,7 +434,7 @@ const Production: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.totalPlans}</div>
-              <div className="stat-label">Total Plans</div>
+              <div className="stat-label">{t('statistics.totalPlans')}</div>
             </div>
           </div>
           <div className="stat-card">
@@ -441,7 +443,7 @@ const Production: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.completedPlans}</div>
-              <div className="stat-label">Completed</div>
+              <div className="stat-label">{t('statistics.completed')}</div>
             </div>
           </div>
           <div className={`stat-card ${statistics.inProgressPlans > 0 ? 'warning' : ''}`}>
@@ -450,7 +452,7 @@ const Production: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.inProgressPlans}</div>
-              <div className="stat-label">In Progress</div>
+              <div className="stat-label">{t('statistics.inProgress')}</div>
             </div>
           </div>
           <div className="stat-card">
@@ -459,7 +461,7 @@ const Production: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.totalUnitsProduced}</div>
-              <div className="stat-label">Units Produced</div>
+              <div className="stat-label">{t('statistics.unitsProduced')}</div>
             </div>
           </div>
         </div>
@@ -474,7 +476,7 @@ const Production: React.FC = () => {
                 <Search size={20} className="search-icon" />
                 <input
                   type="text"
-                  placeholder="Search plans..."
+                  placeholder={t('filters.searchPlans')}
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -523,27 +525,27 @@ const Production: React.FC = () => {
                 <tr>
                   <th className="sortable" onClick={() => handleSort('Name')}>
                     <div className="th-content">
-                      <span>Plan Name</span>
+                      <span>{t('table.planName')}</span>
                       {getSortIcon('Name')}
                     </div>
                   </th>
-                  <th>Target Product</th>
-                  <th>Quantity</th>
-                  <th>Materials</th>
-                  <th>Time</th>
+                  <th>{t('table.targetProduct')}</th>
+                  <th>{t('table.quantity')}</th>
+                  <th>{t('table.materials')}</th>
+                  <th>{t('table.time')}</th>
                   <th className="sortable" onClick={() => handleSort('Status')}>
                     <div className="th-content">
-                      <span>Status</span>
+                      <span>{t('table.status')}</span>
                       {getSortIcon('Status')}
                     </div>
                   </th>
                   <th className="sortable" onClick={() => handleSort('CreatedAt')}>
                     <div className="th-content">
-                      <span>Created</span>
+                      <span>{t('table.created')}</span>
                       {getSortIcon('CreatedAt')}
                     </div>
                   </th>
-                  <th>Actions</th>
+                  <th>{t('table.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -551,8 +553,8 @@ const Production: React.FC = () => {
                   <tr>
                     <td colSpan={8} className="no-products">
                       {searchTerm || statusFilter !== null 
-                        ? 'No production plans found matching your criteria.' 
-                        : 'No production plans created. Create a plan to get started.'}
+                        ? t('emptyState.noPlansFound')
+                        : t('emptyState.noPlansCreated')}
                     </td>
                   </tr>
                 ) : (
@@ -583,7 +585,7 @@ const Production: React.FC = () => {
                           ))}
                           {plan.requiredMaterials.length > 2 && (
                             <div className="materials-more">
-                              +{plan.requiredMaterials.length - 2} more
+                              +{plan.requiredMaterials.length - 2} {t('table.more')}
                             </div>
                           )}
                         </div>
@@ -596,7 +598,7 @@ const Production: React.FC = () => {
                           </span>
                           {plan.status !== ProductionPlanStatus.Completed && plan.status !== ProductionPlanStatus.Cancelled && (
                             <span className={`production-badge ${plan.canProduce ? 'can-produce' : 'cannot-produce'}`}>
-                              {plan.canProduce ? 'Ready' : 'Not Ready'}
+                              {plan.canProduce ? t('badges.ready') : t('badges.notReady')}
                             </span>
                           )}
                         </div>
@@ -607,7 +609,7 @@ const Production: React.FC = () => {
                           <ProtectedButton
                             requiredPermission={Permissions.ViewProductionPlan}
                             className="btn btn-sm btn-info"
-                            title="View Plan Details"
+                            title={t('actions.viewPlanDetails')}
                             onClick={() => handleViewPlan(plan)}
                           >
                             <Eye size={16} />
@@ -618,7 +620,7 @@ const Production: React.FC = () => {
                             <ProtectedButton
                               requiredPermission={Permissions.EditProductionPlan}
                               className="btn btn-sm btn-primary"
-                              title="Edit Plan"
+                              title={t('actions.editPlan')}
                               onClick={() => handleEditPlan(plan)}
                             >
                               <Edit size={16} />
@@ -630,7 +632,7 @@ const Production: React.FC = () => {
                             <ProtectedButton
                               requiredPermission={Permissions.ExecuteProductionPlan}
                               className={`btn btn-sm btn-success ${!plan.canProduce ? 'disabled' : ''}`}
-                              title={plan.canProduce ? "Start Processing" : "Cannot start - missing materials"}
+                              title={plan.canProduce ? t('actions.startProcessing') : t('actions.cannotStartMissingMaterials')}
                               onClick={() => plan.canProduce && handleExecutePlan(plan.id)}
                               disabled={!plan.canProduce}
                             >
@@ -643,7 +645,7 @@ const Production: React.FC = () => {
                             <ProtectedButton
                               requiredPermission={Permissions.ReceiveProduction}
                               className="btn btn-sm btn-success"
-                              title="Complete Production"
+                              title={t('actions.completeProduction')}
                               onClick={() => handleReceivePlan(plan)}
                             >
                               <Truck size={16} />
@@ -655,7 +657,7 @@ const Production: React.FC = () => {
                             <ProtectedButton
                               requiredPermission={Permissions.CancelProductionPlan}
                               className="btn btn-sm btn-warning" 
-                              title="Cancel Plan"
+                              title={t('actions.cancelPlan')}
                               onClick={() => handleCancelPlan(plan)}
                             >
                               <XCircle size={16} />
@@ -674,7 +676,11 @@ const Production: React.FC = () => {
           {pagedData && pagedData.totalPages > 0 && (
             <div className="pagination-container">
               <div className="pagination-info">
-                Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} plans
+                {t('pagination.showing', {
+                  start: ((pagedData.page - 1) * pagedData.pageSize) + 1,
+                  end: Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount),
+                  total: pagedData.totalCount
+                })}
               </div>
               
               <div className="pagination-controls">
@@ -683,7 +689,7 @@ const Production: React.FC = () => {
                   onClick={() => setCurrentPage(1)}
                   disabled={!pagedData.hasPreviousPage}
                 >
-                  First
+                  {t('pagination.first')}
                 </button>
                 <button
                   className="pagination-btn"
@@ -691,7 +697,7 @@ const Production: React.FC = () => {
                   disabled={!pagedData.hasPreviousPage}
                 >
                   <ChevronLeft size={16} />
-                  Previous
+                  {t('pagination.previous')}
                 </button>
                 
                 <div className="pagination-pages">
@@ -724,7 +730,7 @@ const Production: React.FC = () => {
                   onClick={() => setCurrentPage(currentPage + 1)}
                   disabled={!pagedData.hasNextPage}
                 >
-                  Next
+                  {t('pagination.next')}
                   <ChevronRight size={16} />
                 </button>
                 <button
@@ -732,12 +738,12 @@ const Production: React.FC = () => {
                   onClick={() => setCurrentPage(pagedData.totalPages)}
                   disabled={!pagedData.hasNextPage}
                 >
-                  Last
+                  {t('pagination.last')}
                 </button>
               </div>
               
               <div className="page-size-selector">
-                <label>Show:</label>
+                <label>{t('pagination.show')}</label>
                 <select
                   value={pageSize}
                   onChange={(e) => {
@@ -750,7 +756,7 @@ const Production: React.FC = () => {
                   <option value={50}>50</option>
                   <option value={100}>100</option>
                 </select>
-                <span>per page</span>
+                <span>{t('pagination.perPage')}</span>
               </div>
             </div>
           )}
@@ -766,7 +772,7 @@ const Production: React.FC = () => {
                 <Search size={20} className="search-icon" />
                 <input
                   type="text"
-                  placeholder="Search recyclable plans..."
+                  placeholder={t('filters.searchRecyclablePlans')}
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -786,12 +792,12 @@ const Production: React.FC = () => {
                 }}
                 className="filter-select"
               >
-                <option value="">All Status</option>
-                <option value={ProductionPlanStatus.Draft}>Draft</option>
-                <option value={ProductionPlanStatus.Planned}>Planned</option>
-                <option value={ProductionPlanStatus.InProgress}>In Progress</option>
-                <option value={ProductionPlanStatus.Completed}>Completed</option>
-                <option value={ProductionPlanStatus.Cancelled}>Cancelled</option>
+                <option value="">{t('filters.allStatus')}</option>
+                <option value={ProductionPlanStatus.Draft}>{t('status.draft')}</option>
+                <option value={ProductionPlanStatus.Planned}>{t('status.planned')}</option>
+                <option value={ProductionPlanStatus.InProgress}>{t('status.inProgress')}</option>
+                <option value={ProductionPlanStatus.Completed}>{t('status.completed')}</option>
+                <option value={ProductionPlanStatus.Cancelled}>{t('status.cancelled')}</option>
               </select>
             </div>
           </div>
@@ -807,26 +813,26 @@ const Production: React.FC = () => {
                 <tr>
                   <th className="sortable" onClick={() => handleSort('Name')}>
                     <div className="th-content">
-                      <span>Plan Name</span>
+                      <span>{t('table.planName')}</span>
                       {getSortIcon('Name')}
                     </div>
                   </th>
-                  <th>Target Raw Material</th>
-                  <th>Quantity</th>
-                  <th>Recyclables</th>
+                  <th>{t('table.targetRawMaterial')}</th>
+                  <th>{t('table.quantity')}</th>
+                  <th>{t('table.recyclables')}</th>
                   <th className="sortable" onClick={() => handleSort('Status')}>
                     <div className="th-content">
-                      <span>Status</span>
+                      <span>{t('table.status')}</span>
                       {getSortIcon('Status')}
                     </div>
                   </th>
                   <th className="sortable" onClick={() => handleSort('CreatedAt')}>
                     <div className="th-content">
-                      <span>Created</span>
+                      <span>{t('table.created')}</span>
                       {getSortIcon('CreatedAt')}
                     </div>
                   </th>
-                  <th>Actions</th>
+                  <th>{t('table.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -834,8 +840,8 @@ const Production: React.FC = () => {
                   <tr>
                     <td colSpan={7} className="no-products">
                       {searchTerm || statusFilter !== null
-                        ? 'No recyclable plans found.'
-                        : 'No recyclable plans created.'}
+                        ? t('emptyState.noRecyclablePlansFound')
+                        : t('emptyState.noRecyclablePlansCreated')}
                     </td>
                   </tr>
                 ) : (
@@ -865,7 +871,7 @@ const Production: React.FC = () => {
                             </div>
                           ))}
                           {plan.requiredRecyclables.length > 2 && (
-                            <div className="materials-more">+{plan.requiredRecyclables.length - 2} more</div>
+                            <div className="materials-more">+{plan.requiredRecyclables.length - 2} {t('table.more')}</div>
                           )}
                         </div>
                       </td>
@@ -880,7 +886,7 @@ const Production: React.FC = () => {
                           <ProtectedButton
                             requiredPermission={Permissions.ViewProductionPlan}
                             className="btn btn-sm btn-info"
-                            title="View Plan Details"
+                            title={t('actions.viewPlanDetails')}
                             onClick={() => handleViewRecPlan(plan)}
                           >
                             <Eye size={16} />
@@ -889,7 +895,7 @@ const Production: React.FC = () => {
                             <ProtectedButton
                               requiredPermission={Permissions.EditProductionPlan}
                               className="btn btn-sm btn-primary"
-                              title="Edit Plan"
+                              title={t('actions.editPlan')}
                               onClick={() => handleEditRecPlan(plan)}
                             >
                               <Edit size={16} />
@@ -899,7 +905,7 @@ const Production: React.FC = () => {
                             <ProtectedButton
                               requiredPermission={Permissions.CancelProductionPlan}
                               className="btn btn-sm btn-warning"
-                              title="Cancel Plan"
+                              title={t('actions.cancelPlan')}
                               onClick={() => handleCancelRecPlan(plan)}
                             >
                               <XCircle size={16} />
@@ -909,7 +915,7 @@ const Production: React.FC = () => {
                             <ProtectedButton
                               requiredPermission={Permissions.ExecuteProductionPlan}
                               className={`btn btn-sm btn-success ${!canProcessRec(plan) ? 'disabled' : ''}`}
-                              title={canProcessRec(plan) ? 'Process Plan' : 'Cannot process - missing materials'}
+                              title={canProcessRec(plan) ? t('actions.processPlan') : t('actions.cannotProcessMissingMaterials')}
                               onClick={() => canProcessRec(plan) && handleOpenProcessRec(plan)}
                               disabled={!canProcessRec(plan)}
                             >
@@ -929,13 +935,17 @@ const Production: React.FC = () => {
           {recPagedData && recPagedData.totalPages > 0 && (
             <div className="pagination-container">
               <div className="pagination-info">
-                Showing {((recPagedData.page - 1) * recPagedData.pageSize) + 1} to {Math.min(recPagedData.page * recPagedData.pageSize, recPagedData.totalCount)} of {recPagedData.totalCount} plans
+                {t('pagination.showing', {
+                  start: ((recPagedData.page - 1) * recPagedData.pageSize) + 1,
+                  end: Math.min(recPagedData.page * recPagedData.pageSize, recPagedData.totalCount),
+                  total: recPagedData.totalCount
+                })}
               </div>
               <div className="pagination-controls">
-                <button className="pagination-btn" onClick={() => setCurrentPage(1)} disabled={!recPagedData.hasPreviousPage}>First</button>
+                <button className="pagination-btn" onClick={() => setCurrentPage(1)} disabled={!recPagedData.hasPreviousPage}>{t('pagination.first')}</button>
                 <button className="pagination-btn" onClick={() => setCurrentPage(currentPage - 1)} disabled={!recPagedData.hasPreviousPage}>
                   <ChevronLeft size={16} />
-                  Previous
+                  {t('pagination.previous')}
                 </button>
                 <div className="pagination-pages">
                   {Array.from({ length: Math.min(5, recPagedData.totalPages) }, (_, i) => {
@@ -948,18 +958,18 @@ const Production: React.FC = () => {
                     );
                   })}
                 </div>
-                <button className="pagination-btn" onClick={() => setCurrentPage(currentPage + 1)} disabled={!recPagedData.hasNextPage}>Next<ChevronRight size={16} /></button>
-                <button className="pagination-btn" onClick={() => setCurrentPage(recPagedData.totalPages)} disabled={!recPagedData.hasNextPage}>Last</button>
+                <button className="pagination-btn" onClick={() => setCurrentPage(currentPage + 1)} disabled={!recPagedData.hasNextPage}>{t('pagination.next')}<ChevronRight size={16} /></button>
+                <button className="pagination-btn" onClick={() => setCurrentPage(recPagedData.totalPages)} disabled={!recPagedData.hasNextPage}>{t('pagination.last')}</button>
               </div>
               <div className="page-size-selector">
-                <label>Show:</label>
+                <label>{t('pagination.show')}</label>
                 <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}>
                   <option value={10}>10</option>
                   <option value={25}>25</option>
                   <option value={50}>50</option>
                   <option value={100}>100</option>
                 </select>
-                <span>per page</span>
+                <span>{t('pagination.perPage')}</span>
               </div>
             </div>
           )}

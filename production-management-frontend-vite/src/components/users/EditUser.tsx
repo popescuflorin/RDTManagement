@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { userApi } from '../../services/api';
 import type { User, AdminUpdateUserRequest } from '../../types';
 import './EditUser.css';
@@ -10,6 +11,7 @@ interface EditUserProps {
 }
 
 const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => {
+  const { t } = useTranslation(['users', 'common']);
   const [formData, setFormData] = useState<AdminUpdateUserRequest>({
     username: user.username,
     email: user.email,
@@ -41,7 +43,7 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
       onClose();
     } catch (error: any) {
       console.error('Error updating user:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to update user. Please try again.';
+      const errorMessage = error.response?.data?.message || t('editUser.messages.failedToUpdateUser');
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -52,7 +54,7 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
     <div className="edit-user-overlay">
       <div className="edit-user-modal">
         <div className="edit-user-header">
-          <h2>Edit User</h2>
+          <h2>{t('editUser.title')}</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
 
@@ -65,7 +67,7 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="firstName">First Name</label>
+              <label htmlFor="firstName">{t('editUser.fields.firstName')}</label>
               <input
                 type="text"
                 id="firstName"
@@ -77,7 +79,7 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
               />
             </div>
             <div className="form-group">
-              <label htmlFor="lastName">Last Name</label>
+              <label htmlFor="lastName">{t('editUser.fields.lastName')}</label>
               <input
                 type="text"
                 id="lastName"
@@ -92,7 +94,7 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username">{t('editUser.fields.username')}</label>
               <input
                 type="text"
                 id="username"
@@ -104,7 +106,7 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
               />
             </div>
             <div className="form-group">
-              <label htmlFor="email">Email</label>
+              <label htmlFor="email">{t('editUser.fields.email')}</label>
               <input
                 type="email"
                 id="email"
@@ -119,7 +121,7 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="role">Role</label>
+              <label htmlFor="role">{t('editUser.fields.role')}</label>
               <select
                 id="role"
                 name="role"
@@ -128,10 +130,10 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
                 required
                 disabled={isLoading}
               >
-                <option value="">Select Role</option>
-                <option value="Admin">Admin</option>
-                <option value="Manager">Manager</option>
-                <option value="User">User</option>
+                <option value="">{t('editUser.labels.selectRole')}</option>
+                <option value="Admin">{t('editUser.roleOptions.admin')}</option>
+                <option value="Manager">{t('editUser.roleOptions.manager')}</option>
+                <option value="User">{t('editUser.roleOptions.user')}</option>
               </select>
             </div>
           </div>
@@ -146,9 +148,9 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
                 disabled={isLoading}
               />
               <span className="checkbox-label">
-                Enable Email Notifications
+                {t('editUser.labels.enableEmailNotifications')}
                 <small className="checkbox-description">
-                  User will receive email notifications for acquisitions and system events
+                  {t('editUser.labels.emailNotificationsDescription')}
                 </small>
               </span>
             </label>
@@ -161,14 +163,14 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
               className="cancel-button"
               disabled={isLoading}
             >
-              Cancel
+              {t('editUser.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading}
             >
-              {isLoading ? 'Updating...' : 'Update User'}
+              {isLoading ? t('editUser.buttons.updating') : t('editUser.buttons.updateUser')}
             </button>
           </div>
         </form>

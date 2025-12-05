@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { AdminRegisterRequest, User, RoleDto } from '../../types';
 import { authApi, rolePermissionApi } from '../../services/api';
 import './AdminRegister.css';
@@ -9,6 +10,7 @@ interface AdminRegisterProps {
 }
 
 const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated }) => {
+  const { t } = useTranslation(['users', 'common']);
   const [formData, setFormData] = useState<AdminRegisterRequest>({
     username: '',
     email: '',
@@ -34,7 +36,7 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
       setRoles(response.data);
     } catch (err: any) {
       console.error('Error loading roles:', err);
-      setError('Failed to load roles. Please try again.');
+      setError(t('adminRegister.messages.failedToLoadRoles'));
     } finally {
       setIsLoadingRoles(false);
     }
@@ -60,7 +62,7 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
       onUserCreated(response.data);
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create user. Please try again.');
+      setError(err.response?.data?.message || t('adminRegister.messages.failedToCreateUser'));
     } finally {
       setIsLoading(false);
     }
@@ -70,7 +72,7 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
     <div className="admin-register-overlay">
       <div className="admin-register-modal">
         <div className="admin-register-header">
-          <h2>Create New User Account</h2>
+          <h2>{t('adminRegister.title')}</h2>
           <button className="close-button" onClick={onClose}>×</button>
         </div>
 
@@ -83,7 +85,7 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
 
           <div className="form-row">
             <div className="form-group">
-              <label htmlFor="firstName">First Name</label>
+              <label htmlFor="firstName">{t('adminRegister.fields.firstName')}</label>
               <input
                 type="text"
                 id="firstName"
@@ -91,12 +93,12 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
                 value={formData.firstName}
                 onChange={handleChange}
                 required
-                placeholder="Enter first name"
+                placeholder={t('adminRegister.placeholders.firstName')}
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="lastName">Last Name</label>
+              <label htmlFor="lastName">{t('adminRegister.fields.lastName')}</label>
               <input
                 type="text"
                 id="lastName"
@@ -104,13 +106,13 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
                 value={formData.lastName}
                 onChange={handleChange}
                 required
-                placeholder="Enter last name"
+                placeholder={t('adminRegister.placeholders.lastName')}
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label htmlFor="username">Username</label>
+            <label htmlFor="username">{t('adminRegister.fields.username')}</label>
             <input
               type="text"
               id="username"
@@ -118,12 +120,12 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
               value={formData.username}
               onChange={handleChange}
               required
-              placeholder="Enter username"
+              placeholder={t('adminRegister.placeholders.username')}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">{t('adminRegister.fields.email')}</label>
             <input
               type="email"
               id="email"
@@ -131,12 +133,12 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
               value={formData.email}
               onChange={handleChange}
               required
-              placeholder="Enter email address"
+              placeholder={t('adminRegister.placeholders.email')}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="password">Password</label>
+            <label htmlFor="password">{t('adminRegister.fields.password')}</label>
             <input
               type="password"
               id="password"
@@ -144,13 +146,13 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
               value={formData.password}
               onChange={handleChange}
               required
-              placeholder="Enter password"
+              placeholder={t('adminRegister.placeholders.password')}
               minLength={6}
             />
           </div>
 
           <div className="form-group">
-            <label htmlFor="role">Role</label>
+            <label htmlFor="role">{t('adminRegister.fields.role')}</label>
             <select
               id="role"
               name="role"
@@ -160,12 +162,12 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
               disabled={isLoadingRoles || isLoading}
             >
               {isLoadingRoles ? (
-                <option value="">Loading roles...</option>
+                <option value="">{t('adminRegister.labels.loadingRoles')}</option>
               ) : roles.length === 0 ? (
-                <option value="">No roles available</option>
+                <option value="">{t('adminRegister.labels.noRolesAvailable')}</option>
               ) : (
                 <>
-                  <option value="">Select a role</option>
+                  <option value="">{t('adminRegister.labels.selectRole')}</option>
                   {roles.map((role) => (
                     <option key={role.name} value={role.name}>
                       {role.name}
@@ -187,9 +189,9 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
                 disabled={isLoading}
               />
               <span className="checkbox-label">
-                Enable Email Notifications
+                {t('adminRegister.labels.enableEmailNotifications')}
                 <small className="checkbox-description">
-                  User will receive email notifications for acquisitions and system events
+                  {t('adminRegister.labels.emailNotificationsDescription')}
                 </small>
               </span>
             </label>
@@ -197,14 +199,14 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
 
           <div className="form-actions">
             <button type="button" className="cancel-button" onClick={onClose} disabled={isLoading}>
-              Cancel
+              {t('adminRegister.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading || isLoadingRoles}
             >
-              {isLoading ? 'Creating...' : isLoadingRoles ? 'Loading...' : 'Create User'}
+              {isLoading ? t('adminRegister.buttons.creating') : isLoadingRoles ? t('adminRegister.buttons.loading') : t('adminRegister.buttons.createUser')}
             </button>
           </div>
         </form>

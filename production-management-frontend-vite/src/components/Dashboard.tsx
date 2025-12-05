@@ -6,7 +6,6 @@ import {
   Activity, 
   UserPlus, 
   LogOut, 
-  Bug,
   Clock,
   Mail,
   User as UserIcon
@@ -82,16 +81,6 @@ const Dashboard: React.FC = () => {
   const handleUserCreated = (newUser: User) => {
     console.log('New user created:', newUser);
     // Optionally refresh dashboard data or show success message
-  };
-
-  const handleDebugClaims = async () => {
-    try {
-      const response = await authApi.debugClaims();
-      console.log('JWT Claims:', response.data);
-      alert('Check console for JWT claims');
-    } catch (error) {
-      console.error('Error getting claims:', error);
-    }
   };
 
   const handleSidebarToggle = () => {

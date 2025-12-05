@@ -1,6 +1,154 @@
 {
   "title": "Transporturi",
-  "createTransport": "Creează vehicul de transport nou",
-  "editTransport": "Editează transport"
+  "transports": {
+    "title": "Transporturi",
+    "tabs": {
+      "transportVehicles": "Vehicule Transport",
+      "transportRecords": "Înregistrări Transport"
+    },
+    "buttons": {
+      "createNewTransportVehicle": "Creează Vehicul Transport Nou",
+      "createTransportRecord": "Creează Înregistrare Transport"
+    },
+    "search": {
+      "vehicles": "Caută după nume mașină, număr înmatriculare sau telefon...",
+      "records": "Caută după nume mașină, număr înmatriculare, telefon sau entitate asociată..."
+    },
+    "table": {
+      "id": "ID",
+      "carName": "Nume Mașină",
+      "numberPlate": "Număr Înmatriculare",
+      "phoneNumber": "Număr Telefon",
+      "createdAt": "Creat La",
+      "updatedAt": "Actualizat La",
+      "actions": "Acțiuni",
+      "type": "Tip",
+      "relatedEntity": "Entitate Asociată",
+      "transportDate": "Dată Transport",
+      "status": "Status"
+    },
+    "tooltips": {
+      "editTransport": "Editează Transport",
+      "deleteTransport": "Șterge Transport"
+    },
+    "empty": {
+      "noTransportsFound": "Nu s-au găsit transporturi care să corespundă căutării",
+      "noTransportsCreateFirst": "Nu s-au găsit transporturi. Creează primul transport!",
+      "noRecordsFound": "Nu s-au găsit înregistrări transport care să corespundă căutării",
+      "noRecords": "Nu s-au găsit înregistrări transport."
+    },
+    "loading": {
+      "loadingTransports": "Se încarcă transporturile...",
+      "loadingRecords": "Se încarcă înregistrările transport..."
+    },
+    "pagination": {
+      "showing": "Se afișează {{start}} până la {{end}} din {{total}} transporturi",
+      "showingRecords": "Se afișează {{start}} până la {{end}} din {{total}} înregistrări",
+      "first": "Primul",
+      "previous": "Anterior",
+      "next": "Următor",
+      "last": "Ultimul",
+      "show": "Afișează:",
+      "perPage": "pe pagină"
+    },
+    "messages": {
+      "failedToLoadTransports": "Eșec la încărcarea transporturilor",
+      "failedToDeleteTransport": "Eșec la ștergerea transportului",
+      "failedToLoadRecords": "Eșec la încărcarea înregistrărilor transport",
+      "confirmDelete": "Ești sigur că vrei să ștergi transportul \"{{carName}}\"?",
+      "notSet": "—"
+    }
+  },
+  "createTransport": {
+    "title": "Creează Vehicul Transport Nou",
+    "fields": {
+      "carName": "Nume Mașină",
+      "numberPlate": "Număr Înmatriculare",
+      "phoneNumber": "Număr Telefon"
+    },
+    "placeholders": {
+      "carName": "Introdu nume mașină",
+      "numberPlate": "Introdu număr înmatriculare (opțional)",
+      "phoneNumber": "Introdu număr telefon"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "createTransport": "Creează Transport",
+      "creating": "Se creează..."
+    },
+    "messages": {
+      "carNameRequired": "Numele mașinii este obligatoriu",
+      "phoneNumberRequired": "Numărul de telefon este obligatoriu",
+      "failedToCreate": "Eșec la crearea transportului"
+    }
+  },
+  "editTransport": {
+    "title": "Editează Transport",
+    "fields": {
+      "carName": "Nume Mașină",
+      "numberPlate": "Număr Înmatriculare",
+      "phoneNumber": "Număr Telefon"
+    },
+    "placeholders": {
+      "carName": "Introdu nume mașină",
+      "numberPlate": "Introdu număr înmatriculare (opțional)",
+      "phoneNumber": "Introdu număr telefon"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "updateTransport": "Actualizează Transport",
+      "updating": "Se actualizează..."
+    },
+    "messages": {
+      "carNameRequired": "Numele mașinii este obligatoriu",
+      "phoneNumberRequired": "Numărul de telefon este obligatoriu",
+      "failedToUpdate": "Eșec la actualizarea transportului"
+    }
+  },
+  "createTransportRecord": {
+    "title": "Creează Înregistrare Transport",
+    "sections": {
+      "selectEntities": "Selectează Entități",
+      "selectTransport": "Selectează Transport"
+    },
+    "fields": {
+      "transportVehicle": "Vehicul Transport",
+      "transportDate": "Dată Transport",
+      "transportNotes": "Notițe Transport"
+    },
+    "placeholders": {
+      "selectTransport": "Selectează un transport...",
+      "transportNotes": "Notițe opționale despre transport..."
+    },
+    "labels": {
+      "entitiesSelected": "{{count}} entitate selectată",
+      "entitiesSelected_plural": "{{count}} entități selectate",
+      "acquisitions": "Achiziții",
+      "orders": "Comenzi",
+      "selectAll": "Selectează Tot",
+      "deselectAll": "Deselectează Tot",
+      "rawMaterials": "Materii Prime",
+      "recyclableMaterials": "Materiale Reciclabile",
+      "items": "articol(e)",
+      "car": "Mașină:",
+      "plate": "Înmatriculare:",
+      "phone": "Telefon:",
+      "notAvailable": "N/A",
+      "assigningTo_one": "Se atribuie la {{count}} entitate...",
+      "assigningTo_other": "Se atribuie la {{count}} entități...",
+      "assignTransportTo_one": "Atribuie Transport la {{count}} Entitate",
+      "assignTransportTo_other": "Atribuie Transport la {{count}} Entități"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "assignTransport": "Atribuie Transport"
+    },
+    "messages": {
+      "loadingDraftEntities": "Se încarcă entitățile draft...",
+      "noDraftEntities": "Nu există entități draft disponibile",
+      "pleaseSelectEntityAndTransport": "Te rugăm să selectezi cel puțin o entitate și un transport",
+      "failedToLoadData": "Eșec la încărcarea datelor",
+      "failedToAssign": "Eșec la atribuirea transportului la una sau mai multe entități"
+    }
+  }
 }
-

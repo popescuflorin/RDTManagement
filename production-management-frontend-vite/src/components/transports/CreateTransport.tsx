@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { transportApi } from '../../services/api';
 import type { CreateTransportRequest } from '../../types';
 import { X, Truck } from 'lucide-react';
@@ -13,6 +14,7 @@ const CreateTransport: React.FC<CreateTransportProps> = ({
   onClose,
   onTransportCreated
 }) => {
+  const { t } = useTranslation(['transports', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateTransportRequest>({
@@ -33,12 +35,12 @@ const CreateTransport: React.FC<CreateTransportProps> = ({
     e.preventDefault();
     
     if (!formData.carName.trim()) {
-      setError('Car name is required');
+      setError(t('createTransport.messages.carNameRequired'));
       return;
     }
 
     if (!formData.phoneNumber.trim()) {
-      setError('Phone number is required');
+      setError(t('createTransport.messages.phoneNumberRequired'));
       return;
     }
 
@@ -56,7 +58,7 @@ const CreateTransport: React.FC<CreateTransportProps> = ({
       onTransportCreated();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create transport');
+      setError(err.response?.data?.message || t('createTransport.messages.failedToCreate'));
     } finally {
       setIsLoading(false);
     }
@@ -72,7 +74,7 @@ const CreateTransport: React.FC<CreateTransportProps> = ({
         <div className="modal-header">
           <h2>
             <Truck size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            Create New Transport Vehicle
+            {t('createTransport.title')}
           </h2>
           <button className="close-button" onClick={onClose}>
             <X size={24} />
@@ -90,14 +92,14 @@ const CreateTransport: React.FC<CreateTransportProps> = ({
           <div className="form-section">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="carName">Car Name *</label>
+                <label htmlFor="carName">{t('createTransport.fields.carName')} *</label>
                 <input
                   type="text"
                   id="carName"
                   name="carName"
                   value={formData.carName}
                   onChange={handleChange}
-                  placeholder="Enter car name"
+                  placeholder={t('createTransport.placeholders.carName')}
                   required
                 />
               </div>
@@ -105,14 +107,14 @@ const CreateTransport: React.FC<CreateTransportProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="numberPlate">Number Plate</label>
+                <label htmlFor="numberPlate">{t('createTransport.fields.numberPlate')}</label>
                 <input
                   type="text"
                   id="numberPlate"
                   name="numberPlate"
                   value={formData.numberPlate}
                   onChange={handleChange}
-                  placeholder="Enter number plate (optional)"
+                  placeholder={t('createTransport.placeholders.numberPlate')}
                   maxLength={20}
                 />
               </div>
@@ -120,14 +122,14 @@ const CreateTransport: React.FC<CreateTransportProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="phoneNumber">Phone Number *</label>
+                <label htmlFor="phoneNumber">{t('createTransport.fields.phoneNumber')} *</label>
                 <input
                   type="text"
                   id="phoneNumber"
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
-                  placeholder="Enter phone number"
+                  placeholder={t('createTransport.placeholders.phoneNumber')}
                   required
                   maxLength={20}
                 />
@@ -142,14 +144,14 @@ const CreateTransport: React.FC<CreateTransportProps> = ({
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              {t('createTransport.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading}
             >
-              {isLoading ? 'Creating...' : 'Create Transport'}
+              {isLoading ? t('createTransport.buttons.creating') : t('createTransport.buttons.createTransport')}
             </button>
           </div>
         </form>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Truck, 
   Plus, 
@@ -23,6 +24,7 @@ import './Transports.css';
 type TabType = 'transports' | 'records';
 
 const Transports: React.FC = () => {
+  const { t } = useTranslation(['transports', 'common']);
   const [activeTab, setActiveTab] = useState<TabType>('transports');
   
   // Transport Vehicles pagination state
@@ -79,7 +81,7 @@ const Transports: React.FC = () => {
       });
       setPagedTransports(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load transports');
+      setError(err.response?.data?.message || t('transports.messages.failedToLoadTransports'));
     } finally {
       setIsLoading(false);
     }
@@ -112,7 +114,7 @@ const Transports: React.FC = () => {
   };
 
   const handleDeleteTransport = async (transport: Transport) => {
-    if (!window.confirm(`Are you sure you want to delete transport "${transport.carName}"?`)) {
+    if (!window.confirm(t('transports.messages.confirmDelete', { carName: transport.carName }))) {
       return;
     }
 
@@ -121,7 +123,7 @@ const Transports: React.FC = () => {
       await transportApi.deleteTransport(transport.id);
       await loadData();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to delete transport');
+      setError(err.response?.data?.message || t('transports.messages.failedToDeleteTransport'));
     } finally {
       setIsDeleting(false);
     }
@@ -142,7 +144,7 @@ const Transports: React.FC = () => {
 
       setPagedRecords(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load transport records');
+      setError(err.response?.data?.message || t('transports.messages.failedToLoadRecords'));
     } finally {
       setIsLoadingRecords(false);
     }
@@ -173,7 +175,7 @@ const Transports: React.FC = () => {
     return (
       <div className="transports-loading">
         <Loader2 size={32} className="animate-spin" />
-        <p>Loading transports...</p>
+        <p>{t('transports.loading.loadingTransports')}</p>
       </div>
     );
   }
@@ -183,7 +185,7 @@ const Transports: React.FC = () => {
       <div className="transports-header">
         <h1>
           <Truck size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-          Transports
+          {t('transports.title')}
         </h1>
         {activeTab === 'transports' && (
           <ProtectedButton
@@ -192,7 +194,7 @@ const Transports: React.FC = () => {
             onClick={handleCreateTransport}
           >
             <Plus size={16} />
-            Create New Transport Vehicle
+            {t('transports.buttons.createNewTransportVehicle')}
           </ProtectedButton>
         )}
       </div>
@@ -204,14 +206,14 @@ const Transports: React.FC = () => {
           onClick={() => setActiveTab('transports')}
         >
           <Truck size={18} />
-          Transport Vehicles
+          {t('transports.tabs.transportVehicles')}
         </button>
         <button
           className={`tab-button ${activeTab === 'records' ? 'active' : ''}`}
           onClick={() => setActiveTab('records')}
         >
           <FileText size={18} />
-          Transport Records
+          {t('transports.tabs.transportRecords')}
         </button>
       </div>
 
@@ -224,8 +226,8 @@ const Transports: React.FC = () => {
               type="text"
               placeholder={
                 activeTab === 'transports'
-                  ? 'Search by car name, number plate, or phone...'
-                  : 'Search by car name, number plate, phone, or related entity...'
+                  ? t('transports.search.vehicles')
+                  : t('transports.search.records')
               }
               value={activeTab === 'transports' ? searchTerm : recordsSearchTerm}
               onChange={(e) => {
@@ -257,13 +259,13 @@ const Transports: React.FC = () => {
             <table className="transports-table">
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Car Name</th>
-                  <th>Number Plate</th>
-                  <th>Phone Number</th>
-                  <th>Created At</th>
-                  <th>Updated At</th>
-                  <th>Actions</th>
+                  <th>{t('transports.table.id')}</th>
+                  <th>{t('transports.table.carName')}</th>
+                  <th>{t('transports.table.numberPlate')}</th>
+                  <th>{t('transports.table.phoneNumber')}</th>
+                  <th>{t('transports.table.createdAt')}</th>
+                  <th>{t('transports.table.updatedAt')}</th>
+                  <th>{t('transports.table.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -271,8 +273,8 @@ const Transports: React.FC = () => {
                   <tr>
                     <td colSpan={7} className="no-data">
                       {searchTerm 
-                        ? 'No transports found matching your search' 
-                        : 'No transports found. Create your first transport!'}
+                        ? t('transports.empty.noTransportsFound')
+                        : t('transports.empty.noTransportsCreateFirst')}
                     </td>
                   </tr>
                 ) : (
@@ -280,16 +282,16 @@ const Transports: React.FC = () => {
                     <tr key={transport.id}>
                       <td>#{transport.id}</td>
                       <td className="transport-name">{transport.carName}</td>
-                      <td>{transport.numberPlate || '—'}</td>
+                      <td>{transport.numberPlate || t('transports.messages.notSet')}</td>
                       <td>{transport.phoneNumber}</td>
                       <td>{formatDate(transport.createdAt)}</td>
-                      <td>{transport.updatedAt ? formatDate(transport.updatedAt) : '—'}</td>
+                      <td>{transport.updatedAt ? formatDate(transport.updatedAt) : t('transports.messages.notSet')}</td>
                       <td className="actions-cell">
                         <div className="action-buttons">
                           <ProtectedButton
                             requiredPermission={Permissions.EditTransport}
                             className="btn btn-sm btn-primary"
-                            title="Edit Transport"
+                            title={t('transports.tooltips.editTransport')}
                             onClick={() => handleEditTransport(transport)}
                           >
                             <Edit size={16} />
@@ -297,7 +299,7 @@ const Transports: React.FC = () => {
                           <ProtectedButton
                             requiredPermission={Permissions.DeleteTransport}
                             className="btn btn-sm btn-danger"
-                            title="Delete Transport"
+                            title={t('transports.tooltips.deleteTransport')}
                             onClick={() => handleDeleteTransport(transport)}
                             disabled={isDeleting}
                           >
@@ -316,7 +318,11 @@ const Transports: React.FC = () => {
           {pagedTransports && pagedTransports.totalPages > 0 && (
             <div className="pagination-container">
               <div className="pagination-info">
-                Showing {((pagedTransports.page - 1) * pagedTransports.pageSize) + 1} to {Math.min(pagedTransports.page * pagedTransports.pageSize, pagedTransports.totalCount)} of {pagedTransports.totalCount} transports
+                {t('transports.pagination.showing', {
+                  start: ((pagedTransports.page - 1) * pagedTransports.pageSize) + 1,
+                  end: Math.min(pagedTransports.page * pagedTransports.pageSize, pagedTransports.totalCount),
+                  total: pagedTransports.totalCount
+                })}
               </div>
               
               <div className="pagination-controls">
@@ -325,7 +331,7 @@ const Transports: React.FC = () => {
                   onClick={() => setTransportsPage(1)}
                   disabled={!pagedTransports.hasPreviousPage}
                 >
-                  First
+                  {t('transports.pagination.first')}
                 </button>
                 <button
                   className="pagination-btn"
@@ -333,7 +339,7 @@ const Transports: React.FC = () => {
                   disabled={!pagedTransports.hasPreviousPage}
                 >
                   <ChevronLeft size={16} />
-                  Previous
+                  {t('transports.pagination.previous')}
                 </button>
                 
                 <div className="pagination-pages">
@@ -366,7 +372,7 @@ const Transports: React.FC = () => {
                   onClick={() => setTransportsPage(transportsPage + 1)}
                   disabled={!pagedTransports.hasNextPage}
                 >
-                  Next
+                  {t('transports.pagination.next')}
                   <ChevronRight size={16} />
                 </button>
                 <button
@@ -374,12 +380,12 @@ const Transports: React.FC = () => {
                   onClick={() => setTransportsPage(pagedTransports.totalPages)}
                   disabled={!pagedTransports.hasNextPage}
                 >
-                  Last
+                  {t('transports.pagination.last')}
                 </button>
               </div>
               
               <div className="page-size-selector">
-                <label>Show:</label>
+                <label>{t('transports.pagination.show')}</label>
                 <select
                   value={transportsPageSize}
                   onChange={(e) => {
@@ -392,7 +398,7 @@ const Transports: React.FC = () => {
                   <option value={50}>50</option>
                   <option value={100}>100</option>
                 </select>
-                <span>per page</span>
+                <span>{t('transports.pagination.perPage')}</span>
               </div>
             </div>
           )}
@@ -409,14 +415,14 @@ const Transports: React.FC = () => {
               onClick={() => setShowCreateRecordModal(true)}
             >
               <Plus size={16} />
-              Create Transport Record
+              {t('transports.buttons.createTransportRecord')}
             </ProtectedButton>
           </div>
 
           {isLoadingRecords ? (
             <div className="transports-loading">
               <Loader2 size={32} className="animate-spin" />
-              <p>Loading transport records...</p>
+              <p>{t('transports.loading.loadingRecords')}</p>
             </div>
           ) : (
             <>
@@ -424,14 +430,14 @@ const Transports: React.FC = () => {
                 <table className="transports-table">
                   <thead>
                     <tr>
-                      <th>Type</th>
-                      <th>Related Entity</th>
-                      <th>Car Name</th>
-                      <th>Number Plate</th>
-                      <th>Phone Number</th>
-                      <th>Transport Date</th>
-                      <th>Status</th>
-                      <th>Created At</th>
+                      <th>{t('transports.table.type')}</th>
+                      <th>{t('transports.table.relatedEntity')}</th>
+                      <th>{t('transports.table.carName')}</th>
+                      <th>{t('transports.table.numberPlate')}</th>
+                      <th>{t('transports.table.phoneNumber')}</th>
+                      <th>{t('transports.table.transportDate')}</th>
+                      <th>{t('transports.table.status')}</th>
+                      <th>{t('transports.table.createdAt')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -439,8 +445,8 @@ const Transports: React.FC = () => {
                       <tr>
                         <td colSpan={8} className="no-data">
                           {recordsSearchTerm 
-                            ? 'No transport records found matching your search' 
-                            : 'No transport records found.'}
+                            ? t('transports.empty.noRecordsFound')
+                            : t('transports.empty.noRecords')}
                         </td>
                       </tr>
                     ) : (
@@ -463,9 +469,9 @@ const Transports: React.FC = () => {
                             </div>
                           </td>
                           <td className="transport-name">{record.carName}</td>
-                          <td>{record.numberPlate ?? '—'}</td>
-                          <td>{record.phoneNumber ?? '—'}</td>
-                          <td>{record.transportDate ? formatDate(record.transportDate) : '—'}</td>
+                          <td>{record.numberPlate ?? t('transports.messages.notSet')}</td>
+                          <td>{record.phoneNumber ?? t('transports.messages.notSet')}</td>
+                          <td>{record.transportDate ? formatDate(record.transportDate) : t('transports.messages.notSet')}</td>
                           <td>
                             <span className="status-badge">{record.status}</span>
                           </td>
@@ -481,7 +487,11 @@ const Transports: React.FC = () => {
               {pagedRecords && pagedRecords.totalPages > 0 && (
                 <div className="pagination-container">
                   <div className="pagination-info">
-                    Showing {((pagedRecords.page - 1) * pagedRecords.pageSize) + 1} to {Math.min(pagedRecords.page * pagedRecords.pageSize, pagedRecords.totalCount)} of {pagedRecords.totalCount} records
+                    {t('transports.pagination.showingRecords', {
+                      start: ((pagedRecords.page - 1) * pagedRecords.pageSize) + 1,
+                      end: Math.min(pagedRecords.page * pagedRecords.pageSize, pagedRecords.totalCount),
+                      total: pagedRecords.totalCount
+                    })}
                   </div>
                   
                   <div className="pagination-controls">
@@ -490,7 +500,7 @@ const Transports: React.FC = () => {
                       onClick={() => setRecordsPage(1)}
                       disabled={!pagedRecords.hasPreviousPage}
                     >
-                      First
+                      {t('transports.pagination.first')}
                     </button>
                     <button
                       className="pagination-btn"
@@ -498,7 +508,7 @@ const Transports: React.FC = () => {
                       disabled={!pagedRecords.hasPreviousPage}
                     >
                       <ChevronLeft size={16} />
-                      Previous
+                      {t('transports.pagination.previous')}
                     </button>
                     
                     <div className="pagination-pages">
@@ -531,7 +541,7 @@ const Transports: React.FC = () => {
                       onClick={() => setRecordsPage(recordsPage + 1)}
                       disabled={!pagedRecords.hasNextPage}
                     >
-                      Next
+                      {t('transports.pagination.next')}
                       <ChevronRight size={16} />
                     </button>
                     <button
@@ -539,12 +549,12 @@ const Transports: React.FC = () => {
                       onClick={() => setRecordsPage(pagedRecords.totalPages)}
                       disabled={!pagedRecords.hasNextPage}
                     >
-                      Last
+                      {t('transports.pagination.last')}
                     </button>
                   </div>
                   
                   <div className="page-size-selector">
-                    <label>Show:</label>
+                    <label>{t('transports.pagination.show')}</label>
                     <select
                       value={recordsPageSize}
                       onChange={(e) => {
@@ -557,7 +567,7 @@ const Transports: React.FC = () => {
                       <option value={50}>50</option>
                       <option value={100}>100</option>
                     </select>
-                    <span>per page</span>
+                    <span>{t('transports.pagination.perPage')}</span>
                   </div>
                 </div>
               )}

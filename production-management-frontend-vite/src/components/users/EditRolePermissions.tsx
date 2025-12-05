@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { rolePermissionApi } from '../../services/api';
 import type { PermissionInfo } from '../../types';
 import { Shield, Check, X } from 'lucide-react';
@@ -11,6 +12,7 @@ interface EditRolePermissionsProps {
 }
 
 const EditRolePermissions: React.FC<EditRolePermissionsProps> = ({ role, onClose, onPermissionsUpdated }) => {
+  const { t } = useTranslation(['users', 'common']);
   const [allPermissions, setAllPermissions] = useState<Record<string, PermissionInfo[]>>({});
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +37,7 @@ const EditRolePermissions: React.FC<EditRolePermissionsProps> = ({ role, onClose
       setSelectedPermissions(rolePermsResponse.data.permissions);
     } catch (err: any) {
       console.error('Error loading permissions:', err);
-      setError(err.response?.data?.message || 'Failed to load permissions');
+      setError(err.response?.data?.message || t('editRolePermissions.messages.failedToLoadPermissions'));
     } finally {
       setIsLoading(false);
     }
@@ -91,7 +93,7 @@ const EditRolePermissions: React.FC<EditRolePermissionsProps> = ({ role, onClose
       onPermissionsUpdated();
     } catch (err: any) {
       console.error('Error saving permissions:', err);
-      setError(err.response?.data?.message || 'Failed to save permissions');
+      setError(err.response?.data?.message || t('editRolePermissions.messages.failedToSavePermissions'));
     } finally {
       setIsSaving(false);
     }
@@ -107,7 +109,7 @@ const EditRolePermissions: React.FC<EditRolePermissionsProps> = ({ role, onClose
         <div className="edit-role-permissions-header">
           <div className="header-content">
             <Shield size={24} />
-            <h2>Edit {role} Permissions</h2>
+            <h2>{t('editRolePermissions.title', { role })}</h2>
           </div>
           <button className="close-button" onClick={onClose}>
             <X size={24} />
@@ -123,14 +125,14 @@ const EditRolePermissions: React.FC<EditRolePermissionsProps> = ({ role, onClose
 
           {isLoading ? (
             <div className="loading-state">
-              <p>Loading permissions...</p>
+              <p>{t('editRolePermissions.labels.loadingPermissions')}</p>
             </div>
           ) : (
             <>
               <div className="permissions-summary">
                 <p>
-                  Selected <strong>{selectedPermissions.length}</strong> of{' '}
-                  <strong>{Object.values(allPermissions).flat().length}</strong> permissions
+                  {t('editRolePermissions.labels.selected')} <strong>{selectedPermissions.length}</strong> {t('editRolePermissions.labels.of')}{' '}
+                  <strong>{Object.values(allPermissions).flat().length}</strong> {t('editRolePermissions.labels.permissions')}
                 </p>
               </div>
 
@@ -185,7 +187,7 @@ const EditRolePermissions: React.FC<EditRolePermissionsProps> = ({ role, onClose
             className="cancel-button"
             disabled={isSaving}
           >
-            Cancel
+            {t('editRolePermissions.buttons.cancel')}
           </button>
           <button
             type="button"
@@ -193,7 +195,7 @@ const EditRolePermissions: React.FC<EditRolePermissionsProps> = ({ role, onClose
             className="save-button"
             disabled={isSaving || isLoading}
           >
-            {isSaving ? 'Saving...' : 'Save Permissions'}
+            {isSaving ? t('editRolePermissions.buttons.saving') : t('editRolePermissions.buttons.savePermissions')}
           </button>
         </div>
       </div>

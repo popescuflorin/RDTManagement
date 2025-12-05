@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { inventoryApi } from '../../services/api';
 import type { RawMaterial, CreateRawMaterialRequest, AddToExistingMaterialRequest, MaterialTypeInfo } from '../../types';
 import { MaterialType } from '../../types';
@@ -10,6 +11,7 @@ interface AddMaterialProps {
 }
 
 const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated }) => {
+  const { t } = useTranslation(['inventory', 'common']);
   const [mode, setMode] = useState<'new' | 'existing'>('new');
   const [materialTypes, setMaterialTypes] = useState<MaterialTypeInfo[]>([]);
   const [existingMaterials, setExistingMaterials] = useState<RawMaterial[]>([]);
@@ -51,7 +53,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
       setExistingMaterials(materialsResponse.data.filter(m => m.isActive));
     } catch (error: any) {
       console.error('Error loading initial data:', error);
-      setError('Failed to load material data. Please try again.');
+      setError(t('form.messages.failedToLoadData'));
     }
   };
 
@@ -114,7 +116,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
       onClose();
     } catch (error: any) {
       console.error('Error adding material:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to add material. Please try again.';
+      const errorMessage = error.response?.data?.message || t('form.messages.failedToAdd');
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -139,7 +141,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
     <div className="add-material-overlay">
       <div className="add-material-modal">
         <div className="add-material-header">
-          <h2>📦 Add Material to Inventory</h2>
+          <h2>📦 {t('form.addTitle')}</h2>
           <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
         </div>
 
@@ -148,13 +150,13 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
             className={`mode-button ${mode === 'new' ? 'active' : ''}`}
             onClick={() => setMode('new')}
           >
-            ✨ Create New Material
+            ✨ {t('form.modes.createNew')}
           </button>
           <button 
             className={`mode-button ${mode === 'existing' ? 'active' : ''}`}
             onClick={() => setMode('existing')}
           >
-            📈 Add to Existing
+            📈 {t('form.modes.addToExisting')}
           </button>
         </div>
 
@@ -170,7 +172,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
               {/* Quick Select from Existing Types */}
               {materialTypes.length > 0 && (
                 <div className="quick-select-section">
-                  <h3>Quick Select from Existing Types:</h3>
+                  <h3>{t('form.sections.quickSelect')}</h3>
                   <div className="material-types-grid">
                     {materialTypes.map((type, index) => (
                       <button
@@ -187,33 +189,33 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                       </button>
                     ))}
                   </div>
-                  <div className="divider">OR Create Completely New Material</div>
+                  <div className="divider">{t('form.sections.orCreateNew')}</div>
                 </div>
               )}
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="name">Material Name *</label>
+                  <label htmlFor="name">{t('form.fields.materialName')} *</label>
                   <input
                     type="text"
                     id="name"
                     name="name"
                     value={newMaterialData.name}
                     onChange={handleNewMaterialChange}
-                    placeholder="e.g., Steel Sheets, Paint, Screws"
+                    placeholder={t('form.placeholders.materialName')}
                     required
                     disabled={isLoading}
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="color">Color *</label>
+                  <label htmlFor="color">{t('form.fields.color')} *</label>
                   <input
                     type="text"
                     id="color"
                     name="color"
                     value={newMaterialData.color}
                     onChange={handleNewMaterialChange}
-                    placeholder="e.g., Silver, Black, Red"
+                    placeholder={t('form.placeholders.color')}
                     required
                     disabled={isLoading}
                   />
@@ -222,7 +224,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="type">Material Type *</label>
+                  <label htmlFor="type">{t('form.fields.materialType')} *</label>
                   <select
                     id="type"
                     name="type"
@@ -231,20 +233,20 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                     required
                     disabled={isLoading}
                   >
-                    <option value={MaterialType.RawMaterial}>Raw Material</option>
-                    <option value={MaterialType.RecyclableMaterial}>Recyclable Material</option>
-                    <option value={MaterialType.FinishedProduct}>Finished Product</option>
+                    <option value={MaterialType.RawMaterial}>{t('filters.rawMaterials')}</option>
+                    <option value={MaterialType.RecyclableMaterial}>{t('filters.recyclableMaterials')}</option>
+                    <option value={MaterialType.FinishedProduct}>{t('filters.finishedProducts')}</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="quantityType">Unit Type *</label>
+                  <label htmlFor="quantityType">{t('form.fields.unitType')} *</label>
                   <input
                     type="text"
                     id="quantityType"
                     name="quantityType"
                     value={newMaterialData.quantityType}
                     onChange={handleNewMaterialChange}
-                    placeholder="e.g., kg, liters, pieces"
+                    placeholder={t('form.placeholders.unitType')}
                     required
                     disabled={isLoading}
                     list="quantityTypeOptions"
@@ -259,7 +261,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="quantity">Initial Quantity *</label>
+                  <label htmlFor="quantity">{t('form.fields.initialQuantity')} *</label>
                   <input
                     type="number"
                     id="quantity"
@@ -274,7 +276,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="minimumStock">Minimum Stock Level</label>
+                  <label htmlFor="minimumStock">{t('form.fields.minimumStockLevel')}</label>
                   <input
                     type="number"
                     id="minimumStock"
@@ -290,13 +292,13 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
               </div>
 
               <div className="form-group">
-                <label htmlFor="description">Description</label>
+                <label htmlFor="description">{t('form.fields.description')}</label>
                 <textarea
                   id="description"
                   name="description"
                   value={newMaterialData.description}
                   onChange={handleNewMaterialChange}
-                  placeholder="Optional description of the material..."
+                  placeholder={t('form.placeholders.description')}
                   rows={3}
                   disabled={isLoading}
                 />
@@ -305,7 +307,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
           ) : (
             <>
               <div className="form-group">
-                <label htmlFor="materialId">Select Existing Material *</label>
+                <label htmlFor="materialId">{t('form.fields.selectExistingMaterial')} *</label>
                 <select
                   id="materialId"
                   name="materialId"
@@ -314,11 +316,11 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                   required
                   disabled={isLoading}
                 >
-                  <option value={0}>Choose material to restock...</option>
+                  <option value={0}>{t('form.placeholders.chooseMaterial')}</option>
                   {existingMaterials.map(material => (
                     <option key={material.id} value={material.id}>
-                      {material.name} ({material.color}) - Current: {material.quantity} {material.quantityType}
-                      {material.isLowStock && ' - LOW STOCK!'}
+                      {material.name} ({material.color}) - {t('form.labels.current')}: {material.quantity} {material.quantityType}
+                      {material.isLowStock && ` - ${t('status.lowStock').toUpperCase()}!`}
                     </option>
                   ))}
                 </select>
@@ -326,27 +328,31 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
 
               {selectedExistingMaterial && (
                 <div className="selected-material-info">
-                  <h4>Selected Material:</h4>
+                  <h4>{t('form.labels.selectedMaterial')}</h4>
                   <div className="material-details">
                     <div className="detail-row">
-                      <span className="label">Name:</span>
+                      <span className="label">{t('form.labels.name')}</span>
                       <span className="value">{selectedExistingMaterial.name}</span>
                     </div>
                     <div className="detail-row">
-                      <span className="label">Color:</span>
+                      <span className="label">{t('form.labels.color')}</span>
                       <span className="value">{selectedExistingMaterial.color}</span>
                     </div>
                     <div className="detail-row">
-                      <span className="label">Type:</span>
+                      <span className="label">{t('form.labels.type')}</span>
                       <span className="value">
-                        {selectedExistingMaterial.type === MaterialType.RawMaterial ? 'Raw Material' : 'Recyclable Material'}
+                        {selectedExistingMaterial.type === MaterialType.RawMaterial 
+                          ? t('filters.rawMaterials')
+                          : selectedExistingMaterial.type === MaterialType.RecyclableMaterial
+                          ? t('filters.recyclableMaterials')
+                          : t('filters.finishedProducts')}
                       </span>
                     </div>
                     <div className="detail-row">
-                      <span className="label">Current Stock:</span>
+                      <span className="label">{t('form.labels.currentStock')}</span>
                       <span className={`value ${selectedExistingMaterial.isLowStock ? 'low-stock' : ''}`}>
                         {selectedExistingMaterial.quantity} {selectedExistingMaterial.quantityType}
-                        {selectedExistingMaterial.isLowStock && ' (Low Stock!)'}
+                        {selectedExistingMaterial.isLowStock && ` (${t('form.labels.lowStock')})`}
                       </span>
                     </div>
                   </div>
@@ -355,7 +361,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
 
               <div className="form-row">
                 <div className="form-group">
-                  <label htmlFor="quantityToAdd">Quantity to Add *</label>
+                  <label htmlFor="quantityToAdd">{t('form.fields.quantityToAdd')} *</label>
                   <input
                     type="number"
                     id="quantityToAdd"
@@ -365,7 +371,7 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
                     onWheel={handleWheel}
                     min="0.01"
                     step="0.01"
-                    placeholder={selectedExistingMaterial ? `Add ${selectedExistingMaterial.quantityType}` : 'Quantity'}
+                    placeholder={selectedExistingMaterial ? `${t('common:buttons.add', { defaultValue: 'Add' })} ${selectedExistingMaterial.quantityType}` : t('form.placeholders.quantity')}
                     required
                     disabled={isLoading}
                   />
@@ -381,14 +387,14 @@ const AddMaterial: React.FC<AddMaterialProps> = ({ onClose, onMaterialCreated })
               className="btn btn-secondary"
               disabled={isLoading}
             >
-              Cancel
+              {t('form.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="btn btn-primary"
               disabled={isLoading || !isFormValid()}
             >
-              {isLoading ? 'Adding...' : mode === 'new' ? 'Create Material' : 'Add to Stock'}
+              {isLoading ? t('form.buttons.adding') : mode === 'new' ? t('form.buttons.createMaterial') : t('form.buttons.addToStock')}
             </button>
           </div>
         </form>

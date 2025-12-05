@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { X, Plus, Trash2 } from 'lucide-react';
 import * as types from '../../types';
 import { inventoryApi, productionPlanApi } from '../../services/api';
@@ -11,6 +12,7 @@ interface EditRecyclableProductionPlanProps {
 }
 
 const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> = ({ plan, onClose, onPlanUpdated }) => {
+  const { t } = useTranslation(['production', 'common']);
   const [name, setName] = useState(plan.name);
   const [description, setDescription] = useState<string>(plan.description || '');
   const [quantityToProduce, setQuantityToProduce] = useState<number>(plan.quantityToProduce);
@@ -35,7 +37,7 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
         const list = res.data.filter(m => m.type === types.MaterialType.RecyclableMaterial && m.isActive);
         setAllRecyclables(list);
       } catch (e: any) {
-        setError(e.response?.data?.message || 'Failed to load materials');
+        setError(e.response?.data?.message || t('editRecyclablePlan.messages.failedToLoadMaterials'));
       }
     };
     load();
@@ -58,11 +60,11 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
 
   const handleSave = async () => {
     setError(null);
-    if (!name.trim()) { setError('Name is required'); return; }
-    if (!quantityToProduce || quantityToProduce <= 0) { setError('Quantity to produce must be > 0'); return; }
-    if (!estimatedProductionTimeMinutes || estimatedProductionTimeMinutes <= 0) { setError('Estimated time must be > 0'); return; }
-    if (materials.length === 0) { setError('Add at least one recyclable material'); return; }
-    if (materials.some(m => !m.rawMaterialId || !m.requiredQuantity || Number(m.requiredQuantity) <= 0)) { setError('All materials must be valid'); return; }
+    if (!name.trim()) { setError(t('editRecyclablePlan.messages.nameRequired')); return; }
+    if (!quantityToProduce || quantityToProduce <= 0) { setError(t('editRecyclablePlan.messages.quantityMustBeGreaterThanZero')); return; }
+    if (!estimatedProductionTimeMinutes || estimatedProductionTimeMinutes <= 0) { setError(t('editRecyclablePlan.messages.estimatedTimeMustBeGreaterThanZero')); return; }
+    if (materials.length === 0) { setError(t('editRecyclablePlan.messages.addAtLeastOneRecyclable')); return; }
+    if (materials.some(m => !m.rawMaterialId || !m.requiredQuantity || Number(m.requiredQuantity) <= 0)) { setError(t('editRecyclablePlan.messages.allMaterialsMustBeValid')); return; }
 
     const payload: types.UpdateRecyclableProductionPlanRequest = {
       name,
@@ -79,7 +81,7 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
       await productionPlanApi.updateRecyclablePlan(plan.id, payload);
       onPlanUpdated();
     } catch (e: any) {
-      setError(e.response?.data?.message || 'Failed to update plan');
+      setError(e.response?.data?.message || t('editRecyclablePlan.messages.failedToUpdate'));
     } finally {
       setIsSaving(false);
     }
@@ -89,7 +91,7 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
     <div className="edit-production-plan-overlay" onClick={onClose}>
       <div className="edit-production-plan-modal" onClick={(e) => e.stopPropagation()}>
         <div className="edit-production-plan-header">
-          <h2>Edit Recyclable Production Plan</h2>
+          <h2>{t('editRecyclablePlan.title')}</h2>
           <button className="btn btn-secondary btn-sm" onClick={onClose}><X size={16} /></button>
         </div>
 
@@ -98,18 +100,18 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
         <div className="edit-production-plan-form">
           {/* Plan Details - target raw material (read-only) */}
           <div className="form-section">
-            <h3>Plan Details</h3>
+            <h3>{t('editRecyclablePlan.sections.planDetails')}</h3>
             <div className="form-row">
               <div className="form-group">
-                <label>Target Raw Material</label>
+                <label>{t('editRecyclablePlan.fields.targetRawMaterial')}</label>
                 <input value={plan.targetRawMaterialName} disabled />
               </div>
               <div className="form-group">
-                <label>Color</label>
+                <label>{t('editRecyclablePlan.fields.color')}</label>
                 <input value={plan.targetRawMaterialColor} disabled />
               </div>
               <div className="form-group">
-                <label>Quantity Type</label>
+                <label>{t('editRecyclablePlan.fields.quantityType')}</label>
                 <input value={plan.targetRawMaterialQuantityType} disabled />
               </div>
             </div>
@@ -118,52 +120,52 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
           <div className="form-section">
             <div className="form-row">
               <div className="form-group">
-                <label>Plan Name</label>
-                <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Enter plan name" />
+                <label>{t('editRecyclablePlan.fields.planName')}</label>
+                <input value={name} onChange={(e) => setName(e.target.value)} placeholder={t('editRecyclablePlan.placeholders.planName')} />
               </div>
               <div className="form-group">
-                <label>Planned Start Date</label>
+                <label>{t('editRecyclablePlan.fields.plannedStartDate')}</label>
                 <input type="date" value={plannedStartDate ? plannedStartDate.substring(0,10) : ''} onChange={(e) => setPlannedStartDate(e.target.value || undefined)} />
               </div>
               <div className="form-group">
-                <label>Quantity to Produce</label>
+                <label>{t('editRecyclablePlan.fields.quantityToProduce')}</label>
                 <input type="number" min={0} step="0.01" value={quantityToProduce} onChange={(e) => setQuantityToProduce(Number(e.target.value))} onWheel={handleWheel} />
               </div>
               <div className="form-group">
-                <label>Estimated Time (min)</label>
+                <label>{t('editRecyclablePlan.fields.estimatedTimeMin')}</label>
                 <input type="number" min={1} step="1" value={estimatedProductionTimeMinutes} onChange={(e) => setEstimatedProductionTimeMinutes(Number(e.target.value))} onWheel={handleWheel} />
               </div>
             </div>
             <div className="form-group">
-              <label>Description</label>
+              <label>{t('editRecyclablePlan.fields.description')}</label>
               <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
             </div>
             <div className="form-group">
-              <label>Notes</label>
+              <label>{t('editRecyclablePlan.fields.notes')}</label>
               <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
             </div>
           </div>
 
           <div className="form-section">
-            <h3>Required Recyclables (per unit)</h3>
+            <h3>{t('editRecyclablePlan.sections.requiredRecyclables')}</h3>
             <div className="add-material-section">
               <div className="form-row">
                 <div className="form-group" style={{ flex: 2 }}>
-                  <label>Select Recyclable</label>
+                  <label>{t('editRecyclablePlan.fields.selectRecyclable')}</label>
                   <select
                     value={currentRecyclable.rawMaterialId}
                     onChange={(e) => setCurrentRecyclable(prev => ({ ...prev, rawMaterialId: Number(e.target.value) }))}
                   >
-                    <option value={0}>-- Select a recyclable --</option>
+                    <option value={0}>{t('editRecyclablePlan.fields.selectRecyclableOption')}</option>
                     {allRecyclables.map(mat => (
                       <option key={mat.id} value={mat.id}>
-                        {mat.name} ({mat.color}) - Available: {mat.quantity} {mat.quantityType}
+                        {mat.name} ({mat.color}) - {t('editRecyclablePlan.labels.available')} {mat.quantity} {mat.quantityType}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div className="form-group">
-                  <label>Quantity</label>
+                  <label>{t('editRecyclablePlan.fields.quantity')}</label>
                   <input
                     type="number"
                     min={0.01}
@@ -179,11 +181,11 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
                     className="btn btn-secondary"
                     onClick={() => {
                       if (currentRecyclable.rawMaterialId === 0 || currentRecyclable.requiredQuantity <= 0) {
-                        setError('Please select a recyclable and enter a valid quantity');
+                        setError(t('editRecyclablePlan.messages.pleaseSelectRecyclableAndQuantity'));
                         return;
                       }
                       if (materials.some(m => Number(m.rawMaterialId) === currentRecyclable.rawMaterialId)) {
-                        setError('Recyclable material already added');
+                        setError(t('editRecyclablePlan.messages.recyclableAlreadyAdded'));
                         return;
                       }
                       setMaterials(prev => [...prev, { rawMaterialId: currentRecyclable.rawMaterialId, requiredQuantity: currentRecyclable.requiredQuantity }]);
@@ -191,22 +193,22 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
                       setError(null);
                     }}
                   >
-                    <Plus size={16} /> Add
+                    <Plus size={16} /> {t('editRecyclablePlan.buttons.add')}
                   </button>
                 </div>
               </div>
             </div>
             <div className="selected-materials">
-              <h4>Materials</h4>
+              <h4>{t('editRecyclablePlan.fields.materials')}</h4>
               <table className="materials-table">
                 <thead>
                   <tr>
-                    <th>Material</th>
-                    <th>Required Qty (per unit)</th>
-                    <th>Total Need</th>
-                    <th>Available</th>
-                    <th>Status</th>
-                    <th style={{ width: 80 }}>Actions</th>
+                    <th>{t('editRecyclablePlan.table.material')}</th>
+                    <th>{t('editRecyclablePlan.table.requiredQtyPerUnit')}</th>
+                    <th>{t('editRecyclablePlan.table.totalNeed')}</th>
+                    <th>{t('editRecyclablePlan.table.available')}</th>
+                    <th>{t('editRecyclablePlan.table.status')}</th>
+                    <th style={{ width: 80 }}>{t('editRecyclablePlan.table.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -232,7 +234,7 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
                             type="number"
                             min={0}
                             step="0.01"
-                            placeholder="per unit"
+                            placeholder={t('editRecyclablePlan.fields.perUnit')}
                             value={row.requiredQuantity}
                             onChange={(e) => updateMaterialRow(idx, 'requiredQuantity', e.target.value === '' ? '' : Number(e.target.value))}
                             onWheel={handleWheel}
@@ -242,7 +244,7 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
                         <td>{available.toFixed(2)} {qtyType}</td>
                         <td>
                           <span className={`status-badge ${isAvailable ? 'status-available' : 'status-insufficient'}`}>
-                            {isAvailable ? 'Available' : `Short ${shortage.toFixed(2)}`}
+                            {isAvailable ? t('editRecyclablePlan.status.available') : t('editRecyclablePlan.status.short', { amount: shortage.toFixed(2) })}
                           </span>
                         </td>
                         <td>
@@ -259,9 +261,9 @@ const EditRecyclableProductionPlan: React.FC<EditRecyclableProductionPlanProps> 
           </div>
 
           <div className="form-actions">
-            <button className="btn btn-secondary" onClick={onClose} disabled={isSaving}>Cancel</button>
+            <button className="btn btn-secondary" onClick={onClose} disabled={isSaving}>{t('editRecyclablePlan.buttons.cancel')}</button>
             <button className={`btn btn-primary ${isSaving ? 'loading' : ''}`} onClick={handleSave} disabled={isSaving}>
-              {isSaving ? 'Saving...' : 'Save Changes'}
+              {isSaving ? t('editRecyclablePlan.buttons.saving') : t('editRecyclablePlan.buttons.saveChanges')}
             </button>
           </div>
         </div>

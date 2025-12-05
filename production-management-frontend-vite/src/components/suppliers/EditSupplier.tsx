@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supplierApi } from '../../services/api';
 import type { Supplier, UpdateSupplierRequest } from '../../types';
 import { X, Building2 } from 'lucide-react';
@@ -17,6 +18,7 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
   onSuccess,
   supplier
 }) => {
+  const { t } = useTranslation(['suppliers', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<UpdateSupplierRequest>({
@@ -69,7 +71,7 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
     e.preventDefault();
     
     if (!formData.name?.trim()) {
-      setError('Supplier name is required');
+      setError(t('editSupplier.messages.supplierNameRequired'));
       return;
     }
 
@@ -97,7 +99,7 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update supplier');
+      setError(err.response?.data?.message || t('editSupplier.messages.failedToUpdate'));
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +117,7 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
         <div className="modal-header">
           <h2>
             <Building2 size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            Edit Supplier
+            {t('editSupplier.title')}
           </h2>
           <button className="close-button" onClick={onClose}>
             <X size={24} />
@@ -133,14 +135,14 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
           <div className="form-section">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="name">Supplier Name *</label>
+                <label htmlFor="name">{t('editSupplier.fields.supplierName')} *</label>
                 <input
                   type="text"
                   id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Enter supplier name"
+                  placeholder={t('editSupplier.placeholders.supplierName')}
                   required
                 />
               </div>
@@ -148,13 +150,13 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="description">Description</label>
+                <label htmlFor="description">{t('editSupplier.fields.description')}</label>
                 <textarea
                   id="description"
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  placeholder="Enter supplier description"
+                  placeholder={t('editSupplier.placeholders.description')}
                   rows={2}
                 />
               </div>
@@ -162,130 +164,130 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="contactPerson">Contact Person</label>
+                <label htmlFor="contactPerson">{t('editSupplier.fields.contactPerson')}</label>
                 <input
                   type="text"
                   id="contactPerson"
                   name="contactPerson"
                   value={formData.contactPerson}
                   onChange={handleChange}
-                  placeholder="Enter contact person name"
+                  placeholder={t('editSupplier.placeholders.contactPerson')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t('editSupplier.fields.email')}</label>
                 <input
                   type="email"
                   id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter email address"
+                  placeholder={t('editSupplier.placeholders.email')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="phone">Phone</label>
+                <label htmlFor="phone">{t('editSupplier.fields.phone')}</label>
                 <input
                   type="text"
                   id="phone"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="Enter phone number"
+                  placeholder={t('editSupplier.placeholders.phone')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="address">Address</label>
+                <label htmlFor="address">{t('editSupplier.fields.address')}</label>
                 <input
                   type="text"
                   id="address"
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="Enter street address"
+                  placeholder={t('editSupplier.placeholders.address')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="city">City</label>
+                <label htmlFor="city">{t('editSupplier.fields.city')}</label>
                 <input
                   type="text"
                   id="city"
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  placeholder="Enter city"
+                  placeholder={t('editSupplier.placeholders.city')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="postalCode">Postal Code</label>
+                <label htmlFor="postalCode">{t('editSupplier.fields.postalCode')}</label>
                 <input
                   type="text"
                   id="postalCode"
                   name="postalCode"
                   value={formData.postalCode}
                   onChange={handleChange}
-                  placeholder="Enter postal code"
+                  placeholder={t('editSupplier.placeholders.postalCode')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="country">Country</label>
+                <label htmlFor="country">{t('editSupplier.fields.country')}</label>
                 <input
                   type="text"
                   id="country"
                   name="country"
                   value={formData.country}
                   onChange={handleChange}
-                  placeholder="Enter country"
+                  placeholder={t('editSupplier.placeholders.country')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="taxId">Tax ID</label>
+                <label htmlFor="taxId">{t('editSupplier.fields.taxId')}</label>
                 <input
                   type="text"
                   id="taxId"
                   name="taxId"
                   value={formData.taxId}
                   onChange={handleChange}
-                  placeholder="Enter tax ID"
+                  placeholder={t('editSupplier.placeholders.taxId')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="registrationNumber">Registration Number</label>
+                <label htmlFor="registrationNumber">{t('editSupplier.fields.registrationNumber')}</label>
                 <input
                   type="text"
                   id="registrationNumber"
                   name="registrationNumber"
                   value={formData.registrationNumber}
                   onChange={handleChange}
-                  placeholder="Enter registration number"
+                  placeholder={t('editSupplier.placeholders.registrationNumber')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="notes">Notes</label>
+                <label htmlFor="notes">{t('editSupplier.fields.notes')}</label>
                 <textarea
                   id="notes"
                   name="notes"
                   value={formData.notes}
                   onChange={handleChange}
-                  placeholder="Optional notes about the supplier..."
+                  placeholder={t('editSupplier.placeholders.notes')}
                   rows={3}
                 />
               </div>
@@ -300,7 +302,7 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
                     checked={formData.isActive}
                     onChange={handleChange}
                   />
-                  <span>Active</span>
+                  <span>{t('editSupplier.fields.active')}</span>
                 </label>
               </div>
             </div>
@@ -313,14 +315,14 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              {t('editSupplier.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading}
             >
-              {isLoading ? 'Updating...' : 'Update Supplier'}
+              {isLoading ? t('editSupplier.buttons.updating') : t('editSupplier.buttons.updateSupplier')}
             </button>
           </div>
         </form>

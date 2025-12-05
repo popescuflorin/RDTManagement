@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { userApi } from '../../services/api';
 import type { User } from '../../types';
 import './ActivateUser.css';
@@ -10,6 +11,7 @@ interface ActivateUserProps {
 }
 
 const ActivateUser: React.FC<ActivateUserProps> = ({ user, onClose, onUserActivated }) => {
+  const { t } = useTranslation(['users', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,7 +34,7 @@ const ActivateUser: React.FC<ActivateUserProps> = ({ user, onClose, onUserActiva
       onClose();
     } catch (error: any) {
       console.error('Error activating user:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to activate user. Please try again.';
+      const errorMessage = error.response?.data?.message || t('activateUser.messages.failedToActivateUser');
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -44,7 +46,7 @@ const ActivateUser: React.FC<ActivateUserProps> = ({ user, onClose, onUserActiva
       <div className="activate-user-modal">
         <div className="activate-user-header">
           <div className="success-icon">✓</div>
-          <h2>Activate User</h2>
+          <h2>{t('activateUser.title')}</h2>
         </div>
 
         <div className="activate-user-content">
@@ -55,7 +57,7 @@ const ActivateUser: React.FC<ActivateUserProps> = ({ user, onClose, onUserActiva
           )}
 
           <p className="confirmation-text">
-            Are you sure you want to activate this user account?
+            {t('activateUser.confirmation')}
           </p>
 
           <div className="user-details">
@@ -65,16 +67,16 @@ const ActivateUser: React.FC<ActivateUserProps> = ({ user, onClose, onUserActiva
             <div className="user-info">
               <div className="user-name">{user.firstName} {user.lastName}</div>
               <div className="user-email">{user.email}</div>
-              <div className="user-role">Role: {user.role}</div>
+              <div className="user-role">{t('activateUser.labels.role')} {user.role}</div>
             </div>
           </div>
 
           <div className="info-text">
-            <strong>Activating this user will:</strong>
+            <strong>{t('activateUser.info.title')}</strong>
             <ul>
-              <li>Restore their access to the system</li>
-              <li>Allow them to log in again</li>
-              <li>Enable all their previous permissions</li>
+              <li>{t('activateUser.info.restoreAccess')}</li>
+              <li>{t('activateUser.info.allowLogin')}</li>
+              <li>{t('activateUser.info.enablePermissions')}</li>
             </ul>
           </div>
         </div>
@@ -86,7 +88,7 @@ const ActivateUser: React.FC<ActivateUserProps> = ({ user, onClose, onUserActiva
             className="cancel-button"
             disabled={isLoading}
           >
-            Cancel
+            {t('activateUser.buttons.cancel')}
           </button>
           <button
             type="button"
@@ -94,7 +96,7 @@ const ActivateUser: React.FC<ActivateUserProps> = ({ user, onClose, onUserActiva
             className="activate-button"
             disabled={isLoading}
           >
-            {isLoading ? 'Activating...' : 'Activate User'}
+            {isLoading ? t('activateUser.buttons.activating') : t('activateUser.buttons.activateUser')}
           </button>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { rolePermissionApi } from '../../services/api';
 import type { PermissionInfo, CreateRoleRequest, RoleDto } from '../../types';
 import { Check, X, Plus } from 'lucide-react';
@@ -80,6 +81,7 @@ const PermissionCategory: React.FC<PermissionCategoryProps> = ({
 };
 
 const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
+  const { t } = useTranslation(['users', 'common']);
   const [allPermissions, setAllPermissions] = useState<Record<string, PermissionInfo[]>>({});
   const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
   const [roleName, setRoleName] = useState('');
@@ -101,7 +103,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
       setAllPermissions(permissionsResponse.data);
     } catch (err: any) {
       console.error('Error loading permissions:', err);
-      setError(err.response?.data?.message || 'Failed to load permissions');
+      setError(err.response?.data?.message || t('createRole.messages.failedToLoadPermissions'));
     } finally {
       setIsLoading(false);
     }
@@ -146,7 +148,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
 
   const handleSave = async () => {
     if (!roleName.trim()) {
-      setError('Role name is required');
+      setError(t('createRole.messages.roleNameRequired'));
       return;
     }
 
@@ -164,7 +166,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
       onRoleCreated(response.data);
     } catch (err: any) {
       console.error('Error creating role:', err);
-      setError(err.response?.data?.message || 'Failed to create role');
+      setError(err.response?.data?.message || t('createRole.messages.failedToCreateRole'));
     } finally {
       setIsSaving(false);
     }
@@ -180,7 +182,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
         <div className="create-role-header">
           <div className="header-content">
             <Plus size={24} />
-            <h2>Create New Role</h2>
+            <h2>{t('createRole.title')}</h2>
           </div>
           <button className="close-button" onClick={onClose}>
             <X size={24} />
@@ -196,7 +198,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
 
           {isLoading ? (
             <div className="loading-state">
-              <p>Loading permissions...</p>
+              <p>{t('createRole.labels.loadingPermissions')}</p>
             </div>
           ) : (
             <>
@@ -204,26 +206,26 @@ const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
               <div className="role-details-section">
                 <div className="form-group">
                   <label htmlFor="roleName">
-                    Role Name <span className="required">*</span>
+                    {t('createRole.fields.roleName')} <span className="required">*</span>
                   </label>
                   <input
                     id="roleName"
                     type="text"
                     value={roleName}
                     onChange={(e) => setRoleName(e.target.value)}
-                    placeholder="e.g., Supervisor, Operator, Analyst"
+                    placeholder={t('createRole.placeholders.roleName')}
                     maxLength={50}
                     disabled={isSaving}
                   />
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="description">Description</label>
+                  <label htmlFor="description">{t('createRole.fields.description')}</label>
                   <textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Brief description of this role's purpose and responsibilities"
+                    placeholder={t('createRole.placeholders.description')}
                     rows={3}
                     maxLength={500}
                     disabled={isSaving}
@@ -233,11 +235,11 @@ const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
 
               {/* Permissions Selection */}
               <div className="permissions-selection-section">
-                <h3>Assign Permissions</h3>
+                <h3>{t('createRole.labels.assignPermissions')}</h3>
                 <div className="permissions-summary">
                   <p>
-                    Selected <strong>{selectedPermissions.length}</strong> of{' '}
-                    <strong>{Object.values(allPermissions).flat().length}</strong> permissions
+                    {t('createRole.labels.selected')} <strong>{selectedPermissions.length}</strong> {t('createRole.labels.of')}{' '}
+                    <strong>{Object.values(allPermissions).flat().length}</strong> {t('createRole.labels.permissions')}
                   </p>
                 </div>
 
@@ -268,7 +270,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
             className="cancel-button"
             disabled={isSaving}
           >
-            Cancel
+            {t('createRole.buttons.cancel')}
           </button>
           <button
             type="button"
@@ -276,7 +278,7 @@ const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
             className="save-button"
             disabled={isSaving || isLoading || !roleName.trim()}
           >
-            {isSaving ? 'Creating...' : 'Create Role'}
+            {isSaving ? t('createRole.buttons.creating') : t('createRole.buttons.createRole')}
           </button>
         </div>
       </div>

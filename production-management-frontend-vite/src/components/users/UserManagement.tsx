@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Users, 
   UserPlus, 
@@ -23,6 +24,7 @@ import CreateRole from './CreateRole';
 import './UserManagement.css';
 
 const UserManagement: React.FC = () => {
+  const { t } = useTranslation(['users', 'common']);
   const [users, setUsers] = useState<User[]>([]);
   const [roles, setRoles] = useState<RoleDto[]>([]);
   const [rolePermissions, setRolePermissions] = useState<Record<string, number>>({});
@@ -53,7 +55,7 @@ const UserManagement: React.FC = () => {
       setUsers(response.data);
     } catch (error) {
       console.error('Error loading users:', error);
-      setError('Failed to load users. Please try again.');
+      setError(t('userManagement.messages.failedToLoadUsers'));
     } finally {
       setIsLoading(false);
     }
@@ -169,7 +171,7 @@ const UserManagement: React.FC = () => {
     try {
       return new Date(dateString).toLocaleString();
     } catch {
-      return 'Never';
+      return t('userManagement.messages.never');
     }
   };
 
@@ -191,7 +193,7 @@ const UserManagement: React.FC = () => {
       <div className="user-management-container">
         <div className="loading-state">
           <Loader2 size={32} className="animate-spin" />
-          <p>Loading users...</p>
+          <p>{t('userManagement.loading.loadingUsers')}</p>
         </div>
       </div>
     );
@@ -205,7 +207,7 @@ const UserManagement: React.FC = () => {
           <p>{error}</p>
           <button onClick={loadUsers} className="btn btn-primary">
             <RotateCcw size={16} />
-            Try Again
+            {t('userManagement.buttons.tryAgain')}
           </button>
         </div>
       </div>
@@ -216,8 +218,8 @@ const UserManagement: React.FC = () => {
     <div className="user-management-container">
       <div className="user-management-header">
         <div className="header-left">
-          <h1>User & Role Management</h1>
-          <p>Manage system users, roles, and permissions</p>
+          <h1>{t('userManagement.title')}</h1>
+          <p>{t('userManagement.subtitle')}</p>
         </div>
         <div className="header-right">
           {activeTab === 'users' && (
@@ -226,7 +228,7 @@ const UserManagement: React.FC = () => {
               className="btn btn-primary"
             >
               <UserPlus size={16} />
-              Add New User
+              {t('userManagement.buttons.addNewUser')}
             </button>
           )}
           {activeTab === 'roles' && (
@@ -235,7 +237,7 @@ const UserManagement: React.FC = () => {
               className="btn btn-success"
             >
               <Shield size={16} />
-              Create New Role
+              {t('userManagement.buttons.createNewRole')}
             </button>
           )}
         </div>
@@ -248,14 +250,14 @@ const UserManagement: React.FC = () => {
           onClick={() => setActiveTab('users')}
         >
           <Users size={18} />
-          Users
+          {t('userManagement.tabs.users')}
         </button>
         <button
           className={`tab-button ${activeTab === 'roles' ? 'active' : ''}`}
           onClick={() => setActiveTab('roles')}
         >
           <Shield size={18} />
-          Roles & Permissions
+          {t('userManagement.tabs.roles')}
         </button>
       </div>
 
@@ -266,7 +268,7 @@ const UserManagement: React.FC = () => {
           <Search size={16} className="search-icon" />
           <input
             type="text"
-            placeholder="Search users by name, email, username, or role..."
+            placeholder={t('userManagement.search.placeholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
@@ -274,7 +276,7 @@ const UserManagement: React.FC = () => {
         </div>
         <div className="users-count">
           <span className="count-badge">{filteredUsers.length}</span>
-          {filteredUsers.length === 1 ? 'user' : 'users'} found
+          {t('userManagement.search.usersFound', { count: filteredUsers.length })}
         </div>
       </div>
 
@@ -282,14 +284,14 @@ const UserManagement: React.FC = () => {
         <table className="users-table">
           <thead>
             <tr>
-              <th>Avatar</th>
-              <th>Name</th>
-              <th>Username</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Last Login</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>{t('userManagement.table.avatar')}</th>
+              <th>{t('userManagement.table.name')}</th>
+              <th>{t('userManagement.table.username')}</th>
+              <th>{t('userManagement.table.email')}</th>
+              <th>{t('userManagement.table.role')}</th>
+              <th>{t('userManagement.table.lastLogin')}</th>
+              <th>{t('userManagement.table.status')}</th>
+              <th>{t('userManagement.table.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -303,7 +305,7 @@ const UserManagement: React.FC = () => {
                 <td className="name-cell">
                   <div className="user-name">
                     <span className="full-name">{user.firstName} {user.lastName}</span>
-                    <span className="user-id">ID: {user.id}</span>
+                    <span className="user-id">{t('userManagement.labels.id')} {user.id}</span>
                   </div>
                 </td>
                 <td className="username-cell">
@@ -324,14 +326,14 @@ const UserManagement: React.FC = () => {
                 </td>
                 <td className="status-cell">
                   <span className={`status-badge ${user.isActive ? 'status-active' : 'status-inactive'}`}>
-                    {user.isActive ? 'Active' : 'Inactive'}
+                    {user.isActive ? t('userManagement.status.active') : t('userManagement.status.inactive')}
                   </span>
                 </td>
                 <td className="actions-cell">
                   <div className="action-buttons">
                     <button 
                       className="btn btn-sm btn-warning" 
-                      title="Edit User"
+                      title={t('userManagement.tooltips.editUser')}
                       onClick={() => handleEditUser(user)}
                     >
                       <Edit size={16} />
@@ -339,7 +341,7 @@ const UserManagement: React.FC = () => {
                     {user.isActive ? (
                       <button 
                         className="btn btn-sm btn-danger" 
-                        title="Deactivate User"
+                        title={t('userManagement.tooltips.deactivateUser')}
                         onClick={() => handleDeleteUser(user)}
                       >
                         <Trash2 size={16} />
@@ -347,13 +349,13 @@ const UserManagement: React.FC = () => {
                     ) : (
                       <button 
                         className="btn btn-sm btn-success" 
-                        title="Activate User"
+                        title={t('userManagement.tooltips.activateUser')}
                         onClick={() => handleActivateUser(user)}
                       >
                         <UserCheck size={16} />
                       </button>
                     )}
-                    <button className="btn btn-sm btn-secondary" title="View Details">
+                    <button className="btn btn-sm btn-secondary" title={t('userManagement.tooltips.viewDetails')}>
                       <Eye size={16} />
                     </button>
                   </div>
@@ -366,11 +368,11 @@ const UserManagement: React.FC = () => {
         {filteredUsers.length === 0 && !isLoading && (
           <div className="empty-state">
             <Users size={48} className="empty-icon" />
-            <h3>No users found</h3>
+            <h3>{t('userManagement.empty.noUsersFound')}</h3>
             <p>
               {searchTerm
-                ? `No users match "${searchTerm}". Try adjusting your search.`
-                : 'No users in the system yet.'}
+                ? t('userManagement.empty.noUsersMatch', { searchTerm })
+                : t('userManagement.empty.noUsersInSystem')}
             </p>
             {!searchTerm && (
               <button
@@ -378,7 +380,7 @@ const UserManagement: React.FC = () => {
                 className="btn btn-primary"
               >
                 <UserPlus size={16} />
-                Add First User
+                {t('userManagement.empty.addFirstUser')}
               </button>
             )}
           </div>
@@ -392,18 +394,18 @@ const UserManagement: React.FC = () => {
           {isLoadingRoles ? (
             <div className="loading-state">
               <Loader2 size={32} className="animate-spin" />
-              <p>Loading roles...</p>
+              <p>{t('userManagement.loading.loadingRoles')}</p>
             </div>
           ) : (
             <div className="roles-table-container">
               <table className="roles-table">
                 <thead>
                   <tr>
-                    <th>Role</th>
-                    <th>Description</th>
-                    <th>Permissions Count</th>
-                    <th>Users</th>
-                    <th>Actions</th>
+                    <th>{t('userManagement.table.roleColumn')}</th>
+                    <th>{t('userManagement.table.description')}</th>
+                    <th>{t('userManagement.table.permissionsCount')}</th>
+                    <th>{t('userManagement.table.users')}</th>
+                    <th>{t('userManagement.table.actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -416,21 +418,21 @@ const UserManagement: React.FC = () => {
                         </span>
                       </td>
                       <td className="role-description-cell">
-                        {role.description || 'No description available'}
+                        {role.description || t('userManagement.labels.noDescription')}
                       </td>
                       <td className="permissions-count-cell">
                         <span className="permission-badge">
-                          {rolePermissions[role.name] || 0} permissions
+                          {rolePermissions[role.name] || 0} {t('userManagement.labels.permissions')}
                         </span>
                       </td>
                       <td className="users-count-cell">
-                        {users.filter(u => u.role === role.name).length} users
+                        {users.filter(u => u.role === role.name).length} {t('userManagement.labels.users')}
                       </td>
                       <td className="actions-cell">
                         <div className="action-buttons">
                           <button 
                             className="btn btn-sm btn-warning" 
-                            title="Edit Permissions"
+                            title={t('userManagement.tooltips.editPermissions')}
                             onClick={() => handleEditRole(role.name)}
                           >
                             <Edit size={16} />
@@ -445,8 +447,8 @@ const UserManagement: React.FC = () => {
               {roles.length === 0 && !isLoadingRoles && (
                 <div className="empty-state">
                   <Shield size={48} className="empty-icon" />
-                  <h3>No roles found</h3>
-                  <p>No roles configured in the system.</p>
+                  <h3>{t('userManagement.empty.noRolesFound')}</h3>
+                  <p>{t('userManagement.empty.noRolesConfigured')}</p>
                 </div>
               )}
             </div>

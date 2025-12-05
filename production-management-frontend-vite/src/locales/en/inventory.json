@@ -1,7 +1,193 @@
 {
   "title": "Inventory",
+  "inventoryManagement": "Inventory Management",
   "addMaterial": "Add Material",
   "editMaterial": "Edit Material",
-  "viewMaterial": "View Material"
+  "viewMaterial": "View Material",
+  "loading": "Loading inventory...",
+  "searchPlaceholder": "Search materials...",
+  "showInactiveMaterials": "Show Inactive Materials",
+  "table": {
+    "material": "Material",
+    "color": "Color",
+    "inStock": "In Stock",
+    "requested": "Requested",
+    "available": "Available",
+    "minStock": "Min. Stock",
+    "status": "Status",
+    "lastUpdated": "Last Updated",
+    "actions": "Actions"
+  },
+  "statistics": {
+    "totalMaterials": "Total Materials",
+    "lowStock": "Low Stock",
+    "insufficientStock": "Insufficient Stock",
+    "insufficientStockDescription": "Pending requests exceed available quantity"
+  },
+  "filters": {
+    "rawMaterials": "Raw Materials",
+    "recyclableMaterials": "Recyclable Materials",
+    "finishedProducts": "Finished Products"
+  },
+  "status": {
+    "active": "Active",
+    "inactive": "Inactive",
+    "lowStock": "Low Stock!",
+    "insufficient": "Insufficient!"
+  },
+  "emptyState": {
+    "noMaterialsFound": "No materials found matching your criteria.",
+    "noMaterialsInCategory": "No materials in this category. Add some materials to get started."
+  },
+  "pagination": {
+    "showing": "Showing {{start}} to {{end}} of {{total}} materials",
+    "first": "First",
+    "previous": "Previous",
+    "next": "Next",
+    "last": "Last",
+    "show": "Show:",
+    "perPage": "per page"
+  },
+  "actions": {
+    "view": "View Material",
+    "edit": "Edit Material",
+    "deactivate": "Deactivate Material",
+    "activate": "Activate Material",
+    "cannotDeactivate": "Cannot deactivate - stock must be 0"
+  },
+  "messages": {
+    "failedToLoad": "Failed to load inventory data"
+  },
+  "form": {
+    "addTitle": "Add Material to Inventory",
+    "modes": {
+      "createNew": "Create New Material",
+      "addToExisting": "Add to Existing"
+    },
+    "sections": {
+      "quickSelect": "Quick Select from Existing Types:",
+      "orCreateNew": "OR Create Completely New Material"
+    },
+    "fields": {
+      "materialName": "Material Name",
+      "color": "Color",
+      "materialType": "Material Type",
+      "unitType": "Unit Type",
+      "initialQuantity": "Initial Quantity",
+      "minimumStockLevel": "Minimum Stock Level",
+      "description": "Description",
+      "selectExistingMaterial": "Select Existing Material",
+      "quantityToAdd": "Quantity to Add"
+    },
+    "placeholders": {
+      "materialName": "e.g., Steel Sheets, Paint, Screws",
+      "color": "e.g., Silver, Black, Red",
+      "unitType": "e.g., kg, liters, pieces",
+      "description": "Optional description of the material...",
+      "chooseMaterial": "Choose material to restock...",
+      "quantity": "Quantity"
+    },
+    "labels": {
+      "selectedMaterial": "Selected Material:",
+      "name": "Name:",
+      "color": "Color:",
+      "type": "Type:",
+      "currentStock": "Current Stock:",
+      "lowStock": "Low Stock!",
+      "current": "Current:"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "createMaterial": "Create Material",
+      "addToStock": "Add to Stock",
+      "adding": "Adding..."
+    },
+    "messages": {
+      "failedToLoadData": "Failed to load material data. Please try again.",
+      "failedToAdd": "Failed to add material. Please try again."
+    }
+  },
+  "edit": {
+    "title": "Edit Material",
+    "currentMaterial": "Current Material:",
+    "fields": {
+      "currentQuantity": "Current Quantity",
+      "lastUpdated": "Last Updated"
+    },
+    "stockIndicators": {
+      "lowStockWarning": "Low Stock Warning! ({{quantity}} ≤ {{minimum}})",
+      "stockLevelOk": "Stock Level OK ({{quantity}} > {{minimum}})"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "updateMaterial": "Update Material",
+      "updating": "Updating..."
+    },
+    "messages": {
+      "failedToUpdate": "Failed to update material. Please try again."
+    }
+  },
+  "view": {
+    "title": "View Material",
+    "materialInformation": "Material Information:",
+    "fields": {
+      "materialName": "Material Name",
+      "color": "Color",
+      "materialType": "Material Type",
+      "unitType": "Unit Type",
+      "currentQuantity": "Current Quantity",
+      "minimumStockLevel": "Minimum Stock Level",
+      "description": "Description"
+    },
+    "stockIndicators": {
+      "lowStockWarning": "Low Stock Warning! ({{quantity}} ≤ {{minimum}})",
+      "stockLevelOk": "Stock Level OK ({{quantity}} > {{minimum}})"
+    },
+    "buttons": {
+      "close": "Close"
+    }
+  },
+  "activate": {
+    "title": "Activate Material",
+    "confirmationText": "Are you sure you want to activate this material? The material will be marked as active and will appear in active inventory lists.",
+    "materialDetails": "Material Details:",
+    "labels": {
+      "name": "Name:",
+      "type": "Type:",
+      "currentStock": "Current Stock:",
+      "minimumStock": "Minimum Stock:",
+      "lastUpdated": "Last Updated:",
+      "description": "Description:"
+    },
+    "note": "Note: Once activated, this material will be available for use in production and will appear in all active inventory lists.",
+    "buttons": {
+      "cancel": "Cancel",
+      "activateMaterial": "Activate Material",
+      "activating": "Activating..."
+    },
+    "messages": {
+      "failedToActivate": "Failed to activate material. Please try again."
+    }
+  },
+  "deactivate": {
+    "title": "Deactivate Material",
+    "confirmationText": "Are you sure you want to deactivate this material? The material will be marked as inactive and removed from active inventory lists.",
+    "materialDetails": "Material Details:",
+    "labels": {
+      "name": "Name:",
+      "type": "Type:",
+      "currentStock": "Current Stock:",
+      "lastUpdated": "Last Updated:",
+      "description": "Description:"
+    },
+    "note": "Note: This material can only be deactivated because its current stock is 0. Deactivated materials can be reactivated later through the edit function.",
+    "buttons": {
+      "cancel": "Cancel",
+      "deactivateMaterial": "Deactivate Material",
+      "deactivating": "Deactivating..."
+    },
+    "messages": {
+      "failedToDeactivate": "Failed to deactivate material. Please try again."
+    }
+  }
 }
-

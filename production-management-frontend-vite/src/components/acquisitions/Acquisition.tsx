@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { acquisitionApi } from '../../services/api';
 import type { Acquisition as AcquisitionType, AcquisitionStatistics, PagedResult } from '../../types';
 import { AcquisitionStatus, AcquisitionType as AcqType } from '../../types';
@@ -13,6 +14,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import './Acquisition.css';
 
 const Acquisition: React.FC = () => {
+  const { t } = useTranslation(['acquisitions', 'common']);
   const [pagedData, setPagedData] = useState<PagedResult<AcquisitionType> | null>(null);
   const [statistics, setStatistics] = useState<AcquisitionStatistics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -59,7 +61,7 @@ const Acquisition: React.FC = () => {
       setPagedData(pagedResponse.data);
       setStatistics(statsResponse.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load acquisition data');
+      setError(err.response?.data?.message || t('messages.failedToLoad'));
     } finally {
       setIsLoading(false);
     }
@@ -105,16 +107,16 @@ const Acquisition: React.FC = () => {
       setShowDeleteModal(false);
       setSelectedAcquisition(null);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to cancel acquisition');
+      setError(err.response?.data?.message || t('messages.failedToCancel'));
     }
   };
 
   const getStatusBadge = (status: AcquisitionStatus) => {
     const statusConfig = {
-      [AcquisitionStatus.Draft]: { label: 'Draft', className: 'status-draft' },
-      [AcquisitionStatus.Received]: { label: 'Received', className: 'status-received' },
-      [AcquisitionStatus.Cancelled]: { label: 'Cancelled', className: 'status-cancelled' },
-      [AcquisitionStatus.ReadyForProcessing]: { label: 'Ready for Processing', className: 'status-processing' }
+      [AcquisitionStatus.Draft]: { label: t('status.draft'), className: 'status-draft' },
+      [AcquisitionStatus.Received]: { label: t('status.received'), className: 'status-received' },
+      [AcquisitionStatus.Cancelled]: { label: t('status.cancelled'), className: 'status-cancelled' },
+      [AcquisitionStatus.ReadyForProcessing]: { label: t('status.readyForProcessing'), className: 'status-processing' }
     };
 
     const config = statusConfig[status];
@@ -123,8 +125,8 @@ const Acquisition: React.FC = () => {
 
   const getTypeLabel = (type: AcqType) => {
     const typeLabels = {
-      [AcqType.RawMaterials]: 'Raw Materials',
-      [AcqType.RecyclableMaterials]: 'Recyclable Materials'
+      [AcqType.RawMaterials]: t('type.rawMaterials'),
+      [AcqType.RecyclableMaterials]: t('type.recyclableMaterials')
     };
     return typeLabels[type];
   };
@@ -187,7 +189,7 @@ const Acquisition: React.FC = () => {
     return (
       <div className="acquisition-loading">
         <div className="loading-spinner"></div>
-        <p>Loading acquisitions...</p>
+        <p>{t('loading')}</p>
       </div>
     );
   }
@@ -197,8 +199,8 @@ const Acquisition: React.FC = () => {
       {/* Header */}
       <div className="acquisition-header">
         <div className="header-left">
-          <h1>Acquisitions</h1>
-          <p>Manage raw material orders and acquisitions</p>
+          <h1>{t('title')}</h1>
+          <p>{t('subtitle')}</p>
         </div>
         <ProtectedButton
           className="add-acquisition-button"
@@ -206,7 +208,7 @@ const Acquisition: React.FC = () => {
           requiredPermission={Permissions.CreateAcquisition}
         >
           <Plus size={20} />
-          Create Acquisition
+          {t('createAcquisition')}
         </ProtectedButton>
       </div>
 
@@ -219,7 +221,7 @@ const Acquisition: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.totalAcquisitions}</div>
-              <div className="stat-label">Total Acquisitions</div>
+              <div className="stat-label">{t('statistics.totalAcquisitions')}</div>
             </div>
           </div>
           <div className="stat-card">
@@ -228,7 +230,7 @@ const Acquisition: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.draftAcquisitions}</div>
-              <div className="stat-label">Draft</div>
+              <div className="stat-label">{t('statistics.draft')}</div>
             </div>
           </div>
           <div className="stat-card">
@@ -237,7 +239,7 @@ const Acquisition: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.receivedAcquisitions}</div>
-              <div className="stat-label">Received</div>
+              <div className="stat-label">{t('statistics.received')}</div>
             </div>
           </div>
         </div>
@@ -258,7 +260,7 @@ const Acquisition: React.FC = () => {
             <Search size={20} className="search-icon" />
             <input
               type="text"
-              placeholder="Search acquisitions..."
+              placeholder={t('searchPlaceholder')}
               value={searchTerm}
               onChange={(e) => {
                 setSearchTerm(e.target.value);
@@ -278,7 +280,7 @@ const Acquisition: React.FC = () => {
               setCurrentPage(1);
             }}
           >
-            All Types
+            {t('allTypes')}
           </button>
           <button
             className={`filter-btn ${typeFilter === AcqType.RawMaterials ? 'active' : ''}`}
@@ -287,7 +289,7 @@ const Acquisition: React.FC = () => {
               setCurrentPage(1);
             }}
           >
-            Raw Materials
+            {t('type.rawMaterials')}
           </button>
           <button
             className={`filter-btn ${typeFilter === AcqType.RecyclableMaterials ? 'active' : ''}`}
@@ -296,7 +298,7 @@ const Acquisition: React.FC = () => {
               setCurrentPage(1);
             }}
           >
-            Recyclable Materials
+            {t('type.recyclableMaterials')}
           </button>
         </div>
 
@@ -311,11 +313,11 @@ const Acquisition: React.FC = () => {
             }}
             className="filter-select"
           >
-            <option value="">All Status</option>
-            <option value={AcquisitionStatus.Draft}>Draft</option>
-            <option value={AcquisitionStatus.Received}>Received</option>
-            <option value={AcquisitionStatus.ReadyForProcessing}>Ready for Processing</option>
-            <option value={AcquisitionStatus.Cancelled}>Cancelled</option>
+            <option value="">{t('allStatus')}</option>
+            <option value={AcquisitionStatus.Draft}>{t('status.draft')}</option>
+            <option value={AcquisitionStatus.Received}>{t('status.received')}</option>
+            <option value={AcquisitionStatus.ReadyForProcessing}>{t('status.readyForProcessing')}</option>
+            <option value={AcquisitionStatus.Cancelled}>{t('status.cancelled')}</option>
           </select>
         </div>
       </div>
@@ -328,33 +330,33 @@ const Acquisition: React.FC = () => {
               <th className="status-bar-column"></th>
               <th className="sortable" onClick={() => handleSort('Title')}>
                 <div className="th-content">
-                  <span>Title</span>
+                  <span>{t('table.title')}</span>
                   {getSortIcon('Title')}
                 </div>
               </th>
-              <th>Type</th>
+              <th>{t('table.type')}</th>
               <th className="sortable" onClick={() => handleSort('Status')}>
                 <div className="th-content">
-                  <span>Status</span>
+                  <span>{t('table.status')}</span>
                   {getSortIcon('Status')}
                 </div>
               </th>
-              <th>Assigned To</th>
-              <th>Supplier</th>
-              <th>Items</th>
+              <th>{t('table.assignedTo')}</th>
+              <th>{t('table.supplier')}</th>
+              <th>{t('table.items')}</th>
               <th className="sortable" onClick={() => handleSort('DueDate')}>
                 <div className="th-content">
-                  <span>Due Date</span>
+                  <span>{t('table.dueDate')}</span>
                   {getSortIcon('DueDate')}
                 </div>
               </th>
               <th className="sortable" onClick={() => handleSort('CreatedAt')}>
                 <div className="th-content">
-                  <span>Created</span>
+                  <span>{t('table.created')}</span>
                   {getSortIcon('CreatedAt')}
                 </div>
               </th>
-              <th>Actions</th>
+              <th>{t('table.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -363,10 +365,10 @@ const Acquisition: React.FC = () => {
                 <td colSpan={10} className="empty-state">
                   <div className="empty-content">
                     <Package size={48} />
-                    <h3>No acquisitions found</h3>
+                    <h3>{t('emptyState.noAcquisitions')}</h3>
                     <p>{searchTerm || statusFilter !== null || typeFilter !== null 
-                      ? 'No acquisitions match your filters' 
-                      : 'Create your first acquisition to get started'}</p>
+                      ? t('emptyState.noMatches')
+                      : t('emptyState.getStarted')}</p>
                     {!searchTerm && statusFilter === null && typeFilter === null && (
                       <ProtectedButton
                         className="empty-add-button"
@@ -374,7 +376,7 @@ const Acquisition: React.FC = () => {
                         requiredPermission={Permissions.CreateAcquisition}
                       >
                         <Plus size={20} />
-                        Create Acquisition
+                        {t('createAcquisition')}
                       </ProtectedButton>
                     )}
                   </div>
@@ -402,7 +404,7 @@ const Acquisition: React.FC = () => {
                   <td>{getStatusBadge(acquisition.status)}</td>
                   <td>
                     <div className="assigned-user-info">
-                      {acquisition.assignedToUserName || 'Unassigned'}
+                      {acquisition.assignedToUserName || t('tableContent.unassigned')}
                     </div>
                   </td>
                   <td>
@@ -415,8 +417,8 @@ const Acquisition: React.FC = () => {
                   </td>
                   <td>
                     <div className="items-info">
-                      <div className="items-count">{acquisition.totalItems} items</div>
-                      <div className="total-quantity">{acquisition.totalQuantity} units</div>
+                      <div className="items-count">{acquisition.totalItems} {t('tableContent.items')}</div>
+                      <div className="total-quantity">{acquisition.totalQuantity} {t('tableContent.units')}</div>
                     </div>
                   </td>
                   <td>
@@ -436,7 +438,7 @@ const Acquisition: React.FC = () => {
                         {new Date(acquisition.createdAt).toLocaleDateString()}
                       </div>
                       <div className="created-by">
-                        by {acquisition.createdByUserName}
+                        {t('tableContent.by')} {acquisition.createdByUserName}
                       </div>
                     </div>
                   </td>
@@ -445,7 +447,7 @@ const Acquisition: React.FC = () => {
                       <ProtectedButton
                         className="action-button view-button"
                         onClick={() => handleViewAcquisition(acquisition)}
-                        title="View"
+                        title={t('actions.view')}
                         requiredPermission={Permissions.ViewAcquisition}
                       >
                         <Eye size={16} />
@@ -454,7 +456,7 @@ const Acquisition: React.FC = () => {
                         <ProtectedButton
                           className="action-button edit-button"
                           onClick={() => handleEditAcquisition(acquisition)}
-                          title="Edit"
+                          title={t('actions.edit')}
                           requiredPermission={Permissions.EditAcquisition}
                         >
                           <Edit size={16} />
@@ -464,7 +466,7 @@ const Acquisition: React.FC = () => {
                         <ProtectedButton
                           className="action-button receive-button"
                           onClick={() => handleReceiveAcquisition(acquisition)}
-                          title="Receive"
+                          title={t('actions.receive')}
                           requiredPermission={Permissions.ReceiveAcquisition}
                         >
                           <Package size={16} />
@@ -475,7 +477,7 @@ const Acquisition: React.FC = () => {
                         <ProtectedButton
                           className="action-button receive-button"
                           onClick={() => handleProcessAcquisition(acquisition)}
-                          title="Process"
+                          title={t('actions.process')}
                           requiredPermission={Permissions.ProcessAcquisition}
                         >
                           <Recycle size={16} />
@@ -485,7 +487,7 @@ const Acquisition: React.FC = () => {
                         <ProtectedButton
                           className="action-button delete-button"
                           onClick={() => handleDeleteAcquisition(acquisition)}
-                          title="Delete"
+                          title={t('actions.delete')}
                           requiredPermission={Permissions.CancelAcquisition}
                         >
                           <Trash2 size={16} />
@@ -504,7 +506,11 @@ const Acquisition: React.FC = () => {
       {pagedData && pagedData.totalPages > 0 && (
         <div className="pagination-container">
           <div className="pagination-info">
-            Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} acquisitions
+            {t('pagination.showing', {
+              start: ((pagedData.page - 1) * pagedData.pageSize) + 1,
+              end: Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount),
+              total: pagedData.totalCount
+            })}
           </div>
           
           <div className="pagination-controls">
@@ -513,7 +519,7 @@ const Acquisition: React.FC = () => {
               onClick={() => setCurrentPage(1)}
               disabled={!pagedData.hasPreviousPage}
             >
-              First
+              {t('pagination.first')}
             </button>
             <button
               className="pagination-btn"
@@ -521,7 +527,7 @@ const Acquisition: React.FC = () => {
               disabled={!pagedData.hasPreviousPage}
             >
               <ChevronLeft size={16} />
-              Previous
+              {t('pagination.previous')}
             </button>
             
             <div className="pagination-pages">
@@ -554,7 +560,7 @@ const Acquisition: React.FC = () => {
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={!pagedData.hasNextPage}
             >
-              Next
+              {t('pagination.next')}
               <ChevronRight size={16} />
             </button>
             <button
@@ -562,12 +568,12 @@ const Acquisition: React.FC = () => {
               onClick={() => setCurrentPage(pagedData.totalPages)}
               disabled={!pagedData.hasNextPage}
             >
-              Last
+              {t('pagination.last')}
             </button>
           </div>
           
           <div className="page-size-selector">
-            <label>Show:</label>
+            <label>{t('pagination.show')}</label>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -580,7 +586,7 @@ const Acquisition: React.FC = () => {
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span>per page</span>
+            <span>{t('pagination.perPage')}</span>
           </div>
         </div>
       )}
@@ -604,21 +610,21 @@ const Acquisition: React.FC = () => {
       {showDeleteModal && selectedAcquisition && (
         <div className="modal-backdrop" onClick={() => setShowDeleteModal(false)}>
           <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Cancel Acquisition</h2>
-            <p>Are you sure you want to cancel "{selectedAcquisition.title}"?</p>
-            <p className="warning-text">This will mark the acquisition as cancelled and it cannot be received.</p>
+            <h2>{t('deleteModal.title')}</h2>
+            <p>{t('deleteModal.confirmation', { title: selectedAcquisition.title })}</p>
+            <p className="warning-text">{t('deleteModal.warning')}</p>
             <div className="modal-actions">
               <button 
                 className="cancel-button"
                 onClick={() => setShowDeleteModal(false)}
               >
-                Go Back
+                {t('deleteModal.goBack')}
               </button>
               <button 
                 className="delete-button"
                 onClick={handleDelete}
               >
-                Cancel Acquisition
+                {t('deleteModal.confirm')}
               </button>
             </div>
           </div>

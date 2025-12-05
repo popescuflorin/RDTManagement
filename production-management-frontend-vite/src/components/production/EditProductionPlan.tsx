@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { productionPlanApi, inventoryApi } from '../../services/api';
 import type { 
   ProductionPlan, 
@@ -27,6 +28,7 @@ interface MaterialSelection {
 }
 
 const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, onPlanUpdated }) => {
+  const { t } = useTranslation(['production', 'common']);
   const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -61,7 +63,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
       setRawMaterials(rawMats);
     } catch (error: any) {
       console.error('Error loading data:', error);
-      setError('Failed to load materials');
+      setError(t('editPlan.messages.failedToLoadMaterials'));
     }
   };
 
@@ -97,7 +99,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
 
   const handleAddMaterial = () => {
     if (currentMaterial.rawMaterialId === 0 || currentMaterial.requiredQuantity <= 0) {
-      setMaterialsError('Please select a material and enter a valid quantity');
+      setMaterialsError(t('editPlan.messages.pleaseSelectMaterialAndQuantity'));
       return;
     }
 
@@ -106,7 +108,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
 
     // Check if material already added
     if (selectedMaterials.some(m => m.rawMaterialId === currentMaterial.rawMaterialId)) {
-      setMaterialsError('Material already added');
+      setMaterialsError(t('editPlan.messages.materialAlreadyAdded'));
       return;
     }
 
@@ -143,7 +145,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
 
     try {
       if (selectedMaterials.length === 0) {
-        setMaterialsError('Please add at least one material');
+        setMaterialsError(t('editPlan.messages.pleaseAddAtLeastOneMaterial'));
         setIsLoading(false);
         return;
       }
@@ -168,7 +170,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
       onClose();
     } catch (error: any) {
       console.error('Error updating production plan:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to update production plan. Please try again.';
+      const errorMessage = error.response?.data?.message || t('editPlan.messages.failedToUpdate');
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -179,7 +181,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
     <div className="edit-production-plan-overlay">
       <div className="edit-production-plan-modal">
         <div className="edit-production-plan-header">
-          <h2>✏️ Edit Production Plan</h2>
+          <h2>✏️ {t('editPlan.title')}</h2>
           <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
         </div>
 
@@ -192,30 +194,30 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
 
           {/* Plan Details Section */}
           <div className="form-section">
-            <h3>Plan Details</h3>
+            <h3>{t('createPlan.sections.planDetails')}</h3>
             
             <div className="form-group">
-              <label htmlFor="name">Plan Name *</label>
+              <label htmlFor="name">{t('createPlan.fields.planName')} *</label>
               <input
                 type="text"
                 id="name"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
-                placeholder="e.g., Weekly Production Batch"
+                placeholder={t('createPlan.placeholders.planName')}
                 required
                 disabled={isLoading}
               />
             </div>
 
             <div className="form-group">
-              <label htmlFor="description">Description</label>
+              <label htmlFor="description">{t('createPlan.fields.description')}</label>
               <textarea
                 id="description"
                 name="description"
                 value={formData.description}
                 onChange={handleInputChange}
-                placeholder="Optional description..."
+                placeholder={t('createPlan.placeholders.description')}
                 rows={2}
                 disabled={isLoading}
               />
@@ -223,7 +225,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="quantityToProduce">Quantity to Produce *</label>
+                <label htmlFor="quantityToProduce">{t('createPlan.fields.quantityToProduce')} *</label>
                 <input
                   type="number"
                   id="quantityToProduce"
@@ -238,7 +240,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="estimatedProductionTimeMinutes">Est. Time (minutes) *</label>
+                <label htmlFor="estimatedProductionTimeMinutes">{t('createPlan.fields.estimatedTimeMinutes')} *</label>
                 <input
                   type="number"
                   id="estimatedProductionTimeMinutes"
@@ -255,7 +257,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
             </div>
 
             <div className="form-group">
-              <label htmlFor="plannedStartDate">Planned Start Date</label>
+              <label htmlFor="plannedStartDate">{t('createPlan.fields.plannedStartDate')}</label>
               <input
                 type="date"
                 id="plannedStartDate"
@@ -267,13 +269,13 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
             </div>
 
             <div className="form-group">
-              <label htmlFor="notes">Notes</label>
+              <label htmlFor="notes">{t('createPlan.fields.notes')}</label>
               <textarea
                 id="notes"
                 name="notes"
                 value={formData.notes}
                 onChange={handleInputChange}
-                placeholder="Optional notes..."
+                placeholder={t('createPlan.placeholders.notes')}
                 rows={2}
                 disabled={isLoading}
               />
@@ -282,7 +284,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
 
           {/* Required Materials Section */}
           <div className="form-section">
-            <h3>Required Materials (per unit)</h3>
+            <h3>{t('createPlan.sections.requiredMaterials')}</h3>
 
             {/* Materials Error Message */}
             {materialsError && (
@@ -295,23 +297,23 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
             <div className="add-material-section">
               <div className="form-row">
                 <div className="form-group" style={{ flex: 2 }}>
-                  <label htmlFor="currentMaterial">Select Material</label>
+                  <label htmlFor="currentMaterial">{t('createPlan.fields.selectMaterial')}</label>
                   <select
                     id="currentMaterial"
                     value={currentMaterial.rawMaterialId}
                     onChange={(e) => setCurrentMaterial(prev => ({ ...prev, rawMaterialId: parseInt(e.target.value) }))}
                     disabled={isLoading}
                   >
-                    <option value={0}>-- Select a raw material --</option>
+                    <option value={0}>{t('createPlan.fields.selectRawMaterial')}</option>
                     {rawMaterials.map(material => (
                       <option key={material.id} value={material.id}>
-                        {material.name} ({material.color}) - Available: {material.quantity} {material.quantityType}
+                        {material.name} ({material.color}) - {t('createPlan.labels.available')} {material.quantity} {material.quantityType}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="materialQuantity">Quantity</label>
+                  <label htmlFor="materialQuantity">{t('createPlan.fields.quantity')}</label>
                   <input
                     type="number"
                     id="materialQuantity"
@@ -330,7 +332,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
                     className="btn btn-secondary"
                     disabled={isLoading}
                   >
-                    + Add
+                    {t('createPlan.buttons.add')}
                   </button>
                 </div>
               </div>
@@ -338,16 +340,16 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
 
             {selectedMaterials.length > 0 && (
               <div className="selected-materials">
-                <h4>Selected Materials:</h4>
+                <h4>{t('createPlan.labels.selectedMaterials')}</h4>
                 <table className="materials-table">
                   <thead>
                     <tr>
-                      <th>Material</th>
-                      <th>Required (per unit)</th>
-                      <th>Total Need</th>
-                      <th>Available</th>
-                      <th>Status</th>
-                      <th>Actions</th>
+                      <th>{t('createPlan.table.material')}</th>
+                      <th>{t('createPlan.table.requiredPerUnit')}</th>
+                      <th>{t('createPlan.table.totalNeed')}</th>
+                      <th>{t('createPlan.table.available')}</th>
+                      <th>{t('createPlan.table.status')}</th>
+                      <th>{t('createPlan.table.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -379,7 +381,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
                           <td>{material.availableQuantity.toFixed(2)} {material.quantityType}</td>
                           <td>
                             <span className={`status-badge ${isAvailable ? 'status-available' : 'status-insufficient'}`}>
-                              {isAvailable ? '✓ Available' : '⚠ Insufficient'}
+                              {isAvailable ? t('createPlan.status.available') : t('createPlan.status.insufficient')}
                             </span>
                           </td>
                           <td>
@@ -389,7 +391,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
                               className="btn btn-sm btn-danger"
                               disabled={isLoading}
                             >
-                              Remove
+                              {t('createPlan.buttons.remove')}
                             </button>
                           </td>
                         </tr>
@@ -408,14 +410,14 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
               className="btn btn-secondary"
               disabled={isLoading}
             >
-              Cancel
+              {t('createPlan.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="btn btn-primary"
               disabled={isLoading || selectedMaterials.length === 0}
             >
-              {isLoading ? 'Updating...' : 'Update Production Plan'}
+              {isLoading ? t('editPlan.buttons.updating') : t('editPlan.buttons.updateProductionPlan')}
             </button>
           </div>
         </form>

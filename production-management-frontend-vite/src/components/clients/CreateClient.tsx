@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { clientApi } from '../../services/api';
 import type { CreateClientRequest } from '../../types';
 import { X, UserCircle } from 'lucide-react';
@@ -13,6 +14,7 @@ const CreateClient: React.FC<CreateClientProps> = ({
   onClose,
   onClientCreated
 }) => {
+  const { t } = useTranslation(['clients', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<CreateClientRequest>({
@@ -39,7 +41,7 @@ const CreateClient: React.FC<CreateClientProps> = ({
     e.preventDefault();
     
     if (!formData.name.trim()) {
-      setError('Client name is required');
+      setError(t('createClient.messages.clientNameRequired'));
       return;
     }
 
@@ -63,7 +65,7 @@ const CreateClient: React.FC<CreateClientProps> = ({
       onClientCreated();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to create client');
+      setError(err.response?.data?.message || t('createClient.messages.failedToCreate'));
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +81,7 @@ const CreateClient: React.FC<CreateClientProps> = ({
         <div className="modal-header">
           <h2>
             <UserCircle size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            Create New Client
+            {t('createClient.title')}
           </h2>
           <button className="close-button" onClick={onClose}>
             <X size={24} />
@@ -97,14 +99,14 @@ const CreateClient: React.FC<CreateClientProps> = ({
           <div className="form-section">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="name">Client Name *</label>
+                <label htmlFor="name">{t('createClient.fields.clientName')} *</label>
                 <input
                   type="text"
                   id="name"
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Enter client name"
+                  placeholder={t('createClient.placeholders.clientName')}
                   required
                 />
               </div>
@@ -112,105 +114,105 @@ const CreateClient: React.FC<CreateClientProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="contactPerson">Contact Person</label>
+                <label htmlFor="contactPerson">{t('createClient.fields.contactPerson')}</label>
                 <input
                   type="text"
                   id="contactPerson"
                   name="contactPerson"
                   value={formData.contactPerson}
                   onChange={handleChange}
-                  placeholder="Enter contact person name"
+                  placeholder={t('createClient.placeholders.contactPerson')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">{t('createClient.fields.email')}</label>
                 <input
                   type="email"
                   id="email"
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter email address"
+                  placeholder={t('createClient.placeholders.email')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="phone">Phone</label>
+                <label htmlFor="phone">{t('createClient.fields.phone')}</label>
                 <input
                   type="text"
                   id="phone"
                   name="phone"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="Enter phone number"
+                  placeholder={t('createClient.placeholders.phone')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="address">Address</label>
+                <label htmlFor="address">{t('createClient.fields.address')}</label>
                 <input
                   type="text"
                   id="address"
                   name="address"
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="Enter street address"
+                  placeholder={t('createClient.placeholders.address')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="city">City</label>
+                <label htmlFor="city">{t('createClient.fields.city')}</label>
                 <input
                   type="text"
                   id="city"
                   name="city"
                   value={formData.city}
                   onChange={handleChange}
-                  placeholder="Enter city"
+                  placeholder={t('createClient.placeholders.city')}
                 />
               </div>
               <div className="form-group">
-                <label htmlFor="postalCode">Postal Code</label>
+                <label htmlFor="postalCode">{t('createClient.fields.postalCode')}</label>
                 <input
                   type="text"
                   id="postalCode"
                   name="postalCode"
                   value={formData.postalCode}
                   onChange={handleChange}
-                  placeholder="Enter postal code"
+                  placeholder={t('createClient.placeholders.postalCode')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="country">Country</label>
+                <label htmlFor="country">{t('createClient.fields.country')}</label>
                 <input
                   type="text"
                   id="country"
                   name="country"
                   value={formData.country}
                   onChange={handleChange}
-                  placeholder="Enter country"
+                  placeholder={t('createClient.placeholders.country')}
                 />
               </div>
             </div>
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="notes">Notes</label>
+                <label htmlFor="notes">{t('createClient.fields.notes')}</label>
                 <textarea
                   id="notes"
                   name="notes"
                   value={formData.notes}
                   onChange={handleChange}
-                  placeholder="Optional notes about the client..."
+                  placeholder={t('createClient.placeholders.notes')}
                   rows={3}
                 />
               </div>
@@ -224,14 +226,14 @@ const CreateClient: React.FC<CreateClientProps> = ({
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              {t('createClient.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading}
             >
-              {isLoading ? 'Creating...' : 'Create Client'}
+              {isLoading ? t('createClient.buttons.creating') : t('createClient.buttons.createClient')}
             </button>
           </div>
         </form>

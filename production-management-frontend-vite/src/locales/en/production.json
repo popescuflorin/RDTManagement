@@ -1,6 +1,454 @@
 {
   "title": "Production",
-  "createPlan": "Create Production Plan",
-  "editPlan": "Edit Production Plan"
+  "productionManagement": "Production Management",
+  "subtitle": "Manage raw material and recyclable material processing",
+  "loading": "Loading production data...",
+  "tabs": {
+    "rawMaterialProcessing": "Raw Material Processing",
+    "recyclableMaterialsProcessing": "Recyclable Materials Processing"
+  },
+  "buttons": {
+    "createProductionPlan": "Create Production Plan",
+    "createRecyclablesPlan": "Create Recyclables Plan"
+  },
+  "statistics": {
+    "totalPlans": "Total Plans",
+    "completed": "Completed",
+    "inProgress": "In Progress",
+    "unitsProduced": "Units Produced"
+  },
+  "filters": {
+    "allStatus": "All Status",
+    "searchPlans": "Search plans...",
+    "searchRecyclablePlans": "Search recyclable plans..."
+  },
+  "status": {
+    "draft": "Draft",
+    "planned": "Planned",
+    "inProgress": "In Progress",
+    "completed": "Completed",
+    "cancelled": "Cancelled",
+    "unknown": "Unknown"
+  },
+  "table": {
+    "planName": "Plan Name",
+    "targetProduct": "Target Product",
+    "targetRawMaterial": "Target Raw Material",
+    "quantity": "Quantity",
+    "materials": "Materials",
+    "recyclables": "Recyclables",
+    "time": "Time",
+    "status": "Status",
+    "created": "Created",
+    "actions": "Actions",
+    "more": "more"
+  },
+  "badges": {
+    "ready": "Ready",
+    "notReady": "Not Ready"
+  },
+  "actions": {
+    "viewPlanDetails": "View Plan Details",
+    "editPlan": "Edit Plan",
+    "startProcessing": "Start Processing",
+    "cannotStartMissingMaterials": "Cannot start - missing materials",
+    "completeProduction": "Complete Production",
+    "cancelPlan": "Cancel Plan",
+    "processPlan": "Process Plan",
+    "cannotProcessMissingMaterials": "Cannot process - missing materials"
+  },
+  "emptyState": {
+    "noPlansFound": "No production plans found matching your criteria.",
+    "noPlansCreated": "No production plans created. Create a plan to get started.",
+    "noRecyclablePlansFound": "No recyclable plans found.",
+    "noRecyclablePlansCreated": "No recyclable plans created."
+  },
+  "pagination": {
+    "showing": "Showing {{start}} to {{end}} of {{total}} plans",
+    "first": "First",
+    "previous": "Previous",
+    "next": "Next",
+    "last": "Last",
+    "show": "Show:",
+    "perPage": "per page"
+  },
+  "messages": {
+    "failedToLoad": "Failed to load production data",
+    "failedToLoadRecyclablePlans": "Failed to load recyclable plans",
+    "failedToStart": "Failed to start production plan"
+  },
+  "cancelPlan": {
+    "title": "Cancel Production Plan",
+    "confirmation": "Are you sure you want to cancel \"{{planName}}\"?",
+    "warning": "This will mark the plan as cancelled and it cannot be executed.",
+    "buttons": {
+      "goBack": "Go Back",
+      "cancelPlan": "Cancel Plan",
+      "cancelling": "Cancelling..."
+    }
+  },
+  "cancelRecyclablePlan": {
+    "title": "Cancel Recyclable Plan",
+    "confirmation": "Are you sure you want to cancel the plan \"{{planName}}\"? This action will set its status to Cancelled.",
+    "buttons": {
+      "close": "Close",
+      "confirmCancel": "Confirm Cancel"
+    }
+  },
+  "processRecyclablePlan": {
+    "title": "Process Recyclable Plan",
+    "sections": {
+      "overview": "Overview",
+      "recyclablesToConsume": "Recyclables to Consume"
+    },
+    "fields": {
+      "planName": "Plan Name",
+      "targetRawMaterial": "Target Raw Material",
+      "quantityToProduce": "Quantity to Produce"
+    },
+    "table": {
+      "material": "Material",
+      "totalNeed": "Total Need",
+      "available": "Available",
+      "status": "Status"
+    },
+    "status": {
+      "available": "Available",
+      "short": "Short {{amount}}"
+    },
+    "buttons": {
+      "close": "Close",
+      "confirmProcess": "Confirm Process",
+      "processing": "Processing..."
+    }
+  },
+  "viewPlan": {
+    "title": "Production Plan Details",
+    "recyclableTitle": "Recyclable Plan Details",
+    "sections": {
+      "planOverview": "Plan Overview",
+      "timingInformation": "Timing Information",
+      "timing": "Timing",
+      "productionStatus": "Production Status",
+      "requiredMaterials": "Required Materials",
+      "requiredRecyclables": "Required Recyclables",
+      "notes": "Notes"
+    },
+    "fields": {
+      "planName": "Plan Name",
+      "description": "Description",
+      "targetProduct": "Target Product",
+      "targetRawMaterial": "Target Raw Material",
+      "quantityToProduce": "Quantity to Produce",
+      "estimatedProductionTime": "Estimated Production Time",
+      "plannedStartDate": "Planned Start Date",
+      "created": "Created",
+      "startedAt": "Started At",
+      "actualStartDate": "Actual Start Date",
+      "actualEndDate": "Actual End Date",
+      "completedAt": "Completed At",
+      "materialsStatus": "Materials Status",
+      "units": "units"
+    },
+    "table": {
+      "material": "Material",
+      "requiredPerUnit": "Required (per unit)",
+      "totalNeed": "Total Need",
+      "available": "Available",
+      "status": "Status"
+    },
+    "status": {
+      "available": "Available",
+      "short": "Short {{amount}}",
+      "allMaterialsAvailable": "Yes - All materials available",
+      "missingMaterials": "No - Missing materials"
+    },
+    "buttons": {
+      "close": "Close"
+    },
+    "labels": {
+      "na": "N/A",
+      "min": "min"
+    }
+  },
+  "createPlan": {
+    "title": "Create Production Plan",
+    "sections": {
+      "targetProduct": "Target Product",
+      "planDetails": "Plan Details",
+      "requiredMaterials": "Required Materials (per unit)"
+    },
+    "fields": {
+      "selectFinishedProduct": "Select Finished Product",
+      "selectProduct": "-- Select a product --",
+      "createNewProduct": "✨ Create New Product",
+      "productName": "Product Name",
+      "color": "Color",
+      "unitType": "Unit Type",
+      "minimumStock": "Minimum Stock",
+      "description": "Description",
+      "planName": "Plan Name",
+      "quantityToProduce": "Quantity to Produce",
+      "estimatedTimeMinutes": "Est. Time (minutes)",
+      "plannedStartDate": "Planned Start Date",
+      "notes": "Notes",
+      "selectMaterial": "Select Material",
+      "selectRawMaterial": "-- Select a raw material --",
+      "quantity": "Quantity"
+    },
+    "placeholders": {
+      "productName": "e.g., Custom Chair, Table",
+      "color": "e.g., Brown, White",
+      "unitType": "e.g., pieces, kg",
+      "description": "Optional description...",
+      "planName": "e.g., Weekly Production Batch",
+      "notes": "Optional notes..."
+    },
+    "labels": {
+      "currentStock": "Current Stock:",
+      "available": "Available:",
+      "selectedMaterials": "Selected Materials:",
+      "templateLoaded": "✓ Production template loaded",
+      "templateChangesDetected": "Template Changes Detected",
+      "templateChangesDescription": "You have modified the materials or quantities from the original template.",
+      "updateTemplate": "Update the product template with these changes"
+    },
+    "table": {
+      "material": "Material",
+      "requiredPerUnit": "Required (per unit)",
+      "totalNeed": "Total Need",
+      "available": "Available",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "available": "✓ Available",
+      "insufficient": "⚠ Insufficient"
+    },
+    "buttons": {
+      "add": "+ Add",
+      "remove": "Remove",
+      "cancel": "Cancel",
+      "createProductionPlan": "Create Production Plan",
+      "creating": "Creating..."
+    },
+    "messages": {
+      "failedToLoadMaterials": "Failed to load materials",
+      "pleaseSelectMaterialAndQuantity": "Please select a material and enter a valid quantity",
+      "materialAlreadyAdded": "Material already added",
+      "pleaseAddAtLeastOneMaterial": "Please add at least one material",
+      "pleaseFillAllRequiredFields": "Please fill in all required fields for the new product",
+      "pleaseSelectFinishedProduct": "Please select a finished product",
+      "failedToCreate": "Failed to create production plan. Please try again."
+    }
+  },
+  "editPlan": {
+    "title": "Edit Production Plan",
+    "buttons": {
+      "updateProductionPlan": "Update Production Plan",
+      "updating": "Updating..."
+    },
+    "messages": {
+      "failedToLoadMaterials": "Failed to load materials",
+      "pleaseSelectMaterialAndQuantity": "Please select a material and enter a valid quantity",
+      "materialAlreadyAdded": "Material already added",
+      "pleaseAddAtLeastOneMaterial": "Please add at least one material",
+      "failedToUpdate": "Failed to update production plan. Please try again."
+    }
+  },
+  "createRecyclablePlan": {
+    "title": "Create Recyclables Processing Plan",
+    "sections": {
+      "outputRawMaterial": "Output Raw Material",
+      "planDetails": "Plan Details",
+      "requiredRecyclables": "Required Recyclables (per unit)"
+    },
+    "fields": {
+      "selectRawMaterial": "Select Raw Material",
+      "selectRawMaterialOption": "-- Select a raw material --",
+      "createNewRawMaterial": "✨ Create New Raw Material",
+      "name": "Name",
+      "color": "Color",
+      "unitType": "Unit Type",
+      "minimumStock": "Minimum Stock",
+      "description": "Description",
+      "planName": "Plan Name",
+      "quantityToProduce": "Quantity to Produce",
+      "estimatedTimeMinutes": "Est. Time (minutes)",
+      "plannedStartDate": "Planned Start Date",
+      "notes": "Notes",
+      "selectRecyclable": "Select Recyclable",
+      "selectRecyclableOption": "-- Select a recyclable --",
+      "quantity": "Quantity"
+    },
+    "placeholders": {
+      "planName": "e.g., Recycle Batch #1"
+    },
+    "labels": {
+      "currentStock": "Current Stock:",
+      "available": "Available:",
+      "selectedRecyclables": "Selected Recyclables:"
+    },
+    "buttons": {
+      "add": "+ Add",
+      "remove": "Remove",
+      "cancel": "Cancel",
+      "createRecyclablesPlan": "Create Recyclables Plan",
+      "creating": "Creating..."
+    },
+    "messages": {
+      "failedToLoadMaterials": "Failed to load materials",
+      "pleaseSelectRecyclableAndQuantity": "Please select a recyclable and enter a valid quantity",
+      "recyclableAlreadyAdded": "Recyclable material already added",
+      "pleaseAddAtLeastOneRecyclable": "Please add at least one recyclable material",
+      "pleaseFillAllRequiredFields": "Please fill in all required fields for the new raw material",
+      "pleaseSelectOutputRawMaterial": "Please select the output raw material",
+      "failedToCreate": "Failed to create recyclable production plan."
+    }
+  },
+  "editRecyclablePlan": {
+    "title": "Edit Recyclable Production Plan",
+    "sections": {
+      "planDetails": "Plan Details",
+      "requiredRecyclables": "Required Recyclables (per unit)"
+    },
+    "fields": {
+      "targetRawMaterial": "Target Raw Material",
+      "color": "Color",
+      "quantityType": "Quantity Type",
+      "planName": "Plan Name",
+      "plannedStartDate": "Planned Start Date",
+      "quantityToProduce": "Quantity to Produce",
+      "estimatedTimeMin": "Estimated Time (min)",
+      "description": "Description",
+      "notes": "Notes",
+      "selectRecyclable": "Select Recyclable",
+      "selectRecyclableOption": "-- Select a recyclable --",
+      "quantity": "Quantity",
+      "materials": "Materials",
+      "perUnit": "per unit"
+    },
+    "placeholders": {
+      "planName": "Enter plan name"
+    },
+    "labels": {
+      "available": "Available:"
+    },
+    "status": {
+      "available": "Available",
+      "short": "Short {{amount}}"
+    },
+    "buttons": {
+      "add": "Add",
+      "cancel": "Cancel",
+      "saveChanges": "Save Changes",
+      "saving": "Saving..."
+    },
+    "messages": {
+      "failedToLoadMaterials": "Failed to load materials",
+      "nameRequired": "Name is required",
+      "quantityMustBeGreaterThanZero": "Quantity to produce must be > 0",
+      "estimatedTimeMustBeGreaterThanZero": "Estimated time must be > 0",
+      "addAtLeastOneRecyclable": "Add at least one recyclable material",
+      "allMaterialsMustBeValid": "All materials must be valid",
+      "pleaseSelectRecyclableAndQuantity": "Please select a recyclable and enter a valid quantity",
+      "recyclableAlreadyAdded": "Recyclable material already added",
+      "failedToUpdate": "Failed to update plan"
+    },
+    "table": {
+      "material": "Material",
+      "requiredQtyPerUnit": "Required Qty (per unit)",
+      "totalNeed": "Total Need",
+      "available": "Available",
+      "status": "Status",
+      "actions": "Actions"
+    }
+  },
+  "receiveProduction": {
+    "title": "Complete Production",
+    "sections": {
+      "productionPlanOverview": "Production Plan Overview",
+      "finalProductionResults": "Final Production Results",
+      "materialsProduced": "Materials Produced",
+      "materialsUsed": "Materials Used"
+    },
+    "fields": {
+      "planName": "Plan Name",
+      "targetProduct": "Target Product",
+      "startedAt": "Started At",
+      "materialsRequired": "Materials Required",
+      "actualQuantityProduced": "Actual Quantity Produced",
+      "actualProductionTimeMinutes": "Actual Production Time (minutes)",
+      "productionNotes": "Production Notes",
+      "selectProducedMaterial": "Select Produced Material",
+      "selectMaterial": "-- Select a material --",
+      "quantityProduced": "Quantity Produced",
+      "materialName": "Material Name",
+      "color": "Color",
+      "materialType": "Material Type",
+      "unitType": "Unit Type",
+      "quantity": "Quantity",
+      "description": "Description",
+      "producedMaterials": "Produced Materials:",
+      "material": "Material",
+      "type": "Type",
+      "requiredPerUnit": "Required (per unit)",
+      "totalUsed": "Total Used",
+      "status": "Status"
+    },
+    "placeholders": {
+      "actualQuantityProduced": "Enter actual quantity produced",
+      "actualProductionTime": "Enter actual production time",
+      "productionNotes": "Optional notes about the completed production, quality, issues, final results, etc.",
+      "materialName": "e.g., Steel Sheets, Paint, Screws",
+      "color": "e.g., Silver, Black, Red",
+      "unitType": "e.g., kg, liters, pieces",
+      "description": "Optional description of the material..."
+    },
+    "labels": {
+      "plannedQuantity": "Planned quantity:",
+      "units": "units",
+      "materials": "materials",
+      "notStarted": "Not started",
+      "optionalRecordTime": "Optional: Record total time taken for the complete production process",
+      "specifyProducedMaterials": "Specify Produced Materials",
+      "addSpecificMaterials": "Add specific materials that were produced",
+      "usePlannedMaterials": "Use only the materials from the production plan",
+      "selectExistingMaterial": "📦 Select Existing Material",
+      "createNewMaterial": "✨ Create New Material",
+      "rawMaterial": "Raw Material",
+      "recyclableMaterial": "Recyclable Material",
+      "finishedProduct": "Finished Product",
+      "available": "Available",
+      "insufficient": "Insufficient"
+    },
+    "status": {
+      "inProgress": "In Progress",
+      "unknown": "Unknown"
+    },
+    "buttons": {
+      "add": "Add",
+      "createAndAdd": "Create & Add",
+      "cancel": "Cancel",
+      "completeProduction": "Complete Production",
+      "completing": "Completing...",
+      "addingToInventory": "Adding to Inventory..."
+    },
+    "messages": {
+      "failedToLoadMaterials": "Failed to load materials",
+      "pleaseSelectMaterialAndQuantity": "Please select a material and enter a valid quantity",
+      "materialAlreadyAdded": "Material already added",
+      "pleaseFillAllMaterialDetails": "Please fill in all material details and enter a valid quantity",
+      "nameColorQuantityTypeCannotBeEmpty": "Name, color, and quantity type cannot be empty",
+      "failedToCreateMaterial": "Failed to create material",
+      "actualQuantityMustBeGreaterThanZero": "Actual quantity produced must be greater than 0",
+      "pleaseAddAtLeastOneProducedMaterial": "Please add at least one produced material or uncheck \"Specify Produced Materials\"",
+      "addingMaterialsToInventory": "Adding materials to inventory...",
+      "addingMaterialToInventory": "Adding {{materialName}} to inventory...",
+      "successfullyAddedMaterials": "Successfully added {{count}} materials to inventory",
+      "addedMaterialsSuccessfullyFailed": "Added {{successful}} materials successfully, {{failed}} failed",
+      "productionCompletedUsingPlannedMaterials": "Production completed using planned materials only",
+      "failedToComplete": "Failed to complete production. Please try again."
+    }
+  }
 }
-

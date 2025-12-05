@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { productionPlanApi, inventoryApi } from '../../services/api';
 import type { 
   ProductionPlan,
@@ -25,6 +26,7 @@ interface RecyclableSelection {
 }
 
 const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanProps> = ({ onClose, onPlanCreated }) => {
+  const { t } = useTranslation(['production', 'common']);
   const [recyclables, setRecyclables] = useState<RawMaterial[]>([]);
   const [rawMaterials, setRawMaterials] = useState<RawMaterial[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -73,7 +75,7 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
       setRawMaterials(rawMats);
     } catch (err) {
       console.error(err);
-      setError('Failed to load materials');
+      setError(t('createRecyclablePlan.messages.failedToLoadMaterials'));
     }
   };
 
@@ -108,14 +110,14 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
 
   const handleAddRecyclable = () => {
     if (currentRecyclable.rawMaterialId === 0 || currentRecyclable.requiredQuantity <= 0) {
-      setError('Please select a recyclable and enter a valid quantity');
+      setError(t('createRecyclablePlan.messages.pleaseSelectRecyclableAndQuantity'));
       return;
     }
 
     const mat = recyclables.find(m => m.id === currentRecyclable.rawMaterialId);
     if (!mat) return;
     if (selectedRecyclables.some(m => m.rawMaterialId === currentRecyclable.rawMaterialId)) {
-      setError('Recyclable material already added');
+      setError(t('createRecyclablePlan.messages.recyclableAlreadyAdded'));
       return;
     }
 
@@ -149,7 +151,7 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
 
     try {
       if (selectedRecyclables.length === 0) {
-        setError('Please add at least one recyclable material');
+        setError(t('createRecyclablePlan.messages.pleaseAddAtLeastOneRecyclable'));
         setIsLoading(false);
         return;
       }
@@ -166,14 +168,14 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
 
       if (useNewRawMaterial) {
         if (!newRawMaterial.name || !newRawMaterial.color || !newRawMaterial.quantityType) {
-          setError('Please fill in all required fields for the new raw material');
+          setError(t('createRecyclablePlan.messages.pleaseFillAllRequiredFields'));
           setIsLoading(false);
           return;
         }
         request.newRawMaterial = newRawMaterial;
       } else {
         if (formData.targetRawMaterialId === 0) {
-          setError('Please select the output raw material');
+          setError(t('createRecyclablePlan.messages.pleaseSelectOutputRawMaterial'));
           setIsLoading(false);
           return;
         }
@@ -185,7 +187,7 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
       onClose();
     } catch (err: any) {
       console.error('Error creating recyclable production plan:', err);
-      setError(err.response?.data?.message || 'Failed to create recyclable production plan.');
+      setError(err.response?.data?.message || t('createRecyclablePlan.messages.failedToCreate'));
     } finally {
       setIsLoading(false);
     }
@@ -197,7 +199,7 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
     <div className="create-production-plan-overlay">
       <div className="create-production-plan-modal">
         <div className="create-production-plan-header">
-          <h2>♻️ Create Recyclables Processing Plan</h2>
+          <h2>♻️ {t('createRecyclablePlan.title')}</h2>
           <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
         </div>
 
@@ -208,9 +210,9 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
 
           {/* Output Raw Material Section */}
           <div className="form-section">
-            <h3>Output Raw Material</h3>
+            <h3>{t('createRecyclablePlan.sections.outputRawMaterial')}</h3>
             <div className="form-group">
-              <label htmlFor="targetRawMaterialId">Select Raw Material *</label>
+              <label htmlFor="targetRawMaterialId">{t('createRecyclablePlan.fields.selectRawMaterial')} *</label>
               <select
                 id="targetRawMaterialId"
                 name="targetRawMaterialId"
@@ -219,13 +221,13 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
                 required
                 disabled={isLoading}
               >
-                <option value={0}>-- Select a raw material --</option>
+                <option value={0}>{t('createRecyclablePlan.fields.selectRawMaterialOption')}</option>
                 {rawMaterials.map(material => (
                   <option key={material.id} value={material.id}>
-                    {material.name} ({material.color}) - Current Stock: {material.quantity} {material.quantityType}
+                    {material.name} ({material.color}) - {t('createRecyclablePlan.labels.currentStock')} {material.quantity} {material.quantityType}
                   </option>
                 ))}
-                <option value="new">✨ Create New Raw Material</option>
+                <option value="new">{t('createRecyclablePlan.fields.createNewRawMaterial')}</option>
               </select>
             </div>
 
@@ -233,29 +235,29 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
               <div className="new-product-form">
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="newRawName">Name *</label>
+                    <label htmlFor="newRawName">{t('createRecyclablePlan.fields.name')} *</label>
                     <input id="newRawName" name="name" value={newRawMaterial.name} onChange={handleNewRawChange} required disabled={isLoading} />
                   </div>
                   <div className="form-group">
-                    <label htmlFor="newRawColor">Color *</label>
+                    <label htmlFor="newRawColor">{t('createRecyclablePlan.fields.color')} *</label>
                     <input id="newRawColor" name="color" value={newRawMaterial.color} onChange={handleNewRawChange} required disabled={isLoading} />
                   </div>
                 </div>
                 <div className="form-row">
                   <div className="form-group">
-                    <label htmlFor="newRawQtyType">Unit Type *</label>
+                    <label htmlFor="newRawQtyType">{t('createRecyclablePlan.fields.unitType')} *</label>
                     <input id="newRawQtyType" name="quantityType" value={newRawMaterial.quantityType} onChange={handleNewRawChange} required disabled={isLoading} list="qtyTypes" />
                     <datalist id="qtyTypes">
-                      {commonQuantityTypes.map(t => (<option key={t} value={t} />))}
+                      {commonQuantityTypes.map(type => (<option key={type} value={type} />))}
                     </datalist>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="newRawMinStock">Minimum Stock</label>
+                    <label htmlFor="newRawMinStock">{t('createRecyclablePlan.fields.minimumStock')}</label>
                     <input type="number" id="newRawMinStock" name="minimumStock" value={newRawMaterial.minimumStock} onChange={handleNewRawChange} onWheel={handleWheel} min={0} step={1} disabled={isLoading} />
                   </div>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="newRawDesc">Description</label>
+                  <label htmlFor="newRawDesc">{t('createRecyclablePlan.fields.description')}</label>
                   <textarea id="newRawDesc" name="description" value={newRawMaterial.description || ''} onChange={handleNewRawChange} rows={2} disabled={isLoading} />
                 </div>
               </div>
@@ -264,73 +266,73 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
 
           {/* Plan Details */}
           <div className="form-section">
-            <h3>Plan Details</h3>
+            <h3>{t('createRecyclablePlan.sections.planDetails')}</h3>
             <div className="form-group">
-              <label htmlFor="name">Plan Name *</label>
-              <input id="name" name="name" value={formData.name} onChange={handleInputChange} required disabled={isLoading} placeholder="e.g., Recycle Batch #1" />
+              <label htmlFor="name">{t('createRecyclablePlan.fields.planName')} *</label>
+              <input id="name" name="name" value={formData.name} onChange={handleInputChange} required disabled={isLoading} placeholder={t('createRecyclablePlan.placeholders.planName')} />
             </div>
             <div className="form-group">
-              <label htmlFor="description">Description</label>
+              <label htmlFor="description">{t('createRecyclablePlan.fields.description')}</label>
               <textarea id="description" name="description" value={formData.description} onChange={handleInputChange} rows={2} disabled={isLoading} />
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="quantityToProduce">Quantity to Produce *</label>
+                <label htmlFor="quantityToProduce">{t('createRecyclablePlan.fields.quantityToProduce')} *</label>
                 <input type="number" id="quantityToProduce" name="quantityToProduce" value={formData.quantityToProduce} onChange={handleInputChange} onWheel={handleWheel} min={0.01} step={0.01} required disabled={isLoading} />
               </div>
               <div className="form-group">
-                <label htmlFor="estimatedProductionTimeMinutes">Est. Time (minutes) *</label>
+                <label htmlFor="estimatedProductionTimeMinutes">{t('createRecyclablePlan.fields.estimatedTimeMinutes')} *</label>
                 <input type="number" id="estimatedProductionTimeMinutes" name="estimatedProductionTimeMinutes" value={formData.estimatedProductionTimeMinutes} onChange={handleInputChange} onWheel={handleWheel} min={1} step={1} required disabled={isLoading} />
               </div>
             </div>
             <div className="form-group">
-              <label htmlFor="plannedStartDate">Planned Start Date</label>
+              <label htmlFor="plannedStartDate">{t('createRecyclablePlan.fields.plannedStartDate')}</label>
               <input type="date" id="plannedStartDate" name="plannedStartDate" value={formData.plannedStartDate} onChange={handleInputChange} disabled={isLoading} />
             </div>
             <div className="form-group">
-              <label htmlFor="notes">Notes</label>
+              <label htmlFor="notes">{t('createRecyclablePlan.fields.notes')}</label>
               <textarea id="notes" name="notes" value={formData.notes} onChange={handleInputChange} rows={2} disabled={isLoading} />
             </div>
           </div>
 
           {/* Required Recyclables */}
           <div className="form-section">
-            <h3>Required Recyclables (per unit)</h3>
+            <h3>{t('createRecyclablePlan.sections.requiredRecyclables')}</h3>
             <div className="add-material-section">
               <div className="form-row">
                 <div className="form-group" style={{ flex: 2 }}>
-                  <label htmlFor="currentRecyclable">Select Recyclable</label>
+                  <label htmlFor="currentRecyclable">{t('createRecyclablePlan.fields.selectRecyclable')}</label>
                   <select id="currentRecyclable" value={currentRecyclable.rawMaterialId} onChange={(e) => setCurrentRecyclable(prev => ({ ...prev, rawMaterialId: parseInt(e.target.value) }))} disabled={isLoading}>
-                    <option value={0}>-- Select a recyclable --</option>
+                    <option value={0}>{t('createRecyclablePlan.fields.selectRecyclableOption')}</option>
                     {recyclables.map(mat => (
                       <option key={mat.id} value={mat.id}>
-                        {mat.name} ({mat.color}) - Available: {mat.quantity} {mat.quantityType}
+                        {mat.name} ({mat.color}) - {t('createRecyclablePlan.labels.available')} {mat.quantity} {mat.quantityType}
                       </option>
                     ))}
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="recyclableQty">Quantity</label>
+                  <label htmlFor="recyclableQty">{t('createRecyclablePlan.fields.quantity')}</label>
                   <input type="number" id="recyclableQty" value={currentRecyclable.requiredQuantity} onChange={(e) => setCurrentRecyclable(prev => ({ ...prev, requiredQuantity: parseFloat(e.target.value) || 0 }))} onWheel={handleWheel} min={0.01} step={0.01} disabled={isLoading} />
                 </div>
                 <div className="form-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-                  <button type="button" onClick={handleAddRecyclable} className="btn btn-secondary" disabled={isLoading}>+ Add</button>
+                  <button type="button" onClick={handleAddRecyclable} className="btn btn-secondary" disabled={isLoading}>{t('createRecyclablePlan.buttons.add')}</button>
                 </div>
               </div>
             </div>
 
             {selectedRecyclables.length > 0 && (
               <div className="selected-materials">
-                <h4>Selected Recyclables:</h4>
+                <h4>{t('createRecyclablePlan.labels.selectedRecyclables')}</h4>
                 <table className="materials-table">
                   <thead>
                     <tr>
-                      <th>Material</th>
-                      <th>Required (per unit)</th>
-                      <th>Total Need</th>
-                      <th>Available</th>
-                      <th>Status</th>
-                      <th>Actions</th>
+                      <th>{t('createPlan.table.material')}</th>
+                      <th>{t('createPlan.table.requiredPerUnit')}</th>
+                      <th>{t('createPlan.table.totalNeed')}</th>
+                      <th>{t('createPlan.table.available')}</th>
+                      <th>{t('createPlan.table.status')}</th>
+                      <th>{t('createPlan.table.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -353,11 +355,11 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
                           <td>{m.availableQuantity.toFixed(2)} {m.quantityType}</td>
                           <td>
                             <span className={`status-badge ${isAvailable ? 'status-available' : 'status-insufficient'}`}>
-                              {isAvailable ? '✓ Available' : '⚠ Insufficient'}
+                              {isAvailable ? t('createPlan.status.available') : t('createPlan.status.insufficient')}
                             </span>
                           </td>
                           <td>
-                            <button type="button" onClick={() => handleRemoveRecyclable(m.id)} className="btn btn-sm btn-danger" disabled={isLoading}>Remove</button>
+                            <button type="button" onClick={() => handleRemoveRecyclable(m.id)} className="btn btn-sm btn-danger" disabled={isLoading}>{t('createRecyclablePlan.buttons.remove')}</button>
                           </td>
                         </tr>
                       );
@@ -369,9 +371,9 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
           </div>
 
           <div className="form-actions">
-            <button type="button" onClick={onClose} className="btn btn-secondary" disabled={isLoading}>Cancel</button>
+            <button type="button" onClick={onClose} className="btn btn-secondary" disabled={isLoading}>{t('createRecyclablePlan.buttons.cancel')}</button>
             <button type="submit" className="btn btn-primary" disabled={isLoading || selectedRecyclables.length === 0}>
-              {isLoading ? 'Creating...' : 'Create Recyclables Plan'}
+              {isLoading ? t('createRecyclablePlan.buttons.creating') : t('createRecyclablePlan.buttons.createRecyclablesPlan')}
             </button>
           </div>
         </form>

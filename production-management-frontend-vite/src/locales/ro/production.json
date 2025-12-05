@@ -1,6 +1,454 @@
 {
   "title": "Producție",
-  "createPlan": "Creează plan de producție",
-  "editPlan": "Editează plan de producție"
+  "productionManagement": "Gestionare Producție",
+  "subtitle": "Gestionează procesarea materiilor prime și a materialelor reciclabile",
+  "loading": "Se încarcă datele de producție...",
+  "tabs": {
+    "rawMaterialProcessing": "Procesare Materii Prime",
+    "recyclableMaterialsProcessing": "Procesare Materiale Reciclabile"
+  },
+  "buttons": {
+    "createProductionPlan": "Creează Plan de Producție",
+    "createRecyclablesPlan": "Creează Plan Materiale Reciclabile"
+  },
+  "statistics": {
+    "totalPlans": "Total Planuri",
+    "completed": "Finalizate",
+    "inProgress": "În Progres",
+    "unitsProduced": "Unități Produse"
+  },
+  "filters": {
+    "allStatus": "Toate Statusurile",
+    "searchPlans": "Caută planuri...",
+    "searchRecyclablePlans": "Caută planuri reciclabile..."
+  },
+  "status": {
+    "draft": "Ciornă",
+    "planned": "Planificat",
+    "inProgress": "În Progres",
+    "completed": "Finalizat",
+    "cancelled": "Anulat",
+    "unknown": "Necunoscut"
+  },
+  "table": {
+    "planName": "Nume Plan",
+    "targetProduct": "Produs Țintă",
+    "targetRawMaterial": "Materie Primă Țintă",
+    "quantity": "Cantitate",
+    "materials": "Materiale",
+    "recyclables": "Reciclabile",
+    "time": "Timp",
+    "status": "Status",
+    "created": "Creat",
+    "actions": "Acțiuni",
+    "more": "mai multe"
+  },
+  "badges": {
+    "ready": "Gata",
+    "notReady": "Nu e Gata"
+  },
+  "actions": {
+    "viewPlanDetails": "Vizualizează Detalii Plan",
+    "editPlan": "Editează Plan",
+    "startProcessing": "Începe Procesarea",
+    "cannotStartMissingMaterials": "Nu se poate începe - materiale lipsă",
+    "completeProduction": "Finalizează Producția",
+    "cancelPlan": "Anulează Plan",
+    "processPlan": "Procesează Plan",
+    "cannotProcessMissingMaterials": "Nu se poate procesa - materiale lipsă"
+  },
+  "emptyState": {
+    "noPlansFound": "Nu s-au găsit planuri de producție care să corespundă criteriilor tale.",
+    "noPlansCreated": "Nu există planuri de producție create. Creează un plan pentru a începe.",
+    "noRecyclablePlansFound": "Nu s-au găsit planuri reciclabile.",
+    "noRecyclablePlansCreated": "Nu există planuri reciclabile create."
+  },
+  "pagination": {
+    "showing": "Se afișează {{start}} până la {{end}} din {{total}} planuri",
+    "first": "Primul",
+    "previous": "Anterior",
+    "next": "Următor",
+    "last": "Ultimul",
+    "show": "Afișează:",
+    "perPage": "pe pagină"
+  },
+  "messages": {
+    "failedToLoad": "Eșec la încărcarea datelor de producție",
+    "failedToLoadRecyclablePlans": "Eșec la încărcarea planurilor reciclabile",
+    "failedToStart": "Eșec la pornirea planului de producție"
+  },
+  "cancelPlan": {
+    "title": "Anulează Plan de Producție",
+    "confirmation": "Ești sigur că vrei să anulezi \"{{planName}}\"?",
+    "warning": "Aceasta va marca planul ca anulat și nu va mai putea fi executat.",
+    "buttons": {
+      "goBack": "Înapoi",
+      "cancelPlan": "Anulează Plan",
+      "cancelling": "Se anulează..."
+    }
+  },
+  "cancelRecyclablePlan": {
+    "title": "Anulează Plan Reciclabile",
+    "confirmation": "Ești sigur că vrei să anulezi planul \"{{planName}}\"? Această acțiune va seta statusul său ca Anulat.",
+    "buttons": {
+      "close": "Închide",
+      "confirmCancel": "Confirmă Anularea"
+    }
+  },
+  "processRecyclablePlan": {
+    "title": "Procesează Plan Reciclabile",
+    "sections": {
+      "overview": "Prezentare Generală",
+      "recyclablesToConsume": "Reciclabile de Consumat"
+    },
+    "fields": {
+      "planName": "Nume Plan",
+      "targetRawMaterial": "Materie Primă Țintă",
+      "quantityToProduce": "Cantitate de Produs"
+    },
+    "table": {
+      "material": "Material",
+      "totalNeed": "Total Necesar",
+      "available": "Disponibil",
+      "status": "Status"
+    },
+    "status": {
+      "available": "Disponibil",
+      "short": "Lipsă {{amount}}"
+    },
+    "buttons": {
+      "close": "Închide",
+      "confirmProcess": "Confirmă Procesarea",
+      "processing": "Se procesează..."
+    }
+  },
+  "viewPlan": {
+    "title": "Detalii Plan de Producție",
+    "recyclableTitle": "Detalii Plan Reciclabile",
+    "sections": {
+      "planOverview": "Prezentare Generală Plan",
+      "timingInformation": "Informații Timp",
+      "timing": "Timp",
+      "productionStatus": "Status Producție",
+      "requiredMaterials": "Materiale Necesare",
+      "requiredRecyclables": "Reciclabile Necesare",
+      "notes": "Notițe"
+    },
+    "fields": {
+      "planName": "Nume Plan",
+      "description": "Descriere",
+      "targetProduct": "Produs Țintă",
+      "targetRawMaterial": "Materie Primă Țintă",
+      "quantityToProduce": "Cantitate de Produs",
+      "estimatedProductionTime": "Timp Estimativ Producție",
+      "plannedStartDate": "Dată Planificată Start",
+      "created": "Creat",
+      "startedAt": "Început La",
+      "actualStartDate": "Dată Start Reală",
+      "actualEndDate": "Dată Finalizare Reală",
+      "completedAt": "Finalizat La",
+      "materialsStatus": "Status Materiale",
+      "units": "unități"
+    },
+    "table": {
+      "material": "Material",
+      "requiredPerUnit": "Necesar (pe unitate)",
+      "totalNeed": "Total Necesar",
+      "available": "Disponibil",
+      "status": "Status"
+    },
+    "status": {
+      "available": "Disponibil",
+      "short": "Lipsă {{amount}}",
+      "allMaterialsAvailable": "Da - Toate materialele disponibile",
+      "missingMaterials": "Nu - Materiale lipsă"
+    },
+    "buttons": {
+      "close": "Închide"
+    },
+    "labels": {
+      "na": "N/A",
+      "min": "min"
+    }
+  },
+  "createPlan": {
+    "title": "Creează Plan de Producție",
+    "sections": {
+      "targetProduct": "Produs Țintă",
+      "planDetails": "Detalii Plan",
+      "requiredMaterials": "Materiale Necesare (pe unitate)"
+    },
+    "fields": {
+      "selectFinishedProduct": "Selectează Produs Finit",
+      "selectProduct": "-- Selectează un produs --",
+      "createNewProduct": "✨ Creează Produs Nou",
+      "productName": "Nume Produs",
+      "color": "Culoare",
+      "unitType": "Tip Unitate",
+      "minimumStock": "Stoc Minim",
+      "description": "Descriere",
+      "planName": "Nume Plan",
+      "quantityToProduce": "Cantitate de Produs",
+      "estimatedTimeMinutes": "Timp Estimat (minute)",
+      "plannedStartDate": "Dată Planificată Start",
+      "notes": "Notițe",
+      "selectMaterial": "Selectează Material",
+      "selectRawMaterial": "-- Selectează o materie primă --",
+      "quantity": "Cantitate"
+    },
+    "placeholders": {
+      "productName": "ex: Scaun Personalizat, Masă",
+      "color": "ex: Maro, Alb",
+      "unitType": "ex: bucăți, kg",
+      "description": "Descriere opțională...",
+      "planName": "ex: Lot Producție Săptămânal",
+      "notes": "Notițe opționale..."
+    },
+    "labels": {
+      "currentStock": "Stoc Actual:",
+      "available": "Disponibil:",
+      "selectedMaterials": "Materiale Selectate:",
+      "templateLoaded": "✓ Șablon producție încărcat",
+      "templateChangesDetected": "Modificări Șablon Detectate",
+      "templateChangesDescription": "Ai modificat materialele sau cantitățile din șablonul original.",
+      "updateTemplate": "Actualizează șablonul produsului cu aceste modificări"
+    },
+    "table": {
+      "material": "Material",
+      "requiredPerUnit": "Necesar (pe unitate)",
+      "totalNeed": "Total Necesar",
+      "available": "Disponibil",
+      "status": "Status",
+      "actions": "Acțiuni"
+    },
+    "status": {
+      "available": "✓ Disponibil",
+      "insufficient": "⚠ Insuficient"
+    },
+    "buttons": {
+      "add": "+ Adaugă",
+      "remove": "Elimină",
+      "cancel": "Anulează",
+      "createProductionPlan": "Creează Plan de Producție",
+      "creating": "Se creează..."
+    },
+    "messages": {
+      "failedToLoadMaterials": "Eșec la încărcarea materialelor",
+      "pleaseSelectMaterialAndQuantity": "Te rugăm să selectezi un material și să introduci o cantitate validă",
+      "materialAlreadyAdded": "Material deja adăugat",
+      "pleaseAddAtLeastOneMaterial": "Te rugăm să adaugi cel puțin un material",
+      "pleaseFillAllRequiredFields": "Te rugăm să completezi toate câmpurile obligatorii pentru noul produs",
+      "pleaseSelectFinishedProduct": "Te rugăm să selectezi un produs finit",
+      "failedToCreate": "Eșec la crearea planului de producție. Te rugăm să încerci din nou."
+    }
+  },
+  "editPlan": {
+    "title": "Editează Plan de Producție",
+    "buttons": {
+      "updateProductionPlan": "Actualizează Plan de Producție",
+      "updating": "Se actualizează..."
+    },
+    "messages": {
+      "failedToLoadMaterials": "Eșec la încărcarea materialelor",
+      "pleaseSelectMaterialAndQuantity": "Te rugăm să selectezi un material și să introduci o cantitate validă",
+      "materialAlreadyAdded": "Material deja adăugat",
+      "pleaseAddAtLeastOneMaterial": "Te rugăm să adaugi cel puțin un material",
+      "failedToUpdate": "Eșec la actualizarea planului de producție. Te rugăm să încerci din nou."
+    }
+  },
+  "createRecyclablePlan": {
+    "title": "Creează Plan Procesare Reciclabile",
+    "sections": {
+      "outputRawMaterial": "Materie Primă Ieșire",
+      "planDetails": "Detalii Plan",
+      "requiredRecyclables": "Reciclabile Necesare (pe unitate)"
+    },
+    "fields": {
+      "selectRawMaterial": "Selectează Materie Primă",
+      "selectRawMaterialOption": "-- Selectează o materie primă --",
+      "createNewRawMaterial": "✨ Creează Materie Primă Nouă",
+      "name": "Nume",
+      "color": "Culoare",
+      "unitType": "Tip Unitate",
+      "minimumStock": "Stoc Minim",
+      "description": "Descriere",
+      "planName": "Nume Plan",
+      "quantityToProduce": "Cantitate de Produs",
+      "estimatedTimeMinutes": "Timp Estimat (minute)",
+      "plannedStartDate": "Dată Planificată Start",
+      "notes": "Notițe",
+      "selectRecyclable": "Selectează Reciclabile",
+      "selectRecyclableOption": "-- Selectează reciclabile --",
+      "quantity": "Cantitate"
+    },
+    "placeholders": {
+      "planName": "ex: Lot Reciclare #1"
+    },
+    "labels": {
+      "currentStock": "Stoc Actual:",
+      "available": "Disponibil:",
+      "selectedRecyclables": "Reciclabile Selectate:"
+    },
+    "buttons": {
+      "add": "+ Adaugă",
+      "remove": "Elimină",
+      "cancel": "Anulează",
+      "createRecyclablesPlan": "Creează Plan Reciclabile",
+      "creating": "Se creează..."
+    },
+    "messages": {
+      "failedToLoadMaterials": "Eșec la încărcarea materialelor",
+      "pleaseSelectRecyclableAndQuantity": "Te rugăm să selectezi reciclabile și să introduci o cantitate validă",
+      "recyclableAlreadyAdded": "Material reciclabile deja adăugat",
+      "pleaseAddAtLeastOneRecyclable": "Te rugăm să adaugi cel puțin un material reciclabile",
+      "pleaseFillAllRequiredFields": "Te rugăm să completezi toate câmpurile obligatorii pentru noua materie primă",
+      "pleaseSelectOutputRawMaterial": "Te rugăm să selectezi materia primă de ieșire",
+      "failedToCreate": "Eșec la crearea planului de producție reciclabile."
+    }
+  },
+  "editRecyclablePlan": {
+    "title": "Editează Plan Producție Reciclabile",
+    "sections": {
+      "planDetails": "Detalii Plan",
+      "requiredRecyclables": "Reciclabile Necesare (pe unitate)"
+    },
+    "fields": {
+      "targetRawMaterial": "Materie Primă Țintă",
+      "color": "Culoare",
+      "quantityType": "Tip Cantitate",
+      "planName": "Nume Plan",
+      "plannedStartDate": "Dată Planificată Start",
+      "quantityToProduce": "Cantitate de Produs",
+      "estimatedTimeMin": "Timp Estimat (min)",
+      "description": "Descriere",
+      "notes": "Notițe",
+      "selectRecyclable": "Selectează Reciclabile",
+      "selectRecyclableOption": "-- Selectează reciclabile --",
+      "quantity": "Cantitate",
+      "materials": "Materiale",
+      "perUnit": "pe unitate"
+    },
+    "placeholders": {
+      "planName": "Introdu nume plan"
+    },
+    "labels": {
+      "available": "Disponibil:"
+    },
+    "status": {
+      "available": "Disponibil",
+      "short": "Lipsă {{amount}}"
+    },
+    "buttons": {
+      "add": "Adaugă",
+      "cancel": "Anulează",
+      "saveChanges": "Salvează Modificările",
+      "saving": "Se salvează..."
+    },
+    "messages": {
+      "failedToLoadMaterials": "Eșec la încărcarea materialelor",
+      "nameRequired": "Numele este obligatoriu",
+      "quantityMustBeGreaterThanZero": "Cantitatea de produs trebuie să fie > 0",
+      "estimatedTimeMustBeGreaterThanZero": "Timpul estimat trebuie să fie > 0",
+      "addAtLeastOneRecyclable": "Adaugă cel puțin un material reciclabile",
+      "allMaterialsMustBeValid": "Toate materialele trebuie să fie valide",
+      "pleaseSelectRecyclableAndQuantity": "Te rugăm să selectezi reciclabile și să introduci o cantitate validă",
+      "recyclableAlreadyAdded": "Material reciclabile deja adăugat",
+      "failedToUpdate": "Eșec la actualizarea planului"
+    },
+    "table": {
+      "material": "Material",
+      "requiredQtyPerUnit": "Cantitate Necesară (pe unitate)",
+      "totalNeed": "Total Necesar",
+      "available": "Disponibil",
+      "status": "Status",
+      "actions": "Acțiuni"
+    }
+  },
+  "receiveProduction": {
+    "title": "Finalizează Producția",
+    "sections": {
+      "productionPlanOverview": "Prezentare Generală Plan Producție",
+      "finalProductionResults": "Rezultate Finale Producție",
+      "materialsProduced": "Materiale Produse",
+      "materialsUsed": "Materiale Folosite"
+    },
+    "fields": {
+      "planName": "Nume Plan",
+      "targetProduct": "Produs Țintă",
+      "startedAt": "Început La",
+      "materialsRequired": "Materiale Necesare",
+      "actualQuantityProduced": "Cantitate Reală Produsă",
+      "actualProductionTimeMinutes": "Timp Real Producție (minute)",
+      "productionNotes": "Notițe Producție",
+      "selectProducedMaterial": "Selectează Material Produs",
+      "selectMaterial": "-- Selectează un material --",
+      "quantityProduced": "Cantitate Produsă",
+      "materialName": "Nume Material",
+      "color": "Culoare",
+      "materialType": "Tip Material",
+      "unitType": "Tip Unitate",
+      "quantity": "Cantitate",
+      "description": "Descriere",
+      "producedMaterials": "Materiale Produse:",
+      "material": "Material",
+      "type": "Tip",
+      "requiredPerUnit": "Necesar (pe unitate)",
+      "totalUsed": "Total Folosit",
+      "status": "Status"
+    },
+    "placeholders": {
+      "actualQuantityProduced": "Introdu cantitatea reală produsă",
+      "actualProductionTime": "Introdu timpul real de producție",
+      "productionNotes": "Notițe opționale despre producția finalizată, calitate, probleme, rezultate finale, etc.",
+      "materialName": "ex: Foi Oțel, Vopsea, Șuruburi",
+      "color": "ex: Argintiu, Negru, Roșu",
+      "unitType": "ex: kg, litri, bucăți",
+      "description": "Descriere opțională a materialului..."
+    },
+    "labels": {
+      "plannedQuantity": "Cantitate planificată:",
+      "units": "unități",
+      "materials": "materiale",
+      "notStarted": "Nu a fost început",
+      "optionalRecordTime": "Opțional: Înregistrează timpul total necesar pentru procesul complet de producție",
+      "specifyProducedMaterials": "Specifică Materiale Produse",
+      "addSpecificMaterials": "Adaugă materiale specifice care au fost produse",
+      "usePlannedMaterials": "Folosește doar materialele din planul de producție",
+      "selectExistingMaterial": "📦 Selectează Material Existent",
+      "createNewMaterial": "✨ Creează Material Nou",
+      "rawMaterial": "Materie Primă",
+      "recyclableMaterial": "Material Reciclabile",
+      "finishedProduct": "Produs Finit",
+      "available": "Disponibil",
+      "insufficient": "Insuficient"
+    },
+    "status": {
+      "inProgress": "În Progres",
+      "unknown": "Necunoscut"
+    },
+    "buttons": {
+      "add": "Adaugă",
+      "createAndAdd": "Creează și Adaugă",
+      "cancel": "Anulează",
+      "completeProduction": "Finalizează Producția",
+      "completing": "Se finalizează...",
+      "addingToInventory": "Se adaugă în inventar..."
+    },
+    "messages": {
+      "failedToLoadMaterials": "Eșec la încărcarea materialelor",
+      "pleaseSelectMaterialAndQuantity": "Te rugăm să selectezi un material și să introduci o cantitate validă",
+      "materialAlreadyAdded": "Material deja adăugat",
+      "pleaseFillAllMaterialDetails": "Te rugăm să completezi toate detaliile materialului și să introduci o cantitate validă",
+      "nameColorQuantityTypeCannotBeEmpty": "Numele, culoarea și tipul de cantitate nu pot fi goale",
+      "failedToCreateMaterial": "Eșec la crearea materialului",
+      "actualQuantityMustBeGreaterThanZero": "Cantitatea reală produsă trebuie să fie mai mare decât 0",
+      "pleaseAddAtLeastOneProducedMaterial": "Te rugăm să adaugi cel puțin un material produs sau să debifezi \"Specifică Materiale Produse\"",
+      "addingMaterialsToInventory": "Se adaugă materiale în inventar...",
+      "addingMaterialToInventory": "Se adaugă {{materialName}} în inventar...",
+      "successfullyAddedMaterials": "S-au adăugat cu succes {{count}} materiale în inventar",
+      "addedMaterialsSuccessfullyFailed": "S-au adăugat {{successful}} materiale cu succes, {{failed}} au eșuat",
+      "productionCompletedUsingPlannedMaterials": "Producția finalizată folosind doar materialele planificate",
+      "failedToComplete": "Eșec la finalizarea producției. Te rugăm să încerci din nou."
+    }
+  }
 }
-

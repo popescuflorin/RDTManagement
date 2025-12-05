@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { acquisitionApi, inventoryApi } from '../../services/api';
 import type { Acquisition, RawMaterial } from '../../types';
 import { AcquisitionType, MaterialType } from '../../types';
@@ -39,6 +40,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
   onSuccess,
   acquisition
 }) => {
+  const { t } = useTranslation(['acquisitions', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [processingError, setProcessingError] = useState<string | null>(null);
@@ -73,7 +75,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
       );
       setAvailableRawMaterials(rawMaterialsOnly);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load data');
+      setError(err.response?.data?.message || t('process.messages.failedToLoadData'));
     }
   };
 
@@ -132,14 +134,14 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
     
     // Validation
     if (processedMaterials.length === 0) {
-      setProcessingError('Please add at least one processed material');
+      setProcessingError(t('process.messages.pleaseAddAtLeastOne'));
       return;
     }
 
     // Validate all materials have required fields
     for (const material of processedMaterials) {
       if (!material.name || !material.color || material.quantity <= 0) {
-        setProcessingError('All processed materials must have a name, color, and valid quantity');
+        setProcessingError(t('process.messages.allProcessedMaterialsMustHave'));
         return;
       }
     }
@@ -170,7 +172,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to process acquisition');
+      setError(err.response?.data?.message || t('process.messages.failedToProcess'));
     } finally {
       setIsLoading(false);
     }
@@ -187,7 +189,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
   if (!isOpen) return null;
 
   const getTypeLabel = (type: AcquisitionType) => {
-    return type === AcquisitionType.RawMaterials ? 'Raw Materials' : 'Recyclable Materials';
+    return type === AcquisitionType.RawMaterials ? t('type.rawMaterials') : t('type.recyclableMaterials');
   };
 
   const getTotalProcessedForItem = (itemId: number): number => {
@@ -204,7 +206,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
     <div className="modal-backdrop" onClick={handleBackdropClick}>
       <div className="modal-content create-acquisition-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2>Process Recyclable Materials</h2>
+          <h2>{t('process.title')}</h2>
           <button className="close-button" onClick={handleClose}>
             <X size={24} />
           </button>
@@ -221,38 +223,36 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
 
           {/* Info Message */}
           <div className="info-message">
-            <strong>Processing Instructions:</strong> Transform recyclable materials into raw materials by specifying 
-            the output materials and quantities. You can select existing raw materials or create new ones. 
-            The processed materials will be added to your inventory.
+            <strong>{t('process.messages.processingInstructionsLabel', { defaultValue: 'Processing Instructions' })}:</strong> {t('process.messages.processingInstructions')}
           </div>
 
           {/* Acquisition Details - Compact Summary */}
           <div className="form-section">
-            <h3><FileText size={20} /> Acquisition Details</h3>
+            <h3><FileText size={20} /> {t('process.sections.acquisitionDetails')}</h3>
             <div className="acquisition-summary">
               <div className="summary-row">
-                <span className="summary-label">Title:</span>
+                <span className="summary-label">{t('view.labels.title')}:</span>
                 <span className="summary-value">{acquisition.title}</span>
               </div>
               <div className="summary-row">
-                <span className="summary-label">Type:</span>
+                <span className="summary-label">{t('view.labels.type')}:</span>
                 <span className="summary-value">{getTypeLabel(acquisition.type)}</span>
               </div>
               {acquisition.description && (
                 <div className="summary-row">
-                  <span className="summary-label">Description:</span>
+                  <span className="summary-label">{t('view.labels.description')}:</span>
                   <span className="summary-value">{acquisition.description}</span>
                 </div>
               )}
               <div className="summary-row">
-                <span className="summary-label">Assigned To:</span>
-                <span className="summary-value">{acquisition.assignedToUserName || 'Unassigned'}</span>
+                <span className="summary-label">{t('process.labels.assignedTo')}:</span>
+                <span className="summary-value">{acquisition.assignedToUserName || t('view.labels.unassigned')}</span>
               </div>
               <div className="summary-row">
-                <span className="summary-label">Received By:</span>
+                <span className="summary-label">{t('process.labels.receivedBy')}:</span>
                 <span className="summary-value">
-                  {acquisition.receivedByUserName || 'N/A'} 
-                  {acquisition.receivedAt ? ` on ${new Date(acquisition.receivedAt).toLocaleDateString()}` : ''}
+                  {acquisition.receivedByUserName || t('process.labels.na')} 
+                  {acquisition.receivedAt ? ` ${t('view.labels.on')} ${new Date(acquisition.receivedAt).toLocaleDateString()}` : ''}
                 </span>
               </div>
             </div>
@@ -265,19 +265,19 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                 {/* Transport Details */}
                 {acquisition.transportCarName && (
                   <div className="details-column">
-                    <h4><Truck size={18} /> Transport</h4>
+                    <h4><Truck size={18} /> {t('view.sections.transport')}</h4>
                     <div className="acquisition-summary">
                       <div className="summary-row">
-                        <span className="summary-label">Vehicle:</span>
+                        <span className="summary-label">{t('view.labels.vehicle')}:</span>
                         <span className="summary-value">{acquisition.transportCarName}</span>
                       </div>
                       <div className="summary-row">
-                        <span className="summary-label">Number Plate:</span>
-                        <span className="summary-value">{acquisition.transportNumberPlate || 'Not set'}</span>
+                        <span className="summary-label">{t('view.labels.numberPlate')}:</span>
+                        <span className="summary-value">{acquisition.transportNumberPlate || t('view.labels.notSet')}</span>
                       </div>
                       {acquisition.transportPhoneNumber && (
                         <div className="summary-row">
-                          <span className="summary-label">Phone:</span>
+                          <span className="summary-label">{t('view.labels.phone')}:</span>
                           <span className="summary-value">{acquisition.transportPhoneNumber}</span>
                         </div>
                       )}
@@ -288,15 +288,15 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                 {/* Supplier Details */}
                 {acquisition.supplierName && (
                   <div className="details-column">
-                    <h4><Building2 size={18} /> Supplier</h4>
+                    <h4><Building2 size={18} /> {t('view.sections.supplier')}</h4>
                     <div className="acquisition-summary">
                       <div className="summary-row">
-                        <span className="summary-label">Name:</span>
+                        <span className="summary-label">{t('view.labels.name')}:</span>
                         <span className="summary-value">{acquisition.supplierName}</span>
                       </div>
                       {acquisition.supplierContact && (
                         <div className="summary-row">
-                          <span className="summary-label">Contact:</span>
+                          <span className="summary-label">{t('view.labels.contact')}:</span>
                           <span className="summary-value">{acquisition.supplierContact}</span>
                         </div>
                       )}
@@ -309,7 +309,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
 
           {/* Recyclable Materials & Processing */}
           <div className="form-section">
-            <h3><Package size={20} /> Process Recyclable Materials</h3>
+            <h3><Package size={20} /> {t('process.sections.processRecyclableMaterials')}</h3>
 
             {/* Processing Error Message */}
             {processingError && (
@@ -328,12 +328,12 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                   <div className="recyclable-header">
                     <div className="recyclable-info">
                       <h4>{item.name}</h4>
-                      <p>Color: {item.color} | Available: <strong>{item.quantity} {item.unitOfMeasure}</strong></p>
+                      <p>{t('process.labels.color')}: {item.color} | {t('process.labels.available')}: <strong>{item.quantity} {item.unitOfMeasure}</strong></p>
                     </div>
                     <div className="remaining-quantity">
                       <span className={remainingQty === 0 ? 'fully-processed' : remainingQty < 0 ? 'over-processed' : ''}>
-                        Remaining: <strong>{remainingQty} {item.unitOfMeasure}</strong>
-                        {remainingQty < 0 && <span style={{ marginLeft: '8px', fontSize: '0.85em', color: 'var(--warning-700)' }}>(Over-processing allowed)</span>}
+                        {t('process.labels.remaining')}: <strong>{remainingQty} {item.unitOfMeasure}</strong>
+                        {remainingQty < 0 && <span style={{ marginLeft: '8px', fontSize: '0.85em', color: 'var(--warning-700)' }}>{t('process.labels.overProcessingAllowed')}</span>}
                       </span>
                     </div>
                   </div>
@@ -345,7 +345,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                         <div key={material.id} className="processed-material-item">
                           <div className="form-row">
                             <div className="form-group">
-                              <label>Select Raw Material or Create New</label>
+                              <label>{t('process.labels.selectRawMaterialOrCreate')}</label>
                               <select
                                 value={material.rawMaterialId || ''}
                                 onChange={(e) => {
@@ -363,9 +363,9 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                                   }
                                 }}
                               >
-                                <option value="">-- Select or Create New --</option>
-                                <option value="new">➕ Create New Raw Material</option>
-                                <optgroup label="Existing Raw Materials">
+                                <option value="">{t('process.labels.selectOrCreateNew')}</option>
+                                <option value="new">{t('process.labels.createNewRawMaterial')}</option>
+                                <optgroup label={t('process.labels.existingRawMaterials')}>
                                   {availableRawMaterials.map(rm => (
                                     <option key={rm.id} value={rm.id}>
                                       {rm.name} ({rm.color})
@@ -375,7 +375,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                               </select>
                             </div>
                             <div className="form-group">
-                              <label>Quantity</label>
+                              <label>{t('process.labels.quantity')}</label>
                               <input
                                 type="number"
                                 value={material.quantity}
@@ -392,44 +392,44 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                             <>
                               <div className="form-row">
                                 <div className="form-group">
-                                  <label>Material Name</label>
+                                  <label>{t('process.labels.materialName')}</label>
                                   <input
                                     type="text"
                                     value={material.name}
                                     onChange={(e) => handleUpdateProcessedMaterial(material.id, { name: e.target.value })}
-                                    placeholder="Enter material name"
+                                    placeholder={t('process.labels.enterMaterialName')}
                                     required
                                   />
                                 </div>
                                 <div className="form-group">
-                                  <label>Color</label>
+                                  <label>{t('process.labels.color')}</label>
                                   <input
                                     type="text"
                                     value={material.color}
                                     onChange={(e) => handleUpdateProcessedMaterial(material.id, { color: e.target.value })}
-                                    placeholder="Enter color"
+                                    placeholder={t('process.labels.enterColor')}
                                     required
                                   />
                                 </div>
                               </div>
                               <div className="form-row">
                                 <div className="form-group">
-                                  <label>Unit of Measure</label>
+                                  <label>{t('process.labels.unitOfMeasure')}</label>
                                   <input
                                     type="text"
                                     value={material.unitOfMeasure}
                                     onChange={(e) => handleUpdateProcessedMaterial(material.id, { unitOfMeasure: e.target.value })}
-                                    placeholder="kg, liters, etc."
+                                    placeholder={t('form.placeholders.unitExample')}
                                     required
                                   />
                                 </div>
                                 <div className="form-group">
-                                  <label>Description (Optional)</label>
+                                  <label>{t('process.labels.descriptionOptional')}</label>
                                   <input
                                     type="text"
                                     value={material.description}
                                     onChange={(e) => handleUpdateProcessedMaterial(material.id, { description: e.target.value })}
-                                    placeholder="Enter description"
+                                    placeholder={t('process.labels.enterDescription')}
                                   />
                                 </div>
                               </div>
@@ -438,7 +438,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
 
                           {!material.isNew && material.rawMaterialId && (
                             <div className="selected-material-info">
-                              <p><strong>Selected:</strong> {material.name} ({material.color}) - {material.unitOfMeasure}</p>
+                              <p><strong>{t('process.labels.selected')}:</strong> {material.name} ({material.color}) - {material.unitOfMeasure}</p>
                             </div>
                           )}
 
@@ -447,7 +447,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                             className="remove-material-button"
                             onClick={() => handleRemoveProcessedMaterial(material.id)}
                           >
-                            <Trash2 size={16} /> Remove
+                            <Trash2 size={16} /> {t('process.labels.remove')}
                           </button>
                         </div>
                       ))}
@@ -460,7 +460,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                     className="add-processed-material-button"
                     onClick={() => handleAddProcessedMaterial(item)}
                   >
-                    <Plus size={16} /> Add Processed Material
+                    <Plus size={16} /> {t('process.labels.addProcessedMaterial')}
                   </button>
                 </div>
               );
@@ -474,14 +474,14 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
               className="cancel-button"
               onClick={handleClose}
             >
-              Cancel
+              {t('process.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading || processedMaterials.length === 0}
             >
-              {isLoading ? 'Processing...' : 'Complete Processing & Add to Inventory'}
+              {isLoading ? t('process.buttons.processing') : t('process.buttons.completeProcessing')}
             </button>
           </div>
         </form>

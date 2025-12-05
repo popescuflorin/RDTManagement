@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { userApi } from '../../services/api';
 import type { User } from '../../types';
 import './DeleteConfirmation.css';
@@ -10,6 +11,7 @@ interface DeleteConfirmationProps {
 }
 
 const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, onUserDeleted }) => {
+  const { t } = useTranslation(['users', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +25,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
       onClose();
     } catch (error: any) {
       console.error('Error deleting user:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to delete user. Please try again.';
+      const errorMessage = error.response?.data?.message || t('deleteConfirmation.messages.failedToDeleteUser');
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -35,7 +37,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
       <div className="delete-confirmation-modal">
         <div className="delete-confirmation-header">
           <div className="warning-icon">⚠️</div>
-          <h2>Deactivate User</h2>
+          <h2>{t('deleteConfirmation.title')}</h2>
         </div>
 
         <div className="delete-confirmation-content">
@@ -46,7 +48,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
           )}
 
           <p className="confirmation-text">
-            Are you sure you want to deactivate this user account?
+            {t('deleteConfirmation.confirmation')}
           </p>
 
           <div className="user-details">
@@ -56,17 +58,17 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
             <div className="user-info">
               <div className="user-name">{user.firstName} {user.lastName}</div>
               <div className="user-email">{user.email}</div>
-              <div className="user-role">Role: {user.role}</div>
+              <div className="user-role">{t('deleteConfirmation.labels.role')} {user.role}</div>
             </div>
           </div>
 
           <div className="warning-text">
-            <strong>Warning:</strong> Deactivating this user will:
+            <strong>{t('deleteConfirmation.warning.title')}</strong> {t('deleteConfirmation.warning.deactivatingWill')}
             <ul>
-              <li>Block their access to the system</li>
-              <li>Prevent them from logging in</li>
-              <li>Keep their data for record-keeping</li>
-              <li>Can be reactivated later by editing the user</li>
+              <li>{t('deleteConfirmation.warning.blockAccess')}</li>
+              <li>{t('deleteConfirmation.warning.preventLogin')}</li>
+              <li>{t('deleteConfirmation.warning.keepData')}</li>
+              <li>{t('deleteConfirmation.warning.canReactivate')}</li>
             </ul>
           </div>
         </div>
@@ -78,7 +80,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
             className="cancel-button"
             disabled={isLoading}
           >
-            Cancel
+            {t('deleteConfirmation.buttons.cancel')}
           </button>
           <button
             type="button"
@@ -86,7 +88,7 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
             className="delete-button"
             disabled={isLoading}
           >
-            {isLoading ? 'Deactivating...' : 'Deactivate User'}
+            {isLoading ? t('deleteConfirmation.buttons.deactivating') : t('deleteConfirmation.buttons.deactivateUser')}
           </button>
         </div>
       </div>

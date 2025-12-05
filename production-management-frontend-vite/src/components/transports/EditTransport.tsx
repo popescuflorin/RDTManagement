@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { transportApi } from '../../services/api';
 import type { Transport, UpdateTransportRequest } from '../../types';
 import { X, Truck } from 'lucide-react';
@@ -17,6 +18,7 @@ const EditTransport: React.FC<EditTransportProps> = ({
   onSuccess,
   transport
 }) => {
+  const { t } = useTranslation(['transports', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<UpdateTransportRequest>({
@@ -47,12 +49,12 @@ const EditTransport: React.FC<EditTransportProps> = ({
     e.preventDefault();
     
     if (!formData.carName.trim()) {
-      setError('Car name is required');
+      setError(t('editTransport.messages.carNameRequired'));
       return;
     }
 
     if (!formData.phoneNumber.trim()) {
-      setError('Phone number is required');
+      setError(t('editTransport.messages.phoneNumberRequired'));
       return;
     }
 
@@ -70,7 +72,7 @@ const EditTransport: React.FC<EditTransportProps> = ({
       onSuccess();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update transport');
+      setError(err.response?.data?.message || t('editTransport.messages.failedToUpdate'));
     } finally {
       setIsLoading(false);
     }
@@ -88,7 +90,7 @@ const EditTransport: React.FC<EditTransportProps> = ({
         <div className="modal-header">
           <h2>
             <Truck size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            Edit Transport
+            {t('editTransport.title')}
           </h2>
           <button className="close-button" onClick={onClose}>
             <X size={24} />
@@ -106,14 +108,14 @@ const EditTransport: React.FC<EditTransportProps> = ({
           <div className="form-section">
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="carName">Car Name *</label>
+                <label htmlFor="carName">{t('editTransport.fields.carName')} *</label>
                 <input
                   type="text"
                   id="carName"
                   name="carName"
                   value={formData.carName}
                   onChange={handleChange}
-                  placeholder="Enter car name"
+                  placeholder={t('editTransport.placeholders.carName')}
                   required
                 />
               </div>
@@ -121,14 +123,14 @@ const EditTransport: React.FC<EditTransportProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="numberPlate">Number Plate</label>
+                <label htmlFor="numberPlate">{t('editTransport.fields.numberPlate')}</label>
                 <input
                   type="text"
                   id="numberPlate"
                   name="numberPlate"
                   value={formData.numberPlate}
                   onChange={handleChange}
-                  placeholder="Enter number plate (optional)"
+                  placeholder={t('editTransport.placeholders.numberPlate')}
                   maxLength={20}
                 />
               </div>
@@ -136,14 +138,14 @@ const EditTransport: React.FC<EditTransportProps> = ({
 
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="phoneNumber">Phone Number *</label>
+                <label htmlFor="phoneNumber">{t('editTransport.fields.phoneNumber')} *</label>
                 <input
                   type="text"
                   id="phoneNumber"
                   name="phoneNumber"
                   value={formData.phoneNumber}
                   onChange={handleChange}
-                  placeholder="Enter phone number"
+                  placeholder={t('editTransport.placeholders.phoneNumber')}
                   required
                   maxLength={20}
                 />
@@ -158,14 +160,14 @@ const EditTransport: React.FC<EditTransportProps> = ({
               onClick={onClose}
               disabled={isLoading}
             >
-              Cancel
+              {t('editTransport.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="submit-button"
               disabled={isLoading}
             >
-              {isLoading ? 'Updating...' : 'Update Transport'}
+              {isLoading ? t('editTransport.buttons.updating') : t('editTransport.buttons.updateTransport')}
             </button>
           </div>
         </form>

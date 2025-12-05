@@ -114,7 +114,7 @@ const Sidebar: React.FC<SidebarProps> = ({
           {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
         </button>
         {!isCollapsed && (
-          <h2 className="sidebar-title">Production Management</h2>
+          <h2 className="sidebar-title">RodutPlast</h2>
         )}
       </div>
 

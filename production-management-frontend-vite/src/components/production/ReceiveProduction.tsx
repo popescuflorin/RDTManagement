@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Truck, 
   Package, 
@@ -30,6 +31,7 @@ interface ProducedMaterial {
 }
 
 const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, onPlanReceived }) => {
+  const { t } = useTranslation(['production', 'common']);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [actualQuantityProduced, setActualQuantityProduced] = useState(plan.quantityToProduce);
@@ -66,7 +68,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
       setAvailableMaterials(materials);
     } catch (error: any) {
       console.error('Error loading materials:', error);
-      setError('Failed to load materials');
+      setError(t('receiveProduction.messages.failedToLoadMaterials'));
     }
   };
 
@@ -91,7 +93,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
   const handleAddProducedMaterial = async () => {
     if (materialMode === 'existing') {
       if (currentMaterial.materialId === 0 || currentMaterial.quantity <= 0) {
-        setError('Please select a material and enter a valid quantity');
+        setError(t('receiveProduction.messages.pleaseSelectMaterialAndQuantity'));
         return;
       }
 
@@ -100,7 +102,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
 
       // Check if material already added
       if (producedMaterials.some(m => m.materialId === currentMaterial.materialId)) {
-        setError('Material already added');
+        setError(t('receiveProduction.messages.materialAlreadyAdded'));
         return;
       }
 
@@ -120,13 +122,13 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
     } else {
       // Create new material
       if (!newMaterialData.name || !newMaterialData.color || !newMaterialData.quantityType || currentMaterial.quantity <= 0) {
-        setError('Please fill in all material details and enter a valid quantity');
+        setError(t('receiveProduction.messages.pleaseFillAllMaterialDetails'));
         return;
       }
 
       // Validate that name, color, and quantityType are not just whitespace
       if (newMaterialData.name.trim() === '' || newMaterialData.color.trim() === '' || newMaterialData.quantityType.trim() === '') {
-        setError('Name, color, and quantity type cannot be empty');
+        setError(t('receiveProduction.messages.nameColorQuantityTypeCannotBeEmpty'));
         return;
       }
 
@@ -172,7 +174,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
       } catch (error: any) {
         console.error('Error creating material:', error);
         console.error('Error response:', error.response?.data);
-        setError(error.response?.data?.message || error.response?.data?.title || 'Failed to create material');
+        setError(error.response?.data?.message || error.response?.data?.title || t('receiveProduction.messages.failedToCreateMaterial'));
       }
     }
   };
@@ -202,13 +204,13 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
 
     try {
       if (actualQuantityProduced <= 0) {
-        setError('Actual quantity produced must be greater than 0');
+        setError(t('receiveProduction.messages.actualQuantityMustBeGreaterThanZero'));
         setIsLoading(false);
         return;
       }
 
       if (useProducedMaterials && producedMaterials.length === 0) {
-        setError('Please add at least one produced material or uncheck "Specify Produced Materials"');
+        setError(t('receiveProduction.messages.pleaseAddAtLeastOneProducedMaterial'));
         setIsLoading(false);
         return;
       }
@@ -222,12 +224,12 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
       // Add produced materials to inventory (only if specified)
       if (useProducedMaterials && producedMaterials.length > 0) {
         setIsAddingToInventory(true);
-        setInventoryUpdateStatus('Adding materials to inventory...');
+        setInventoryUpdateStatus(t('receiveProduction.messages.addingMaterialsToInventory'));
         
         const inventoryResults = [];
         for (const producedMaterial of producedMaterials) {
           try {
-            setInventoryUpdateStatus(`Adding ${producedMaterial.materialName} to inventory...`);
+            setInventoryUpdateStatus(t('receiveProduction.messages.addingMaterialToInventory', { materialName: producedMaterial.materialName }));
             await inventoryApi.addToExisting({
               materialId: producedMaterial.materialId,
               quantityToAdd: producedMaterial.quantity
@@ -250,12 +252,12 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
         const failed = inventoryResults.filter(r => !r.success).length;
         
         if (failed === 0) {
-          setInventoryUpdateStatus(`Successfully added ${successful} materials to inventory`);
+          setInventoryUpdateStatus(t('receiveProduction.messages.successfullyAddedMaterials', { count: successful }));
         } else {
-          setInventoryUpdateStatus(`Added ${successful} materials successfully, ${failed} failed`);
+          setInventoryUpdateStatus(t('receiveProduction.messages.addedMaterialsSuccessfullyFailed', { successful, failed }));
         }
       } else {
-        setInventoryUpdateStatus('Production completed using planned materials only');
+        setInventoryUpdateStatus(t('receiveProduction.messages.productionCompletedUsingPlannedMaterials'));
       }
 
       // Create an updated plan object with Completed status
@@ -269,7 +271,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
       onClose();
     } catch (error: any) {
       console.error('Error completing production:', error);
-      const errorMessage = error.response?.data?.message || 'Failed to complete production. Please try again.';
+      const errorMessage = error.response?.data?.message || t('receiveProduction.messages.failedToComplete');
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -279,9 +281,9 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
   const getStatusInfo = (status: ProductionPlanStatus) => {
     switch (status) {
       case ProductionPlanStatus.InProgress:
-        return { label: 'In Progress', color: 'status-in-progress', icon: Clock };
+        return { label: t('receiveProduction.status.inProgress'), color: 'status-in-progress', icon: Clock };
       default:
-        return { label: 'Unknown', color: 'status-draft', icon: Package };
+        return { label: t('receiveProduction.status.unknown'), color: 'status-draft', icon: Package };
     }
   };
 
@@ -295,7 +297,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
           <div className="header-content">
             <div className="header-title">
               <Truck className="header-icon" />
-              <h2>Complete Production</h2>
+              <h2>{t('receiveProduction.title')}</h2>
             </div>
             <button className="close-button" onClick={onClose}>
               <X size={20} />
@@ -327,17 +329,17 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
           <div className="form-section">
             <div className="section-header">
               <Package className="section-icon" />
-              <h3>Production Plan Overview</h3>
+              <h3>{t('receiveProduction.sections.productionPlanOverview')}</h3>
             </div>
             
             <div className="info-grid">
               <div className="info-item">
-                <label>Plan Name</label>
+                <label>{t('receiveProduction.fields.planName')}</label>
                 <div className="info-value">{plan.name}</div>
               </div>
               
               <div className="info-item">
-                <label>Target Product</label>
+                <label>{t('receiveProduction.fields.targetProduct')}</label>
                 <div className="info-value">
                   <div className="product-info">
                     <span className="product-name">{plan.targetProductName}</span>
@@ -347,15 +349,15 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
               </div>
               
               <div className="info-item">
-                <label>Started At</label>
+                <label>{t('receiveProduction.fields.startedAt')}</label>
                 <div className="info-value">
-                  {plan.startedAt ? formatDateTime(plan.startedAt) : 'Not started'}
+                  {plan.startedAt ? formatDateTime(plan.startedAt) : t('receiveProduction.labels.notStarted')}
                 </div>
               </div>
               
               <div className="info-item">
-                <label>Materials Required</label>
-                <div className="info-value">{plan.requiredMaterials.length} materials</div>
+                <label>{t('receiveProduction.fields.materialsRequired')}</label>
+                <div className="info-value">{plan.requiredMaterials.length} {t('receiveProduction.labels.materials')}</div>
               </div>
             </div>
           </div>
@@ -364,11 +366,11 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
           <div className="form-section">
             <div className="section-header">
               <CheckCircle className="section-icon" />
-              <h3>Final Production Results</h3>
+              <h3>{t('receiveProduction.sections.finalProductionResults')}</h3>
             </div>
             
             <div className="form-group">
-              <label htmlFor="actualQuantityProduced">Actual Quantity Produced *</label>
+              <label htmlFor="actualQuantityProduced">{t('receiveProduction.fields.actualQuantityProduced')} *</label>
               <input
                 type="number"
                 id="actualQuantityProduced"
@@ -379,15 +381,15 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                 step="0.01"
                 required
                 disabled={isLoading}
-                placeholder="Enter actual quantity produced"
+                placeholder={t('receiveProduction.placeholders.actualQuantityProduced')}
               />
               <div className="input-help">
-                Planned quantity: {plan.quantityToProduce} units
+                {t('receiveProduction.labels.plannedQuantity')} {plan.quantityToProduce} {t('receiveProduction.labels.units')}
               </div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="actualProductionTimeMinutes">Actual Production Time (minutes)</label>
+              <label htmlFor="actualProductionTimeMinutes">{t('receiveProduction.fields.actualProductionTimeMinutes')}</label>
               <input
                 type="number"
                 id="actualProductionTimeMinutes"
@@ -397,22 +399,22 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                 min="0"
                 step="1"
                 disabled={isLoading}
-                placeholder="Enter actual production time"
+                placeholder={t('receiveProduction.placeholders.actualProductionTime')}
               />
               <div className="input-help">
-                Optional: Record total time taken for the complete production process
+                {t('receiveProduction.labels.optionalRecordTime')}
               </div>
             </div>
 
             <div className="form-group">
-              <label htmlFor="notes">Production Notes</label>
+              <label htmlFor="notes">{t('receiveProduction.fields.productionNotes')}</label>
               <textarea
                 id="notes"
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
                 rows={3}
                 disabled={isLoading}
-                placeholder="Optional notes about the completed production, quality, issues, final results, etc."
+                placeholder={t('receiveProduction.placeholders.productionNotes')}
               />
             </div>
           </div>
@@ -421,7 +423,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
           <div className="form-section">
             <div className="section-header">
               <Package className="section-icon" />
-              <h3>Materials Produced</h3>
+              <h3>{t('receiveProduction.sections.materialsProduced')}</h3>
               <div className="section-toggle">
                 <label className="toggle-checkbox">
                   <input
@@ -430,12 +432,12 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                     onChange={(e) => setUseProducedMaterials(e.target.checked)}
                     disabled={isLoading}
                   />
-                  <span className="toggle-label">Specify Produced Materials</span>
+                  <span className="toggle-label">{t('receiveProduction.labels.specifyProducedMaterials')}</span>
                 </label>
                 <div className="toggle-help">
                   {useProducedMaterials 
-                    ? 'Add specific materials that were produced' 
-                    : 'Use only the materials from the production plan'
+                    ? t('receiveProduction.labels.addSpecificMaterials')
+                    : t('receiveProduction.labels.usePlannedMaterials')
                   }
                 </div>
               </div>
@@ -451,7 +453,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                   onClick={() => setMaterialMode('existing')}
                   disabled={isLoading}
                 >
-                  📦 Select Existing Material
+                  {t('receiveProduction.labels.selectExistingMaterial')}
                 </button>
                 <button 
                   type="button"
@@ -459,21 +461,21 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                   onClick={() => setMaterialMode('new')}
                   disabled={isLoading}
                 >
-                  ✨ Create New Material
+                  {t('receiveProduction.labels.createNewMaterial')}
                 </button>
               </div>
 
               {materialMode === 'existing' ? (
                 <div className="form-row">
                   <div className="form-group" style={{ flex: 2 }}>
-                    <label htmlFor="currentMaterial">Select Produced Material</label>
+                    <label htmlFor="currentMaterial">{t('receiveProduction.fields.selectProducedMaterial')}</label>
                     <select
                       id="currentMaterial"
                       value={currentMaterial.materialId}
                       onChange={(e) => setCurrentMaterial(prev => ({ ...prev, materialId: parseInt(e.target.value) }))}
                       disabled={isLoading}
                     >
-                      <option value={0}>-- Select a material --</option>
+                      <option value={0}>{t('receiveProduction.fields.selectMaterial')}</option>
                       {availableMaterials.map(material => (
                         <option key={material.id} value={material.id}>
                           {material.name} ({material.color}) - {material.quantityType}
@@ -482,7 +484,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                     </select>
                   </div>
                   <div className="form-group">
-                    <label htmlFor="materialQuantity">Quantity Produced</label>
+                    <label htmlFor="materialQuantity">{t('receiveProduction.fields.quantityProduced')}</label>
                     <input
                       type="number"
                       id="materialQuantity"
@@ -502,7 +504,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                       disabled={isLoading}
                     >
                       <Plus size={16} />
-                      Add
+                      {t('receiveProduction.buttons.add')}
                     </button>
                   </div>
                 </div>
@@ -510,27 +512,27 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                 <div className="new-material-form">
                   <div className="form-row">
                     <div className="form-group">
-                      <label htmlFor="newMaterialName">Material Name *</label>
+                      <label htmlFor="newMaterialName">{t('receiveProduction.fields.materialName')} *</label>
                       <input
                         type="text"
                         id="newMaterialName"
                         name="name"
                         value={newMaterialData.name}
                         onChange={handleNewMaterialChange}
-                        placeholder="e.g., Steel Sheets, Paint, Screws"
+                        placeholder={t('receiveProduction.placeholders.materialName')}
                         required
                         disabled={isLoading}
                       />
                     </div>
                     <div className="form-group">
-                      <label htmlFor="newMaterialColor">Color *</label>
+                      <label htmlFor="newMaterialColor">{t('receiveProduction.fields.color')} *</label>
                       <input
                         type="text"
                         id="newMaterialColor"
                         name="color"
                         value={newMaterialData.color}
                         onChange={handleNewMaterialChange}
-                        placeholder="e.g., Silver, Black, Red"
+                        placeholder={t('receiveProduction.placeholders.color')}
                         required
                         disabled={isLoading}
                       />
@@ -539,7 +541,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label htmlFor="newMaterialType">Material Type *</label>
+                      <label htmlFor="newMaterialType">{t('receiveProduction.fields.materialType')} *</label>
                       <select
                         id="newMaterialType"
                         name="type"
@@ -548,20 +550,20 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                         required
                         disabled={isLoading}
                       >
-                        <option value={MaterialType.RawMaterial}>Raw Material</option>
-                        <option value={MaterialType.RecyclableMaterial}>Recyclable Material</option>
-                        <option value={MaterialType.FinishedProduct}>Finished Product</option>
+                        <option value={MaterialType.RawMaterial}>{t('receiveProduction.labels.rawMaterial')}</option>
+                        <option value={MaterialType.RecyclableMaterial}>{t('receiveProduction.labels.recyclableMaterial')}</option>
+                        <option value={MaterialType.FinishedProduct}>{t('receiveProduction.labels.finishedProduct')}</option>
                       </select>
                     </div>
                     <div className="form-group">
-                      <label htmlFor="newMaterialQuantityType">Unit Type *</label>
+                      <label htmlFor="newMaterialQuantityType">{t('receiveProduction.fields.unitType')} *</label>
                       <input
                         type="text"
                         id="newMaterialQuantityType"
                         name="quantityType"
                         value={newMaterialData.quantityType}
                         onChange={handleNewMaterialChange}
-                        placeholder="e.g., kg, liters, pieces"
+                        placeholder={t('receiveProduction.placeholders.unitType')}
                         required
                         disabled={isLoading}
                       />
@@ -570,7 +572,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
 
                   <div className="form-row">
                     <div className="form-group">
-                      <label htmlFor="newMaterialQuantity">Quantity Produced *</label>
+                      <label htmlFor="newMaterialQuantity">{t('receiveProduction.fields.quantityProduced')} *</label>
                       <input
                         type="number"
                         id="newMaterialQuantity"
@@ -591,19 +593,19 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                         disabled={isLoading}
                       >
                         <Plus size={16} />
-                        Create & Add
+                        {t('receiveProduction.buttons.createAndAdd')}
                       </button>
                     </div>
                   </div>
 
                   <div className="form-group">
-                    <label htmlFor="newMaterialDescription">Description</label>
+                    <label htmlFor="newMaterialDescription">{t('receiveProduction.fields.description')}</label>
                     <textarea
                       id="newMaterialDescription"
                       name="description"
                       value={newMaterialData.description}
                       onChange={handleNewMaterialChange}
-                      placeholder="Optional description of the material..."
+                      placeholder={t('receiveProduction.placeholders.description')}
                       rows={2}
                       disabled={isLoading}
                     />
@@ -615,14 +617,14 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
 
             {useProducedMaterials && producedMaterials.length > 0 && (
               <div className="produced-materials">
-                <h4>Produced Materials:</h4>
+                <h4>{t('receiveProduction.fields.producedMaterials')}</h4>
                 <table className="materials-table">
                   <thead>
                     <tr>
-                      <th>Material</th>
-                      <th>Type</th>
-                      <th>Quantity</th>
-                      <th>Actions</th>
+                      <th>{t('receiveProduction.fields.material')}</th>
+                      <th>{t('receiveProduction.fields.type')}</th>
+                      <th>{t('receiveProduction.fields.quantity')}</th>
+                      <th>{t('common:table.actions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -637,8 +639,8 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                         <td>
                           <span className={`material-type-badge ${material.materialType === MaterialType.RawMaterial ? 'raw-material' : 
                             material.materialType === MaterialType.RecyclableMaterial ? 'recyclable-material' : 'finished-product'}`}>
-                            {material.materialType === MaterialType.RawMaterial ? 'Raw Material' : 
-                             material.materialType === MaterialType.RecyclableMaterial ? 'Recyclable' : 'Finished Product'}
+                            {material.materialType === MaterialType.RawMaterial ? t('receiveProduction.labels.rawMaterial') : 
+                             material.materialType === MaterialType.RecyclableMaterial ? t('receiveProduction.labels.recyclableMaterial') : t('receiveProduction.labels.finishedProduct')}
                           </span>
                         </td>
                         <td>
@@ -676,17 +678,17 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
           <div className="form-section">
             <div className="section-header">
               <Package className="section-icon" />
-              <h3>Materials Used</h3>
+              <h3>{t('receiveProduction.sections.materialsUsed')}</h3>
             </div>
             
             <div className="materials-summary">
               <table className="materials-table">
                 <thead>
                   <tr>
-                    <th>Material</th>
-                    <th>Required (per unit)</th>
-                    <th>Total Used</th>
-                    <th>Status</th>
+                    <th>{t('receiveProduction.fields.material')}</th>
+                    <th>{t('receiveProduction.fields.requiredPerUnit')}</th>
+                    <th>{t('receiveProduction.fields.totalUsed')}</th>
+                    <th>{t('receiveProduction.fields.status')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -709,11 +711,11 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                             {isAvailable ? (
                               <>
                                 <CheckCircle size={14} />
-                                <span>Available</span>
+                                <span>{t('receiveProduction.labels.available')}</span>
                               </>
                             ) : (
                               <>
-                                <span>Insufficient</span>
+                                <span>{t('receiveProduction.labels.insufficient')}</span>
                               </>
                             )}
                           </div>
@@ -733,14 +735,14 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
               className="btn btn-secondary"
               disabled={isLoading}
             >
-              Cancel
+              {t('receiveProduction.buttons.cancel')}
             </button>
             <button
               type="submit"
               className="btn btn-success"
               disabled={isLoading || actualQuantityProduced <= 0 || isAddingToInventory}
             >
-              {isLoading ? 'Completing...' : isAddingToInventory ? 'Adding to Inventory...' : 'Complete Production'}
+              {isLoading ? t('receiveProduction.buttons.completing') : isAddingToInventory ? t('receiveProduction.buttons.addingToInventory') : t('receiveProduction.buttons.completeProduction')}
             </button>
           </div>
         </form>

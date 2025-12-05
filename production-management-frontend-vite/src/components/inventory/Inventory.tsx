@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   Package, 
   AlertTriangle, 
@@ -29,6 +30,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import './Inventory.css';
 
 const Inventory: React.FC = () => {
+  const { t } = useTranslation(['inventory', 'common']);
   const [pagedData, setPagedData] = useState<PagedResult<RawMaterial> | null>(null);
   const [statistics, setStatistics] = useState<InventoryStatistics | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -74,7 +76,7 @@ const Inventory: React.FC = () => {
       setPagedData(pagedResponse.data);
       setStatistics(statsResponse.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load inventory data');
+      setError(err.response?.data?.message || t('messages.failedToLoad'));
     } finally {
       setIsLoading(false);
     }
@@ -166,7 +168,7 @@ const Inventory: React.FC = () => {
     return (
       <div className="inventory-loading">
         <Loader2 size={32} className="animate-spin" />
-        <p>Loading inventory...</p>
+        <p>{t('loading')}</p>
       </div>
     );
   }
@@ -176,7 +178,7 @@ const Inventory: React.FC = () => {
       <div className="inventory-header">
         <h1>
           <Package size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-          Inventory Management
+          {t('inventoryManagement')}
         </h1>
         <ProtectedButton
           requiredPermission={Permissions.AddMaterial}
@@ -184,7 +186,7 @@ const Inventory: React.FC = () => {
           onClick={() => setShowAddModal(true)}
         >
           <Plus size={16} />
-          Add Material
+          {t('addMaterial')}
         </ProtectedButton>
       </div>
 
@@ -197,7 +199,7 @@ const Inventory: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.totalMaterials}</div>
-              <div className="stat-label">Total Materials</div>
+              <div className="stat-label">{t('statistics.totalMaterials')}</div>
             </div>
           </div>
           <div className={`stat-card ${statistics.lowStockCount > 0 ? 'warning' : ''}`}>
@@ -206,7 +208,7 @@ const Inventory: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.lowStockCount}</div>
-              <div className="stat-label">Low Stock</div>
+              <div className="stat-label">{t('statistics.lowStock')}</div>
             </div>
           </div>
           <div className={`stat-card ${statistics.insufficientStockCount > 0 ? 'error' : ''}`}>
@@ -215,8 +217,8 @@ const Inventory: React.FC = () => {
             </div>
             <div className="stat-content">
               <div className="stat-number">{statistics.insufficientStockCount}</div>
-              <div className="stat-label">Insufficient Stock</div>
-              <div className="stat-description">Pending requests exceed available quantity</div>
+              <div className="stat-label">{t('statistics.insufficientStock')}</div>
+              <div className="stat-description">{t('statistics.insufficientStockDescription')}</div>
             </div>
           </div>
         </div>
@@ -228,7 +230,7 @@ const Inventory: React.FC = () => {
           <Search size={16} className="search-icon" />
           <input
             type="text"
-            placeholder="Search materials..."
+            placeholder={t('searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => {
               setSearchTerm(e.target.value);
@@ -247,7 +249,7 @@ const Inventory: React.FC = () => {
               setCurrentPage(1);
             }}
           >
-            Raw Materials
+            {t('filters.rawMaterials')}
           </button>
           <button
             className={`filter-btn ${filterBy === MaterialType.RecyclableMaterial ? 'active' : ''}`}
@@ -256,7 +258,7 @@ const Inventory: React.FC = () => {
               setCurrentPage(1);
             }}
           >
-            Recyclable Materials
+            {t('filters.recyclableMaterials')}
           </button>
           <button
             className={`filter-btn ${filterBy === MaterialType.FinishedProduct ? 'active' : ''}`}
@@ -265,7 +267,7 @@ const Inventory: React.FC = () => {
               setCurrentPage(1);
             }}
           >
-            Finished Products
+            {t('filters.finishedProducts')}
           </button>
         </div>
         
@@ -279,7 +281,7 @@ const Inventory: React.FC = () => {
                 setCurrentPage(1);
               }}
             />
-            <span>Show Inactive Materials</span>
+            <span>{t('showInactiveMaterials')}</span>
           </label>
         </div>
       </div>
@@ -297,28 +299,28 @@ const Inventory: React.FC = () => {
             <tr>
               <th className="sortable" onClick={() => handleSort('Name')}>
                 <div className="th-content">
-                  <span>Material</span>
+                  <span>{t('table.material')}</span>
                   {getSortIcon('Name')}
                 </div>
               </th>
-              <th>Color</th>
+              <th>{t('table.color')}</th>
               <th className="sortable" onClick={() => handleSort('Quantity')}>
                 <div className="th-content">
-                  <span>In Stock</span>
+                  <span>{t('table.inStock')}</span>
                   {getSortIcon('Quantity')}
                 </div>
               </th>
-              <th>Requested</th>
-              <th>Available</th>
-              <th>Min. Stock</th>
-              <th>Status</th>
+              <th>{t('table.requested')}</th>
+              <th>{t('table.available')}</th>
+              <th>{t('table.minStock')}</th>
+              <th>{t('table.status')}</th>
               <th className="sortable" onClick={() => handleSort('Updated')}>
                 <div className="th-content">
-                  <span>Last Updated</span>
+                  <span>{t('table.lastUpdated')}</span>
                   {getSortIcon('Updated')}
                 </div>
               </th>
-              <th>Actions</th>
+              <th>{t('table.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -326,8 +328,8 @@ const Inventory: React.FC = () => {
               <tr>
                 <td colSpan={10} className="no-materials">
                   {searchTerm 
-                    ? 'No materials found matching your criteria.' 
-                    : 'No materials in this category. Add some materials to get started.'}
+                    ? t('emptyState.noMaterialsFound')
+                    : t('emptyState.noMaterialsInCategory')}
                 </td>
               </tr>
             ) : (
@@ -371,14 +373,14 @@ const Inventory: React.FC = () => {
                     </div>
                     {material.isLowStock && (
                       <div className="low-stock-indicator">
-                        {isInsufficient ? 'Insufficient!' : 'Low Stock!'}
+                        {isInsufficient ? t('status.insufficient') : t('status.lowStock')}
                       </div>
                     )}
                   </td>
                   <td>{material.minimumStock.toLocaleString()} {material.quantityType}</td>
                   <td className="status-cell">
                     <span className={`status-badge ${material.isActive ? 'status-active' : 'status-inactive'}`}>
-                      {material.isActive ? 'Active' : 'Inactive'}
+                      {material.isActive ? t('status.active') : t('status.inactive')}
                     </span>
                   </td>
                   <td>{formatDate(material.updatedAt)}</td>
@@ -387,7 +389,7 @@ const Inventory: React.FC = () => {
                       <ProtectedButton
                         requiredPermission={Permissions.ViewMaterial}
                         className="btn btn-sm btn-info" 
-                        title="View Material"
+                        title={t('actions.view')}
                         onClick={() => handleViewMaterial(material)}
                       >
                         <Eye size={16} />
@@ -395,7 +397,7 @@ const Inventory: React.FC = () => {
                       <ProtectedButton
                         requiredPermission={Permissions.EditMaterial}
                         className="btn btn-sm btn-warning" 
-                        title="Edit Material"
+                        title={t('actions.edit')}
                         onClick={() => handleEditMaterial(material)}
                       >
                         <Edit size={16} />
@@ -404,7 +406,7 @@ const Inventory: React.FC = () => {
                         <ProtectedButton
                           requiredPermission={Permissions.DeactivateMaterial}
                           className="btn btn-sm btn-danger" 
-                          title={material.quantity > 0 ? "Cannot deactivate - stock must be 0" : "Deactivate Material"}
+                          title={material.quantity > 0 ? t('actions.cannotDeactivate') : t('actions.deactivate')}
                           onClick={() => handleDeleteMaterial(material)}
                           disabled={material.quantity > 0}
                         >
@@ -414,7 +416,7 @@ const Inventory: React.FC = () => {
                         <ProtectedButton
                           requiredPermission={Permissions.ActivateMaterial}
                           className="btn btn-sm btn-success" 
-                          title="Activate Material"
+                          title={t('actions.activate')}
                           onClick={() => handleActivateMaterial(material)}
                         >
                           <CheckCircle size={16} />
@@ -434,7 +436,11 @@ const Inventory: React.FC = () => {
       {pagedData && pagedData.totalPages > 0 && (
         <div className="pagination-container">
           <div className="pagination-info">
-            Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} materials
+            {t('pagination.showing', {
+              start: ((pagedData.page - 1) * pagedData.pageSize) + 1,
+              end: Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount),
+              total: pagedData.totalCount
+            })}
           </div>
           
           <div className="pagination-controls">
@@ -443,7 +449,7 @@ const Inventory: React.FC = () => {
               onClick={() => setCurrentPage(1)}
               disabled={!pagedData.hasPreviousPage}
             >
-              First
+              {t('pagination.first')}
             </button>
             <button
               className="pagination-btn"
@@ -451,7 +457,7 @@ const Inventory: React.FC = () => {
               disabled={!pagedData.hasPreviousPage}
             >
               <ChevronLeft size={16} />
-              Previous
+              {t('pagination.previous')}
             </button>
             
             <div className="pagination-pages">
@@ -484,7 +490,7 @@ const Inventory: React.FC = () => {
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={!pagedData.hasNextPage}
             >
-              Next
+              {t('pagination.next')}
               <ChevronRight size={16} />
             </button>
             <button
@@ -492,12 +498,12 @@ const Inventory: React.FC = () => {
               onClick={() => setCurrentPage(pagedData.totalPages)}
               disabled={!pagedData.hasNextPage}
             >
-              Last
+              {t('pagination.last')}
             </button>
           </div>
           
           <div className="page-size-selector">
-            <label>Show:</label>
+            <label>{t('pagination.show')}</label>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -510,7 +516,7 @@ const Inventory: React.FC = () => {
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span>per page</span>
+            <span>{t('pagination.perPage')}</span>
           </div>
         </div>
       )}

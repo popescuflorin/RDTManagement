@@ -1,7 +1,193 @@
 {
   "title": "Inventar",
-  "addMaterial": "Adaugă material",
-  "editMaterial": "Editează material",
-  "viewMaterial": "Vizualizează material"
+  "inventoryManagement": "Gestionare Inventar",
+  "addMaterial": "Adaugă Material",
+  "editMaterial": "Editează Material",
+  "viewMaterial": "Vizualizează Material",
+  "loading": "Se încarcă inventarul...",
+  "searchPlaceholder": "Caută materiale...",
+  "showInactiveMaterials": "Afișează Materiale Inactive",
+  "table": {
+    "material": "Material",
+    "color": "Culoare",
+    "inStock": "În Stoc",
+    "requested": "Solicitat",
+    "available": "Disponibil",
+    "minStock": "Stoc Min.",
+    "status": "Status",
+    "lastUpdated": "Ultima Actualizare",
+    "actions": "Acțiuni"
+  },
+  "statistics": {
+    "totalMaterials": "Total Materiale",
+    "lowStock": "Stoc Redus",
+    "insufficientStock": "Stoc Insuficient",
+    "insufficientStockDescription": "Cererile în așteptare depășesc cantitatea disponibilă"
+  },
+  "filters": {
+    "rawMaterials": "Materii Prime",
+    "recyclableMaterials": "Materiale Reciclabile",
+    "finishedProducts": "Produse Finite"
+  },
+  "status": {
+    "active": "Activ",
+    "inactive": "Inactiv",
+    "lowStock": "Stoc Redus!",
+    "insufficient": "Insuficient!"
+  },
+  "emptyState": {
+    "noMaterialsFound": "Nu s-au găsit materiale care să corespundă criteriilor tale.",
+    "noMaterialsInCategory": "Nu există materiale în această categorie. Adaugă materiale pentru a începe."
+  },
+  "pagination": {
+    "showing": "Se afișează {{start}} până la {{end}} din {{total}} materiale",
+    "first": "Primul",
+    "previous": "Anterior",
+    "next": "Următor",
+    "last": "Ultimul",
+    "show": "Afișează:",
+    "perPage": "pe pagină"
+  },
+  "actions": {
+    "view": "Vizualizează Material",
+    "edit": "Editează Material",
+    "deactivate": "Dezactivează Material",
+    "activate": "Activează Material",
+    "cannotDeactivate": "Nu se poate dezactiva - stocul trebuie să fie 0"
+  },
+  "messages": {
+    "failedToLoad": "Eșec la încărcarea datelor inventarului"
+  },
+  "form": {
+    "addTitle": "Adaugă Material în Inventar",
+    "modes": {
+      "createNew": "Creează Material Nou",
+      "addToExisting": "Adaugă la Existent"
+    },
+    "sections": {
+      "quickSelect": "Selectare Rapidă din Tipuri Existente:",
+      "orCreateNew": "SAU Creează Material Complet Nou"
+    },
+    "fields": {
+      "materialName": "Nume Material",
+      "color": "Culoare",
+      "materialType": "Tip Material",
+      "unitType": "Tip Unitate",
+      "initialQuantity": "Cantitate Inițială",
+      "minimumStockLevel": "Nivel Stoc Minim",
+      "description": "Descriere",
+      "selectExistingMaterial": "Selectează Material Existent",
+      "quantityToAdd": "Cantitate de Adăugat"
+    },
+    "placeholders": {
+      "materialName": "ex: Foi de Oțel, Vopsea, Șuruburi",
+      "color": "ex: Argintiu, Negru, Roșu",
+      "unitType": "ex: kg, litri, bucăți",
+      "description": "Descriere opțională a materialului...",
+      "chooseMaterial": "Alege material pentru reîncărcare...",
+      "quantity": "Cantitate"
+    },
+    "labels": {
+      "selectedMaterial": "Material Selectat:",
+      "name": "Nume:",
+      "color": "Culoare:",
+      "type": "Tip:",
+      "currentStock": "Stoc Actual:",
+      "lowStock": "Stoc Redus!",
+      "current": "Actual:"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "createMaterial": "Creează Material",
+      "addToStock": "Adaugă în Stoc",
+      "adding": "Se adaugă..."
+    },
+    "messages": {
+      "failedToLoadData": "Eșec la încărcarea datelor materialului. Te rugăm să încerci din nou.",
+      "failedToAdd": "Eșec la adăugarea materialului. Te rugăm să încerci din nou."
+    }
+  },
+  "edit": {
+    "title": "Editează Material",
+    "currentMaterial": "Material Actual:",
+    "fields": {
+      "currentQuantity": "Cantitate Actuală",
+      "lastUpdated": "Ultima Actualizare"
+    },
+    "stockIndicators": {
+      "lowStockWarning": "Avertisment Stoc Redus! ({{quantity}} ≤ {{minimum}})",
+      "stockLevelOk": "Nivel Stoc OK ({{quantity}} > {{minimum}})"
+    },
+    "buttons": {
+      "cancel": "Anulează",
+      "updateMaterial": "Actualizează Material",
+      "updating": "Se actualizează..."
+    },
+    "messages": {
+      "failedToUpdate": "Eșec la actualizarea materialului. Te rugăm să încerci din nou."
+    }
+  },
+  "view": {
+    "title": "Vizualizează Material",
+    "materialInformation": "Informații Material:",
+    "fields": {
+      "materialName": "Nume Material",
+      "color": "Culoare",
+      "materialType": "Tip Material",
+      "unitType": "Tip Unitate",
+      "currentQuantity": "Cantitate Actuală",
+      "minimumStockLevel": "Nivel Stoc Minim",
+      "description": "Descriere"
+    },
+    "stockIndicators": {
+      "lowStockWarning": "Avertisment Stoc Redus! ({{quantity}} ≤ {{minimum}})",
+      "stockLevelOk": "Nivel Stoc OK ({{quantity}} > {{minimum}})"
+    },
+    "buttons": {
+      "close": "Închide"
+    }
+  },
+  "activate": {
+    "title": "Activează Material",
+    "confirmationText": "Ești sigur că vrei să activezi acest material? Materialul va fi marcat ca activ și va apărea în listele de inventar active.",
+    "materialDetails": "Detalii Material:",
+    "labels": {
+      "name": "Nume:",
+      "type": "Tip:",
+      "currentStock": "Stoc Actual:",
+      "minimumStock": "Stoc Minim:",
+      "lastUpdated": "Ultima Actualizare:",
+      "description": "Descriere:"
+    },
+    "note": "Notă: Odată activat, acest material va fi disponibil pentru utilizare în producție și va apărea în toate listele de inventar active.",
+    "buttons": {
+      "cancel": "Anulează",
+      "activateMaterial": "Activează Material",
+      "activating": "Se activează..."
+    },
+    "messages": {
+      "failedToActivate": "Eșec la activarea materialului. Te rugăm să încerci din nou."
+    }
+  },
+  "deactivate": {
+    "title": "Dezactivează Material",
+    "confirmationText": "Ești sigur că vrei să dezactivezi acest material? Materialul va fi marcat ca inactiv și va fi eliminat din listele de inventar active.",
+    "materialDetails": "Detalii Material:",
+    "labels": {
+      "name": "Nume:",
+      "type": "Tip:",
+      "currentStock": "Stoc Actual:",
+      "lastUpdated": "Ultima Actualizare:",
+      "description": "Descriere:"
+    },
+    "note": "Notă: Acest material poate fi dezactivat doar pentru că stocul său actual este 0. Materialele dezactivate pot fi reactivate mai târziu prin funcția de editare.",
+    "buttons": {
+      "cancel": "Anulează",
+      "deactivateMaterial": "Dezactivează Material",
+      "deactivating": "Se dezactivează..."
+    },
+    "messages": {
+      "failedToDeactivate": "Eșec la dezactivarea materialului. Te rugăm să încerci din nou."
+    }
+  }
 }
-

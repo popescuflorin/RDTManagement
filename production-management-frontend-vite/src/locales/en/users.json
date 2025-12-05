@@ -1,5 +1,222 @@
 {
   "title": "Users",
-  "manageUsers": "User Management"
+  "manageUsers": "User Management",
+  "userManagement": {
+    "title": "User & Role Management",
+    "subtitle": "Manage system users, roles, and permissions",
+    "tabs": {
+      "users": "Users",
+      "roles": "Roles & Permissions"
+    },
+    "buttons": {
+      "addNewUser": "Add New User",
+      "createNewRole": "Create New Role",
+      "tryAgain": "Try Again"
+    },
+    "search": {
+      "placeholder": "Search users by name, email, username, or role...",
+      "usersFound": "{{count}} user found",
+      "usersFound_plural": "{{count}} users found"
+    },
+    "table": {
+      "avatar": "Avatar",
+      "name": "Name",
+      "username": "Username",
+      "email": "Email",
+      "role": "Role",
+      "lastLogin": "Last Login",
+      "status": "Status",
+      "actions": "Actions",
+      "roleColumn": "Role",
+      "description": "Description",
+      "permissionsCount": "Permissions Count",
+      "users": "Users"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "tooltips": {
+      "editUser": "Edit User",
+      "deactivateUser": "Deactivate User",
+      "activateUser": "Activate User",
+      "viewDetails": "View Details",
+      "editPermissions": "Edit Permissions"
+    },
+    "empty": {
+      "noUsersFound": "No users found",
+      "noUsersMatch": "No users match \"{{searchTerm}}\". Try adjusting your search.",
+      "noUsersInSystem": "No users in the system yet.",
+      "addFirstUser": "Add First User",
+      "noRolesFound": "No roles found",
+      "noRolesConfigured": "No roles configured in the system."
+    },
+    "loading": {
+      "loadingUsers": "Loading users...",
+      "loadingRoles": "Loading roles..."
+    },
+    "messages": {
+      "failedToLoadUsers": "Failed to load users. Please try again.",
+      "never": "Never"
+    },
+    "labels": {
+      "id": "ID:",
+      "permissions": "permissions",
+      "users": "users",
+      "noDescription": "No description available"
+    }
+  },
+  "adminRegister": {
+    "title": "Create New User Account",
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "role": "Role"
+    },
+    "placeholders": {
+      "firstName": "Enter first name",
+      "lastName": "Enter last name",
+      "username": "Enter username",
+      "email": "Enter email address",
+      "password": "Enter password"
+    },
+    "labels": {
+      "enableEmailNotifications": "Enable Email Notifications",
+      "emailNotificationsDescription": "User will receive email notifications for acquisitions and system events",
+      "selectRole": "Select a role",
+      "loadingRoles": "Loading roles...",
+      "noRolesAvailable": "No roles available"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "createUser": "Create User",
+      "creating": "Creating...",
+      "loading": "Loading..."
+    },
+    "messages": {
+      "failedToLoadRoles": "Failed to load roles. Please try again.",
+      "failedToCreateUser": "Failed to create user. Please try again."
+    }
+  },
+  "editUser": {
+    "title": "Edit User",
+    "fields": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "username": "Username",
+      "email": "Email",
+      "role": "Role"
+    },
+    "labels": {
+      "enableEmailNotifications": "Enable Email Notifications",
+      "emailNotificationsDescription": "User will receive email notifications for acquisitions and system events",
+      "selectRole": "Select Role"
+    },
+    "roleOptions": {
+      "admin": "Admin",
+      "manager": "Manager",
+      "user": "User"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "updateUser": "Update User",
+      "updating": "Updating..."
+    },
+    "messages": {
+      "failedToUpdateUser": "Failed to update user. Please try again."
+    }
+  },
+  "activateUser": {
+    "title": "Activate User",
+    "confirmation": "Are you sure you want to activate this user account?",
+    "labels": {
+      "role": "Role:"
+    },
+    "info": {
+      "title": "Activating this user will:",
+      "restoreAccess": "Restore their access to the system",
+      "allowLogin": "Allow them to log in again",
+      "enablePermissions": "Enable all their previous permissions"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "activateUser": "Activate User",
+      "activating": "Activating..."
+    },
+    "messages": {
+      "failedToActivateUser": "Failed to activate user. Please try again."
+    }
+  },
+  "deleteConfirmation": {
+    "title": "Deactivate User",
+    "confirmation": "Are you sure you want to deactivate this user account?",
+    "labels": {
+      "role": "Role:"
+    },
+    "warning": {
+      "title": "Warning:",
+      "deactivatingWill": "Deactivating this user will:",
+      "blockAccess": "Block their access to the system",
+      "preventLogin": "Prevent them from logging in",
+      "keepData": "Keep their data for record-keeping",
+      "canReactivate": "Can be reactivated later by editing the user"
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "deactivateUser": "Deactivate User",
+      "deactivating": "Deactivating..."
+    },
+    "messages": {
+      "failedToDeleteUser": "Failed to delete user. Please try again."
+    }
+  },
+  "createRole": {
+    "title": "Create New Role",
+    "fields": {
+      "roleName": "Role Name",
+      "description": "Description"
+    },
+    "placeholders": {
+      "roleName": "e.g., Supervisor, Operator, Analyst",
+      "description": "Brief description of this role's purpose and responsibilities"
+    },
+    "labels": {
+      "assignPermissions": "Assign Permissions",
+      "selected": "Selected",
+      "of": "of",
+      "permissions": "permissions",
+      "loadingPermissions": "Loading permissions..."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "createRole": "Create Role",
+      "creating": "Creating..."
+    },
+    "messages": {
+      "roleNameRequired": "Role name is required",
+      "failedToLoadPermissions": "Failed to load permissions",
+      "failedToCreateRole": "Failed to create role"
+    }
+  },
+  "editRolePermissions": {
+    "title": "Edit {{role}} Permissions",
+    "labels": {
+      "selected": "Selected",
+      "of": "of",
+      "permissions": "permissions",
+      "loadingPermissions": "Loading permissions..."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "savePermissions": "Save Permissions",
+      "saving": "Saving..."
+    },
+    "messages": {
+      "failedToLoadPermissions": "Failed to load permissions",
+      "failedToSavePermissions": "Failed to save permissions"
+    }
+  }
 }
-

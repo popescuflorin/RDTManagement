@@ -1,7 +1,163 @@
 {
   "title": "Clients",
-  "createClient": "Create New Client",
-  "editClient": "Edit Client",
-  "viewClient": "View Client"
+  "clients": {
+    "title": "Clients",
+    "buttons": {
+      "createNewClient": "Create New Client"
+    },
+    "search": {
+      "placeholder": "Search by name, contact, email, phone, city, or country..."
+    },
+    "filters": {
+      "showInactive": "Show Inactive"
+    },
+    "table": {
+      "id": "ID",
+      "name": "Name",
+      "contact": "Contact",
+      "location": "Location",
+      "totalOrders": "Total Orders",
+      "totalValue": "Total Value",
+      "status": "Status",
+      "createdAt": "Created At",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "tooltips": {
+      "viewClient": "View Client",
+      "editClient": "Edit Client",
+      "deactivateClient": "Deactivate Client"
+    },
+    "empty": {
+      "noClientsFound": "No clients found matching your criteria",
+      "noClientsCreateFirst": "No clients found. Create your first client!"
+    },
+    "loading": {
+      "loadingClients": "Loading clients..."
+    },
+    "pagination": {
+      "showing": "Showing {{start}} to {{end}} of {{total}} clients",
+      "first": "First",
+      "previous": "Previous",
+      "next": "Next",
+      "last": "Last",
+      "show": "Show:",
+      "perPage": "per page"
+    },
+    "summary": {
+      "totalClients": "Total Clients:",
+      "active": "Active:",
+      "inactive": "Inactive:",
+      "of": "of"
+    },
+    "messages": {
+      "failedToLoadClients": "Failed to load clients",
+      "failedToDeactivateClient": "Failed to deactivate client",
+      "confirmDeactivate": "Are you sure you want to deactivate client \"{{name}}\"?",
+      "notSet": "—"
+    }
+  },
+  "createClient": {
+    "title": "Create New Client",
+    "fields": {
+      "clientName": "Client Name",
+      "contactPerson": "Contact Person",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "notes": "Notes"
+    },
+    "placeholders": {
+      "clientName": "Enter client name",
+      "contactPerson": "Enter contact person name",
+      "email": "Enter email address",
+      "phone": "Enter phone number",
+      "address": "Enter street address",
+      "city": "Enter city",
+      "postalCode": "Enter postal code",
+      "country": "Enter country",
+      "notes": "Optional notes about the client..."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "createClient": "Create Client",
+      "creating": "Creating..."
+    },
+    "messages": {
+      "clientNameRequired": "Client name is required",
+      "failedToCreate": "Failed to create client"
+    }
+  },
+  "editClient": {
+    "title": "Edit Client",
+    "fields": {
+      "clientName": "Client Name",
+      "contactPerson": "Contact Person",
+      "email": "Email",
+      "phone": "Phone",
+      "address": "Address",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "notes": "Notes",
+      "active": "Active"
+    },
+    "placeholders": {
+      "clientName": "Enter client name",
+      "contactPerson": "Enter contact person name",
+      "email": "Enter email address",
+      "phone": "Enter phone number",
+      "address": "Enter street address",
+      "city": "Enter city",
+      "postalCode": "Enter postal code",
+      "country": "Enter country",
+      "notes": "Optional notes about the client..."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "updateClient": "Update Client",
+      "updating": "Updating..."
+    },
+    "messages": {
+      "clientNameRequired": "Client name is required",
+      "failedToUpdate": "Failed to update client"
+    }
+  },
+  "viewClient": {
+    "title": "Client Details",
+    "sections": {
+      "basicInformation": "Basic Information",
+      "contactInformation": "Contact Information",
+      "address": "Address",
+      "statistics": "Statistics",
+      "notes": "Notes",
+      "metadata": "Metadata"
+    },
+    "fields": {
+      "name": "Name",
+      "contactPerson": "Contact Person",
+      "status": "Status",
+      "email": "Email",
+      "phone": "Phone",
+      "streetAddress": "Street Address",
+      "city": "City",
+      "postalCode": "Postal Code",
+      "country": "Country",
+      "totalOrders": "Total Orders",
+      "totalOrderValue": "Total Order Value",
+      "lastOrderDate": "Last Order Date",
+      "createdBy": "Created By",
+      "createdAt": "Created At",
+      "updatedAt": "Updated At"
+    },
+    "buttons": {
+      "close": "Close"
+    }
+  }
 }
-

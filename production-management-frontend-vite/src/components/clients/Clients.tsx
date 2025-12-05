@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { 
   UserCircle, 
   Plus, 
@@ -23,6 +24,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import './Clients.css';
 
 const Clients: React.FC = () => {
+  const { t } = useTranslation(['clients', 'common']);
   const [pagedData, setPagedData] = useState<PagedResult<Client> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +74,7 @@ const Clients: React.FC = () => {
       });
       setPagedData(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load clients');
+      setError(err.response?.data?.message || t('clients.messages.failedToLoadClients'));
     } finally {
       setIsLoading(false);
     }
@@ -115,7 +117,7 @@ const Clients: React.FC = () => {
   };
 
   const handleDeleteClient = async (client: Client) => {
-    if (!window.confirm(`Are you sure you want to deactivate client "${client.name}"?`)) {
+    if (!window.confirm(t('clients.messages.confirmDeactivate', { name: client.name }))) {
       return;
     }
 
@@ -124,7 +126,7 @@ const Clients: React.FC = () => {
       await clientApi.deleteClient(client.id);
       await loadData();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to deactivate client');
+      setError(err.response?.data?.message || t('clients.messages.failedToDeactivateClient'));
     } finally {
       setIsDeleting(false);
     }
@@ -151,7 +153,7 @@ const Clients: React.FC = () => {
     return (
       <div className="clients-loading">
         <Loader2 size={32} className="animate-spin" />
-        <p>Loading clients...</p>
+        <p>{t('clients.loading.loadingClients')}</p>
       </div>
     );
   }
@@ -161,7 +163,7 @@ const Clients: React.FC = () => {
       <div className="clients-header">
         <h1>
           <UserCircle size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-          Clients
+          {t('clients.title')}
         </h1>
         <ProtectedButton
           requiredPermission={Permissions.CreateClient}
@@ -169,7 +171,7 @@ const Clients: React.FC = () => {
           onClick={handleCreateClient}
         >
           <Plus size={16} />
-          Create New Client
+          {t('clients.buttons.createNewClient')}
         </ProtectedButton>
       </div>
 
@@ -180,7 +182,7 @@ const Clients: React.FC = () => {
             <Search size={20} className="search-icon" />
             <input
               type="text"
-              placeholder="Search by name, contact, email, phone, city, or country..."
+              placeholder={t('clients.search.placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -198,7 +200,7 @@ const Clients: React.FC = () => {
                 setCurrentPage(1); // Reset to first page on filter change
               }}
             />
-            <span>Show Inactive</span>
+            <span>{t('clients.filters.showInactive')}</span>
           </label>
         </div>
       </div>
@@ -215,15 +217,15 @@ const Clients: React.FC = () => {
         <table className="clients-table">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Name</th>
-              <th>Contact</th>
-              <th>Location</th>
-              <th>Total Orders</th>
-              <th>Total Value</th>
-              <th>Status</th>
-              <th>Created At</th>
-              <th>Actions</th>
+              <th>{t('clients.table.id')}</th>
+              <th>{t('clients.table.name')}</th>
+              <th>{t('clients.table.contact')}</th>
+              <th>{t('clients.table.location')}</th>
+              <th>{t('clients.table.totalOrders')}</th>
+              <th>{t('clients.table.totalValue')}</th>
+              <th>{t('clients.table.status')}</th>
+              <th>{t('clients.table.createdAt')}</th>
+              <th>{t('clients.table.actions')}</th>
             </tr>
           </thead>
           <tbody>
@@ -231,8 +233,8 @@ const Clients: React.FC = () => {
               <tr>
                 <td colSpan={9} className="no-data">
                   {searchTerm || showInactive
-                    ? 'No clients found matching your criteria' 
-                    : 'No clients found. Create your first client!'}
+                    ? t('clients.empty.noClientsFound')
+                    : t('clients.empty.noClientsCreateFirst')}
                 </td>
               </tr>
             ) : (
@@ -259,7 +261,7 @@ const Clients: React.FC = () => {
                           {client.phone}
                         </div>
                       )}
-                      {!client.email && !client.phone && <span className="no-contact">—</span>}
+                      {!client.email && !client.phone && <span className="no-contact">{t('clients.messages.notSet')}</span>}
                     </div>
                   </td>
                   <td>
@@ -269,14 +271,14 @@ const Clients: React.FC = () => {
                         {[client.city, client.country].filter(Boolean).join(', ')}
                       </div>
                     ) : (
-                      <span>—</span>
+                      <span>{t('clients.messages.notSet')}</span>
                     )}
                   </td>
                   <td>{client.totalOrders}</td>
                   <td className="currency-cell">{formatCurrency(client.totalOrderValue)}</td>
                   <td>
                     <span className={`status-badge ${client.isActive ? 'status-active' : 'status-inactive'}`}>
-                      {client.isActive ? 'Active' : 'Inactive'}
+                      {client.isActive ? t('clients.status.active') : t('clients.status.inactive')}
                     </span>
                   </td>
                   <td>{formatDate(client.createdAt)}</td>
@@ -285,7 +287,7 @@ const Clients: React.FC = () => {
                       <ProtectedButton
                         requiredPermission={Permissions.ViewClient}
                         className="btn btn-sm btn-primary"
-                        title="View Client"
+                        title={t('clients.tooltips.viewClient')}
                         onClick={() => handleViewClient(client)}
                       >
                         <Eye size={16} />
@@ -293,7 +295,7 @@ const Clients: React.FC = () => {
                       <ProtectedButton
                         requiredPermission={Permissions.EditClient}
                         className="btn btn-sm btn-primary"
-                        title="Edit Client"
+                        title={t('clients.tooltips.editClient')}
                         onClick={() => handleEditClient(client)}
                       >
                         <Edit size={16} />
@@ -302,7 +304,7 @@ const Clients: React.FC = () => {
                         <ProtectedButton
                           requiredPermission={Permissions.DeleteClient}
                           className="btn btn-sm btn-danger"
-                          title="Deactivate Client"
+                          title={t('clients.tooltips.deactivateClient')}
                           onClick={() => handleDeleteClient(client)}
                           disabled={isDeleting}
                         >
@@ -322,7 +324,11 @@ const Clients: React.FC = () => {
       {pagedData && pagedData.totalPages > 0 && (
         <div className="pagination-container">
           <div className="pagination-info">
-            Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} clients
+            {t('clients.pagination.showing', {
+              start: ((pagedData.page - 1) * pagedData.pageSize) + 1,
+              end: Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount),
+              total: pagedData.totalCount
+            })}
           </div>
           
           <div className="pagination-controls">
@@ -331,7 +337,7 @@ const Clients: React.FC = () => {
               onClick={() => setCurrentPage(1)}
               disabled={!pagedData.hasPreviousPage}
             >
-              First
+              {t('clients.pagination.first')}
             </button>
             <button
               className="pagination-btn"
@@ -339,7 +345,7 @@ const Clients: React.FC = () => {
               disabled={!pagedData.hasPreviousPage}
             >
               <ChevronLeft size={16} />
-              Previous
+              {t('clients.pagination.previous')}
             </button>
             
             <div className="pagination-pages">
@@ -372,7 +378,7 @@ const Clients: React.FC = () => {
               onClick={() => setCurrentPage(currentPage + 1)}
               disabled={!pagedData.hasNextPage}
             >
-              Next
+              {t('clients.pagination.next')}
               <ChevronRight size={16} />
             </button>
             <button
@@ -380,12 +386,12 @@ const Clients: React.FC = () => {
               onClick={() => setCurrentPage(pagedData.totalPages)}
               disabled={!pagedData.hasNextPage}
             >
-              Last
+              {t('clients.pagination.last')}
             </button>
           </div>
           
           <div className="page-size-selector">
-            <label>Show:</label>
+            <label>{t('clients.pagination.show')}</label>
             <select
               value={pageSize}
               onChange={(e) => {
@@ -398,7 +404,7 @@ const Clients: React.FC = () => {
               <option value={50}>50</option>
               <option value={100}>100</option>
             </select>
-            <span>per page</span>
+            <span>{t('clients.pagination.perPage')}</span>
           </div>
         </div>
       )}
@@ -407,13 +413,13 @@ const Clients: React.FC = () => {
       {pagedData && (
         <div className="clients-summary">
           <div className="summary-item">
-            <strong>Total Clients:</strong> {pagedData.totalCount}
+            <strong>{t('clients.summary.totalClients')}</strong> {pagedData.totalCount}
           </div>
           <div className="summary-item">
-            <strong>Active:</strong> {clients.filter(c => c.isActive).length} of {pagedData.totalCount}
+            <strong>{t('clients.summary.active')}</strong> {clients.filter(c => c.isActive).length} {t('clients.summary.of')} {pagedData.totalCount}
           </div>
           <div className="summary-item">
-            <strong>Inactive:</strong> {clients.filter(c => !c.isActive).length} of {pagedData.totalCount}
+            <strong>{t('clients.summary.inactive')}</strong> {clients.filter(c => !c.isActive).length} {t('clients.summary.of')} {pagedData.totalCount}
           </div>
         </div>
       )}

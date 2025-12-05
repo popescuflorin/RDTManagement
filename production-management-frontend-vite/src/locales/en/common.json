@@ -42,7 +42,8 @@
     "updatedAt": "Updated At",
     "createdBy": "Created By",
     "assignedTo": "Assigned To",
-    "noAssignment": "No Assignment"
+    "noAssignment": "No Assignment",
+    "available": "available"
   },
   "messages": {
     "loading": "Loading...",
