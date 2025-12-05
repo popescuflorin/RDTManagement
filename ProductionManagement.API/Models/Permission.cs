@@ -59,6 +59,13 @@ namespace ProductionManagement.API.Models
         public const string EditClient = "Clients.Edit";
         public const string DeleteClient = "Clients.Delete";
 
+        // Suppliers
+        public const string ViewSuppliersTab = "Suppliers.ViewTab";
+        public const string CreateSupplier = "Suppliers.Create";
+        public const string ViewSupplier = "Suppliers.View";
+        public const string EditSupplier = "Suppliers.Edit";
+        public const string DeleteSupplier = "Suppliers.Delete";
+
         // Roles & Permissions
         public const string ViewRolesTab = "Roles.ViewTab";
         public const string ManageRolePermissions = "Roles.ManagePermissions";
@@ -93,6 +100,9 @@ namespace ProductionManagement.API.Models
                 
                 // Clients
                 ViewClientsTab, CreateClient, ViewClient, EditClient, DeleteClient,
+                
+                // Suppliers
+                ViewSuppliersTab, CreateSupplier, ViewSupplier, EditSupplier, DeleteSupplier,
                 
                 // Roles
                 ViewRolesTab, ManageRolePermissions
@@ -166,6 +176,14 @@ namespace ProductionManagement.API.Models
                     new PermissionInfo { Key = ViewClient, Name = "View Client", Description = "View client details" },
                     new PermissionInfo { Key = EditClient, Name = "Edit Client", Description = "Edit existing clients" },
                     new PermissionInfo { Key = DeleteClient, Name = "Delete Client", Description = "Deactivate client accounts" }
+                },
+                ["Suppliers"] = new List<PermissionInfo>
+                {
+                    new PermissionInfo { Key = ViewSuppliersTab, Name = "View Suppliers Tab", Description = "Access to the supplier management module" },
+                    new PermissionInfo { Key = CreateSupplier, Name = "Create Supplier", Description = "Create new supplier accounts" },
+                    new PermissionInfo { Key = ViewSupplier, Name = "View Supplier", Description = "View supplier details" },
+                    new PermissionInfo { Key = EditSupplier, Name = "Edit Supplier", Description = "Edit existing suppliers" },
+                    new PermissionInfo { Key = DeleteSupplier, Name = "Delete Supplier", Description = "Deactivate supplier accounts" }
                 },
                 ["Roles & Permissions"] = new List<PermissionInfo>
                 {

@@ -1,5 +1,5 @@
-/* Clients Container */
-.clients-container {
+/* Suppliers Container */
+.suppliers-container {
   padding: 0;
   width: 100%;
   background: #ffffff;
@@ -7,7 +7,7 @@
 }
 
 /* Header */
-.clients-header {
+.suppliers-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -16,7 +16,7 @@
   border-bottom: 1px solid var(--border);
 }
 
-.clients-header h1 {
+.suppliers-header h1 {
   margin: 0;
   color: var(--text-primary);
   font-size: var(--text-3xl);
@@ -24,7 +24,7 @@
 }
 
 /* Loading State */
-.clients-loading {
+.suppliers-loading {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -33,7 +33,7 @@
   gap: 16px;
 }
 
-.clients-loading .animate-spin {
+.suppliers-loading .animate-spin {
   animation: spin 1s linear infinite;
 }
 
@@ -43,7 +43,7 @@
 }
 
 /* Controls */
-.clients-controls {
+.suppliers-controls {
   display: flex;
   gap: 16px;
   margin-bottom: 24px;
@@ -111,17 +111,17 @@
   margin-bottom: 24px;
 }
 
-.clients-table {
+.suppliers-table {
   width: 100%;
   border-collapse: collapse;
 }
 
-.clients-table thead {
+.suppliers-table thead {
   background: var(--primary-600);
   color: white;
 }
 
-.clients-table th {
+.suppliers-table th {
   padding: 16px;
   text-align: left;
   font-weight: 600;
@@ -130,32 +130,39 @@
   letter-spacing: 0.5px;
 }
 
-.clients-table tbody tr {
+.suppliers-table tbody tr {
   border-bottom: 1px solid var(--border);
   transition: background-color var(--transition-fast);
 }
 
-.clients-table tbody tr:hover {
+.suppliers-table tbody tr:hover {
   background-color: var(--background-secondary);
 }
 
-.clients-table tbody tr.inactive-row {
+.suppliers-table tbody tr.inactive-row {
   opacity: 0.6;
   background-color: var(--background-secondary);
 }
 
-.clients-table td {
+.suppliers-table td {
   padding: 16px;
   font-size: var(--text-sm);
   color: var(--text-primary);
 }
 
-.client-name {
+.supplier-name {
   font-weight: 600;
   color: var(--primary-600);
 }
 
-.client-contact-person {
+.supplier-description {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  margin-top: 4px;
+  font-style: italic;
+}
+
+.supplier-contact-person {
   font-size: var(--text-xs);
   color: var(--text-secondary);
   margin-top: 4px;
@@ -386,7 +393,7 @@
 }
 
 /* Summary */
-.clients-summary {
+.suppliers-summary {
   display: flex;
   justify-content: flex-start;
   align-items: center;

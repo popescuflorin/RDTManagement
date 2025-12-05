@@ -58,6 +58,13 @@ export const Permissions = {
   EditClient: 'Clients.Edit',
   DeleteClient: 'Clients.Delete',
 
+  // Suppliers
+  ViewSuppliersTab: 'Suppliers.ViewTab',
+  CreateSupplier: 'Suppliers.Create',
+  ViewSupplier: 'Suppliers.View',
+  EditSupplier: 'Suppliers.Edit',
+  DeleteSupplier: 'Suppliers.Delete',
+
   // Roles
   ViewRolesTab: 'Roles.ViewTab',
   ManageRolePermissions: 'Roles.ManagePermissions',

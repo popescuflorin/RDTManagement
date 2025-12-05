@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  UserCircle, 
+  Building2, 
   Plus, 
   Search, 
   Edit, 
@@ -13,17 +13,17 @@ import {
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
-import { clientApi } from '../../services/api';
-import type { Client, PagedResult } from '../../types';
-import CreateClient from './CreateClient';
-import EditClient from './EditClient';
-import ViewClient from './ViewClient';
+import { supplierApi } from '../../services/api';
+import type { Supplier, PagedResult } from '../../types';
+import CreateSupplier from './CreateSupplier';
+import EditSupplier from './EditSupplier';
+import ViewSupplier from './ViewSupplier';
 import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
-import './Clients.css';
+import './Suppliers.css';
 
-const Clients: React.FC = () => {
-  const [pagedData, setPagedData] = useState<PagedResult<Client> | null>(null);
+const Suppliers: React.FC = () => {
+  const [pagedData, setPagedData] = useState<PagedResult<Supplier> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -31,14 +31,14 @@ const Clients: React.FC = () => {
   const [showInactive, setShowInactive] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const clientsSortBy = 'Name';
-  const clientsSortOrder: 'asc' | 'desc' = 'asc';
+  const suppliersSortBy = 'Name';
+  const suppliersSortOrder: 'asc' | 'desc' = 'asc';
   
   // Modal state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
-  const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
   // Debounce search term - wait 500ms after user stops typing
@@ -62,69 +62,69 @@ const Clients: React.FC = () => {
     try {
       setIsLoading(true);
       setError(null);
-      const response = await clientApi.getClientsPaged({
+      const response = await supplierApi.getSuppliersPaged({
         page: currentPage,
         pageSize: pageSize,
         searchTerm: debouncedSearchTerm || undefined,
         isActive: showInactive ? undefined : true,
-        sortBy: clientsSortBy,
-        sortOrder: clientsSortOrder
+        sortBy: suppliersSortBy,
+        sortOrder: suppliersSortOrder
       });
       setPagedData(response.data);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to load clients');
+      setError(err.response?.data?.message || 'Failed to load suppliers');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleCreateClient = () => {
-    setSelectedClient(null);
+  const handleCreateSupplier = () => {
+    setSelectedSupplier(null);
     setShowCreateModal(true);
   };
 
-  const handleClientCreated = () => {
+  const handleSupplierCreated = () => {
     setShowCreateModal(false);
     loadData();
   };
 
-  const handleViewClient = (client: Client) => {
-    setSelectedClient(client);
+  const handleViewSupplier = (supplier: Supplier) => {
+    setSelectedSupplier(supplier);
     setShowViewModal(true);
   };
 
-  const handleEditClient = (client: Client) => {
-    setSelectedClient(client);
+  const handleEditSupplier = (supplier: Supplier) => {
+    setSelectedSupplier(supplier);
     setShowEditModal(true);
   };
 
-  const handleClientUpdated = () => {
+  const handleSupplierUpdated = () => {
     setShowEditModal(false);
-    setSelectedClient(null);
+    setSelectedSupplier(null);
     loadData();
   };
 
   const handleCloseEditModal = () => {
     setShowEditModal(false);
-    setSelectedClient(null);
+    setSelectedSupplier(null);
   };
 
   const handleCloseViewModal = () => {
     setShowViewModal(false);
-    setSelectedClient(null);
+    setSelectedSupplier(null);
   };
 
-  const handleDeleteClient = async (client: Client) => {
-    if (!window.confirm(`Are you sure you want to deactivate client "${client.name}"?`)) {
+  const handleDeleteSupplier = async (supplier: Supplier) => {
+    if (!window.confirm(`Are you sure you want to deactivate supplier "${supplier.name}"?`)) {
       return;
     }
 
     try {
       setIsDeleting(true);
-      await clientApi.deleteClient(client.id);
+      await supplierApi.deleteSupplier(supplier.id);
       await loadData();
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to deactivate client');
+      setError(err.response?.data?.message || 'Failed to deactivate supplier');
     } finally {
       setIsDeleting(false);
     }
@@ -145,42 +145,42 @@ const Clients: React.FC = () => {
     }).format(amount);
   };
 
-  const clients = pagedData?.items || [];
+  const suppliers = pagedData?.items || [];
 
   if (isLoading) {
     return (
-      <div className="clients-loading">
+      <div className="suppliers-loading">
         <Loader2 size={32} className="animate-spin" />
-        <p>Loading clients...</p>
+        <p>Loading suppliers...</p>
       </div>
     );
   }
 
   return (
-    <div className="clients-container">
-      <div className="clients-header">
+    <div className="suppliers-container">
+      <div className="suppliers-header">
         <h1>
-          <UserCircle size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-          Clients
+          <Building2 size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
+          Suppliers
         </h1>
         <ProtectedButton
-          requiredPermission={Permissions.CreateClient}
+          requiredPermission={Permissions.CreateSupplier}
           className="btn btn-primary"
-          onClick={handleCreateClient}
+          onClick={handleCreateSupplier}
         >
           <Plus size={16} />
-          Create New Client
+          Create New Supplier
         </ProtectedButton>
       </div>
 
       {/* Search and Filter */}
-      <div className="clients-controls">
+      <div className="suppliers-controls">
         <div className="search-container">
           <div className="search-input-wrapper">
             <Search size={20} className="search-icon" />
             <input
               type="text"
-              placeholder="Search by name, contact, email, phone, city, or country..."
+              placeholder="Search by name, description, contact, email, phone, city, country, tax ID, or registration number..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -210,16 +210,16 @@ const Clients: React.FC = () => {
         </div>
       )}
 
-      {/* Clients Table */}
+      {/* Suppliers Table */}
       <div className="table-container">
-        <table className="clients-table">
+        <table className="suppliers-table">
           <thead>
             <tr>
               <th>ID</th>
               <th>Name</th>
               <th>Contact</th>
               <th>Location</th>
-              <th>Total Orders</th>
+              <th>Total Acquisitions</th>
               <th>Total Value</th>
               <th>Status</th>
               <th>Created At</th>
@@ -227,83 +227,86 @@ const Clients: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {clients.length === 0 ? (
+            {suppliers.length === 0 ? (
               <tr>
                 <td colSpan={9} className="no-data">
                   {searchTerm || showInactive
-                    ? 'No clients found matching your criteria' 
-                    : 'No clients found. Create your first client!'}
+                    ? 'No suppliers found matching your criteria' 
+                    : 'No suppliers found. Create your first supplier!'}
                 </td>
               </tr>
             ) : (
-              clients.map(client => (
-                <tr key={client.id} className={!client.isActive ? 'inactive-row' : ''}>
-                  <td>#{client.id}</td>
-                  <td className="client-name">
-                    <div>{client.name}</div>
-                    {client.contactPerson && (
-                      <div className="client-contact-person">{client.contactPerson}</div>
+              suppliers.map(supplier => (
+                <tr key={supplier.id} className={!supplier.isActive ? 'inactive-row' : ''}>
+                  <td>#{supplier.id}</td>
+                  <td className="supplier-name">
+                    <div>{supplier.name}</div>
+                    {supplier.description && (
+                      <div className="supplier-description">{supplier.description}</div>
+                    )}
+                    {supplier.contactPerson && (
+                      <div className="supplier-contact-person">{supplier.contactPerson}</div>
                     )}
                   </td>
                   <td>
                     <div className="contact-info">
-                      {client.email && (
+                      {supplier.email && (
                         <div className="contact-item">
                           <Mail size={14} />
-                          {client.email}
+                          {supplier.email}
                         </div>
                       )}
-                      {client.phone && (
+                      {supplier.phone && (
                         <div className="contact-item">
                           <Phone size={14} />
-                          {client.phone}
+                          {supplier.phone}
                         </div>
                       )}
-                      {!client.email && !client.phone && <span className="no-contact">—</span>}
+                      {!supplier.email && !supplier.phone && <span className="no-contact">—</span>}
                     </div>
                   </td>
                   <td>
-                    {client.city || client.country ? (
+                    {supplier.city || supplier.country ? (
                       <div className="location-info">
                         <MapPin size={14} />
-                        {[client.city, client.country].filter(Boolean).join(', ')}
+                        {[supplier.city, supplier.country].filter(Boolean).join(', ')}
                       </div>
                     ) : (
                       <span>—</span>
                     )}
                   </td>
-                  <td>{client.totalOrders}</td>
-                  <td className="currency-cell">{formatCurrency(client.totalOrderValue)}</td>
+                  <td>{supplier.totalAcquisitions}</td>
+                  <td className="currency-cell">{formatCurrency(supplier.totalAcquisitionValue)}</td>
                   <td>
-                    <span className={`status-badge ${client.isActive ? 'status-active' : 'status-inactive'}`}>
-                      {client.isActive ? 'Active' : 'Inactive'}
+                    <span className={`status-badge ${supplier.isActive ? 'status-active' : 'status-inactive'}`}>
+                      {supplier.isActive ? 'Active' : 'Inactive'}
                     </span>
                   </td>
-                  <td>{formatDate(client.createdAt)}</td>
+                  <td>{formatDate(supplier.createdAt)}</td>
                   <td className="actions-cell">
                     <div className="action-buttons">
                       <ProtectedButton
-                        requiredPermission={Permissions.ViewClient}
+                        requiredPermission={Permissions.ViewSupplier}
                         className="btn btn-sm btn-primary"
-                        title="View Client"
-                        onClick={() => handleViewClient(client)}
+                        title="View Supplier"
+                        onClick={() => handleViewSupplier(supplier)}
                       >
                         <Eye size={16} />
                       </ProtectedButton>
                       <ProtectedButton
-                        requiredPermission={Permissions.EditClient}
+                        requiredPermission={Permissions.EditSupplier}
                         className="btn btn-sm btn-primary"
-                        title="Edit Client"
-                        onClick={() => handleEditClient(client)}
+                        title="Edit Supplier"
+                        onClick={() => handleEditSupplier(supplier)}
                       >
                         <Edit size={16} />
                       </ProtectedButton>
-                      {client.isActive && (
+                      {supplier.isActive && (
                         <ProtectedButton
-                          requiredPermission={Permissions.DeleteClient}
+                          requiredPermission={Permissions.DeleteSupplier}
                           className="btn btn-sm btn-danger"
-                          title="Deactivate Client"
-                          onClick={() => handleDeleteClient(client)}
+                          title="Deactivate Supplier"
+                          onClick={() => handleDeleteSupplier(supplier)}
                           disabled={isDeleting}
                         >
                           <Trash2 size={16} />
@@ -322,7 +325,7 @@ const Clients: React.FC = () => {
       {pagedData && pagedData.totalPages > 0 && (
         <div className="pagination-container">
           <div className="pagination-info">
-            Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} clients
+            Showing {((pagedData.page - 1) * pagedData.pageSize) + 1} to {Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount)} of {pagedData.totalCount} suppliers
           </div>
           
           <div className="pagination-controls">
@@ -405,46 +408,46 @@ const Clients: React.FC = () => {
 
       {/* Summary */}
       {pagedData && (
-        <div className="clients-summary">
+        <div className="suppliers-summary">
           <div className="summary-item">
-            <strong>Total Clients:</strong> {pagedData.totalCount}
+            <strong>Total Suppliers:</strong> {pagedData.totalCount}
           </div>
           <div className="summary-item">
-            <strong>Active:</strong> {clients.filter(c => c.isActive).length} of {pagedData.totalCount}
+            <strong>Active:</strong> {suppliers.filter(s => s.isActive).length} of {pagedData.totalCount}
           </div>
           <div className="summary-item">
-            <strong>Inactive:</strong> {clients.filter(c => !c.isActive).length} of {pagedData.totalCount}
+            <strong>Inactive:</strong> {suppliers.filter(s => !s.isActive).length} of {pagedData.totalCount}
           </div>
         </div>
       )}
 
       {/* Modals */}
       {showCreateModal && (
-        <CreateClient
+        <CreateSupplier
           onClose={() => setShowCreateModal(false)}
-          onClientCreated={handleClientCreated}
+          onSupplierCreated={handleSupplierCreated}
         />
       )}
 
-      {showViewModal && selectedClient && (
-        <ViewClient
+      {showViewModal && selectedSupplier && (
+        <ViewSupplier
           isOpen={showViewModal}
           onClose={handleCloseViewModal}
-          client={selectedClient}
+          supplier={selectedSupplier}
         />
       )}
 
-      {showEditModal && selectedClient && (
-        <EditClient
+      {showEditModal && selectedSupplier && (
+        <EditSupplier
           isOpen={showEditModal}
           onClose={handleCloseEditModal}
-          onSuccess={handleClientUpdated}
-          client={selectedClient}
+          onSuccess={handleSupplierUpdated}
+          supplier={selectedSupplier}
         />
       )}
     </div>
   );
 };
 
-export default Clients;
+export default Suppliers;
 

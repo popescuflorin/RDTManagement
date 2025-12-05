@@ -791,6 +791,15 @@ export interface UpdateSupplierRequest {
   isActive: boolean;
 }
 
+export interface SupplierPagedRequest {
+  page: number;
+  pageSize: number;
+  searchTerm?: string;
+  isActive?: boolean;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
 export interface SupplierStatistics {
   totalSuppliers: number;
   activeSuppliers: number;

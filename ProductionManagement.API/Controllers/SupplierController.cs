@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using ProductionManagement.API.Authorization;
+using ProductionManagement.API.Data;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
 using System.Security.Claims;
@@ -14,11 +16,13 @@ namespace ProductionManagement.API.Controllers
     {
         private readonly ISupplierRepository _supplierRepository;
         private readonly IUserRepository _userRepository;
+        private readonly ApplicationDbContext _context;
 
-        public SupplierController(ISupplierRepository supplierRepository, IUserRepository userRepository)
+        public SupplierController(ISupplierRepository supplierRepository, IUserRepository userRepository, ApplicationDbContext context)
         {
             _supplierRepository = supplierRepository;
             _userRepository = userRepository;
+            _context = context;
         }
 
         [HttpGet]
@@ -31,8 +35,89 @@ namespace ProductionManagement.API.Controllers
             return Ok(supplierDtos);
         }
 
+        [HttpGet("paged")]
+        [RequirePermission(Permissions.ViewSupplier)]
+        public async Task<ActionResult<PagedResult<SupplierDto>>> GetSuppliersPaged([FromQuery] SupplierPagedRequest request)
+        {
+            var query = _context.Suppliers
+                .Include(s => s.Acquisitions)
+                .AsQueryable();
+
+            // Apply active/inactive filter
+            if (request.IsActive.HasValue)
+            {
+                query = query.Where(s => s.IsActive == request.IsActive.Value);
+            }
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            {
+                var searchTerm = request.SearchTerm.ToLower();
+                query = query.Where(s =>
+                    s.Name.ToLower().Contains(searchTerm) ||
+                    (s.Description != null && s.Description.ToLower().Contains(searchTerm)) ||
+                    (s.ContactPerson != null && s.ContactPerson.ToLower().Contains(searchTerm)) ||
+                    (s.Email != null && s.Email.ToLower().Contains(searchTerm)) ||
+                    (s.Phone != null && s.Phone.ToLower().Contains(searchTerm)) ||
+                    (s.City != null && s.City.ToLower().Contains(searchTerm)) ||
+                    (s.Country != null && s.Country.ToLower().Contains(searchTerm)) ||
+                    (s.TaxId != null && s.TaxId.ToLower().Contains(searchTerm)) ||
+                    (s.RegistrationNumber != null && s.RegistrationNumber.ToLower().Contains(searchTerm))
+                );
+            }
+
+            // Get total count before pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply sorting
+            query = request.SortBy.ToLower() switch
+            {
+                "name" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(s => s.Name)
+                    : query.OrderByDescending(s => s.Name),
+                "email" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(s => s.Email ?? "")
+                    : query.OrderByDescending(s => s.Email ?? ""),
+                "phone" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(s => s.Phone ?? "")
+                    : query.OrderByDescending(s => s.Phone ?? ""),
+                "city" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(s => s.City ?? "")
+                    : query.OrderByDescending(s => s.City ?? ""),
+                "country" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(s => s.Country ?? "")
+                    : query.OrderByDescending(s => s.Country ?? ""),
+                "isactive" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(s => s.IsActive)
+                    : query.OrderByDescending(s => s.IsActive),
+                "createdat" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(s => s.CreatedAt)
+                    : query.OrderByDescending(s => s.CreatedAt),
+                _ => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(s => s.Name)
+                    : query.OrderByDescending(s => s.Name)
+            };
+
+            // Apply pagination
+            var skip = (request.Page - 1) * request.PageSize;
+            var suppliers = await query
+                .Skip(skip)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            var result = new PagedResult<SupplierDto>
+            {
+                Items = suppliers.Select(MapToDto).ToList(),
+                TotalCount = totalCount,
+                Page = request.Page,
+                PageSize = request.PageSize
+            };
+
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
-        [RequirePermission(Permissions.ViewAcquisitionsTab)]
+        [RequirePermission(Permissions.ViewSupplier)]
         public async Task<ActionResult<SupplierDto>> GetSupplier(int id)
         {
             var supplier = await _supplierRepository.GetByIdWithDetailsAsync(id);
@@ -45,7 +130,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost]
-        [RequirePermission(Permissions.CreateAcquisition)]
+        [RequirePermission(Permissions.CreateSupplier)]
         public async Task<ActionResult<SupplierDto>> CreateSupplier([FromBody] CreateSupplierRequest request)
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -93,11 +178,11 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequirePermission(Permissions.EditAcquisition)]
+        [RequirePermission(Permissions.EditSupplier)]
         public async Task<ActionResult<SupplierDto>> UpdateSupplier(int id, [FromBody] UpdateSupplierRequest request)
         {
             var supplier = await _supplierRepository.GetByIdAsync(id);
-            if (supplier == null || !supplier.IsActive)
+            if (supplier == null)
             {
                 return NotFound(new { message = "Supplier not found" });
             }
@@ -131,27 +216,25 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RequirePermission(Permissions.CreateAcquisition)]
+        [RequirePermission(Permissions.DeleteSupplier)]
         public async Task<IActionResult> DeleteSupplier(int id)
         {
-            var supplier = await _supplierRepository.GetByIdWithDetailsAsync(id);
+            var supplier = await _supplierRepository.GetByIdAsync(id);
             if (supplier == null)
             {
                 return NotFound(new { message = "Supplier not found" });
             }
 
-            // Check if supplier has any acquisitions
-            if (supplier.Acquisitions.Any())
-            {
-                return BadRequest(new { message = "Cannot delete supplier with existing acquisitions" });
-            }
-
-            await _supplierRepository.DeleteAsync(supplier);
-            return Ok(new { message = "Supplier deleted successfully" });
+            // Soft delete - set as inactive
+            supplier.IsActive = false;
+            supplier.UpdatedAt = DateTime.UtcNow;
+            await _supplierRepository.UpdateAsync(supplier);
+            
+            return NoContent();
         }
 
         [HttpGet("statistics")]
-        [RequirePermission(Permissions.ViewAcquisitionsTab)]
+        [RequirePermission(Permissions.ViewSupplier)]
         public async Task<ActionResult<SupplierStatistics>> GetStatistics()
         {
             var allSuppliers = await _supplierRepository.GetAllAsync();

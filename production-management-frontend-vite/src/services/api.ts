@@ -39,6 +39,7 @@ import type {
   Supplier,
   CreateSupplierRequest,
   UpdateSupplierRequest,
+  SupplierPagedRequest,
   SupplierStatistics,
   Transport,
   CreateTransportRequest,
@@ -261,6 +262,8 @@ export const acquisitionApi = {
 // Supplier API
 export const supplierApi = {
   getAllSuppliers: () => api.get<Supplier[]>('/supplier'),
+  getSuppliersPaged: (params: SupplierPagedRequest) =>
+    api.get<PagedResult<Supplier>>('/supplier/paged', { params }),
   getSupplier: (id: number) => api.get<Supplier>(`/supplier/${id}`),
   getStatistics: () => api.get<SupplierStatistics>('/supplier/statistics'),
   createSupplier: (supplierData: CreateSupplierRequest) => api.post<Supplier>('/supplier', supplierData),

@@ -26,7 +26,7 @@
   flex-direction: column;
 }
 
-.create-client-modal {
+.create-supplier-modal {
   max-width: 700px;
 }
 
@@ -67,7 +67,7 @@
 }
 
 /* Form */
-.client-form {
+.supplier-form {
   padding: 24px;
   display: flex;
   flex-direction: column;
@@ -210,8 +210,8 @@
   border-radius: 50%;
 }
 
-/* View Client Styles */
-.client-view-content {
+/* View Supplier Styles */
+.supplier-view-content {
   padding: 24px;
   display: flex;
   flex-direction: column;
