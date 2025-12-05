@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ProductionManagement.API.Authorization;
+using ProductionManagement.API.Data;
 using ProductionManagement.API.Models;
 using ProductionManagement.API.Repositories;
 using System.Security.Claims;
@@ -13,10 +15,12 @@ namespace ProductionManagement.API.Controllers
     public class ClientController : ControllerBase
     {
         private readonly IClientRepository _clientRepository;
+        private readonly ApplicationDbContext _context;
 
-        public ClientController(IClientRepository clientRepository)
+        public ClientController(IClientRepository clientRepository, ApplicationDbContext context)
         {
             _clientRepository = clientRepository;
+            _context = context;
         }
 
         [HttpGet]
@@ -27,8 +31,95 @@ namespace ProductionManagement.API.Controllers
             return Ok(clients.Select(MapToClientInfo).ToList());
         }
 
+        [HttpGet("all")]
+        [RequirePermission(Permissions.ViewClient)]
+        public async Task<ActionResult<List<ClientInfo>>> GetAllClientsIncludingInactive()
+        {
+            var clients = await _clientRepository.GetAllAsync();
+            return Ok(clients.Select(MapToClientInfo).ToList());
+        }
+
+        [HttpGet("paged")]
+        [RequirePermission(Permissions.ViewClient)]
+        public async Task<ActionResult<PagedResult<ClientInfo>>> GetClientsPaged([FromQuery] ClientPagedRequest request)
+        {
+            var query = _context.Clients
+                .Include(c => c.Orders)
+                    .ThenInclude(o => o.OrderMaterials)
+                .AsQueryable();
+
+            // Apply active/inactive filter
+            if (request.IsActive.HasValue)
+            {
+                query = query.Where(c => c.IsActive == request.IsActive.Value);
+            }
+
+            // Apply search filter
+            if (!string.IsNullOrWhiteSpace(request.SearchTerm))
+            {
+                var searchTerm = request.SearchTerm.ToLower();
+                query = query.Where(c =>
+                    c.Name.ToLower().Contains(searchTerm) ||
+                    (c.ContactPerson != null && c.ContactPerson.ToLower().Contains(searchTerm)) ||
+                    (c.Email != null && c.Email.ToLower().Contains(searchTerm)) ||
+                    (c.Phone != null && c.Phone.ToLower().Contains(searchTerm)) ||
+                    (c.City != null && c.City.ToLower().Contains(searchTerm)) ||
+                    (c.Country != null && c.Country.ToLower().Contains(searchTerm))
+                );
+            }
+
+            // Get total count before pagination
+            var totalCount = await query.CountAsync();
+
+            // Apply sorting
+            query = request.SortBy.ToLower() switch
+            {
+                "name" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(c => c.Name)
+                    : query.OrderByDescending(c => c.Name),
+                "email" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(c => c.Email ?? "")
+                    : query.OrderByDescending(c => c.Email ?? ""),
+                "phone" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(c => c.Phone ?? "")
+                    : query.OrderByDescending(c => c.Phone ?? ""),
+                "city" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(c => c.City ?? "")
+                    : query.OrderByDescending(c => c.City ?? ""),
+                "country" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(c => c.Country ?? "")
+                    : query.OrderByDescending(c => c.Country ?? ""),
+                "isactive" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(c => c.IsActive)
+                    : query.OrderByDescending(c => c.IsActive),
+                "createdat" => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(c => c.CreatedAt)
+                    : query.OrderByDescending(c => c.CreatedAt),
+                _ => request.SortOrder.ToLower() == "asc"
+                    ? query.OrderBy(c => c.Name)
+                    : query.OrderByDescending(c => c.Name)
+            };
+
+            // Apply pagination
+            var skip = (request.Page - 1) * request.PageSize;
+            var clients = await query
+                .Skip(skip)
+                .Take(request.PageSize)
+                .ToListAsync();
+
+            var result = new PagedResult<ClientInfo>
+            {
+                Items = clients.Select(MapToClientInfo).ToList(),
+                TotalCount = totalCount,
+                Page = request.Page,
+                PageSize = request.PageSize
+            };
+
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
-        [RequirePermission(Permissions.ViewOrdersTab)]
+        [RequirePermission(Permissions.ViewClient)]
         public async Task<ActionResult<ClientInfo>> GetClient(int id)
         {
             var client = await _clientRepository.GetByIdWithOrdersAsync(id);
@@ -41,7 +132,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost]
-        [RequirePermission(Permissions.CreateOrder)]
+        [RequirePermission(Permissions.CreateClient)]
         public async Task<ActionResult<ClientInfo>> CreateClient(CreateClientRequest request)
         {
             var userName = User.FindFirst(ClaimTypes.Name)?.Value ?? "Unknown";
@@ -69,11 +160,11 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [RequirePermission(Permissions.EditOrder)]
+        [RequirePermission(Permissions.EditClient)]
         public async Task<ActionResult<ClientInfo>> UpdateClient(int id, UpdateClientRequest request)
         {
             var client = await _clientRepository.GetByIdAsync(id);
-            if (client == null || !client.IsActive)
+            if (client == null)
             {
                 return NotFound();
             }
@@ -106,26 +197,25 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [RequirePermission(Permissions.CreateOrder)]
+        [RequirePermission(Permissions.DeleteClient)]
         public async Task<IActionResult> DeleteClient(int id)
         {
-            var client = await _clientRepository.GetByIdWithOrdersAsync(id);
+            var client = await _clientRepository.GetByIdAsync(id);
             if (client == null)
             {
                 return NotFound();
             }
 
-            if (client.Orders.Any())
-            {
-                return BadRequest(new { message = "Cannot delete client with existing orders. Mark as inactive instead." });
-            }
-
-            await _clientRepository.DeleteAsync(client);
+            // Soft delete - set as inactive
+            client.IsActive = false;
+            client.UpdatedAt = DateTime.UtcNow;
+            await _clientRepository.UpdateAsync(client);
+            
             return NoContent();
         }
 
         [HttpGet("statistics")]
-        [RequirePermission(Permissions.ViewOrdersTab)]
+        [RequirePermission(Permissions.ViewClient)]
         public async Task<ActionResult<ClientStatistics>> GetStatistics()
         {
             var allClients = await _clientRepository.GetAllAsync();

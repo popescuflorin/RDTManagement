@@ -7,6 +7,7 @@ import {
   ShoppingCart,
   ClipboardList,
   Truck,
+  UserCircle,
   ChevronLeft, 
   ChevronRight 
 } from 'lucide-react';
@@ -79,6 +80,12 @@ const Sidebar: React.FC<SidebarProps> = ({
       label: 'Transports',
       icon: Truck,
       requiredPermission: Permissions.ViewTransportsTab
+    },
+    {
+      id: 'clients',
+      label: 'Clients',
+      icon: UserCircle,
+      requiredPermission: Permissions.ViewClientsTab
     }
   ];
 

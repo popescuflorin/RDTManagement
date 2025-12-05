@@ -52,6 +52,13 @@ namespace ProductionManagement.API.Models
         public const string EditTransport = "Transports.Edit";
         public const string DeleteTransport = "Transports.Delete";
 
+        // Clients
+        public const string ViewClientsTab = "Clients.ViewTab";
+        public const string CreateClient = "Clients.Create";
+        public const string ViewClient = "Clients.View";
+        public const string EditClient = "Clients.Edit";
+        public const string DeleteClient = "Clients.Delete";
+
         // Roles & Permissions
         public const string ViewRolesTab = "Roles.ViewTab";
         public const string ManageRolePermissions = "Roles.ManagePermissions";
@@ -83,6 +90,9 @@ namespace ProductionManagement.API.Models
                 
                 // Transport
                 ViewTransportsTab, CreateTransport, ViewTransport, EditTransport, DeleteTransport,
+                
+                // Clients
+                ViewClientsTab, CreateClient, ViewClient, EditClient, DeleteClient,
                 
                 // Roles
                 ViewRolesTab, ManageRolePermissions
@@ -148,6 +158,14 @@ namespace ProductionManagement.API.Models
                     new PermissionInfo { Key = ViewTransport, Name = "View Transport", Description = "View transport details" },
                     new PermissionInfo { Key = EditTransport, Name = "Edit Transport", Description = "Edit existing transport vehicles" },
                     new PermissionInfo { Key = DeleteTransport, Name = "Delete Transport", Description = "Delete transport vehicles" }
+                },
+                ["Clients"] = new List<PermissionInfo>
+                {
+                    new PermissionInfo { Key = ViewClientsTab, Name = "View Clients Tab", Description = "Access to the client management module" },
+                    new PermissionInfo { Key = CreateClient, Name = "Create Client", Description = "Create new client accounts" },
+                    new PermissionInfo { Key = ViewClient, Name = "View Client", Description = "View client details" },
+                    new PermissionInfo { Key = EditClient, Name = "Edit Client", Description = "Edit existing clients" },
+                    new PermissionInfo { Key = DeleteClient, Name = "Delete Client", Description = "Deactivate client accounts" }
                 },
                 ["Roles & Permissions"] = new List<PermissionInfo>
                 {

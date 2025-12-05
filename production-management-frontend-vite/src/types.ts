@@ -951,6 +951,15 @@ export interface UpdateClientRequest {
   isActive?: boolean;
 }
 
+export interface ClientPagedRequest {
+  page: number;
+  pageSize: number;
+  searchTerm?: string;
+  isActive?: boolean;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+}
+
 export interface ClientStatistics {
   totalClients: number;
   activeClients: number;

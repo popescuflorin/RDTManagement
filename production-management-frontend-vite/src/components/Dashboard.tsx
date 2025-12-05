@@ -21,6 +21,7 @@ import Production from './production/Production';
 import AcquisitionPage from './acquisitions/Acquisition';
 import Orders from './orders/Orders';
 import Transports from './transports/Transports';
+import Clients from './clients/Clients';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -117,6 +118,8 @@ const Dashboard: React.FC = () => {
         return <Orders />;
       case 'transports':
         return <Transports />;
+      case 'clients':
+        return <Clients />;
       default:
         return renderDashboardContent();
     }

@@ -51,6 +51,13 @@ export const Permissions = {
   EditTransport: 'Transports.Edit',
   DeleteTransport: 'Transports.Delete',
 
+  // Clients
+  ViewClientsTab: 'Clients.ViewTab',
+  CreateClient: 'Clients.Create',
+  ViewClient: 'Clients.View',
+  EditClient: 'Clients.Edit',
+  DeleteClient: 'Clients.Delete',
+
   // Roles
   ViewRolesTab: 'Roles.ViewTab',
   ManageRolePermissions: 'Roles.ManagePermissions',

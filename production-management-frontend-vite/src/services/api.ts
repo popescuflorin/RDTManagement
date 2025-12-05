@@ -55,6 +55,7 @@ import type {
   Client,
   CreateClientRequest,
   UpdateClientRequest,
+  ClientPagedRequest,
   ClientStatistics,
   RolePermissions,
   UpdateRolePermissionsRequest,
@@ -309,6 +310,9 @@ export const rolePermissionApi = {
 // Client API
 export const clientApi = {
   getAllClients: () => api.get<Client[]>('/client'),
+  getAllClientsIncludingInactive: () => api.get<Client[]>('/client/all'),
+  getClientsPaged: (params: ClientPagedRequest) =>
+    api.get<PagedResult<Client>>('/client/paged', { params }),
   getClient: (id: number) => api.get<Client>(`/client/${id}`),
   getStatistics: () => api.get<ClientStatistics>('/client/statistics'),
   createClient: (clientData: CreateClientRequest) => api.post<Client>('/client', clientData),
