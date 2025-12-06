@@ -180,21 +180,25 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
           </div>
 
           <div className="form-group checkbox-group">
-            <label>
+            <div className="checkbox-wrapper">
               <input
                 type="checkbox"
+                id="receiveEmails"
                 name="receiveEmails"
                 checked={formData.receiveEmails}
                 onChange={handleChange}
                 disabled={isLoading}
+                className="checkbox-input"
               />
-              <span className="checkbox-label">
-                {t('adminRegister.labels.enableEmailNotifications')}
-                <small className="checkbox-description">
+              <label htmlFor="receiveEmails" className="checkbox-label-wrapper">
+                <span className="checkbox-main-label">
+                  {t('adminRegister.labels.enableEmailNotifications')}
+                </span>
+                <span className="checkbox-description">
                   {t('adminRegister.labels.emailNotificationsDescription')}
-                </small>
-              </span>
-            </label>
+                </span>
+              </label>
+            </div>
           </div>
 
           <div className="form-actions">

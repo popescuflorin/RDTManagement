@@ -139,21 +139,25 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
           </div>
 
           <div className="form-group checkbox-group">
-            <label>
+            <div className="checkbox-wrapper">
               <input
                 type="checkbox"
+                id="receiveEmails"
                 name="receiveEmails"
                 checked={formData.receiveEmails}
                 onChange={handleInputChange}
                 disabled={isLoading}
+                className="checkbox-input"
               />
-              <span className="checkbox-label">
-                {t('editUser.labels.enableEmailNotifications')}
-                <small className="checkbox-description">
+              <label htmlFor="receiveEmails" className="checkbox-label-wrapper">
+                <span className="checkbox-main-label">
+                  {t('editUser.labels.enableEmailNotifications')}
+                </span>
+                <span className="checkbox-description">
                   {t('editUser.labels.emailNotificationsDescription')}
-                </small>
-              </span>
-            </label>
+                </span>
+              </label>
+            </div>
           </div>
 
           <div className="form-actions">
