@@ -4,9 +4,6 @@ import {
   Users, 
   UserPlus, 
   Search, 
-  Edit, 
-  Trash2, 
-  Eye, 
   AlertTriangle, 
   Loader2,
   RotateCcw,
@@ -21,6 +18,8 @@ import DeleteConfirmation from './DeleteConfirmation';
 import ActivateUser from './ActivateUser';
 import EditRolePermissions from './EditRolePermissions';
 import CreateRole from './CreateRole';
+import EditButton from '../atoms/EditButton';
+import DeleteButton from '../atoms/DeleteButton';
 import './UserManagement.css';
 
 const UserManagement: React.FC = () => {
@@ -331,21 +330,15 @@ const UserManagement: React.FC = () => {
                 </td>
                 <td className="actions-cell">
                   <div className="action-buttons">
-                    <button 
-                      className="btn btn-sm btn-warning" 
+                    <EditButton
                       title={t('userManagement.tooltips.editUser')}
                       onClick={() => handleEditUser(user)}
-                    >
-                      <Edit size={16} />
-                    </button>
+                    />
                     {user.isActive ? (
-                      <button 
-                        className="btn btn-sm btn-danger" 
+                      <DeleteButton
                         title={t('userManagement.tooltips.deactivateUser')}
                         onClick={() => handleDeleteUser(user)}
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      />
                     ) : (
                       <button 
                         className="btn btn-sm btn-success" 
@@ -355,9 +348,6 @@ const UserManagement: React.FC = () => {
                         <UserCheck size={16} />
                       </button>
                     )}
-                    <button className="btn btn-sm btn-secondary" title={t('userManagement.tooltips.viewDetails')}>
-                      <Eye size={16} />
-                    </button>
                   </div>
                 </td>
               </tr>
@@ -430,13 +420,10 @@ const UserManagement: React.FC = () => {
                       </td>
                       <td className="actions-cell">
                         <div className="action-buttons">
-                          <button 
-                            className="btn btn-sm btn-warning" 
+                          <EditButton
                             title={t('userManagement.tooltips.editPermissions')}
                             onClick={() => handleEditRole(role.name)}
-                          >
-                            <Edit size={16} />
-                          </button>
+                          />
                         </div>
                       </td>
                     </tr>

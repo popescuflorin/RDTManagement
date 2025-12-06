@@ -4,13 +4,10 @@ import {
   Building2, 
   Plus, 
   Search, 
-  Edit, 
-  Trash2,
   Loader2,
   Mail,
   Phone,
   MapPin,
-  Eye,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -21,6 +18,9 @@ import EditSupplier from './EditSupplier';
 import ViewSupplier from './ViewSupplier';
 import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
+import EditButton from '../atoms/EditButton';
+import ViewButton from '../atoms/ViewButton';
+import DeleteButton from '../atoms/DeleteButton';
 import './Suppliers.css';
 
 const Suppliers: React.FC = () => {
@@ -287,32 +287,23 @@ const Suppliers: React.FC = () => {
                   <td>{formatDate(supplier.createdAt)}</td>
                   <td className="actions-cell">
                     <div className="action-buttons">
-                      <ProtectedButton
+                      <ViewButton
                         requiredPermission={Permissions.ViewSupplier}
-                        className="btn btn-sm btn-primary"
                         title={t('suppliers.tooltips.viewSupplier')}
                         onClick={() => handleViewSupplier(supplier)}
-                      >
-                        <Eye size={16} />
-                      </ProtectedButton>
-                      <ProtectedButton
+                      />
+                      <EditButton
                         requiredPermission={Permissions.EditSupplier}
-                        className="btn btn-sm btn-primary"
                         title={t('suppliers.tooltips.editSupplier')}
                         onClick={() => handleEditSupplier(supplier)}
-                      >
-                        <Edit size={16} />
-                      </ProtectedButton>
+                      />
                       {supplier.isActive && (
-                        <ProtectedButton
+                        <DeleteButton
                           requiredPermission={Permissions.DeleteSupplier}
-                          className="btn btn-sm btn-danger"
                           title={t('suppliers.tooltips.deactivateSupplier')}
                           onClick={() => handleDeleteSupplier(supplier)}
                           disabled={isDeleting}
-                        >
-                          <Trash2 size={16} />
-                        </ProtectedButton>
+                        />
                       )}
                     </div>
                   </td>

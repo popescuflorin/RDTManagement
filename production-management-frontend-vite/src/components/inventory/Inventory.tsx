@@ -5,10 +5,7 @@ import {
   AlertTriangle, 
   Plus, 
   Search, 
-  Edit, 
-  Trash2,
   CheckCircle,
-  Eye,
   Loader2,
   XCircle,
   ChevronLeft,
@@ -27,6 +24,9 @@ import DeleteMaterialConfirmation from './DeleteMaterialConfirmation';
 import ActivateMaterialModal from './ActivateMaterialModal';
 import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
+import EditButton from '../atoms/EditButton';
+import ViewButton from '../atoms/ViewButton';
+import DeleteButton from '../atoms/DeleteButton';
 import './Inventory.css';
 
 const Inventory: React.FC = () => {
@@ -386,32 +386,23 @@ const Inventory: React.FC = () => {
                   <td>{formatDate(material.updatedAt)}</td>
                   <td className="actions-cell">
                     <div className="action-buttons">
-                      <ProtectedButton
+                      <ViewButton
                         requiredPermission={Permissions.ViewMaterial}
-                        className="btn btn-sm btn-info" 
                         title={t('actions.view')}
                         onClick={() => handleViewMaterial(material)}
-                      >
-                        <Eye size={16} />
-                      </ProtectedButton>
-                      <ProtectedButton
+                      />
+                      <EditButton
                         requiredPermission={Permissions.EditMaterial}
-                        className="btn btn-sm btn-warning" 
                         title={t('actions.edit')}
                         onClick={() => handleEditMaterial(material)}
-                      >
-                        <Edit size={16} />
-                      </ProtectedButton>
+                      />
                       {material.isActive ? (
-                        <ProtectedButton
+                        <DeleteButton
                           requiredPermission={Permissions.DeactivateMaterial}
-                          className="btn btn-sm btn-danger" 
                           title={material.quantity > 0 ? t('actions.cannotDeactivate') : t('actions.deactivate')}
                           onClick={() => handleDeleteMaterial(material)}
                           disabled={material.quantity > 0}
-                        >
-                          <Trash2 size={16} />
-                        </ProtectedButton>
+                        />
                       ) : (
                         <ProtectedButton
                           requiredPermission={Permissions.ActivateMaterial}

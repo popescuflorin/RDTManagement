@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { orderApi, inventoryApi } from '../../services/api';
 import type { Order, OrderStatistics, RawMaterial, PagedResult } from '../../types';
 import { OrderStatus } from '../../types';
-import { Plus, Edit, Package, Search, Filter, Eye, Clock, Loader2, Truck, CheckCircle, BarChart3, XCircle, Play, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Edit, Package, Search, Filter, Clock, Loader2, Truck, CheckCircle, BarChart3, Play, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import CreateOrder from './CreateOrder';
 import ViewOrder from './ViewOrder';
 import EditOrder from './EditOrder';
@@ -11,6 +11,9 @@ import ProcessOrder from './ProcessOrder';
 import CancelOrderModal from './CancelOrderModal';
 import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
+import EditButton from '../atoms/EditButton';
+import ViewButton from '../atoms/ViewButton';
+import CancelButton from '../atoms/CancelButton';
 import './Orders.css';
 
 const Orders: React.FC = () => {
@@ -452,23 +455,17 @@ const Orders: React.FC = () => {
                   <td>{getStatusBadge(order.status)}</td>
                   <td className="actions-cell">
                     <div className="action-buttons">
-                      <ProtectedButton
+                      <ViewButton
                         requiredPermission={Permissions.ViewOrder}
-                        className="btn btn-sm btn-info"
                         title={t('viewOrder')}
                         onClick={() => handleViewOrder(order)}
-                      >
-                        <Eye size={16} />
-                      </ProtectedButton>
+                      />
                       {order.status === OrderStatus.Draft && (
-                        <ProtectedButton
+                        <EditButton
                           requiredPermission={Permissions.EditOrder}
-                          className="btn btn-sm btn-primary"
                           title={t('editOrder')}
                           onClick={() => handleEditOrder(order)}
-                        >
-                          <Edit size={16} />
-                        </ProtectedButton>
+                        />
                       )}
                       {(order.status === OrderStatus.Draft || order.status === OrderStatus.Pending) && (() => {
                         const stockCheck = hasInsufficientStock(order);
@@ -491,14 +488,11 @@ const Orders: React.FC = () => {
                         );
                       })()}
                       {order.status !== OrderStatus.Delivered && order.status !== OrderStatus.Cancelled && (
-                        <ProtectedButton
+                        <CancelButton
                           requiredPermission={Permissions.CancelOrder}
-                          className="btn btn-sm btn-danger"
                           title={t('cancelOrder')}
                           onClick={() => handleCancelOrder(order)}
-                        >
-                          <XCircle size={16} />
-                        </ProtectedButton>
+                        />
                       )}
                     </div>
                   </td>

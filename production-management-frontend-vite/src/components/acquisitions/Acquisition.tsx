@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { acquisitionApi } from '../../services/api';
 import type { Acquisition as AcquisitionType, AcquisitionStatistics, PagedResult } from '../../types';
 import { AcquisitionStatus, AcquisitionType as AcqType } from '../../types';
-import { Plus, Edit, Trash2, Package, Search, Filter, Eye, Recycle, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Edit, Package, Search, Filter, Recycle, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
 import CreateAcquisition from './CreateAcquisition';
 import EditAcquisition from './EditAcquisition';
 import ReceiveAcquisition from './ReceiveAcquisition';
@@ -11,6 +11,9 @@ import ProcessAcquisition from './ProcessAcquisition';
 import ViewAcquisition from './ViewAcquisition';
 import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
+import EditButton from '../atoms/EditButton';
+import ViewButton from '../atoms/ViewButton';
+import DeleteButton from '../atoms/DeleteButton';
 import './Acquisition.css';
 
 const Acquisition: React.FC = () => {
@@ -444,23 +447,17 @@ const Acquisition: React.FC = () => {
                   </td>
                   <td>
                     <div className="action-buttons">
-                      <ProtectedButton
-                        className="action-button view-button"
+                      <ViewButton
                         onClick={() => handleViewAcquisition(acquisition)}
                         title={t('actions.view')}
                         requiredPermission={Permissions.ViewAcquisition}
-                      >
-                        <Eye size={16} />
-                      </ProtectedButton>
+                      />
                       {acquisition.canEdit && (
-                        <ProtectedButton
-                          className="action-button edit-button"
+                        <EditButton
                           onClick={() => handleEditAcquisition(acquisition)}
                           title={t('actions.edit')}
                           requiredPermission={Permissions.EditAcquisition}
-                        >
-                          <Edit size={16} />
-                        </ProtectedButton>
+                        />
                       )}
                       {acquisition.canReceive && (
                         <ProtectedButton
@@ -484,14 +481,11 @@ const Acquisition: React.FC = () => {
                         </ProtectedButton>
                       )}
                       {acquisition.canDelete && (
-                        <ProtectedButton
-                          className="action-button delete-button"
+                        <DeleteButton
                           onClick={() => handleDeleteAcquisition(acquisition)}
                           title={t('actions.delete')}
                           requiredPermission={Permissions.CancelAcquisition}
-                        >
-                          <Trash2 size={16} />
-                        </ProtectedButton>
+                        />
                       )}
                     </div>
                   </td>

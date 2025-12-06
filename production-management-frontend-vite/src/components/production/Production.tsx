@@ -10,17 +10,14 @@ import {
   Search, 
   Filter,
   Play,
-  XCircle,
-  Loader2,
-  Edit,
-  Eye,
   Truck,
   ChevronLeft,
   ChevronRight,
   ArrowUpDown,
   ArrowUp,
   ArrowDown,
-  Recycle
+  Recycle,
+  Loader2
 } from 'lucide-react';
 import { productionPlanApi } from '../../services/api';
 import type { ProductionPlan, ProductionPlanStatistics, PagedResult, RecyclableProductionPlan } from '../../types';
@@ -37,6 +34,9 @@ import ReceiveProduction from './ReceiveProduction';
 import CreateRecyclableProductionPlan from './CreateRecyclableProductionPlan';
 import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
+import EditButton from '../atoms/EditButton';
+import ViewButton from '../atoms/ViewButton';
+import CancelButton from '../atoms/CancelButton';
 import './Production.css';
 
 const Production: React.FC = () => {
@@ -606,25 +606,19 @@ const Production: React.FC = () => {
                       <td>{formatDate(plan.createdAt)}</td>
                       <td className="actions-cell">
                         <div className="action-buttons">
-                          <ProtectedButton
+                          <ViewButton
                             requiredPermission={Permissions.ViewProductionPlan}
-                            className="btn btn-sm btn-info"
                             title={t('actions.viewPlanDetails')}
                             onClick={() => handleViewPlan(plan)}
-                          >
-                            <Eye size={16} />
-                          </ProtectedButton>
+                          />
                           
                           {/* Edit button - only for Draft status */}
                           {plan.status === ProductionPlanStatus.Draft && (
-                            <ProtectedButton
+                            <EditButton
                               requiredPermission={Permissions.EditProductionPlan}
-                              className="btn btn-sm btn-primary"
                               title={t('actions.editPlan')}
                               onClick={() => handleEditPlan(plan)}
-                            >
-                              <Edit size={16} />
-                            </ProtectedButton>
+                            />
                           )}
                           
                           {/* Start Processing button - only for Draft and Planned status */}
@@ -654,14 +648,11 @@ const Production: React.FC = () => {
                           
                           {/* Cancel button - for Draft, Planned, and In Progress status */}
                           {plan.status !== ProductionPlanStatus.Completed && plan.status !== ProductionPlanStatus.Cancelled && (
-                            <ProtectedButton
+                            <CancelButton
                               requiredPermission={Permissions.CancelProductionPlan}
-                              className="btn btn-sm btn-warning" 
                               title={t('actions.cancelPlan')}
                               onClick={() => handleCancelPlan(plan)}
-                            >
-                              <XCircle size={16} />
-                            </ProtectedButton>
+                            />
                           )}
                         </div>
                       </td>
@@ -883,33 +874,24 @@ const Production: React.FC = () => {
                       <td>{formatDate(plan.createdAt)}</td>
                       <td className="actions-cell">
                         <div className="action-buttons">
-                          <ProtectedButton
+                          <ViewButton
                             requiredPermission={Permissions.ViewProductionPlan}
-                            className="btn btn-sm btn-info"
                             title={t('actions.viewPlanDetails')}
                             onClick={() => handleViewRecPlan(plan)}
-                          >
-                            <Eye size={16} />
-                          </ProtectedButton>
+                          />
                           {plan.status === ProductionPlanStatus.Draft && (
-                            <ProtectedButton
+                            <EditButton
                               requiredPermission={Permissions.EditProductionPlan}
-                              className="btn btn-sm btn-primary"
                               title={t('actions.editPlan')}
                               onClick={() => handleEditRecPlan(plan)}
-                            >
-                              <Edit size={16} />
-                            </ProtectedButton>
+                            />
                           )}
                           {plan.status !== ProductionPlanStatus.Completed && plan.status !== ProductionPlanStatus.Cancelled && (
-                            <ProtectedButton
+                            <CancelButton
                               requiredPermission={Permissions.CancelProductionPlan}
-                              className="btn btn-sm btn-warning"
                               title={t('actions.cancelPlan')}
                               onClick={() => handleCancelRecPlan(plan)}
-                            >
-                              <XCircle size={16} />
-                            </ProtectedButton>
+                            />
                           )}
                           {(plan.status === ProductionPlanStatus.Draft || plan.status === ProductionPlanStatus.Planned) && (
                             <ProtectedButton

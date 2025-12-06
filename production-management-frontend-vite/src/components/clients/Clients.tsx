@@ -4,13 +4,10 @@ import {
   UserCircle, 
   Plus, 
   Search, 
-  Edit, 
-  Trash2,
   Loader2,
   Mail,
   Phone,
   MapPin,
-  Eye,
   ChevronLeft,
   ChevronRight
 } from 'lucide-react';
@@ -21,6 +18,9 @@ import EditClient from './EditClient';
 import ViewClient from './ViewClient';
 import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
+import EditButton from '../atoms/EditButton';
+import ViewButton from '../atoms/ViewButton';
+import DeleteButton from '../atoms/DeleteButton';
 import './Clients.css';
 
 const Clients: React.FC = () => {
@@ -284,32 +284,23 @@ const Clients: React.FC = () => {
                   <td>{formatDate(client.createdAt)}</td>
                   <td className="actions-cell">
                     <div className="action-buttons">
-                      <ProtectedButton
+                      <ViewButton
                         requiredPermission={Permissions.ViewClient}
-                        className="btn btn-sm btn-primary"
                         title={t('clients.tooltips.viewClient')}
                         onClick={() => handleViewClient(client)}
-                      >
-                        <Eye size={16} />
-                      </ProtectedButton>
-                      <ProtectedButton
+                      />
+                      <EditButton
                         requiredPermission={Permissions.EditClient}
-                        className="btn btn-sm btn-primary"
                         title={t('clients.tooltips.editClient')}
                         onClick={() => handleEditClient(client)}
-                      >
-                        <Edit size={16} />
-                      </ProtectedButton>
+                      />
                       {client.isActive && (
-                        <ProtectedButton
+                        <DeleteButton
                           requiredPermission={Permissions.DeleteClient}
-                          className="btn btn-sm btn-danger"
                           title={t('clients.tooltips.deactivateClient')}
                           onClick={() => handleDeleteClient(client)}
                           disabled={isDeleting}
-                        >
-                          <Trash2 size={16} />
-                        </ProtectedButton>
+                        />
                       )}
                     </div>
                   </td>

@@ -4,8 +4,6 @@ import {
   Truck, 
   Plus, 
   Search, 
-  Edit, 
-  Trash2,
   Loader2,
   FileText,
   ClipboardList,
@@ -19,6 +17,8 @@ import EditTransport from './EditTransport';
 import CreateTransportRecord from './CreateTransportRecord';
 import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
+import EditButton from '../atoms/EditButton';
+import DeleteButton from '../atoms/DeleteButton';
 import './Transports.css';
 
 type TabType = 'transports' | 'records';
@@ -288,23 +288,17 @@ const Transports: React.FC = () => {
                       <td>{transport.updatedAt ? formatDate(transport.updatedAt) : t('transports.messages.notSet')}</td>
                       <td className="actions-cell">
                         <div className="action-buttons">
-                          <ProtectedButton
+                          <EditButton
                             requiredPermission={Permissions.EditTransport}
-                            className="btn btn-sm btn-primary"
                             title={t('transports.tooltips.editTransport')}
                             onClick={() => handleEditTransport(transport)}
-                          >
-                            <Edit size={16} />
-                          </ProtectedButton>
-                          <ProtectedButton
+                          />
+                          <DeleteButton
                             requiredPermission={Permissions.DeleteTransport}
-                            className="btn btn-sm btn-danger"
                             title={t('transports.tooltips.deleteTransport')}
                             onClick={() => handleDeleteTransport(transport)}
                             disabled={isDeleting}
-                          >
-                            <Trash2 size={16} />
-                          </ProtectedButton>
+                          />
                         </div>
                       </td>
                     </tr>
