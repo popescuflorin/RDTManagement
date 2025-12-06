@@ -16,6 +16,7 @@ import enUsers from '../locales/en/users.json';
 import enLogin from '../locales/en/login.json';
 import enErrors from '../locales/en/errors.json';
 import enValidation from '../locales/en/validation.json';
+import enDashboard from '../locales/en/dashboard.json';
 
 import roCommon from '../locales/ro/common.json';
 import roNavigation from '../locales/ro/navigation.json';
@@ -30,6 +31,7 @@ import roUsers from '../locales/ro/users.json';
 import roLogin from '../locales/ro/login.json';
 import roErrors from '../locales/ro/errors.json';
 import roValidation from '../locales/ro/validation.json';
+import roDashboard from '../locales/ro/dashboard.json';
 
 const resources = {
   en: {
@@ -46,6 +48,7 @@ const resources = {
     login: enLogin,
     errors: enErrors,
     validation: enValidation,
+    dashboard: enDashboard,
   },
   ro: {
     common: roCommon,
@@ -61,6 +64,7 @@ const resources = {
     login: roLogin,
     errors: roErrors,
     validation: roValidation,
+    dashboard: roDashboard,
   },
 };
 
@@ -86,6 +90,7 @@ i18n
       'login',
       'errors',
       'validation',
+      'dashboard',
     ],
     interpolation: {
       escapeValue: false, // React already escapes values

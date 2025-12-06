@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
@@ -25,6 +26,7 @@ import Suppliers from './suppliers/Suppliers';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
+  const { t } = useTranslation(['dashboard', 'common']);
   const [user, setUser] = useState<User | null>(null);
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -53,7 +55,7 @@ const Dashboard: React.FC = () => {
           clearAuthData();
           navigate('/login');
         } else {
-          setError(err.response?.data?.message || 'Failed to load dashboard data');
+          setError(err.response?.data?.message || t('dashboard.error.failedToLoad'));
         }
       } finally {
         setIsLoading(false);
@@ -92,6 +94,16 @@ const Dashboard: React.FC = () => {
     // Handle other page navigation here
   };
 
+  const getPageTitle = (page: string): string => {
+    const pageKey = `pages.${page}`;
+    const translated = t(pageKey, { ns: 'dashboard' });
+    // If translation key doesn't exist, return capitalized page name
+    if (translated === pageKey) {
+      return page.charAt(0).toUpperCase() + page.slice(1);
+    }
+    return translated;
+  };
+
   const renderPageContent = () => {
     switch (currentPage) {
       case 'dashboard':
@@ -126,7 +138,7 @@ const Dashboard: React.FC = () => {
           <h2>{dashboardData?.welcomeMessage}</h2>
           <p>
             <Clock size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            Last login: {new Date(user?.lastLoginAt || '').toLocaleString()}
+            {t('content.lastLogin', { ns: 'dashboard' })} {new Date(user?.lastLoginAt || '').toLocaleString()}
           </p>
         </div>
 
@@ -135,27 +147,27 @@ const Dashboard: React.FC = () => {
             <div className="stat-icon">
               <Users size={24} />
             </div>
-            <h3>Total Users</h3>
+            <h3>{t('content.totalUsers', { ns: 'dashboard' })}</h3>
             <div className="stat-value">{dashboardData?.totalUsers}</div>
           </div>
           <div className="stat-card">
             <div className="stat-icon">
               <UserCheck size={24} />
             </div>
-            <h3>Active Users</h3>
+            <h3>{t('content.activeUsers', { ns: 'dashboard' })}</h3>
             <div className="stat-value">{dashboardData?.activeUsers}</div>
           </div>
           <div className="stat-card">
             <div className="stat-icon">
               <Activity size={24} />
             </div>
-            <h3>System Status</h3>
+            <h3>{t('content.systemStatus', { ns: 'dashboard' })}</h3>
             <div className="stat-value status-ok">{dashboardData?.systemStatus}</div>
           </div>
         </div>
 
         <div className="activity-section">
-          <h3>Recent Activity</h3>
+          <h3>{t('content.recentActivity', { ns: 'dashboard' })}</h3>
           <div className="activity-list">
             {dashboardData?.recentActivity.map((activity, index) => (
               <div key={index} className="activity-item">
@@ -167,26 +179,26 @@ const Dashboard: React.FC = () => {
         </div>
 
         <div className="user-profile-section">
-          <h3>Profile Information</h3>
+          <h3>{t('content.profileInformation', { ns: 'dashboard' })}</h3>
           <div className="profile-info">
             <div className="profile-item">
               <label>
                 <UserIcon size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-                Username:
+                {t('content.username', { ns: 'dashboard' })}
               </label>
               <span>{user?.username}</span>
             </div>
             <div className="profile-item">
               <label>
                 <Mail size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-                Email:
+                {t('content.email', { ns: 'dashboard' })}
               </label>
               <span>{user?.email}</span>
             </div>
             <div className="profile-item">
               <label>
                 <UserIcon size={16} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-                Full Name:
+                {t('content.fullName', { ns: 'dashboard' })}
               </label>
               <span>{user?.firstName} {user?.lastName}</span>
             </div>
@@ -201,7 +213,7 @@ const Dashboard: React.FC = () => {
   if (isLoading) {
     return (
       <div className="dashboard-container">
-        <div className="loading">Loading dashboard...</div>
+        <div className="loading">{t('loading.loadingDashboard', { ns: 'dashboard' })}</div>
       </div>
     );
   }
@@ -209,7 +221,7 @@ const Dashboard: React.FC = () => {
   if (error) {
     return (
       <div className="dashboard-container">
-        <div className="error">Error: {error}</div>
+        <div className="error">{t('error.error', { ns: 'dashboard', error })}</div>
       </div>
     );
   }
@@ -227,21 +239,21 @@ const Dashboard: React.FC = () => {
       <div className={`dashboard-content ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
       <header className="dashboard-header">
         <div className="header-content">
-          <h1>{currentPage === 'dashboard' ? 'Dashboard' : currentPage.charAt(0).toUpperCase() + currentPage.slice(1)}</h1>
+          <h1>{getPageTitle(currentPage)}</h1>
           <div className="user-info">
-            <span>Welcome, {user?.firstName} {user?.lastName} ({user?.role})</span>
+            <span>{t('header.welcome', { ns: 'dashboard', firstName: user?.firstName, lastName: user?.lastName, role: user?.role })}</span>
             {isAdmin && currentPage === 'dashboard' && (
               <button 
                 onClick={() => setShowRegisterModal(true)} 
                 className="btn btn-primary"
               >
                 <UserPlus size={16} />
-                Create User
+                {t('header.createUser', { ns: 'dashboard' })}
               </button>
             )}
             <button onClick={handleLogout} className="btn btn-danger">
               <LogOut size={16} />
-              Logout
+              {t('header.logout', { ns: 'dashboard' })}
             </button>
           </div>
         </div>

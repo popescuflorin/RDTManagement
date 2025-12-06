@@ -1,0 +1,38 @@
+{
+  "title": "Tablou de Bord",
+  "loading": {
+    "loadingDashboard": "Se încarcă tabloul de bord..."
+  },
+  "error": {
+    "error": "Eroare: {{error}}",
+    "failedToLoad": "Eșec la încărcarea datelor tabloului de bord"
+  },
+  "header": {
+    "welcome": "Bun venit, {{firstName}} {{lastName}} ({{role}})",
+    "createUser": "Creează Utilizator",
+    "logout": "Deconectare"
+  },
+  "content": {
+    "lastLogin": "Ultima autentificare:",
+    "totalUsers": "Total Utilizatori",
+    "activeUsers": "Utilizatori Activi",
+    "systemStatus": "Status Sistem",
+    "recentActivity": "Activitate Recentă",
+    "profileInformation": "Informații Profil",
+    "username": "Nume utilizator:",
+    "email": "Email:",
+    "fullName": "Nume complet:"
+  },
+  "pages": {
+    "dashboard": "Tablou de Bord",
+    "users": "Utilizatori",
+    "production": "Producție",
+    "inventory": "Inventar",
+    "acquisitions": "Achiziții",
+    "orders": "Comenzi",
+    "transports": "Transporturi",
+    "clients": "Clienți",
+    "suppliers": "Furnizori"
+  }
+}
+

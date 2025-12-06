@@ -1,0 +1,38 @@
+{
+  "title": "Dashboard",
+  "loading": {
+    "loadingDashboard": "Loading dashboard..."
+  },
+  "error": {
+    "error": "Error: {{error}}",
+    "failedToLoad": "Failed to load dashboard data"
+  },
+  "header": {
+    "welcome": "Welcome, {{firstName}} {{lastName}} ({{role}})",
+    "createUser": "Create User",
+    "logout": "Logout"
+  },
+  "content": {
+    "lastLogin": "Last login:",
+    "totalUsers": "Total Users",
+    "activeUsers": "Active Users",
+    "systemStatus": "System Status",
+    "recentActivity": "Recent Activity",
+    "profileInformation": "Profile Information",
+    "username": "Username:",
+    "email": "Email:",
+    "fullName": "Full Name:"
+  },
+  "pages": {
+    "dashboard": "Dashboard",
+    "users": "Users",
+    "production": "Production",
+    "inventory": "Inventory",
+    "acquisitions": "Acquisitions",
+    "orders": "Orders",
+    "transports": "Transports",
+    "clients": "Clients",
+    "suppliers": "Suppliers"
+  }
+}
+
