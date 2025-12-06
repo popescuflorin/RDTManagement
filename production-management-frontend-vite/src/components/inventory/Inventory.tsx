@@ -9,10 +9,7 @@ import {
   Loader2,
   XCircle,
   ChevronLeft,
-  ChevronRight,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown
+  ChevronRight
 } from 'lucide-react';
 import { inventoryApi } from '../../services/api';
 import type { RawMaterial, InventoryStatistics, PagedResult } from '../../types';
@@ -27,6 +24,8 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
+import { Table } from '../atoms';
+import type { TableColumn } from '../atoms';
 import './Inventory.css';
 
 const Inventory: React.FC = () => {
@@ -133,25 +132,10 @@ const Inventory: React.FC = () => {
     setSelectedMaterial(null);
   };
 
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      // Toggle sort order if clicking the same column
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      // Set new column and default to ascending
-      setSortBy(column);
-      setSortOrder('asc');
-    }
+  const handleSort = (column: string, order: 'asc' | 'desc') => {
+    setSortBy(column);
+    setSortOrder(order);
     setCurrentPage(1); // Reset to first page when sorting changes
-  };
-
-  const getSortIcon = (column: string) => {
-    if (sortBy !== column) {
-      return <ArrowUpDown size={14} className="sort-icon inactive" />;
-    }
-    return sortOrder === 'asc' 
-      ? <ArrowUp size={14} className="sort-icon active" />
-      : <ArrowDown size={14} className="sort-icon active" />;
   };
 
   const materials = pagedData?.items || [];
@@ -293,135 +277,157 @@ const Inventory: React.FC = () => {
       )}
 
       {/* Materials Table */}
-      <div className="table-container">
-        <table className="inventory-materials-table">
-          <thead>
-            <tr>
-              <th className="sortable" onClick={() => handleSort('Name')}>
-                <div className="th-content">
-                  <span>{t('table.material')}</span>
-                  {getSortIcon('Name')}
+      {(() => {
+        const columns: TableColumn<RawMaterial>[] = [
+          {
+            key: 'Name',
+            label: t('table.material'),
+            sortable: true,
+            render: (_, material) => (
+              <div className="material-name-cell">
+                <div className="material-name">{material.name}</div>
+                {material.description && (
+                  <div className="material-description">{material.description}</div>
+                )}
+              </div>
+            ),
+            cellClassName: 'material-name-cell'
+          },
+          {
+            key: 'color',
+            label: t('table.color'),
+            render: (_, material) => (
+              <div className="color-indicator">
+                <span 
+                  className="color-dot" 
+                  style={{ backgroundColor: material.color.toLowerCase() }}
+                ></span>
+                {material.color}
+              </div>
+            )
+          },
+          {
+            key: 'Quantity',
+            label: t('table.inStock'),
+            sortable: true,
+            render: (_, material) => (
+              <div className="quantity-cell">
+                <div className="quantity-value">
+                  {material.quantity.toLocaleString()} {material.quantityType}
                 </div>
-              </th>
-              <th>{t('table.color')}</th>
-              <th className="sortable" onClick={() => handleSort('Quantity')}>
-                <div className="th-content">
-                  <span>{t('table.inStock')}</span>
-                  {getSortIcon('Quantity')}
+              </div>
+            ),
+            cellClassName: 'quantity-cell'
+          },
+          {
+            key: 'requested',
+            label: t('table.requested'),
+            render: (_, material) => (
+              <div className="quantity-cell">
+                <div className="quantity-value" style={{ color: material.requestedQuantity > 0 ? '#ff9800' : '#666' }}>
+                  {material.requestedQuantity.toLocaleString()} {material.quantityType}
                 </div>
-              </th>
-              <th>{t('table.requested')}</th>
-              <th>{t('table.available')}</th>
-              <th>{t('table.minStock')}</th>
-              <th>{t('table.status')}</th>
-              <th className="sortable" onClick={() => handleSort('Updated')}>
-                <div className="th-content">
-                  <span>{t('table.lastUpdated')}</span>
-                  {getSortIcon('Updated')}
+              </div>
+            ),
+            cellClassName: 'quantity-cell'
+          },
+          {
+            key: 'available',
+            label: t('table.available'),
+            render: (_, material) => {
+              const availableQuantity = material.quantity - material.requestedQuantity;
+              const isInsufficient = availableQuantity < 0;
+              return (
+                <div className="quantity-cell">
+                  <div className="quantity-value" style={{ 
+                    color: isInsufficient ? '#f44336' : (availableQuantity <= material.minimumStock ? '#ff9800' : '#4caf50'),
+                    fontWeight: isInsufficient ? 'bold' : 'normal'
+                  }}>
+                    {availableQuantity.toLocaleString()} {material.quantityType}
+                  </div>
+                  {material.isLowStock && (
+                    <div className="low-stock-indicator">
+                      {isInsufficient ? t('status.insufficient') : t('status.lowStock')}
+                    </div>
+                  )}
                 </div>
-              </th>
-              <th>{t('table.actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {materials.length === 0 ? (
-              <tr>
-                <td colSpan={10} className="no-materials">
-                  {searchTerm 
-                    ? t('emptyState.noMaterialsFound')
-                    : t('emptyState.noMaterialsInCategory')}
-                </td>
-              </tr>
-            ) : (
-              materials.map((material) => {
-                const availableQuantity = material.quantity - material.requestedQuantity;
-                const isInsufficient = availableQuantity < 0;
-                
-                return (
-                <tr key={material.id} className={!material.isActive ? 'inactive-material' : ''}>
-                  <td className="material-name-cell">
-                    <div className="material-name">{material.name}</div>
-                    {material.description && (
-                      <div className="material-description">{material.description}</div>
-                    )}
-                  </td>
-                  <td>
-                    <div className="color-indicator">
-                      <span 
-                        className="color-dot" 
-                        style={{ backgroundColor: material.color.toLowerCase() }}
-                      ></span>
-                      {material.color}
-                    </div>
-                  </td>
-                  <td className="quantity-cell">
-                    <div className="quantity-value">
-                      {material.quantity.toLocaleString()} {material.quantityType}
-                    </div>
-                  </td>
-                  <td className="quantity-cell">
-                    <div className="quantity-value" style={{ color: material.requestedQuantity > 0 ? '#ff9800' : '#666' }}>
-                      {material.requestedQuantity.toLocaleString()} {material.quantityType}
-                    </div>
-                  </td>
-                  <td className="quantity-cell">
-                    <div className="quantity-value" style={{ 
-                      color: isInsufficient ? '#f44336' : (availableQuantity <= material.minimumStock ? '#ff9800' : '#4caf50'),
-                      fontWeight: isInsufficient ? 'bold' : 'normal'
-                    }}>
-                      {availableQuantity.toLocaleString()} {material.quantityType}
-                    </div>
-                    {material.isLowStock && (
-                      <div className="low-stock-indicator">
-                        {isInsufficient ? t('status.insufficient') : t('status.lowStock')}
-                      </div>
-                    )}
-                  </td>
-                  <td>{material.minimumStock.toLocaleString()} {material.quantityType}</td>
-                  <td className="status-cell">
-                    <span className={`status-badge ${material.isActive ? 'status-active' : 'status-inactive'}`}>
-                      {material.isActive ? t('status.active') : t('status.inactive')}
-                    </span>
-                  </td>
-                  <td>{formatDate(material.updatedAt)}</td>
-                  <td className="actions-cell">
-                    <div className="action-buttons">
-                      <ViewButton
-                        requiredPermission={Permissions.ViewMaterial}
-                        title={t('actions.view')}
-                        onClick={() => handleViewMaterial(material)}
-                      />
-                      <EditButton
-                        requiredPermission={Permissions.EditMaterial}
-                        title={t('actions.edit')}
-                        onClick={() => handleEditMaterial(material)}
-                      />
-                      {material.isActive ? (
-                        <DeleteButton
-                          requiredPermission={Permissions.DeactivateMaterial}
-                          title={material.quantity > 0 ? t('actions.cannotDeactivate') : t('actions.deactivate')}
-                          onClick={() => handleDeleteMaterial(material)}
-                          disabled={material.quantity > 0}
-                        />
-                      ) : (
-                        <ProtectedButton
-                          requiredPermission={Permissions.ActivateMaterial}
-                          className="btn btn-sm btn-success" 
-                          title={t('actions.activate')}
-                          onClick={() => handleActivateMaterial(material)}
-                        >
-                          <CheckCircle size={16} />
-                        </ProtectedButton>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-                );
-              })
-            )}
-          </tbody>
-        </table>
-      </div>
+              );
+            },
+            cellClassName: 'quantity-cell'
+          },
+          {
+            key: 'minStock',
+            label: t('table.minStock'),
+            render: (_, material) => `${material.minimumStock.toLocaleString()} ${material.quantityType}`
+          },
+          {
+            key: 'status',
+            label: t('table.status'),
+            render: (_, material) => (
+              <span className={`status-badge ${material.isActive ? 'status-active' : 'status-inactive'}`}>
+                {material.isActive ? t('status.active') : t('status.inactive')}
+              </span>
+            ),
+            cellClassName: 'status-cell'
+          },
+          {
+            key: 'Updated',
+            label: t('table.lastUpdated'),
+            sortable: true,
+            render: (_, material) => formatDate(material.updatedAt)
+          },
+          {
+            key: 'actions',
+            label: t('table.actions'),
+            render: (_, material) => (
+              <div className="action-buttons">
+                <ViewButton
+                  requiredPermission={Permissions.ViewMaterial}
+                  title={t('actions.view')}
+                  onClick={() => handleViewMaterial(material)}
+                />
+                <EditButton
+                  requiredPermission={Permissions.EditMaterial}
+                  title={t('actions.edit')}
+                  onClick={() => handleEditMaterial(material)}
+                />
+                {material.isActive ? (
+                  <DeleteButton
+                    requiredPermission={Permissions.DeactivateMaterial}
+                    title={material.quantity > 0 ? t('actions.cannotDeactivate') : t('actions.deactivate')}
+                    onClick={() => handleDeleteMaterial(material)}
+                    disabled={material.quantity > 0}
+                  />
+                ) : (
+                  <ProtectedButton
+                    requiredPermission={Permissions.ActivateMaterial}
+                    className="btn btn-sm btn-success" 
+                    title={t('actions.activate')}
+                    onClick={() => handleActivateMaterial(material)}
+                  >
+                    <CheckCircle size={16} />
+                  </ProtectedButton>
+                )}
+              </div>
+            ),
+            cellClassName: 'actions-cell'
+          }
+        ];
+
+        return (
+          <Table
+            columns={columns}
+            data={materials}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSort={handleSort}
+            getRowClassName={(material) => !material.isActive ? 'inactive-material' : ''}
+            emptyMessage={searchTerm 
+              ? t('emptyState.noMaterialsFound')
+              : t('emptyState.noMaterialsInCategory')}
+          />
+        );
+      })()}
 
       {/* Pagination Controls */}
       {pagedData && pagedData.totalPages > 0 && (

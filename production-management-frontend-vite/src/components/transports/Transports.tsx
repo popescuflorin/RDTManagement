@@ -19,6 +19,8 @@ import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import DeleteButton from '../atoms/DeleteButton';
+import { Table } from '../atoms';
+import type { TableColumn } from '../atoms';
 import './Transports.css';
 
 type TabType = 'transports' | 'records';
@@ -255,58 +257,71 @@ const Transports: React.FC = () => {
       {/* Transport Vehicles Tab Content */}
       {activeTab === 'transports' && (
         <>
-          <div className="table-container">
-            <table className="transports-table">
-              <thead>
-                <tr>
-                  <th>{t('transports.table.id')}</th>
-                  <th>{t('transports.table.carName')}</th>
-                  <th>{t('transports.table.numberPlate')}</th>
-                  <th>{t('transports.table.phoneNumber')}</th>
-                  <th>{t('transports.table.createdAt')}</th>
-                  <th>{t('transports.table.updatedAt')}</th>
-                  <th>{t('transports.table.actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transports.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="no-data">
-                      {searchTerm 
-                        ? t('transports.empty.noTransportsFound')
-                        : t('transports.empty.noTransportsCreateFirst')}
-                    </td>
-                  </tr>
-                ) : (
-                  transports.map(transport => (
-                    <tr key={transport.id}>
-                      <td>#{transport.id}</td>
-                      <td className="transport-name">{transport.carName}</td>
-                      <td>{transport.numberPlate || t('transports.messages.notSet')}</td>
-                      <td>{transport.phoneNumber}</td>
-                      <td>{formatDate(transport.createdAt)}</td>
-                      <td>{transport.updatedAt ? formatDate(transport.updatedAt) : t('transports.messages.notSet')}</td>
-                      <td className="actions-cell">
-                        <div className="action-buttons">
-                          <EditButton
-                            requiredPermission={Permissions.EditTransport}
-                            title={t('transports.tooltips.editTransport')}
-                            onClick={() => handleEditTransport(transport)}
-                          />
-                          <DeleteButton
-                            requiredPermission={Permissions.DeleteTransport}
-                            title={t('transports.tooltips.deleteTransport')}
-                            onClick={() => handleDeleteTransport(transport)}
-                            disabled={isDeleting}
-                          />
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+          {(() => {
+            const columns: TableColumn<Transport>[] = [
+              {
+                key: 'id',
+                label: t('transports.table.id'),
+                render: (_, transport) => `#${transport.id}`
+              },
+              {
+                key: 'carName',
+                label: t('transports.table.carName'),
+                render: (_, transport) => <span className="transport-name">{transport.carName}</span>,
+                cellClassName: 'transport-name'
+              },
+              {
+                key: 'numberPlate',
+                label: t('transports.table.numberPlate'),
+                render: (_, transport) => transport.numberPlate || t('transports.messages.notSet')
+              },
+              {
+                key: 'phoneNumber',
+                label: t('transports.table.phoneNumber'),
+                render: (_, transport) => transport.phoneNumber
+              },
+              {
+                key: 'createdAt',
+                label: t('transports.table.createdAt'),
+                render: (_, transport) => formatDate(transport.createdAt)
+              },
+              {
+                key: 'updatedAt',
+                label: t('transports.table.updatedAt'),
+                render: (_, transport) => transport.updatedAt ? formatDate(transport.updatedAt) : t('transports.messages.notSet')
+              },
+              {
+                key: 'actions',
+                label: t('transports.table.actions'),
+                render: (_, transport) => (
+                  <div className="action-buttons">
+                    <EditButton
+                      requiredPermission={Permissions.EditTransport}
+                      title={t('transports.tooltips.editTransport')}
+                      onClick={() => handleEditTransport(transport)}
+                    />
+                    <DeleteButton
+                      requiredPermission={Permissions.DeleteTransport}
+                      title={t('transports.tooltips.deleteTransport')}
+                      onClick={() => handleDeleteTransport(transport)}
+                      disabled={isDeleting}
+                    />
+                  </div>
+                ),
+                cellClassName: 'actions-cell'
+              }
+            ];
+
+            return (
+              <Table
+                columns={columns}
+                data={transports}
+                emptyMessage={searchTerm 
+                  ? t('transports.empty.noTransportsFound')
+                  : t('transports.empty.noTransportsCreateFirst')}
+              />
+            );
+          })()}
 
           {/* Pagination Controls */}
           {pagedTransports && pagedTransports.totalPages > 0 && (
@@ -420,62 +435,76 @@ const Transports: React.FC = () => {
             </div>
           ) : (
             <>
-              <div className="table-container">
-                <table className="transports-table">
-                  <thead>
-                    <tr>
-                      <th>{t('transports.table.type')}</th>
-                      <th>{t('transports.table.relatedEntity')}</th>
-                      <th>{t('transports.table.carName')}</th>
-                      <th>{t('transports.table.numberPlate')}</th>
-                      <th>{t('transports.table.phoneNumber')}</th>
-                      <th>{t('transports.table.transportDate')}</th>
-                      <th>{t('transports.table.status')}</th>
-                      <th>{t('transports.table.createdAt')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transportRecords.length === 0 ? (
-                      <tr>
-                        <td colSpan={8} className="no-data">
-                          {recordsSearchTerm 
-                            ? t('transports.empty.noRecordsFound')
-                            : t('transports.empty.noRecords')}
-                        </td>
-                      </tr>
-                    ) : (
-                      transportRecords.map(record => (
-                        <tr key={`${record.type}-${record.id}`}>
-                          <td>
-                            <span className={`record-type-badge ${record.type.toLowerCase()}`}>
-                              {record.type === 'Acquisition' ? (
-                                <FileText size={14} style={{ marginRight: '4px' }} />
-                              ) : (
-                                <ClipboardList size={14} style={{ marginRight: '4px' }} />
-                              )}
-                              {record.type}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="related-entity">
-                              <strong>#{record.relatedEntityId}</strong>
-                              <span className="entity-name">{record.relatedEntityName}</span>
-                            </div>
-                          </td>
-                          <td className="transport-name">{record.carName}</td>
-                          <td>{record.numberPlate ?? t('transports.messages.notSet')}</td>
-                          <td>{record.phoneNumber ?? t('transports.messages.notSet')}</td>
-                          <td>{record.transportDate ? formatDate(record.transportDate) : t('transports.messages.notSet')}</td>
-                          <td>
-                            <span className="status-badge">{record.status}</span>
-                          </td>
-                          <td>{formatDateTime(record.createdAt)}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
-              </div>
+              {(() => {
+                const columns: TableColumn<TransportRecord>[] = [
+                  {
+                    key: 'type',
+                    label: t('transports.table.type'),
+                    render: (_, record) => (
+                      <span className={`record-type-badge ${record.type.toLowerCase()}`}>
+                        {record.type === 'Acquisition' ? (
+                          <FileText size={14} style={{ marginRight: '4px' }} />
+                        ) : (
+                          <ClipboardList size={14} style={{ marginRight: '4px' }} />
+                        )}
+                        {record.type}
+                      </span>
+                    )
+                  },
+                  {
+                    key: 'relatedEntity',
+                    label: t('transports.table.relatedEntity'),
+                    render: (_, record) => (
+                      <div className="related-entity">
+                        <strong>#{record.relatedEntityId}</strong>
+                        <span className="entity-name">{record.relatedEntityName}</span>
+                      </div>
+                    )
+                  },
+                  {
+                    key: 'carName',
+                    label: t('transports.table.carName'),
+                    render: (_, record) => <span className="transport-name">{record.carName}</span>,
+                    cellClassName: 'transport-name'
+                  },
+                  {
+                    key: 'numberPlate',
+                    label: t('transports.table.numberPlate'),
+                    render: (_, record) => record.numberPlate ?? t('transports.messages.notSet')
+                  },
+                  {
+                    key: 'phoneNumber',
+                    label: t('transports.table.phoneNumber'),
+                    render: (_, record) => record.phoneNumber ?? t('transports.messages.notSet')
+                  },
+                  {
+                    key: 'transportDate',
+                    label: t('transports.table.transportDate'),
+                    render: (_, record) => record.transportDate ? formatDate(record.transportDate) : t('transports.messages.notSet')
+                  },
+                  {
+                    key: 'status',
+                    label: t('transports.table.status'),
+                    render: (_, record) => <span className="status-badge">{record.status}</span>
+                  },
+                  {
+                    key: 'createdAt',
+                    label: t('transports.table.createdAt'),
+                    render: (_, record) => formatDateTime(record.createdAt)
+                  }
+                ];
+
+                return (
+                  <Table
+                    columns={columns}
+                    data={transportRecords}
+                    getRowKey={(record) => `${record.type}-${record.id}`}
+                    emptyMessage={recordsSearchTerm 
+                      ? t('transports.empty.noRecordsFound')
+                      : t('transports.empty.noRecords')}
+                  />
+                );
+              })()}
 
               {/* Pagination Controls */}
               {pagedRecords && pagedRecords.totalPages > 0 && (

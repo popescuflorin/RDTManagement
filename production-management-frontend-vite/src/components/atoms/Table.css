@@ -1,0 +1,104 @@
+/* Table Container */
+.table-container {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin: 0 var(--space-2xl);
+}
+
+/* Table Styles */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.data-table th {
+  background: var(--primary-500);
+  color: var(--text-inverse);
+  padding: var(--space-lg) var(--space-md);
+  text-align: left;
+  font-weight: 600;
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  user-select: none;
+}
+
+.data-table th.sortable {
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.data-table th.sortable:hover {
+  background: var(--primary-600);
+}
+
+.data-table th .th-content {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  justify-content: space-between;
+}
+
+.data-table th .sort-icon {
+  flex-shrink: 0;
+  transition: all var(--transition-fast);
+  opacity: 0.4;
+}
+
+.data-table th .sort-icon.active {
+  opacity: 1;
+  color: var(--warning-200);
+}
+
+.data-table th.sortable:hover .sort-icon.inactive {
+  opacity: 0.7;
+}
+
+.data-table td {
+  padding: var(--space-lg) var(--space-md);
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  color: var(--text-primary);
+}
+
+.data-table tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.data-table tbody tr:hover {
+  background-color: var(--surface-hover);
+}
+
+.data-table tbody tr.inactive-row {
+  opacity: 0.6;
+  background-color: var(--surface-hover);
+}
+
+.data-table .no-data {
+  text-align: center;
+  padding: var(--space-3xl);
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .table-container {
+    margin: 0 var(--space-md);
+    overflow-x: auto;
+  }
+
+  .data-table {
+    min-width: 600px;
+  }
+
+  .data-table th,
+  .data-table td {
+    padding: var(--space-md) var(--space-sm);
+    font-size: var(--text-xs);
+  }
+}

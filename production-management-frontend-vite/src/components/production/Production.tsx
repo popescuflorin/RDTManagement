@@ -13,9 +13,6 @@ import {
   Truck,
   ChevronLeft,
   ChevronRight,
-  ArrowUpDown,
-  ArrowUp,
-  ArrowDown,
   Recycle,
   Loader2
 } from 'lucide-react';
@@ -37,6 +34,8 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import CancelButton from '../atoms/CancelButton';
+import { Table } from '../atoms';
+import type { TableColumn } from '../atoms';
 import './Production.css';
 
 const Production: React.FC = () => {
@@ -289,25 +288,10 @@ const Production: React.FC = () => {
     loadData();
   };
 
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      // Toggle sort order if clicking the same column
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      // Set new column and default to descending
-      setSortBy(column);
-      setSortOrder('desc');
-    }
+  const handleSort = (column: string, order: 'asc' | 'desc') => {
+    setSortBy(column);
+    setSortOrder(order);
     setCurrentPage(1); // Reset to first page when sorting changes
-  };
-
-  const getSortIcon = (column: string) => {
-    if (sortBy !== column) {
-      return <ArrowUpDown size={14} className="sort-icon inactive" />;
-    }
-    return sortOrder === 'asc' 
-      ? <ArrowUp size={14} className="sort-icon active" />
-      : <ArrowDown size={14} className="sort-icon active" />;
   };
 
   const plans = pagedData?.items || [];
@@ -519,149 +503,171 @@ const Production: React.FC = () => {
       {activeTab === 'rawMaterial' && (
         <>
           {/* Production Plans Table */}
-          <div className="table-container">
-            <table className="products-table">
-              <thead>
-                <tr>
-                  <th className="sortable" onClick={() => handleSort('Name')}>
-                    <div className="th-content">
-                      <span>{t('table.planName')}</span>
-                      {getSortIcon('Name')}
-                    </div>
-                  </th>
-                  <th>{t('table.targetProduct')}</th>
-                  <th>{t('table.quantity')}</th>
-                  <th>{t('table.materials')}</th>
-                  <th>{t('table.time')}</th>
-                  <th className="sortable" onClick={() => handleSort('Status')}>
-                    <div className="th-content">
-                      <span>{t('table.status')}</span>
-                      {getSortIcon('Status')}
-                    </div>
-                  </th>
-                  <th className="sortable" onClick={() => handleSort('CreatedAt')}>
-                    <div className="th-content">
-                      <span>{t('table.created')}</span>
-                      {getSortIcon('CreatedAt')}
-                    </div>
-                  </th>
-                  <th>{t('table.actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {plans.length === 0 ? (
-                  <tr>
-                    <td colSpan={8} className="no-products">
-                      {searchTerm || statusFilter !== null 
-                        ? t('emptyState.noPlansFound')
-                        : t('emptyState.noPlansCreated')}
-                    </td>
-                  </tr>
-                ) : (
-                  plans.map((plan) => (
-                    <tr key={plan.id} className={plan.status === ProductionPlanStatus.Cancelled ? 'inactive-product' : ''}>
-                      <td className="product-name-cell">
-                        <div className="product-name">{plan.name}</div>
-                        {plan.description && (
-                          <div className="product-description">{plan.description}</div>
-                        )}
-                      </td>
-                      <td>
-                        <div className="product-name">{plan.targetProductName}</div>
-                        <div className="product-description">({plan.targetProductColor})</div>
-                      </td>
-                      <td className="quantity-cell">
-                        {plan.quantityToProduce} {plan.targetProductQuantityType}
-                      </td>
-                      <td className="materials-cell">
-                        <div className="materials-list">
-                          {plan.requiredMaterials.slice(0, 2).map((material) => (
-                            <div key={material.id} className="material-item">
-                              <span className="material-name">{material.materialName}</span>
-                              <span className={`material-quantity ${!material.isAvailable ? 'insufficient' : ''}`}>
-                                {material.requiredQuantity * plan.quantityToProduce} {material.quantityType}
-                              </span>
-                            </div>
-                          ))}
-                          {plan.requiredMaterials.length > 2 && (
-                            <div className="materials-more">
-                              +{plan.requiredMaterials.length - 2} {t('table.more')}
-                            </div>
-                          )}
-                        </div>
-                      </td>
-                      <td className="time-cell">{formatTime(plan.estimatedProductionTimeMinutes)}</td>
-                      <td className="status-cell">
-                        <div className="status-badges">
-                          <span className={`status-badge ${getStatusClass(plan.status)}`}>
-                            {getStatusLabel(plan.status)}
+          {(() => {
+            const columns: TableColumn<ProductionPlan>[] = [
+              {
+                key: 'Name',
+                label: t('table.planName'),
+                sortable: true,
+                render: (_, plan) => (
+                  <div className="product-name-cell">
+                    <div className="product-name">{plan.name}</div>
+                    {plan.description && (
+                      <div className="product-description">{plan.description}</div>
+                    )}
+                  </div>
+                ),
+                cellClassName: 'product-name-cell'
+              },
+              {
+                key: 'targetProduct',
+                label: t('table.targetProduct'),
+                render: (_, plan) => (
+                  <>
+                    <div className="product-name">{plan.targetProductName}</div>
+                    <div className="product-description">({plan.targetProductColor})</div>
+                  </>
+                )
+              },
+              {
+                key: 'quantity',
+                label: t('table.quantity'),
+                render: (_, plan) => (
+                  <span className="quantity-cell">
+                    {plan.quantityToProduce} {plan.targetProductQuantityType}
+                  </span>
+                ),
+                cellClassName: 'quantity-cell'
+              },
+              {
+                key: 'materials',
+                label: t('table.materials'),
+                render: (_, plan) => (
+                  <div className="materials-cell">
+                    <div className="materials-list">
+                      {plan.requiredMaterials.slice(0, 2).map((material) => (
+                        <div key={material.id} className="material-item">
+                          <span className="material-name">{material.materialName}</span>
+                          <span className={`material-quantity ${!material.isAvailable ? 'insufficient' : ''}`}>
+                            {material.requiredQuantity * plan.quantityToProduce} {material.quantityType}
                           </span>
-                          {plan.status !== ProductionPlanStatus.Completed && plan.status !== ProductionPlanStatus.Cancelled && (
-                            <span className={`production-badge ${plan.canProduce ? 'can-produce' : 'cannot-produce'}`}>
-                              {plan.canProduce ? t('badges.ready') : t('badges.notReady')}
-                            </span>
-                          )}
                         </div>
-                      </td>
-                      <td>{formatDate(plan.createdAt)}</td>
-                      <td className="actions-cell">
-                        <div className="action-buttons">
-                          <ViewButton
-                            requiredPermission={Permissions.ViewProductionPlan}
-                            title={t('actions.viewPlanDetails')}
-                            onClick={() => handleViewPlan(plan)}
-                          />
-                          
-                          {/* Edit button - only for Draft status */}
-                          {plan.status === ProductionPlanStatus.Draft && (
-                            <EditButton
-                              requiredPermission={Permissions.EditProductionPlan}
-                              title={t('actions.editPlan')}
-                              onClick={() => handleEditPlan(plan)}
-                            />
-                          )}
-                          
-                          {/* Start Processing button - only for Draft and Planned status */}
-                          {(plan.status === ProductionPlanStatus.Draft || plan.status === ProductionPlanStatus.Planned) && (
-                            <ProtectedButton
-                              requiredPermission={Permissions.ExecuteProductionPlan}
-                              className={`btn btn-sm btn-success ${!plan.canProduce ? 'disabled' : ''}`}
-                              title={plan.canProduce ? t('actions.startProcessing') : t('actions.cannotStartMissingMaterials')}
-                              onClick={() => plan.canProduce && handleExecutePlan(plan.id)}
-                              disabled={!plan.canProduce}
-                            >
-                              <Play size={16} />
-                            </ProtectedButton>
-                          )}
-                          
-                          {/* Complete Production button - only for In Progress status */}
-                          {plan.status === ProductionPlanStatus.InProgress && (
-                            <ProtectedButton
-                              requiredPermission={Permissions.ReceiveProduction}
-                              className="btn btn-sm btn-success"
-                              title={t('actions.completeProduction')}
-                              onClick={() => handleReceivePlan(plan)}
-                            >
-                              <Truck size={16} />
-                            </ProtectedButton>
-                          )}
-                          
-                          {/* Cancel button - for Draft, Planned, and In Progress status */}
-                          {plan.status !== ProductionPlanStatus.Completed && plan.status !== ProductionPlanStatus.Cancelled && (
-                            <CancelButton
-                              requiredPermission={Permissions.CancelProductionPlan}
-                              title={t('actions.cancelPlan')}
-                              onClick={() => handleCancelPlan(plan)}
-                            />
-                          )}
+                      ))}
+                      {plan.requiredMaterials.length > 2 && (
+                        <div className="materials-more">
+                          +{plan.requiredMaterials.length - 2} {t('table.more')}
                         </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                      )}
+                    </div>
+                  </div>
+                ),
+                cellClassName: 'materials-cell'
+              },
+              {
+                key: 'time',
+                label: t('table.time'),
+                render: (_, plan) => <span className="time-cell">{formatTime(plan.estimatedProductionTimeMinutes)}</span>,
+                cellClassName: 'time-cell'
+              },
+              {
+                key: 'Status',
+                label: t('table.status'),
+                sortable: true,
+                render: (_, plan) => (
+                  <div className="status-cell">
+                    <div className="status-badges">
+                      <span className={`status-badge ${getStatusClass(plan.status)}`}>
+                        {getStatusLabel(plan.status)}
+                      </span>
+                      {plan.status !== ProductionPlanStatus.Completed && plan.status !== ProductionPlanStatus.Cancelled && (
+                        <span className={`production-badge ${plan.canProduce ? 'can-produce' : 'cannot-produce'}`}>
+                          {plan.canProduce ? t('badges.ready') : t('badges.notReady')}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                ),
+                cellClassName: 'status-cell'
+              },
+              {
+                key: 'CreatedAt',
+                label: t('table.created'),
+                sortable: true,
+                render: (_, plan) => formatDate(plan.createdAt)
+              },
+              {
+                key: 'actions',
+                label: t('table.actions'),
+                render: (_, plan) => (
+                  <div className="action-buttons">
+                    <ViewButton
+                      requiredPermission={Permissions.ViewProductionPlan}
+                      title={t('actions.viewPlanDetails')}
+                      onClick={() => handleViewPlan(plan)}
+                    />
+                    
+                    {/* Edit button - only for Draft status */}
+                    {plan.status === ProductionPlanStatus.Draft && (
+                      <EditButton
+                        requiredPermission={Permissions.EditProductionPlan}
+                        title={t('actions.editPlan')}
+                        onClick={() => handleEditPlan(plan)}
+                      />
+                    )}
+                    
+                    {/* Start Processing button - only for Draft and Planned status */}
+                    {(plan.status === ProductionPlanStatus.Draft || plan.status === ProductionPlanStatus.Planned) && (
+                      <ProtectedButton
+                        requiredPermission={Permissions.ExecuteProductionPlan}
+                        className={`btn btn-sm btn-success ${!plan.canProduce ? 'disabled' : ''}`}
+                        title={plan.canProduce ? t('actions.startProcessing') : t('actions.cannotStartMissingMaterials')}
+                        onClick={() => plan.canProduce && handleExecutePlan(plan.id)}
+                        disabled={!plan.canProduce}
+                      >
+                        <Play size={16} />
+                      </ProtectedButton>
+                    )}
+                    
+                    {/* Complete Production button - only for In Progress status */}
+                    {plan.status === ProductionPlanStatus.InProgress && (
+                      <ProtectedButton
+                        requiredPermission={Permissions.ReceiveProduction}
+                        className="btn btn-sm btn-success"
+                        title={t('actions.completeProduction')}
+                        onClick={() => handleReceivePlan(plan)}
+                      >
+                        <Truck size={16} />
+                      </ProtectedButton>
+                    )}
+                    
+                    {/* Cancel button - for Draft, Planned, and In Progress status */}
+                    {plan.status !== ProductionPlanStatus.Completed && plan.status !== ProductionPlanStatus.Cancelled && (
+                      <CancelButton
+                        requiredPermission={Permissions.CancelProductionPlan}
+                        title={t('actions.cancelPlan')}
+                        onClick={() => handleCancelPlan(plan)}
+                      />
+                    )}
+                  </div>
+                ),
+                cellClassName: 'actions-cell'
+              }
+            ];
+
+            return (
+              <Table
+                columns={columns}
+                data={plans}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+                getRowClassName={(plan) => plan.status === ProductionPlanStatus.Cancelled ? 'inactive-product' : ''}
+                emptyMessage={searchTerm || statusFilter !== null 
+                  ? t('emptyState.noPlansFound')
+                  : t('emptyState.noPlansCreated')}
+              />
+            );
+          })()}
 
           {/* Pagination Controls */}
           {pagedData && pagedData.totalPages > 0 && (
@@ -798,120 +804,138 @@ const Production: React.FC = () => {
           )}
 
           {/* Recyclable Plans Table */}
-          <div className="table-container">
-            <table className="products-table">
-              <thead>
-                <tr>
-                  <th className="sortable" onClick={() => handleSort('Name')}>
-                    <div className="th-content">
-                      <span>{t('table.planName')}</span>
-                      {getSortIcon('Name')}
-                    </div>
-                  </th>
-                  <th>{t('table.targetRawMaterial')}</th>
-                  <th>{t('table.quantity')}</th>
-                  <th>{t('table.recyclables')}</th>
-                  <th className="sortable" onClick={() => handleSort('Status')}>
-                    <div className="th-content">
-                      <span>{t('table.status')}</span>
-                      {getSortIcon('Status')}
-                    </div>
-                  </th>
-                  <th className="sortable" onClick={() => handleSort('CreatedAt')}>
-                    <div className="th-content">
-                      <span>{t('table.created')}</span>
-                      {getSortIcon('CreatedAt')}
-                    </div>
-                  </th>
-                  <th>{t('table.actions')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recPlans.length === 0 ? (
-                  <tr>
-                    <td colSpan={7} className="no-products">
-                      {searchTerm || statusFilter !== null
-                        ? t('emptyState.noRecyclablePlansFound')
-                        : t('emptyState.noRecyclablePlansCreated')}
-                    </td>
-                  </tr>
-                ) : (
-                  recPlans.map((plan) => (
-                    <tr key={plan.id} className={plan.status === ProductionPlanStatus.Cancelled ? 'inactive-product' : ''}>
-                      <td className="product-name-cell">
-                        <div className="product-name">{plan.name}</div>
-                        {plan.description && (
-                          <div className="product-description">{plan.description}</div>
-                        )}
-                      </td>
-                      <td>
-                        <div className="product-name">{plan.targetRawMaterialName}</div>
-                        <div className="product-description">({plan.targetRawMaterialColor})</div>
-                      </td>
-                      <td className="quantity-cell">
-                        {plan.quantityToProduce} {plan.targetRawMaterialQuantityType}
-                      </td>
-                      <td className="materials-cell">
-                        <div className="materials-list">
-                          {plan.requiredRecyclables.slice(0, 2).map((m) => (
-                            <div key={m.id} className="material-item">
-                              <span className="material-name">{m.materialName}</span>
-                              <span className="material-quantity">
-                                {m.requiredQuantity * plan.quantityToProduce} {m.quantityType}
-                              </span>
-                            </div>
-                          ))}
-                          {plan.requiredRecyclables.length > 2 && (
-                            <div className="materials-more">+{plan.requiredRecyclables.length - 2} {t('table.more')}</div>
-                          )}
+          {(() => {
+            const columns: TableColumn<RecyclableProductionPlan>[] = [
+              {
+                key: 'Name',
+                label: t('table.planName'),
+                sortable: true,
+                render: (_, plan) => (
+                  <div className="product-name-cell">
+                    <div className="product-name">{plan.name}</div>
+                    {plan.description && (
+                      <div className="product-description">{plan.description}</div>
+                    )}
+                  </div>
+                ),
+                cellClassName: 'product-name-cell'
+              },
+              {
+                key: 'targetRawMaterial',
+                label: t('table.targetRawMaterial'),
+                render: (_, plan) => (
+                  <>
+                    <div className="product-name">{plan.targetRawMaterialName}</div>
+                    <div className="product-description">({plan.targetRawMaterialColor})</div>
+                  </>
+                )
+              },
+              {
+                key: 'quantity',
+                label: t('table.quantity'),
+                render: (_, plan) => (
+                  <span className="quantity-cell">
+                    {plan.quantityToProduce} {plan.targetRawMaterialQuantityType}
+                  </span>
+                ),
+                cellClassName: 'quantity-cell'
+              },
+              {
+                key: 'recyclables',
+                label: t('table.recyclables'),
+                render: (_, plan) => (
+                  <div className="materials-cell">
+                    <div className="materials-list">
+                      {plan.requiredRecyclables.slice(0, 2).map((m) => (
+                        <div key={m.id} className="material-item">
+                          <span className="material-name">{m.materialName}</span>
+                          <span className="material-quantity">
+                            {m.requiredQuantity * plan.quantityToProduce} {m.quantityType}
+                          </span>
                         </div>
-                      </td>
-                      <td className="status-cell">
-                        <span className={`status-badge ${getStatusClass(plan.status)}`}>
-                          {getStatusLabel(plan.status)}
-                        </span>
-                      </td>
-                      <td>{formatDate(plan.createdAt)}</td>
-                      <td className="actions-cell">
-                        <div className="action-buttons">
-                          <ViewButton
-                            requiredPermission={Permissions.ViewProductionPlan}
-                            title={t('actions.viewPlanDetails')}
-                            onClick={() => handleViewRecPlan(plan)}
-                          />
-                          {plan.status === ProductionPlanStatus.Draft && (
-                            <EditButton
-                              requiredPermission={Permissions.EditProductionPlan}
-                              title={t('actions.editPlan')}
-                              onClick={() => handleEditRecPlan(plan)}
-                            />
-                          )}
-                          {plan.status !== ProductionPlanStatus.Completed && plan.status !== ProductionPlanStatus.Cancelled && (
-                            <CancelButton
-                              requiredPermission={Permissions.CancelProductionPlan}
-                              title={t('actions.cancelPlan')}
-                              onClick={() => handleCancelRecPlan(plan)}
-                            />
-                          )}
-                          {(plan.status === ProductionPlanStatus.Draft || plan.status === ProductionPlanStatus.Planned) && (
-                            <ProtectedButton
-                              requiredPermission={Permissions.ExecuteProductionPlan}
-                              className={`btn btn-sm btn-success ${!canProcessRec(plan) ? 'disabled' : ''}`}
-                              title={canProcessRec(plan) ? t('actions.processPlan') : t('actions.cannotProcessMissingMaterials')}
-                              onClick={() => canProcessRec(plan) && handleOpenProcessRec(plan)}
-                              disabled={!canProcessRec(plan)}
-                            >
-                              <Play size={16} />
-                            </ProtectedButton>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
+                      ))}
+                      {plan.requiredRecyclables.length > 2 && (
+                        <div className="materials-more">+{plan.requiredRecyclables.length - 2} {t('table.more')}</div>
+                      )}
+                    </div>
+                  </div>
+                ),
+                cellClassName: 'materials-cell'
+              },
+              {
+                key: 'Status',
+                label: t('table.status'),
+                sortable: true,
+                render: (_, plan) => (
+                  <div className="status-cell">
+                    <span className={`status-badge ${getStatusClass(plan.status)}`}>
+                      {getStatusLabel(plan.status)}
+                    </span>
+                  </div>
+                ),
+                cellClassName: 'status-cell'
+              },
+              {
+                key: 'CreatedAt',
+                label: t('table.created'),
+                sortable: true,
+                render: (_, plan) => formatDate(plan.createdAt)
+              },
+              {
+                key: 'actions',
+                label: t('table.actions'),
+                render: (_, plan) => (
+                  <div className="action-buttons">
+                    <ViewButton
+                      requiredPermission={Permissions.ViewProductionPlan}
+                      title={t('actions.viewPlanDetails')}
+                      onClick={() => handleViewRecPlan(plan)}
+                    />
+                    {plan.status === ProductionPlanStatus.Draft && (
+                      <EditButton
+                        requiredPermission={Permissions.EditProductionPlan}
+                        title={t('actions.editPlan')}
+                        onClick={() => handleEditRecPlan(plan)}
+                      />
+                    )}
+                    {plan.status !== ProductionPlanStatus.Completed && plan.status !== ProductionPlanStatus.Cancelled && (
+                      <CancelButton
+                        requiredPermission={Permissions.CancelProductionPlan}
+                        title={t('actions.cancelPlan')}
+                        onClick={() => handleCancelRecPlan(plan)}
+                      />
+                    )}
+                    {(plan.status === ProductionPlanStatus.Draft || plan.status === ProductionPlanStatus.Planned) && (
+                      <ProtectedButton
+                        requiredPermission={Permissions.ExecuteProductionPlan}
+                        className={`btn btn-sm btn-success ${!canProcessRec(plan) ? 'disabled' : ''}`}
+                        title={canProcessRec(plan) ? t('actions.processPlan') : t('actions.cannotProcessMissingMaterials')}
+                        onClick={() => canProcessRec(plan) && handleOpenProcessRec(plan)}
+                        disabled={!canProcessRec(plan)}
+                      >
+                        <Play size={16} />
+                      </ProtectedButton>
+                    )}
+                  </div>
+                ),
+                cellClassName: 'actions-cell'
+              }
+            ];
+
+            return (
+              <Table
+                columns={columns}
+                data={recPlans}
+                sortBy={sortBy}
+                sortOrder={sortOrder}
+                onSort={handleSort}
+                getRowClassName={(plan) => plan.status === ProductionPlanStatus.Cancelled ? 'inactive-product' : ''}
+                emptyMessage={searchTerm || statusFilter !== null
+                  ? t('emptyState.noRecyclablePlansFound')
+                  : t('emptyState.noRecyclablePlansCreated')}
+              />
+            );
+          })()}
 
           {/* Pagination Controls */}
           {recPagedData && recPagedData.totalPages > 0 && (

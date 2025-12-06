@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { acquisitionApi } from '../../services/api';
 import type { Acquisition as AcquisitionType, AcquisitionStatistics, PagedResult } from '../../types';
 import { AcquisitionStatus, AcquisitionType as AcqType } from '../../types';
-import { Plus, Edit, Package, Search, Filter, Recycle, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Package, Search, Filter, Recycle, ChevronLeft, ChevronRight, Edit } from 'lucide-react';
 import CreateAcquisition from './CreateAcquisition';
 import EditAcquisition from './EditAcquisition';
 import ReceiveAcquisition from './ReceiveAcquisition';
@@ -14,6 +14,8 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
+import { Table } from '../atoms';
+import type { TableColumn } from '../atoms';
 import './Acquisition.css';
 
 const Acquisition: React.FC = () => {
@@ -134,25 +136,10 @@ const Acquisition: React.FC = () => {
     return typeLabels[type];
   };
 
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      // Toggle sort order if clicking the same column
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      // Set new column and default to descending
-      setSortBy(column);
-      setSortOrder('desc');
-    }
+  const handleSort = (column: string, order: 'asc' | 'desc') => {
+    setSortBy(column);
+    setSortOrder(order);
     setCurrentPage(1); // Reset to first page when sorting changes
-  };
-
-  const getSortIcon = (column: string) => {
-    if (sortBy !== column) {
-      return <ArrowUpDown size={14} className="sort-icon inactive" />;
-    }
-    return sortOrder === 'asc' 
-      ? <ArrowUp size={14} className="sort-icon active" />
-      : <ArrowDown size={14} className="sort-icon active" />;
   };
 
   // Function to determine due date status
@@ -326,175 +313,193 @@ const Acquisition: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="table-container">
-        <table className="acquisitions-table">
-          <thead>
-            <tr>
-              <th className="status-bar-column"></th>
-              <th className="sortable" onClick={() => handleSort('Title')}>
-                <div className="th-content">
-                  <span>{t('table.title')}</span>
-                  {getSortIcon('Title')}
+      {acquisitions.length === 0 ? (
+        <div className="table-container">
+          <div className="empty-state">
+            <div className="empty-content">
+              <Package size={48} />
+              <h3>{t('emptyState.noAcquisitions')}</h3>
+              <p>{searchTerm || statusFilter !== null || typeFilter !== null 
+                ? t('emptyState.noMatches')
+                : t('emptyState.getStarted')}</p>
+              {!searchTerm && statusFilter === null && typeFilter === null && (
+                <ProtectedButton
+                  className="empty-add-button"
+                  onClick={handleCreateAcquisition}
+                  requiredPermission={Permissions.CreateAcquisition}
+                >
+                  <Plus size={20} />
+                  {t('createAcquisition')}
+                </ProtectedButton>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : (
+        (() => {
+          const columns: TableColumn<AcquisitionType>[] = [
+            {
+              key: 'statusBar',
+              label: '',
+              render: (_, acquisition) => (
+                <div className={`status-bar-cell status-bar status-${getDueDateStatus(acquisition)}`}></div>
+              ),
+              cellClassName: 'status-bar-cell',
+              width: '4px'
+            },
+            {
+              key: 'Title',
+              label: t('table.title'),
+              sortable: true,
+              render: (_, acquisition) => (
+                <div className="acquisition-title">
+                  <div className="title">{acquisition.title}</div>
+                  {acquisition.description && (
+                    <div className="description">{acquisition.description}</div>
+                  )}
                 </div>
-              </th>
-              <th>{t('table.type')}</th>
-              <th className="sortable" onClick={() => handleSort('Status')}>
-                <div className="th-content">
-                  <span>{t('table.status')}</span>
-                  {getSortIcon('Status')}
+              )
+            },
+            {
+              key: 'type',
+              label: t('table.type'),
+              render: (_, acquisition) => (
+                <span className="type-badge">
+                  {getTypeLabel(acquisition.type)}
+                </span>
+              )
+            },
+            {
+              key: 'Status',
+              label: t('table.status'),
+              sortable: true,
+              render: (_, acquisition) => getStatusBadge(acquisition.status)
+            },
+            {
+              key: 'assignedTo',
+              label: t('table.assignedTo'),
+              render: (_, acquisition) => (
+                <div className="assigned-user-info">
+                  {acquisition.assignedToUserName || t('tableContent.unassigned')}
                 </div>
-              </th>
-              <th>{t('table.assignedTo')}</th>
-              <th>{t('table.supplier')}</th>
-              <th>{t('table.items')}</th>
-              <th className="sortable" onClick={() => handleSort('DueDate')}>
-                <div className="th-content">
-                  <span>{t('table.dueDate')}</span>
-                  {getSortIcon('DueDate')}
+              )
+            },
+            {
+              key: 'supplier',
+              label: t('table.supplier'),
+              render: (_, acquisition) => (
+                <div className="supplier-info">
+                  <div className="supplier-name">{acquisition.supplierName || '-'}</div>
+                  {acquisition.supplierContact && (
+                    <div className="supplier-contact">{acquisition.supplierContact}</div>
+                  )}
                 </div>
-              </th>
-              <th className="sortable" onClick={() => handleSort('CreatedAt')}>
-                <div className="th-content">
-                  <span>{t('table.created')}</span>
-                  {getSortIcon('CreatedAt')}
+              )
+            },
+            {
+              key: 'items',
+              label: t('table.items'),
+              render: (_, acquisition) => (
+                <div className="items-info">
+                  <div className="items-count">{acquisition.totalItems} {t('tableContent.items')}</div>
+                  <div className="total-quantity">{acquisition.totalQuantity} {t('tableContent.units')}</div>
                 </div>
-              </th>
-              <th>{t('table.actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {acquisitions.length === 0 ? (
-              <tr>
-                <td colSpan={10} className="empty-state">
-                  <div className="empty-content">
-                    <Package size={48} />
-                    <h3>{t('emptyState.noAcquisitions')}</h3>
-                    <p>{searchTerm || statusFilter !== null || typeFilter !== null 
-                      ? t('emptyState.noMatches')
-                      : t('emptyState.getStarted')}</p>
-                    {!searchTerm && statusFilter === null && typeFilter === null && (
-                      <ProtectedButton
-                        className="empty-add-button"
-                        onClick={handleCreateAcquisition}
-                        requiredPermission={Permissions.CreateAcquisition}
-                      >
-                        <Plus size={20} />
-                        {t('createAcquisition')}
-                      </ProtectedButton>
-                    )}
+              )
+            },
+            {
+              key: 'DueDate',
+              label: t('table.dueDate'),
+              sortable: true,
+              render: (_, acquisition) => (
+                <div className="due-date-info">
+                  {acquisition.dueDate ? (
+                    <div className="due-date">
+                      {new Date(acquisition.dueDate).toLocaleDateString()}
+                    </div>
+                  ) : (
+                    <div className="no-due-date">-</div>
+                  )}
+                </div>
+              )
+            },
+            {
+              key: 'CreatedAt',
+              label: t('table.created'),
+              sortable: true,
+              render: (_, acquisition) => (
+                <div className="date-info">
+                  <div className="created-date">
+                    {new Date(acquisition.createdAt).toLocaleDateString()}
                   </div>
-                </td>
-              </tr>
-            ) : (
-              acquisitions.map((acquisition) => (
-                <tr key={acquisition.id}>
-                  <td className="status-bar-cell">
-                    <div className={`status-bar status-${getDueDateStatus(acquisition)}`}></div>
-                  </td>
-                  <td>
-                    <div className="acquisition-title">
-                      <div className="title">{acquisition.title}</div>
-                      {acquisition.description && (
-                        <div className="description">{acquisition.description}</div>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <span className="type-badge">
-                      {getTypeLabel(acquisition.type)}
-                    </span>
-                  </td>
-                  <td>{getStatusBadge(acquisition.status)}</td>
-                  <td>
-                    <div className="assigned-user-info">
-                      {acquisition.assignedToUserName || t('tableContent.unassigned')}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="supplier-info">
-                      <div className="supplier-name">{acquisition.supplierName || '-'}</div>
-                      {acquisition.supplierContact && (
-                        <div className="supplier-contact">{acquisition.supplierContact}</div>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="items-info">
-                      <div className="items-count">{acquisition.totalItems} {t('tableContent.items')}</div>
-                      <div className="total-quantity">{acquisition.totalQuantity} {t('tableContent.units')}</div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="due-date-info">
-                      {acquisition.dueDate ? (
-                        <div className="due-date">
-                          {new Date(acquisition.dueDate).toLocaleDateString()}
-                        </div>
-                      ) : (
-                        <div className="no-due-date">-</div>
-                      )}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="date-info">
-                      <div className="created-date">
-                        {new Date(acquisition.createdAt).toLocaleDateString()}
-                      </div>
-                      <div className="created-by">
-                        {t('tableContent.by')} {acquisition.createdByUserName}
-                      </div>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="action-buttons">
-                      <ViewButton
-                        onClick={() => handleViewAcquisition(acquisition)}
-                        title={t('actions.view')}
-                        requiredPermission={Permissions.ViewAcquisition}
-                      />
-                      {acquisition.canEdit && (
-                        <EditButton
-                          onClick={() => handleEditAcquisition(acquisition)}
-                          title={t('actions.edit')}
-                          requiredPermission={Permissions.EditAcquisition}
-                        />
-                      )}
-                      {acquisition.canReceive && (
-                        <ProtectedButton
-                          className="action-button receive-button"
-                          onClick={() => handleReceiveAcquisition(acquisition)}
-                          title={t('actions.receive')}
-                          requiredPermission={Permissions.ReceiveAcquisition}
-                        >
-                          <Package size={16} />
-                        </ProtectedButton>
-                      )}
-                      {acquisition.status === AcquisitionStatus.ReadyForProcessing && 
-                       acquisition.type === AcqType.RecyclableMaterials && (
-                        <ProtectedButton
-                          className="action-button receive-button"
-                          onClick={() => handleProcessAcquisition(acquisition)}
-                          title={t('actions.process')}
-                          requiredPermission={Permissions.ProcessAcquisition}
-                        >
-                          <Recycle size={16} />
-                        </ProtectedButton>
-                      )}
-                      {acquisition.canDelete && (
-                        <DeleteButton
-                          onClick={() => handleDeleteAcquisition(acquisition)}
-                          title={t('actions.delete')}
-                          requiredPermission={Permissions.CancelAcquisition}
-                        />
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+                  <div className="created-by">
+                    {t('tableContent.by')} {acquisition.createdByUserName}
+                  </div>
+                </div>
+              )
+            },
+            {
+              key: 'actions',
+              label: t('table.actions'),
+              render: (_, acquisition) => (
+                <div className="action-buttons">
+                  <ViewButton
+                    onClick={() => handleViewAcquisition(acquisition)}
+                    title={t('actions.view')}
+                    requiredPermission={Permissions.ViewAcquisition}
+                  />
+                  {acquisition.canEdit && (
+                    <EditButton
+                      onClick={() => handleEditAcquisition(acquisition)}
+                      title={t('actions.edit')}
+                      requiredPermission={Permissions.EditAcquisition}
+                    />
+                  )}
+                  {acquisition.canReceive && (
+                    <ProtectedButton
+                      className="action-button receive-button"
+                      onClick={() => handleReceiveAcquisition(acquisition)}
+                      title={t('actions.receive')}
+                      requiredPermission={Permissions.ReceiveAcquisition}
+                    >
+                      <Package size={16} />
+                    </ProtectedButton>
+                  )}
+                  {acquisition.status === AcquisitionStatus.ReadyForProcessing && 
+                   acquisition.type === AcqType.RecyclableMaterials && (
+                    <ProtectedButton
+                      className="action-button receive-button"
+                      onClick={() => handleProcessAcquisition(acquisition)}
+                      title={t('actions.process')}
+                      requiredPermission={Permissions.ProcessAcquisition}
+                    >
+                      <Recycle size={16} />
+                    </ProtectedButton>
+                  )}
+                  {acquisition.canDelete && (
+                    <DeleteButton
+                      onClick={() => handleDeleteAcquisition(acquisition)}
+                      title={t('actions.delete')}
+                      requiredPermission={Permissions.CancelAcquisition}
+                    />
+                  )}
+                </div>
+              ),
+              cellClassName: 'actions-cell'
+            }
+          ];
+
+          return (
+            <Table
+              columns={columns}
+              data={acquisitions}
+              sortBy={sortBy}
+              sortOrder={sortOrder}
+              onSort={handleSort}
+              emptyMessage=""
+            />
+          );
+        })()
+      )}
 
       {/* Pagination Controls */}
       {pagedData && pagedData.totalPages > 0 && (

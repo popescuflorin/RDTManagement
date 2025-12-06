@@ -21,6 +21,8 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
+import { Table } from '../atoms';
+import type { TableColumn } from '../atoms';
 import './Suppliers.css';
 
 const Suppliers: React.FC = () => {
@@ -213,106 +215,128 @@ const Suppliers: React.FC = () => {
       )}
 
       {/* Suppliers Table */}
-      <div className="table-container">
-        <table className="suppliers-table">
-          <thead>
-            <tr>
-              <th>{t('suppliers.table.id')}</th>
-              <th>{t('suppliers.table.name')}</th>
-              <th>{t('suppliers.table.contact')}</th>
-              <th>{t('suppliers.table.location')}</th>
-              <th>{t('suppliers.table.totalAcquisitions')}</th>
-              <th>{t('suppliers.table.totalValue')}</th>
-              <th>{t('suppliers.table.status')}</th>
-              <th>{t('suppliers.table.createdAt')}</th>
-              <th>{t('suppliers.table.actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {suppliers.length === 0 ? (
-              <tr>
-                <td colSpan={9} className="no-data">
-                  {searchTerm || showInactive
-                    ? t('suppliers.empty.noSuppliersFound')
-                    : t('suppliers.empty.noSuppliersCreateFirst')}
-                </td>
-              </tr>
-            ) : (
-              suppliers.map(supplier => (
-                <tr key={supplier.id} className={!supplier.isActive ? 'inactive-row' : ''}>
-                  <td>#{supplier.id}</td>
-                  <td className="supplier-name">
-                    <div>{supplier.name}</div>
-                    {supplier.description && (
-                      <div className="supplier-description">{supplier.description}</div>
-                    )}
-                    {supplier.contactPerson && (
-                      <div className="supplier-contact-person">{supplier.contactPerson}</div>
-                    )}
-                  </td>
-                  <td>
-                    <div className="contact-info">
-                      {supplier.email && (
-                        <div className="contact-item">
-                          <Mail size={14} />
-                          {supplier.email}
-                        </div>
-                      )}
-                      {supplier.phone && (
-                        <div className="contact-item">
-                          <Phone size={14} />
-                          {supplier.phone}
-                        </div>
-                      )}
-                      {!supplier.email && !supplier.phone && <span className="no-contact">{t('suppliers.messages.notSet')}</span>}
-                    </div>
-                  </td>
-                  <td>
-                    {supplier.city || supplier.country ? (
-                      <div className="location-info">
-                        <MapPin size={14} />
-                        {[supplier.city, supplier.country].filter(Boolean).join(', ')}
-                      </div>
-                    ) : (
-                      <span>{t('suppliers.messages.notSet')}</span>
-                    )}
-                  </td>
-                  <td>{supplier.totalAcquisitions}</td>
-                  <td className="currency-cell">{formatCurrency(supplier.totalAcquisitionValue)}</td>
-                  <td>
-                    <span className={`status-badge ${supplier.isActive ? 'status-active' : 'status-inactive'}`}>
-                      {supplier.isActive ? t('suppliers.status.active') : t('suppliers.status.inactive')}
-                    </span>
-                  </td>
-                  <td>{formatDate(supplier.createdAt)}</td>
-                  <td className="actions-cell">
-                    <div className="action-buttons">
-                      <ViewButton
-                        requiredPermission={Permissions.ViewSupplier}
-                        title={t('suppliers.tooltips.viewSupplier')}
-                        onClick={() => handleViewSupplier(supplier)}
-                      />
-                      <EditButton
-                        requiredPermission={Permissions.EditSupplier}
-                        title={t('suppliers.tooltips.editSupplier')}
-                        onClick={() => handleEditSupplier(supplier)}
-                      />
-                      {supplier.isActive && (
-                        <DeleteButton
-                          requiredPermission={Permissions.DeleteSupplier}
-                          title={t('suppliers.tooltips.deactivateSupplier')}
-                          onClick={() => handleDeleteSupplier(supplier)}
-                          disabled={isDeleting}
-                        />
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {(() => {
+        const columns: TableColumn<Supplier>[] = [
+          {
+            key: 'id',
+            label: t('suppliers.table.id'),
+            render: (_, supplier) => `#${supplier.id}`
+          },
+          {
+            key: 'name',
+            label: t('suppliers.table.name'),
+            render: (_, supplier) => (
+              <div className="supplier-name">
+                <div>{supplier.name}</div>
+                {supplier.description && (
+                  <div className="supplier-description">{supplier.description}</div>
+                )}
+                {supplier.contactPerson && (
+                  <div className="supplier-contact-person">{supplier.contactPerson}</div>
+                )}
+              </div>
+            ),
+            cellClassName: 'supplier-name'
+          },
+          {
+            key: 'contact',
+            label: t('suppliers.table.contact'),
+            render: (_, supplier) => (
+              <div className="contact-info">
+                {supplier.email && (
+                  <div className="contact-item">
+                    <Mail size={14} />
+                    {supplier.email}
+                  </div>
+                )}
+                {supplier.phone && (
+                  <div className="contact-item">
+                    <Phone size={14} />
+                    {supplier.phone}
+                  </div>
+                )}
+                {!supplier.email && !supplier.phone && <span className="no-contact">{t('suppliers.messages.notSet')}</span>}
+              </div>
+            )
+          },
+          {
+            key: 'location',
+            label: t('suppliers.table.location'),
+            render: (_, supplier) => (
+              supplier.city || supplier.country ? (
+                <div className="location-info">
+                  <MapPin size={14} />
+                  {[supplier.city, supplier.country].filter(Boolean).join(', ')}
+                </div>
+              ) : (
+                <span>{t('suppliers.messages.notSet')}</span>
+              )
+            )
+          },
+          {
+            key: 'totalAcquisitions',
+            label: t('suppliers.table.totalAcquisitions'),
+            render: (_, supplier) => supplier.totalAcquisitions
+          },
+          {
+            key: 'totalValue',
+            label: t('suppliers.table.totalValue'),
+            render: (_, supplier) => <span className="currency-cell">{formatCurrency(supplier.totalAcquisitionValue)}</span>
+          },
+          {
+            key: 'status',
+            label: t('suppliers.table.status'),
+            render: (_, supplier) => (
+              <span className={`status-badge ${supplier.isActive ? 'status-active' : 'status-inactive'}`}>
+                {supplier.isActive ? t('suppliers.status.active') : t('suppliers.status.inactive')}
+              </span>
+            )
+          },
+          {
+            key: 'createdAt',
+            label: t('suppliers.table.createdAt'),
+            render: (_, supplier) => formatDate(supplier.createdAt)
+          },
+          {
+            key: 'actions',
+            label: t('suppliers.table.actions'),
+            render: (_, supplier) => (
+              <div className="action-buttons">
+                <ViewButton
+                  requiredPermission={Permissions.ViewSupplier}
+                  title={t('suppliers.tooltips.viewSupplier')}
+                  onClick={() => handleViewSupplier(supplier)}
+                />
+                <EditButton
+                  requiredPermission={Permissions.EditSupplier}
+                  title={t('suppliers.tooltips.editSupplier')}
+                  onClick={() => handleEditSupplier(supplier)}
+                />
+                {supplier.isActive && (
+                  <DeleteButton
+                    requiredPermission={Permissions.DeleteSupplier}
+                    title={t('suppliers.tooltips.deactivateSupplier')}
+                    onClick={() => handleDeleteSupplier(supplier)}
+                    disabled={isDeleting}
+                  />
+                )}
+              </div>
+            ),
+            cellClassName: 'actions-cell'
+          }
+        ];
+
+        return (
+          <Table
+            columns={columns}
+            data={suppliers}
+            getRowClassName={(supplier) => !supplier.isActive ? 'inactive-row' : ''}
+            emptyMessage={searchTerm || showInactive
+              ? t('suppliers.empty.noSuppliersFound')
+              : t('suppliers.empty.noSuppliersCreateFirst')}
+          />
+        );
+      })()}
 
       {/* Pagination Controls */}
       {pagedData && pagedData.totalPages > 0 && (

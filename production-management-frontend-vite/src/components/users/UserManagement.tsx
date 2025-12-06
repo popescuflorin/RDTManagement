@@ -20,6 +20,8 @@ import EditRolePermissions from './EditRolePermissions';
 import CreateRole from './CreateRole';
 import EditButton from '../atoms/EditButton';
 import DeleteButton from '../atoms/DeleteButton';
+import { Table } from '../atoms';
+import type { TableColumn } from '../atoms';
 import './UserManagement.css';
 
 const UserManagement: React.FC = () => {
@@ -280,55 +282,109 @@ const UserManagement: React.FC = () => {
       </div>
 
       <div className="users-table-container">
-        <table className="users-table">
-          <thead>
-            <tr>
-              <th>{t('userManagement.table.avatar')}</th>
-              <th>{t('userManagement.table.name')}</th>
-              <th>{t('userManagement.table.username')}</th>
-              <th>{t('userManagement.table.email')}</th>
-              <th>{t('userManagement.table.role')}</th>
-              <th>{t('userManagement.table.lastLogin')}</th>
-              <th>{t('userManagement.table.status')}</th>
-              <th>{t('userManagement.table.actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredUsers.map((user) => (
-              <tr key={user.id} className="user-row">
-                <td className="avatar-cell">
-                  <div className="user-avatar">
-                    {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+        {filteredUsers.length === 0 && !isLoading ? (
+          <div className="empty-state">
+            <Users size={48} className="empty-icon" />
+            <h3>{t('userManagement.empty.noUsersFound')}</h3>
+            <p>
+              {searchTerm
+                ? t('userManagement.empty.noUsersMatch', { searchTerm })
+                : t('userManagement.empty.noUsersInSystem')}
+            </p>
+            {!searchTerm && (
+              <button
+                onClick={() => setShowAddModal(true)}
+                className="btn btn-primary"
+              >
+                <UserPlus size={16} />
+                {t('userManagement.empty.addFirstUser')}
+              </button>
+            )}
+          </div>
+        ) : (
+          (() => {
+            const columns: TableColumn<User>[] = [
+              {
+                key: 'avatar',
+                label: t('userManagement.table.avatar'),
+                render: (_, user) => (
+                  <div className="avatar-cell">
+                    <div className="user-avatar">
+                      {user.firstName.charAt(0)}{user.lastName.charAt(0)}
+                    </div>
                   </div>
-                </td>
-                <td className="name-cell">
-                  <div className="user-name">
-                    <span className="full-name">{user.firstName} {user.lastName}</span>
-                    <span className="user-id">{t('userManagement.labels.id')} {user.id}</span>
+                ),
+                cellClassName: 'avatar-cell'
+              },
+              {
+                key: 'name',
+                label: t('userManagement.table.name'),
+                render: (_, user) => (
+                  <div className="name-cell">
+                    <div className="user-name">
+                      <span className="full-name">{user.firstName} {user.lastName}</span>
+                      <span className="user-id">{t('userManagement.labels.id')} {user.id}</span>
+                    </div>
                   </div>
-                </td>
-                <td className="username-cell">
-                  <span className="username">{user.username}</span>
-                </td>
-                <td className="email-cell">
-                  <span className="email">{user.email}</span>
-                </td>
-                <td className="role-cell">
-                  <span className={getRoleBadgeClass(user.role)}>
+                ),
+                cellClassName: 'name-cell'
+              },
+              {
+                key: 'username',
+                label: t('userManagement.table.username'),
+                render: (_, user) => (
+                  <span className="username-cell">
+                    <span className="username">{user.username}</span>
+                  </span>
+                ),
+                cellClassName: 'username-cell'
+              },
+              {
+                key: 'email',
+                label: t('userManagement.table.email'),
+                render: (_, user) => (
+                  <span className="email-cell">
+                    <span className="email">{user.email}</span>
+                  </span>
+                ),
+                cellClassName: 'email-cell'
+              },
+              {
+                key: 'role',
+                label: t('userManagement.table.role'),
+                render: (_, user) => (
+                  <span className={`role-cell ${getRoleBadgeClass(user.role)}`}>
                     {user.role}
                   </span>
-                </td>
-                <td className="login-cell">
-                  <span className="last-login">
-                    {formatDate(user.lastLoginAt?.toString() || '')}
+                ),
+                cellClassName: 'role-cell'
+              },
+              {
+                key: 'lastLogin',
+                label: t('userManagement.table.lastLogin'),
+                render: (_, user) => (
+                  <span className="login-cell">
+                    <span className="last-login">
+                      {formatDate(user.lastLoginAt?.toString() || '')}
+                    </span>
                   </span>
-                </td>
-                <td className="status-cell">
-                  <span className={`status-badge ${user.isActive ? 'status-active' : 'status-inactive'}`}>
+                ),
+                cellClassName: 'login-cell'
+              },
+              {
+                key: 'status',
+                label: t('userManagement.table.status'),
+                render: (_, user) => (
+                  <span className={`status-cell status-badge ${user.isActive ? 'status-active' : 'status-inactive'}`}>
                     {user.isActive ? t('userManagement.status.active') : t('userManagement.status.inactive')}
                   </span>
-                </td>
-                <td className="actions-cell">
+                ),
+                cellClassName: 'status-cell'
+              },
+              {
+                key: 'actions',
+                label: t('userManagement.table.actions'),
+                render: (_, user) => (
                   <div className="action-buttons">
                     <EditButton
                       title={t('userManagement.tooltips.editUser')}
@@ -349,31 +405,20 @@ const UserManagement: React.FC = () => {
                       </button>
                     )}
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                ),
+                cellClassName: 'actions-cell'
+              }
+            ];
 
-        {filteredUsers.length === 0 && !isLoading && (
-          <div className="empty-state">
-            <Users size={48} className="empty-icon" />
-            <h3>{t('userManagement.empty.noUsersFound')}</h3>
-            <p>
-              {searchTerm
-                ? t('userManagement.empty.noUsersMatch', { searchTerm })
-                : t('userManagement.empty.noUsersInSystem')}
-            </p>
-            {!searchTerm && (
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="btn btn-primary"
-              >
-                <UserPlus size={16} />
-                {t('userManagement.empty.addFirstUser')}
-              </button>
-            )}
-          </div>
+            return (
+              <Table
+                columns={columns}
+                data={filteredUsers}
+                getRowClassName={() => 'user-row'}
+                showContainer={false}
+              />
+            );
+          })()
         )}
       </div>
         </>
@@ -388,55 +433,76 @@ const UserManagement: React.FC = () => {
             </div>
           ) : (
             <div className="roles-table-container">
-              <table className="roles-table">
-                <thead>
-                  <tr>
-                    <th>{t('userManagement.table.roleColumn')}</th>
-                    <th>{t('userManagement.table.description')}</th>
-                    <th>{t('userManagement.table.permissionsCount')}</th>
-                    <th>{t('userManagement.table.users')}</th>
-                    <th>{t('userManagement.table.actions')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {roles.map((role) => (
-                    <tr key={role.id} className="role-row">
-                      <td className="role-name-cell">
-                        <span className={getRoleBadgeClass(role.name)}>
+              {roles.length === 0 && !isLoadingRoles ? (
+                <div className="empty-state">
+                  <Shield size={48} className="empty-icon" />
+                  <h3>{t('userManagement.empty.noRolesFound')}</h3>
+                  <p>{t('userManagement.empty.noRolesConfigured')}</p>
+                </div>
+              ) : (
+                (() => {
+                  const columns: TableColumn<RoleDto>[] = [
+                    {
+                      key: 'name',
+                      label: t('userManagement.table.roleColumn'),
+                      render: (_, role) => (
+                        <span className={`role-name-cell ${getRoleBadgeClass(role.name)}`}>
                           <Shield size={14} />
                           {role.name}
                         </span>
-                      </td>
-                      <td className="role-description-cell">
-                        {role.description || t('userManagement.labels.noDescription')}
-                      </td>
-                      <td className="permissions-count-cell">
-                        <span className="permission-badge">
+                      ),
+                      cellClassName: 'role-name-cell'
+                    },
+                    {
+                      key: 'description',
+                      label: t('userManagement.table.description'),
+                      render: (_, role) => role.description || t('userManagement.labels.noDescription'),
+                      cellClassName: 'role-description-cell'
+                    },
+                    {
+                      key: 'permissionsCount',
+                      label: t('userManagement.table.permissionsCount'),
+                      render: (_, role) => (
+                        <span className="permissions-count-cell permission-badge">
                           {rolePermissions[role.name] || 0} {t('userManagement.labels.permissions')}
                         </span>
-                      </td>
-                      <td className="users-count-cell">
-                        {users.filter(u => u.role === role.name).length} {t('userManagement.labels.users')}
-                      </td>
-                      <td className="actions-cell">
+                      ),
+                      cellClassName: 'permissions-count-cell'
+                    },
+                    {
+                      key: 'users',
+                      label: t('userManagement.table.users'),
+                      render: (_, role) => (
+                        <span className="users-count-cell">
+                          {users.filter(u => u.role === role.name).length} {t('userManagement.labels.users')}
+                        </span>
+                      ),
+                      cellClassName: 'users-count-cell'
+                    },
+                    {
+                      key: 'actions',
+                      label: t('userManagement.table.actions'),
+                      render: (_, role) => (
                         <div className="action-buttons">
                           <EditButton
                             title={t('userManagement.tooltips.editPermissions')}
                             onClick={() => handleEditRole(role.name)}
                           />
                         </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+                      ),
+                      cellClassName: 'actions-cell'
+                    }
+                  ];
 
-              {roles.length === 0 && !isLoadingRoles && (
-                <div className="empty-state">
-                  <Shield size={48} className="empty-icon" />
-                  <h3>{t('userManagement.empty.noRolesFound')}</h3>
-                  <p>{t('userManagement.empty.noRolesConfigured')}</p>
-                </div>
+                  return (
+                    <Table
+                      columns={columns}
+                      data={roles}
+                      getRowClassName={() => 'role-row'}
+                      showContainer={false}
+                    />
+                  );
+                })()
               )}
             </div>
           )}

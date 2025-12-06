@@ -21,6 +21,8 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
+import { Table } from '../atoms';
+import type { TableColumn } from '../atoms';
 import './Clients.css';
 
 const Clients: React.FC = () => {
@@ -213,103 +215,125 @@ const Clients: React.FC = () => {
       )}
 
       {/* Clients Table */}
-      <div className="table-container">
-        <table className="clients-table">
-          <thead>
-            <tr>
-              <th>{t('clients.table.id')}</th>
-              <th>{t('clients.table.name')}</th>
-              <th>{t('clients.table.contact')}</th>
-              <th>{t('clients.table.location')}</th>
-              <th>{t('clients.table.totalOrders')}</th>
-              <th>{t('clients.table.totalValue')}</th>
-              <th>{t('clients.table.status')}</th>
-              <th>{t('clients.table.createdAt')}</th>
-              <th>{t('clients.table.actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {clients.length === 0 ? (
-              <tr>
-                <td colSpan={9} className="no-data">
-                  {searchTerm || showInactive
-                    ? t('clients.empty.noClientsFound')
-                    : t('clients.empty.noClientsCreateFirst')}
-                </td>
-              </tr>
-            ) : (
-              clients.map(client => (
-                <tr key={client.id} className={!client.isActive ? 'inactive-row' : ''}>
-                  <td>#{client.id}</td>
-                  <td className="client-name">
-                    <div>{client.name}</div>
-                    {client.contactPerson && (
-                      <div className="client-contact-person">{client.contactPerson}</div>
-                    )}
-                  </td>
-                  <td>
-                    <div className="contact-info">
-                      {client.email && (
-                        <div className="contact-item">
-                          <Mail size={14} />
-                          {client.email}
-                        </div>
-                      )}
-                      {client.phone && (
-                        <div className="contact-item">
-                          <Phone size={14} />
-                          {client.phone}
-                        </div>
-                      )}
-                      {!client.email && !client.phone && <span className="no-contact">{t('clients.messages.notSet')}</span>}
-                    </div>
-                  </td>
-                  <td>
-                    {client.city || client.country ? (
-                      <div className="location-info">
-                        <MapPin size={14} />
-                        {[client.city, client.country].filter(Boolean).join(', ')}
-                      </div>
-                    ) : (
-                      <span>{t('clients.messages.notSet')}</span>
-                    )}
-                  </td>
-                  <td>{client.totalOrders}</td>
-                  <td className="currency-cell">{formatCurrency(client.totalOrderValue)}</td>
-                  <td>
-                    <span className={`status-badge ${client.isActive ? 'status-active' : 'status-inactive'}`}>
-                      {client.isActive ? t('clients.status.active') : t('clients.status.inactive')}
-                    </span>
-                  </td>
-                  <td>{formatDate(client.createdAt)}</td>
-                  <td className="actions-cell">
-                    <div className="action-buttons">
-                      <ViewButton
-                        requiredPermission={Permissions.ViewClient}
-                        title={t('clients.tooltips.viewClient')}
-                        onClick={() => handleViewClient(client)}
-                      />
-                      <EditButton
-                        requiredPermission={Permissions.EditClient}
-                        title={t('clients.tooltips.editClient')}
-                        onClick={() => handleEditClient(client)}
-                      />
-                      {client.isActive && (
-                        <DeleteButton
-                          requiredPermission={Permissions.DeleteClient}
-                          title={t('clients.tooltips.deactivateClient')}
-                          onClick={() => handleDeleteClient(client)}
-                          disabled={isDeleting}
-                        />
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      {(() => {
+        const columns: TableColumn<Client>[] = [
+          {
+            key: 'id',
+            label: t('clients.table.id'),
+            render: (_, client) => `#${client.id}`
+          },
+          {
+            key: 'name',
+            label: t('clients.table.name'),
+            render: (_, client) => (
+              <div className="client-name">
+                <div>{client.name}</div>
+                {client.contactPerson && (
+                  <div className="client-contact-person">{client.contactPerson}</div>
+                )}
+              </div>
+            ),
+            cellClassName: 'client-name'
+          },
+          {
+            key: 'contact',
+            label: t('clients.table.contact'),
+            render: (_, client) => (
+              <div className="contact-info">
+                {client.email && (
+                  <div className="contact-item">
+                    <Mail size={14} />
+                    {client.email}
+                  </div>
+                )}
+                {client.phone && (
+                  <div className="contact-item">
+                    <Phone size={14} />
+                    {client.phone}
+                  </div>
+                )}
+                {!client.email && !client.phone && <span className="no-contact">{t('clients.messages.notSet')}</span>}
+              </div>
+            )
+          },
+          {
+            key: 'location',
+            label: t('clients.table.location'),
+            render: (_, client) => (
+              client.city || client.country ? (
+                <div className="location-info">
+                  <MapPin size={14} />
+                  {[client.city, client.country].filter(Boolean).join(', ')}
+                </div>
+              ) : (
+                <span>{t('clients.messages.notSet')}</span>
+              )
+            )
+          },
+          {
+            key: 'totalOrders',
+            label: t('clients.table.totalOrders'),
+            render: (_, client) => client.totalOrders
+          },
+          {
+            key: 'totalValue',
+            label: t('clients.table.totalValue'),
+            render: (_, client) => <span className="currency-cell">{formatCurrency(client.totalOrderValue)}</span>
+          },
+          {
+            key: 'status',
+            label: t('clients.table.status'),
+            render: (_, client) => (
+              <span className={`status-badge ${client.isActive ? 'status-active' : 'status-inactive'}`}>
+                {client.isActive ? t('clients.status.active') : t('clients.status.inactive')}
+              </span>
+            )
+          },
+          {
+            key: 'createdAt',
+            label: t('clients.table.createdAt'),
+            render: (_, client) => formatDate(client.createdAt)
+          },
+          {
+            key: 'actions',
+            label: t('clients.table.actions'),
+            render: (_, client) => (
+              <div className="action-buttons">
+                <ViewButton
+                  requiredPermission={Permissions.ViewClient}
+                  title={t('clients.tooltips.viewClient')}
+                  onClick={() => handleViewClient(client)}
+                />
+                <EditButton
+                  requiredPermission={Permissions.EditClient}
+                  title={t('clients.tooltips.editClient')}
+                  onClick={() => handleEditClient(client)}
+                />
+                {client.isActive && (
+                  <DeleteButton
+                    requiredPermission={Permissions.DeleteClient}
+                    title={t('clients.tooltips.deactivateClient')}
+                    onClick={() => handleDeleteClient(client)}
+                    disabled={isDeleting}
+                  />
+                )}
+              </div>
+            ),
+            cellClassName: 'actions-cell'
+          }
+        ];
+
+        return (
+          <Table
+            columns={columns}
+            data={clients}
+            getRowClassName={(client) => !client.isActive ? 'inactive-row' : ''}
+            emptyMessage={searchTerm || showInactive
+              ? t('clients.empty.noClientsFound')
+              : t('clients.empty.noClientsCreateFirst')}
+          />
+        );
+      })()}
 
       {/* Pagination Controls */}
       {pagedData && pagedData.totalPages > 0 && (

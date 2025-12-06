@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { orderApi, inventoryApi } from '../../services/api';
 import type { Order, OrderStatistics, RawMaterial, PagedResult } from '../../types';
 import { OrderStatus } from '../../types';
-import { Plus, Edit, Package, Search, Filter, Clock, Loader2, Truck, CheckCircle, BarChart3, Play, ChevronLeft, ChevronRight, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Plus, Package, Search, Filter, Clock, Loader2, Truck, CheckCircle, BarChart3, Play, ChevronLeft, ChevronRight, Edit } from 'lucide-react';
 import CreateOrder from './CreateOrder';
 import ViewOrder from './ViewOrder';
 import EditOrder from './EditOrder';
@@ -14,6 +14,8 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import CancelButton from '../atoms/CancelButton';
+import { Table } from '../atoms';
+import type { TableColumn } from '../atoms';
 import './Orders.css';
 
 const Orders: React.FC = () => {
@@ -158,25 +160,10 @@ const Orders: React.FC = () => {
     setSelectedOrder(null);
   };
 
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      // Toggle sort order if clicking the same column
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-    } else {
-      // Set new column and default to descending
-      setSortBy(column);
-      setSortOrder('desc');
-    }
+  const handleSort = (column: string, order: 'asc' | 'desc') => {
+    setSortBy(column);
+    setSortOrder(order);
     setCurrentPage(1); // Reset to first page when sorting changes
-  };
-
-  const getSortIcon = (column: string) => {
-    if (sortBy !== column) {
-      return <ArrowUpDown size={14} className="sort-icon inactive" />;
-    }
-    return sortOrder === 'asc' 
-      ? <ArrowUp size={14} className="sort-icon active" />
-      : <ArrowDown size={14} className="sort-icon active" />;
   };
 
   const getStatusBadge = (status: OrderStatus) => {
@@ -377,131 +364,148 @@ const Orders: React.FC = () => {
       )}
 
       {/* Orders Table */}
-      <div className="table-container">
-        <table className="orders-table">
-          <thead>
-            <tr>
-              <th>{t('table.orderId')}</th>
-              <th>{t('table.clientName')}</th>
-              <th>{t('table.contact')}</th>
-              <th className="sortable" onClick={() => handleSort('OrderDate')}>
-                <div className="th-content">
-                  <span>{t('orderDate')}</span>
-                  {getSortIcon('OrderDate')}
+      {(() => {
+        const columns: TableColumn<Order>[] = [
+          {
+            key: 'id',
+            label: t('table.orderId'),
+            render: (_, order) => `#${order.id}`
+          },
+          {
+            key: 'clientName',
+            label: t('table.clientName'),
+            render: (_, order) => (
+              <>
+                <div className="client-name">{order.clientName}</div>
+                {order.clientCity && (
+                  <div className="client-location">{order.clientCity}, {order.clientCountry || ''}</div>
+                )}
+              </>
+            )
+          },
+          {
+            key: 'contact',
+            label: t('table.contact'),
+            render: (_, order) => (
+              <>
+                {order.clientEmail && <div className="contact-info">{order.clientEmail}</div>}
+                {order.clientPhone && <div className="contact-info">{order.clientPhone}</div>}
+              </>
+            )
+          },
+          {
+            key: 'OrderDate',
+            label: t('orderDate'),
+            sortable: true,
+            render: (_, order) => formatDate(order.orderDate)
+          },
+          {
+            key: 'ExpectedDeliveryDate',
+            label: t('expectedDeliveryDate'),
+            sortable: true,
+            render: (_, order) => order.expectedDeliveryDate ? formatDate(order.expectedDeliveryDate) : '—'
+          },
+          {
+            key: 'items',
+            label: t('items'),
+            render: (_, order) => `${order.orderMaterials.length} ${t('items', { defaultValue: 'item(s)' })}`
+          },
+          {
+            key: 'totalValue',
+            label: t('totalValue'),
+            render: (_, order) => <span className="currency-cell">{formatCurrency(order.totalValue)}</span>
+          },
+          {
+            key: 'transport',
+            label: t('table.transport'),
+            render: (_, order) => (
+              order.transportCarName ? (
+                <div className="transport-info">
+                  <div>{order.transportCarName}</div>
+                  {order.transportNumberPlate && (
+                    <div className="transport-number-plate">{order.transportNumberPlate}</div>
+                  )}
+                  {order.transportPhoneNumber && (
+                    <div className="transport-phone">{order.transportPhoneNumber}</div>
+                  )}
                 </div>
-              </th>
-              <th className="sortable" onClick={() => handleSort('ExpectedDeliveryDate')}>
-                <div className="th-content">
-                  <span>{t('expectedDeliveryDate')}</span>
-                  {getSortIcon('ExpectedDeliveryDate')}
-                </div>
-              </th>
-              <th>{t('items')}</th>
-              <th>{t('totalValue')}</th>
-              <th>{t('table.transport')}</th>
-              <th>{t('assignedTo')}</th>
-              <th className="sortable" onClick={() => handleSort('Status')}>
-                <div className="th-content">
-                  <span>{t('common:labels.status')}</span>
-                  {getSortIcon('Status')}
-                </div>
-              </th>
-              <th>{t('common:labels.actions')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.length === 0 ? (
-              <tr>
-                <td colSpan={11} className="no-data">
-                  {searchTerm || statusFilter !== null 
-                    ? t('table.noMatchingOrders')
-                    : t('table.noOrders')}
-                </td>
-              </tr>
-            ) : (
-              orders.map(order => (
-                <tr key={order.id}>
-                  <td>#{order.id}</td>
-                  <td>
-                    <div className="client-name">{order.clientName}</div>
-                    {order.clientCity && (
-                      <div className="client-location">{order.clientCity}, {order.clientCountry || ''}</div>
-                    )}
-                  </td>
-                  <td>
-                    {order.clientEmail && <div className="contact-info">{order.clientEmail}</div>}
-                    {order.clientPhone && <div className="contact-info">{order.clientPhone}</div>}
-                  </td>
-                  <td>{formatDate(order.orderDate)}</td>
-                  <td>
-                    {order.expectedDeliveryDate ? formatDate(order.expectedDeliveryDate) : '—'}
-                  </td>
-                  <td>{order.orderMaterials.length} {t('items', { defaultValue: 'item(s)' })}</td>
-                  <td className="currency-cell">{formatCurrency(order.totalValue)}</td>
-                  <td>
-                    {order.transportCarName ? (
-                      <div className="transport-info">
-                        <div>{order.transportCarName}</div>
-                        {order.transportNumberPlate && (
-                          <div className="transport-number-plate">{order.transportNumberPlate}</div>
-                        )}
-                        {order.transportPhoneNumber && (
-                          <div className="transport-phone">{order.transportPhoneNumber}</div>
-                        )}
-                      </div>
-                    ) : '—'}
-                  </td>
-                  <td>{order.assignedToUserName || '—'}</td>
-                  <td>{getStatusBadge(order.status)}</td>
-                  <td className="actions-cell">
-                    <div className="action-buttons">
-                      <ViewButton
-                        requiredPermission={Permissions.ViewOrder}
-                        title={t('viewOrder')}
-                        onClick={() => handleViewOrder(order)}
-                      />
-                      {order.status === OrderStatus.Draft && (
-                        <EditButton
-                          requiredPermission={Permissions.EditOrder}
-                          title={t('editOrder')}
-                          onClick={() => handleEditOrder(order)}
-                        />
-                      )}
-                      {(order.status === OrderStatus.Draft || order.status === OrderStatus.Pending) && (() => {
-                        const stockCheck = hasInsufficientStock(order);
-                        const isDisabled = stockCheck.hasIssue;
-                        const title = isDisabled 
-                          ? `${t('messages.insufficientStock')}:\n${stockCheck.insufficientItems.join('\n')}`
-                          : t('processOrder');
-                        
-                        return (
-                          <ProtectedButton
-                            requiredPermission={Permissions.ProcessOrder}
-                            className={`btn btn-sm ${isDisabled ? 'btn-secondary' : 'btn-success'}`}
-                            title={title}
-                            onClick={() => !isDisabled && handleProcessOrder(order)}
-                            disabled={isDisabled}
-                            style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
-                          >
-                            <Play size={16} />
-                          </ProtectedButton>
-                        );
-                      })()}
-                      {order.status !== OrderStatus.Delivered && order.status !== OrderStatus.Cancelled && (
-                        <CancelButton
-                          requiredPermission={Permissions.CancelOrder}
-                          title={t('cancelOrder')}
-                          onClick={() => handleCancelOrder(order)}
-                        />
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+              ) : '—'
+            )
+          },
+          {
+            key: 'assignedTo',
+            label: t('assignedTo'),
+            render: (_, order) => order.assignedToUserName || '—'
+          },
+          {
+            key: 'Status',
+            label: t('common:labels.status'),
+            sortable: true,
+            render: (_, order) => getStatusBadge(order.status)
+          },
+          {
+            key: 'actions',
+            label: t('common:labels.actions'),
+            render: (_, order) => (
+              <div className="action-buttons">
+                <ViewButton
+                  requiredPermission={Permissions.ViewOrder}
+                  title={t('viewOrder')}
+                  onClick={() => handleViewOrder(order)}
+                />
+                {order.status === OrderStatus.Draft && (
+                  <EditButton
+                    requiredPermission={Permissions.EditOrder}
+                    title={t('editOrder')}
+                    onClick={() => handleEditOrder(order)}
+                  />
+                )}
+                {(order.status === OrderStatus.Draft || order.status === OrderStatus.Pending) && (() => {
+                  const stockCheck = hasInsufficientStock(order);
+                  const isDisabled = stockCheck.hasIssue;
+                  const title = isDisabled 
+                    ? `${t('messages.insufficientStock')}:\n${stockCheck.insufficientItems.join('\n')}`
+                    : t('processOrder');
+                  
+                  return (
+                    <ProtectedButton
+                      requiredPermission={Permissions.ProcessOrder}
+                      className={`btn btn-sm ${isDisabled ? 'btn-secondary' : 'btn-success'}`}
+                      title={title}
+                      onClick={() => !isDisabled && handleProcessOrder(order)}
+                      disabled={isDisabled}
+                      style={isDisabled ? { opacity: 0.5, cursor: 'not-allowed' } : undefined}
+                    >
+                      <Play size={16} />
+                    </ProtectedButton>
+                  );
+                })()}
+                {order.status !== OrderStatus.Delivered && order.status !== OrderStatus.Cancelled && (
+                  <CancelButton
+                    requiredPermission={Permissions.CancelOrder}
+                    title={t('cancelOrder')}
+                    onClick={() => handleCancelOrder(order)}
+                  />
+                )}
+              </div>
+            ),
+            cellClassName: 'actions-cell'
+          }
+        ];
+
+        return (
+          <Table
+            columns={columns}
+            data={orders}
+            sortBy={sortBy}
+            sortOrder={sortOrder}
+            onSort={handleSort}
+            emptyMessage={searchTerm || statusFilter !== null 
+              ? t('table.noMatchingOrders')
+              : t('table.noOrders')}
+          />
+        );
+      })()}
 
       {/* Pagination Controls */}
       {pagedData && pagedData.totalPages > 0 && (
