@@ -64,7 +64,7 @@
 }
 
 .header-content svg {
-  color: var(--primary-600);
+  color: white;
 }
 
 .edit-role-permissions-header h2 {

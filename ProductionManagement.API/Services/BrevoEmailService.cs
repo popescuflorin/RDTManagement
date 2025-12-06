@@ -76,7 +76,7 @@ public class BrevoEmailService : IEmailService
 
     public async Task<bool> SendWelcomeEmailAsync(string toEmail, string userName, string temporaryPassword)
     {
-        var subject = "Welcome to Production Management System";
+        var subject = "Bun venit în Sistemul de Management al Producției";
         var htmlContent = $@"
             <!DOCTYPE html>
             <html>
@@ -94,27 +94,27 @@ public class BrevoEmailService : IEmailService
             <body>
                 <div class='container'>
                     <div class='header'>
-                        <h1>Welcome to Production Management!</h1>
+                        <h1>Bun venit în Sistemul de Management al Producției!</h1>
                     </div>
                     <div class='content'>
-                        <h2>Hello {userName},</h2>
-                        <p>Your account has been successfully created. You can now access the Production Management System.</p>
+                        <h2>Bună ziua {userName},</h2>
+                        <p>Contul dvs. a fost creat cu succes. Acum puteți accesa Sistemul de Management al Producției.</p>
                         
                         <div class='credentials'>
-                            <h3>Your Login Credentials:</h3>
+                            <h3>Datele dvs. de autentificare:</h3>
                             <p><strong>Email:</strong> {toEmail}</p>
-                            <p><strong>username:</strong> {userName}</p>
-                            <p><strong>Temporary Password:</strong> {temporaryPassword}</p>
+                            <p><strong>Nume utilizator:</strong> {userName}</p>
+                            <p><strong>Parolă temporară:</strong> {temporaryPassword}</p>
                         </div>
                         
-                        <p><strong>⚠️ Important:</strong> Please change your password after your first login for security purposes.</p>
+                        <p><strong>⚠️ Important:</strong> Vă rugăm să vă schimbați parola după prima autentificare din motive de securitate.</p>
                         
-                        <a href='http://localhost:5173/login' class='button'>Login Now</a>
+                        <a href='http://localhost:5173/login' class='button'>Autentificare Acum</a>
                         
-                        <p style='margin-top: 30px;'>If you have any questions, please contact your system administrator.</p>
+                        <p style='margin-top: 30px;'>Dacă aveți întrebări, vă rugăm să contactați administratorul sistemului.</p>
                     </div>
                     <div class='footer'>
-                        <p>© 2025 Production Management System. All rights reserved.</p>
+                        <p>© 2025 Sistemul de Management al Producției. Toate drepturile rezervate.</p>
                     </div>
                 </div>
             </body>
@@ -125,7 +125,7 @@ public class BrevoEmailService : IEmailService
 
     public async Task<bool> SendPasswordResetEmailAsync(string toEmail, string userName, string resetLink)
     {
-        var subject = "Password Reset Request";
+        var subject = "Cerere de Resetare a Parolei";
         var htmlContent = $@"
             <!DOCTYPE html>
             <html>
@@ -143,26 +143,26 @@ public class BrevoEmailService : IEmailService
             <body>
                 <div class='container'>
                     <div class='header'>
-                        <h1>Password Reset Request</h1>
+                        <h1>Cerere de Resetare a Parolei</h1>
                     </div>
                     <div class='content'>
-                        <h2>Hello {userName},</h2>
-                        <p>We received a request to reset your password for your Production Management account.</p>
+                        <h2>Bună ziua {userName},</h2>
+                        <p>Am primit o cerere de resetare a parolei pentru contul dvs. din Sistemul de Management al Producției.</p>
                         
-                        <p>Click the button below to reset your password:</p>
+                        <p>Faceți clic pe butonul de mai jos pentru a vă reseta parola:</p>
                         
-                        <a href='{resetLink}' class='button'>Reset Password</a>
+                        <a href='{resetLink}' class='button'>Resetează Parola</a>
                         
                         <div class='warning'>
-                            <p><strong>⚠️ Security Notice:</strong></p>
-                            <p>This link will expire in 24 hours. If you didn't request this password reset, please ignore this email and your password will remain unchanged.</p>
+                            <p><strong>⚠️ Notificare de Securitate:</strong></p>
+                            <p>Acest link va expira în 24 de ore. Dacă nu ați solicitat resetarea parolei, vă rugăm să ignorați acest email și parola dvs. va rămâne neschimbată.</p>
                         </div>
                         
-                        <p>If the button doesn't work, copy and paste this link into your browser:</p>
+                        <p>Dacă butonul nu funcționează, copiați și lipiți acest link în browser-ul dvs.:</p>
                         <p style='word-break: break-all; color: #2196F3;'>{resetLink}</p>
                     </div>
                     <div class='footer'>
-                        <p>© 2025 Production Management System. All rights reserved.</p>
+                        <p>© 2025 Sistemul de Management al Producției. Toate drepturile rezervate.</p>
                     </div>
                 </div>
             </body>
@@ -173,7 +173,7 @@ public class BrevoEmailService : IEmailService
 
     public async Task<bool> SendLowStockAlertAsync(string toEmail, string materialName, int currentStock, int minimumStock)
     {
-        var subject = $"⚠️ Low Stock Alert: {materialName}";
+        var subject = $"⚠️ Alertă Stoc Redus: {materialName}";
         var htmlContent = $@"
             <!DOCTYPE html>
             <html>
@@ -195,41 +195,41 @@ public class BrevoEmailService : IEmailService
             <body>
                 <div class='container'>
                     <div class='header'>
-                        <h1>⚠️ Low Stock Alert</h1>
+                        <h1>⚠️ Alertă Stoc Redus</h1>
                     </div>
                     <div class='content'>
                         <div class='alert'>
                             <h2>Material: {materialName}</h2>
-                            <p>The stock level for this material has fallen below the minimum threshold.</p>
+                            <p>Nivelul stocului pentru acest material a scăzut sub pragul minim.</p>
                             
                             <div class='stats'>
                                 <div class='stat'>
                                     <div class='stat-value'>{currentStock}</div>
-                                    <div class='stat-label'>Current Stock</div>
+                                    <div class='stat-label'>Stoc Actual</div>
                                 </div>
                                 <div class='stat'>
                                     <div class='stat-value'>{minimumStock}</div>
-                                    <div class='stat-label'>Minimum Required</div>
+                                    <div class='stat-label'>Minim Necesar</div>
                                 </div>
                                 <div class='stat'>
                                     <div class='stat-value'>{minimumStock - currentStock}</div>
-                                    <div class='stat-label'>Shortage</div>
+                                    <div class='stat-label'>Deficit</div>
                                 </div>
                             </div>
                             
-                            <p><strong>Action Required:</strong> Please create a new acquisition to replenish this material.</p>
+                            <p><strong>Acțiune Necesară:</strong> Vă rugăm să creați o nouă achiziție pentru a reumple acest material.</p>
                         </div>
                         
-                        <a href='http://localhost:5173/acquisitions' class='button'>Create Acquisition</a>
+                        <a href='http://localhost:5173/acquisitions' class='button'>Creează Achiziție</a>
                     </div>
                     <div class='footer'>
-                        <p>© 2025 Production Management System. All rights reserved.</p>
+                        <p>© 2025 Sistemul de Management al Producției. Toate drepturile rezervate.</p>
                     </div>
                 </div>
             </body>
             </html>";
 
-        return await SendEmailAsync(toEmail, "Inventory Manager", subject, htmlContent);
+        return await SendEmailAsync(toEmail, "Manager Inventar", subject, htmlContent);
     }
 
     public async Task<bool> SendAcquisitionCreatedAsync(
@@ -250,7 +250,7 @@ public class BrevoEmailService : IEmailService
         string? transportNotes = null,
         List<AcquisitionItemEmailDto>? items = null)
     {
-        var subject = $"📋 New Acquisition Created: {acquisitionTitle}";
+        var subject = $"📋 Achiziție Nouă Creată: {acquisitionTitle}";
         
         // Build description section
         var descriptionSection = !string.IsNullOrEmpty(description) 
@@ -263,10 +263,10 @@ public class BrevoEmailService : IEmailService
         {
             supplierSection = $@"
                 <div class='section'>
-                    <h3 style='color: #2196F3; margin-top: 0;'>🏢 Supplier Information</h3>
+                    <h3 style='color: #2196F3; margin-top: 0;'>🏢 Informații Furnizor</h3>
                     <div class='details-grid'>
                         <div class='detail-row'>
-                            <div class='detail-label'>Supplier:</div>
+                            <div class='detail-label'>Furnizor:</div>
                             <div class='detail-value'>{supplierName}</div>
                         </div>
                         {(!string.IsNullOrEmpty(supplierContact) ? $@"
@@ -284,31 +284,31 @@ public class BrevoEmailService : IEmailService
         {
             transportSection = $@"
                 <div class='section'>
-                    <h3 style='color: #2196F3; margin-top: 0;'>🚚 Transport Details</h3>
+                    <h3 style='color: #2196F3; margin-top: 0;'>🚚 Detalii Transport</h3>
                     <div class='details-grid'>
                         {(!string.IsNullOrEmpty(transportCarName) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Car Name:</div>
+                            <div class='detail-label'>Nume Mașină:</div>
                             <div class='detail-value'>{transportCarName}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportNumberPlate) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Number Plate:</div>
+                            <div class='detail-label'>Număr Înmatriculare:</div>
                             <div class='detail-value'>{transportNumberPlate}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportPhoneNumber) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Phone:</div>
+                            <div class='detail-label'>Telefon:</div>
                             <div class='detail-value'>{transportPhoneNumber}</div>
                         </div>" : "")}
                         {(transportDate.HasValue ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Transport Date:</div>
-                            <div class='detail-value'>{transportDate.Value:MMM dd, yyyy}</div>
+                            <div class='detail-label'>Data Transport:</div>
+                            <div class='detail-value'>{transportDate.Value:dd MMM yyyy}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportNotes) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Notes:</div>
+                            <div class='detail-label'>Note:</div>
                             <div class='detail-value'>{transportNotes}</div>
                         </div>" : "")}
                     </div>
@@ -329,14 +329,14 @@ public class BrevoEmailService : IEmailService
             
             itemsTable = $@"
                 <div class='section'>
-                    <h3 style='color: #2196F3; margin-top: 0;'>📦 Materials List</h3>
+                    <h3 style='color: #2196F3; margin-top: 0;'>📦 Lista Materiale</h3>
                     <table style='width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);'>
                         <thead>
                             <tr style='background-color: #f5f5f5;'>
-                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #2196F3;'>Material Name</th>
-                                <th style='padding: 12px; text-align: center; border-bottom: 2px solid #2196F3;'>Color</th>
-                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #2196F3;'>Ordered Qty</th>
-                                <th style='padding: 12px; text-align: center; border-bottom: 2px solid #2196F3;'>Unit</th>
+                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #2196F3;'>Nume Material</th>
+                                <th style='padding: 12px; text-align: center; border-bottom: 2px solid #2196F3;'>Culoare</th>
+                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #2196F3;'>Cantitate Comandată</th>
+                                <th style='padding: 12px; text-align: center; border-bottom: 2px solid #2196F3;'>Unitate</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -344,8 +344,8 @@ public class BrevoEmailService : IEmailService
                         </tbody>
                         <tfoot>
                             <tr style='background-color: #f5f5f5; font-weight: bold;'>
-                                <td colspan='2' style='padding: 12px; border-top: 2px solid #2196F3;'>Total Items:</td>
-                                <td colspan='2' style='padding: 12px; text-align: right; border-top: 2px solid #2196F3;'>{items.Count} material(s)</td>
+                                <td colspan='2' style='padding: 12px; border-top: 2px solid #2196F3;'>Total Materiale:</td>
+                                <td colspan='2' style='padding: 12px; text-align: right; border-top: 2px solid #2196F3;'>{items.Count} material(e)</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -377,8 +377,8 @@ public class BrevoEmailService : IEmailService
             <body>
                 <div class='container'>
                     <div class='header'>
-                        <h1 style='margin: 0; font-size: 28px;'>📋 New Acquisition Created</h1>
-                        <p style='margin: 10px 0 0 0; opacity: 0.9;'>Action Required</p>
+                        <h1 style='margin: 0; font-size: 28px;'>📋 Achiziție Nouă Creată</h1>
+                        <p style='margin: 10px 0 0 0; opacity: 0.9;'>Acțiune Necesară</p>
                     </div>
                     <div class='content'>
                         <div class='info-box'>
@@ -387,21 +387,21 @@ public class BrevoEmailService : IEmailService
                             
                             <div class='details-grid'>
                                 <div class='detail-row'>
-                                    <div class='detail-label'>Acquisition #:</div>
+                                    <div class='detail-label'>Achiziție #:</div>
                                     <div class='detail-value'><strong>{acquisitionNumber}</strong></div>
                                 </div>
                                 <div class='detail-row'>
-                                    <div class='detail-label'>Created By:</div>
+                                    <div class='detail-label'>Creată De:</div>
                                     <div class='detail-value'>{createdBy}</div>
                                 </div>
                                 {(assignedToUser != null ? $@"
                                 <div class='detail-row'>
-                                    <div class='detail-label'>Assigned To:</div>
+                                    <div class='detail-label'>Atribuită Lui:</div>
                                     <div class='detail-value'><strong>{assignedToUser}</strong></div>
                                 </div>" : "")}
                                 <div class='detail-row'>
                                     <div class='detail-label'>Status:</div>
-                                    <div class='detail-value'><span class='status-badge'>Draft</span></div>
+                                    <div class='detail-value'><span class='status-badge'>Ciornă</span></div>
                                 </div>
                             </div>
                         </div>
@@ -411,13 +411,13 @@ public class BrevoEmailService : IEmailService
                         {itemsTable}
                         
                         <div style='text-align: center; margin-top: 30px;'>
-                            <p style='color: #666;'>Please review the acquisition details and take necessary actions.</p>
-                            <a href='http://localhost:5173/acquisitions' class='button'>View Acquisition Details</a>
+                            <p style='color: #666;'>Vă rugăm să examinați detaliile achiziției și să luați măsurile necesare.</p>
+                            <a href='http://localhost:5173/acquisitions' class='button'>Vezi Detaliile Achiziției</a>
                         </div>
                     </div>
                     <div class='footer'>
-                        <p>© 2025 Production Management System. All rights reserved.</p>
-                        <p style='color: #999; margin-top: 5px;'>This is an automated notification. Please do not reply to this email.</p>
+                        <p>© 2025 Sistemul de Management al Producției. Toate drepturile rezervate.</p>
+                        <p style='color: #999; margin-top: 5px;'>Aceasta este o notificare automată. Vă rugăm să nu răspundeți la acest email.</p>
                     </div>
                 </div>
             </body>
@@ -445,7 +445,7 @@ public class BrevoEmailService : IEmailService
         string? transportNotes = null,
         List<AcquisitionItemEmailDto>? items = null)
     {
-        var subject = $"✏️ Acquisition Updated: {acquisitionTitle}";
+        var subject = $"✏️ Achiziție Actualizată: {acquisitionTitle}";
         
         // Build description section
         var descriptionSection = !string.IsNullOrEmpty(description) 
@@ -459,7 +459,7 @@ public class BrevoEmailService : IEmailService
             var changeItems = string.Join("", changes.Select(change => $"<li style='padding: 8px 0; border-bottom: 1px solid #fff3e0;'>{change}</li>"));
             changesSection = $@"
                 <div class='changes-box' style='background-color: #fff8e1; border-left: 4px solid #ffa726; padding: 20px; margin: 20px 0; border-radius: 6px;'>
-                    <h3 style='color: #f57c00; margin-top: 0;'>📝 Changes Made</h3>
+                    <h3 style='color: #f57c00; margin-top: 0;'>📝 Modificări Efectuate</h3>
                     <ul style='margin: 10px 0; padding-left: 20px; list-style-type: none;'>
                         {changeItems}
                     </ul>
@@ -472,10 +472,10 @@ public class BrevoEmailService : IEmailService
         {
             supplierSection = $@"
                 <div class='section'>
-                    <h3 style='color: #2196F3; margin-top: 0;'>🏢 Supplier Information</h3>
+                    <h3 style='color: #2196F3; margin-top: 0;'>🏢 Informații Furnizor</h3>
                     <div class='details-grid'>
                         <div class='detail-row'>
-                            <div class='detail-label'>Supplier:</div>
+                            <div class='detail-label'>Furnizor:</div>
                             <div class='detail-value'>{supplierName}</div>
                         </div>
                         {(!string.IsNullOrEmpty(supplierContact) ? $@"
@@ -493,31 +493,31 @@ public class BrevoEmailService : IEmailService
         {
             transportSection = $@"
                 <div class='section'>
-                    <h3 style='color: #2196F3; margin-top: 0;'>🚚 Transport Details</h3>
+                    <h3 style='color: #2196F3; margin-top: 0;'>🚚 Detalii Transport</h3>
                     <div class='details-grid'>
                         {(!string.IsNullOrEmpty(transportCarName) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Car Name:</div>
+                            <div class='detail-label'>Nume Mașină:</div>
                             <div class='detail-value'>{transportCarName}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportNumberPlate) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Number Plate:</div>
+                            <div class='detail-label'>Număr Înmatriculare:</div>
                             <div class='detail-value'>{transportNumberPlate}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportPhoneNumber) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Phone:</div>
+                            <div class='detail-label'>Telefon:</div>
                             <div class='detail-value'>{transportPhoneNumber}</div>
                         </div>" : "")}
                         {(transportDate.HasValue ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Transport Date:</div>
-                            <div class='detail-value'>{transportDate.Value:MMM dd, yyyy}</div>
+                            <div class='detail-label'>Data Transport:</div>
+                            <div class='detail-value'>{transportDate.Value:dd MMM yyyy}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportNotes) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Notes:</div>
+                            <div class='detail-label'>Note:</div>
                             <div class='detail-value'>{transportNotes}</div>
                         </div>" : "")}
                     </div>
@@ -558,22 +558,22 @@ public class BrevoEmailService : IEmailService
             }));
             
             var receivedHeader = hasReceivedQty 
-                ? "<th style='padding: 12px; text-align: right; border-bottom: 2px solid #ff9800;'>Received Qty</th>"
+                ? "<th style='padding: 12px; text-align: right; border-bottom: 2px solid #ff9800;'>Cantitate Primită</th>"
                 : "";
             
             var colspanValue = hasReceivedQty ? "3" : "2";
             
             itemsTable = $@"
                 <div class='section'>
-                    <h3 style='color: #2196F3; margin-top: 0;'>📦 Materials List</h3>
+                    <h3 style='color: #2196F3; margin-top: 0;'>📦 Lista Materiale</h3>
                     <table style='width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);'>
                         <thead>
                             <tr style='background-color: #f5f5f5;'>
-                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #ff9800;'>Material Name</th>
-                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #ff9800;'>Color</th>
-                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #ff9800;'>Ordered Qty</th>
+                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #ff9800;'>Nume Material</th>
+                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #ff9800;'>Culoare</th>
+                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #ff9800;'>Cantitate Comandată</th>
                                 {receivedHeader}
-                                <th style='padding: 12px; text-align: center; border-bottom: 2px solid #ff9800;'>Unit</th>
+                                <th style='padding: 12px; text-align: center; border-bottom: 2px solid #ff9800;'>Unitate</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -581,8 +581,8 @@ public class BrevoEmailService : IEmailService
                         </tbody>
                         <tfoot>
                             <tr style='background-color: #f5f5f5; font-weight: bold;'>
-                                <td colspan='2' style='padding: 12px; border-top: 2px solid #ff9800;'>Total Items:</td>
-                                <td colspan='{colspanValue}' style='padding: 12px; text-align: right; border-top: 2px solid #ff9800;'>{items.Count} material(s)</td>
+                                <td colspan='2' style='padding: 12px; border-top: 2px solid #ff9800;'>Total Materiale:</td>
+                                <td colspan='{colspanValue}' style='padding: 12px; text-align: right; border-top: 2px solid #ff9800;'>{items.Count} material(e)</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -614,8 +614,8 @@ public class BrevoEmailService : IEmailService
             <body>
                 <div class='container'>
                     <div class='header'>
-                        <h1 style='margin: 0; font-size: 28px;'>✏️ Acquisition Updated</h1>
-                        <p style='margin: 10px 0 0 0; opacity: 0.9;'>Changes Made</p>
+                        <h1 style='margin: 0; font-size: 28px;'>✏️ Achiziție Actualizată</h1>
+                        <p style='margin: 10px 0 0 0; opacity: 0.9;'>Modificări Efectuate</p>
                     </div>
                     <div class='content'>
                         <div class='info-box'>
@@ -624,21 +624,21 @@ public class BrevoEmailService : IEmailService
                             
                             <div class='details-grid'>
                                 <div class='detail-row'>
-                                    <div class='detail-label'>Acquisition #:</div>
+                                    <div class='detail-label'>Achiziție #:</div>
                                     <div class='detail-value'><strong>{acquisitionNumber}</strong></div>
                                 </div>
                                 <div class='detail-row'>
-                                    <div class='detail-label'>Updated By:</div>
+                                    <div class='detail-label'>Actualizată De:</div>
                                     <div class='detail-value'>{updatedBy}</div>
                                 </div>
                                 {(assignedToUser != null ? $@"
                                 <div class='detail-row'>
-                                    <div class='detail-label'>Assigned To:</div>
+                                    <div class='detail-label'>Atribuită Lui:</div>
                                     <div class='detail-value'><strong>{assignedToUser}</strong></div>
                                 </div>" : "")}
                                 <div class='detail-row'>
                                     <div class='detail-label'>Status:</div>
-                                    <div class='detail-value'><span class='status-badge'>Draft</span></div>
+                                    <div class='detail-value'><span class='status-badge'>Ciornă</span></div>
                                 </div>
                             </div>
                         </div>
@@ -649,13 +649,13 @@ public class BrevoEmailService : IEmailService
                         {itemsTable}
                         
                         <div style='text-align: center; margin-top: 30px;'>
-                            <p style='color: #666;'>The acquisition has been updated. Please review the changes.</p>
-                            <a href='http://localhost:5173/acquisitions' class='button'>View Acquisition Details</a>
+                            <p style='color: #666;'>Achiziția a fost actualizată. Vă rugăm să examinați modificările.</p>
+                            <a href='http://localhost:5173/acquisitions' class='button'>Vezi Detaliile Achiziției</a>
                         </div>
                     </div>
                     <div class='footer'>
-                        <p>© 2025 Production Management System. All rights reserved.</p>
-                        <p style='color: #999; margin-top: 5px;'>This is an automated notification. Please do not reply to this email.</p>
+                        <p>© 2025 Sistemul de Management al Producției. Toate drepturile rezervate.</p>
+                        <p style='color: #999; margin-top: 5px;'>Aceasta este o notificare automată. Vă rugăm să nu răspundeți la acest email.</p>
                     </div>
                 </div>
             </body>
@@ -682,7 +682,7 @@ public class BrevoEmailService : IEmailService
         string? transportNotes = null,
         List<AcquisitionItemEmailDto>? items = null)
     {
-        var subject = $"🗑️ Acquisition Deleted: {acquisitionTitle}";
+        var subject = $"🗑️ Achiziție Ștearsă: {acquisitionTitle}";
         
         // Build description section
         var descriptionSection = !string.IsNullOrEmpty(description) 
@@ -695,10 +695,10 @@ public class BrevoEmailService : IEmailService
         {
             supplierSection = $@"
                 <div class='section'>
-                    <h3 style='color: #e53935; margin-top: 0;'>🏢 Supplier Information</h3>
+                    <h3 style='color: #e53935; margin-top: 0;'>🏢 Informații Furnizor</h3>
                     <div class='details-grid'>
                         <div class='detail-row'>
-                            <div class='detail-label'>Supplier:</div>
+                            <div class='detail-label'>Furnizor:</div>
                             <div class='detail-value'>{supplierName}</div>
                         </div>
                         {(!string.IsNullOrEmpty(supplierContact) ? $@"
@@ -716,31 +716,31 @@ public class BrevoEmailService : IEmailService
         {
             transportSection = $@"
                 <div class='section'>
-                    <h3 style='color: #e53935; margin-top: 0;'>🚚 Transport Details</h3>
+                    <h3 style='color: #e53935; margin-top: 0;'>🚚 Detalii Transport</h3>
                     <div class='details-grid'>
                         {(!string.IsNullOrEmpty(transportCarName) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Car Name:</div>
+                            <div class='detail-label'>Nume Mașină:</div>
                             <div class='detail-value'>{transportCarName}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportNumberPlate) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Number Plate:</div>
+                            <div class='detail-label'>Număr Înmatriculare:</div>
                             <div class='detail-value'>{transportNumberPlate}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportPhoneNumber) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Phone:</div>
+                            <div class='detail-label'>Telefon:</div>
                             <div class='detail-value'>{transportPhoneNumber}</div>
                         </div>" : "")}
                         {(transportDate.HasValue ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Transport Date:</div>
-                            <div class='detail-value'>{transportDate.Value:MMM dd, yyyy}</div>
+                            <div class='detail-label'>Data Transport:</div>
+                            <div class='detail-value'>{transportDate.Value:dd MMM yyyy}</div>
                         </div>" : "")}
                         {(!string.IsNullOrEmpty(transportNotes) ? $@"
                         <div class='detail-row'>
-                            <div class='detail-label'>Notes:</div>
+                            <div class='detail-label'>Note:</div>
                             <div class='detail-value'>{transportNotes}</div>
                         </div>" : "")}
                     </div>
@@ -770,22 +770,22 @@ public class BrevoEmailService : IEmailService
             }));
             
             var receivedHeader = hasReceivedQty 
-                ? "<th style='padding: 12px; text-align: right; border-bottom: 2px solid #e53935;'>Received Qty</th>"
+                ? "<th style='padding: 12px; text-align: right; border-bottom: 2px solid #e53935;'>Cantitate Primită</th>"
                 : "";
             
             var colspanValue = hasReceivedQty ? "3" : "2";
             
             itemsTable = $@"
                 <div class='section'>
-                    <h3 style='color: #e53935; margin-top: 0;'>📦 Materials List (Cancelled)</h3>
+                    <h3 style='color: #e53935; margin-top: 0;'>📦 Lista Materiale (Anulată)</h3>
                     <table style='width: 100%; border-collapse: collapse; background-color: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1);'>
                         <thead>
                             <tr style='background-color: #f5f5f5;'>
-                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #e53935;'>Material Name</th>
-                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #e53935;'>Color</th>
-                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #e53935;'>Ordered Qty</th>
+                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #e53935;'>Nume Material</th>
+                                <th style='padding: 12px; text-align: left; border-bottom: 2px solid #e53935;'>Culoare</th>
+                                <th style='padding: 12px; text-align: right; border-bottom: 2px solid #e53935;'>Cantitate Comandată</th>
                                 {receivedHeader}
-                                <th style='padding: 12px; text-align: center; border-bottom: 2px solid #e53935;'>Unit</th>
+                                <th style='padding: 12px; text-align: center; border-bottom: 2px solid #e53935;'>Unitate</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -793,8 +793,8 @@ public class BrevoEmailService : IEmailService
                         </tbody>
                         <tfoot>
                             <tr style='background-color: #ffebee; font-weight: bold;'>
-                                <td colspan='2' style='padding: 12px; border-top: 2px solid #e53935;'>Total Items (Cancelled):</td>
-                                <td colspan='{colspanValue}' style='padding: 12px; text-align: right; border-top: 2px solid #e53935;'>{items.Count} material(s)</td>
+                                <td colspan='2' style='padding: 12px; border-top: 2px solid #e53935;'>Total Materiale (Anulate):</td>
+                                <td colspan='{colspanValue}' style='padding: 12px; text-align: right; border-top: 2px solid #e53935;'>{items.Count} material(e)</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -827,13 +827,13 @@ public class BrevoEmailService : IEmailService
             <body>
                 <div class='container'>
                     <div class='header'>
-                        <h1 style='margin: 0; font-size: 28px;'>🗑️ Acquisition Deleted</h1>
-                        <p style='margin: 10px 0 0 0; opacity: 0.9;'>Cancelled</p>
+                        <h1 style='margin: 0; font-size: 28px;'>🗑️ Achiziție Ștearsă</h1>
+                        <p style='margin: 10px 0 0 0; opacity: 0.9;'>Anulată</p>
                     </div>
                     <div class='content'>
                         <div class='alert-box'>
-                            <h3 style='margin-top: 0; color: #d32f2f;'>⚠️ This acquisition has been deleted</h3>
-                            <p style='margin-bottom: 0; color: #666;'>The following acquisition has been cancelled and removed from the active list.</p>
+                            <h3 style='margin-top: 0; color: #d32f2f;'>⚠️ Această achiziție a fost ștearsă</h3>
+                            <p style='margin-bottom: 0; color: #666;'>Următoarea achiziție a fost anulată și eliminată din lista activă.</p>
                         </div>
                         
                         <div class='info-box'>
@@ -842,21 +842,21 @@ public class BrevoEmailService : IEmailService
                             
                             <div class='details-grid'>
                                 <div class='detail-row'>
-                                    <div class='detail-label'>Acquisition #:</div>
+                                    <div class='detail-label'>Achiziție #:</div>
                                     <div class='detail-value'><strong>{acquisitionNumber}</strong></div>
                                 </div>
                                 <div class='detail-row'>
-                                    <div class='detail-label'>Deleted By:</div>
+                                    <div class='detail-label'>Ștearsă De:</div>
                                     <div class='detail-value'>{deletedBy}</div>
                                 </div>
                                 {(assignedToUser != null ? $@"
                                 <div class='detail-row'>
-                                    <div class='detail-label'>Was Assigned To:</div>
+                                    <div class='detail-label'>Era Atribuită Lui:</div>
                                     <div class='detail-value'><strong>{assignedToUser}</strong></div>
                                 </div>" : "")}
                                 <div class='detail-row'>
                                     <div class='detail-label'>Status:</div>
-                                    <div class='detail-value'><span class='status-badge'>Deleted</span></div>
+                                    <div class='detail-value'><span class='status-badge'>Ștearsă</span></div>
                                 </div>
                             </div>
                         </div>
@@ -866,13 +866,13 @@ public class BrevoEmailService : IEmailService
                         {itemsTable}
                         
                         <div style='text-align: center; margin-top: 30px;'>
-                            <p style='color: #666;'>This acquisition has been permanently removed from the system.</p>
-                            <a href='http://localhost:5173/acquisitions' class='button'>View All Acquisitions</a>
+                            <p style='color: #666;'>Această achiziție a fost eliminată permanent din sistem.</p>
+                            <a href='http://localhost:5173/acquisitions' class='button'>Vezi Toate Achizițiile</a>
                         </div>
                     </div>
                     <div class='footer'>
-                        <p>© 2025 Production Management System. All rights reserved.</p>
-                        <p style='color: #999; margin-top: 5px;'>This is an automated notification. Please do not reply to this email.</p>
+                        <p>© 2025 Sistemul de Management al Producției. Toate drepturile rezervate.</p>
+                        <p style='color: #999; margin-top: 5px;'>Aceasta este o notificare automată. Vă rugăm să nu răspundeți la acest email.</p>
                     </div>
                 </div>
             </body>
@@ -900,7 +900,7 @@ public class BrevoEmailService : IEmailService
         decimal? totalActualCost = null,
         List<AcquisitionItemEmailDto>? items = null)
     {
-        var subject = $"✅ Acquisition Received: {acquisitionTitle} ({acquisitionNumber})";
+        var subject = $"✅ Achiziție Primită: {acquisitionTitle} ({acquisitionNumber})";
         
         // Build items table HTML with ordered and received quantities
         var itemsHtml = "";
@@ -908,14 +908,14 @@ public class BrevoEmailService : IEmailService
         {
             itemsHtml = @"
                 <div style='margin-top: 30px;'>
-                    <h3 style='color: #2e7d32; margin-bottom: 15px; border-bottom: 2px solid #81c784; padding-bottom: 8px;'>📦 Received Materials</h3>
+                    <h3 style='color: #2e7d32; margin-bottom: 15px; border-bottom: 2px solid #81c784; padding-bottom: 8px;'>📦 Materiale Primite</h3>
                     <table style='width: 100%; border-collapse: collapse; margin-top: 10px;'>
                         <thead>
                             <tr style='background-color: #c8e6c9; color: #1b5e20;'>
                                 <th style='padding: 12px; text-align: left; border: 1px solid #a5d6a7;'>Material</th>
-                                <th style='padding: 12px; text-align: left; border: 1px solid #a5d6a7;'>Color</th>
-                                <th style='padding: 12px; text-align: right; border: 1px solid #a5d6a7;'>Ordered Qty</th>
-                                <th style='padding: 12px; text-align: right; border: 1px solid #a5d6a7;'>Received Qty</th>
+                                <th style='padding: 12px; text-align: left; border: 1px solid #a5d6a7;'>Culoare</th>
+                                <th style='padding: 12px; text-align: right; border: 1px solid #a5d6a7;'>Cantitate Comandată</th>
+                                <th style='padding: 12px; text-align: right; border: 1px solid #a5d6a7;'>Cantitate Primită</th>
                                 <th style='padding: 12px; text-align: center; border: 1px solid #a5d6a7;'>Status</th>
                             </tr>
                         </thead>
@@ -933,19 +933,19 @@ public class BrevoEmailService : IEmailService
                     if (item.ReceivedQuantity.Value == item.OrderedQuantity)
                     {
                         statusIcon = "✓";
-                        statusText = "Complete";
+                        statusText = "Complet";
                         statusColor = "#4caf50";
                     }
                     else if (item.ReceivedQuantity.Value < item.OrderedQuantity)
                     {
                         statusIcon = "⚠";
-                        statusText = $"Partial ({(item.ReceivedQuantity.Value / item.OrderedQuantity * 100):N0}%)";
+                        statusText = $"Parțial ({(item.ReceivedQuantity.Value / item.OrderedQuantity * 100):N0}%)";
                         statusColor = "#ff9800";
                     }
                     else
                     {
                         statusIcon = "↑";
-                        statusText = $"Excess (+{(item.ReceivedQuantity.Value - item.OrderedQuantity):N2})";
+                        statusText = $"Exces (+{(item.ReceivedQuantity.Value - item.OrderedQuantity):N2})";
                         statusColor = "#2196f3";
                     }
                 }
@@ -974,7 +974,7 @@ public class BrevoEmailService : IEmailService
         {
             supplierSection = $@"
                 <div style='background-color: #e8f5e9; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #4caf50;'>
-                    <div style='color: #2e7d32; font-weight: bold; margin-bottom: 8px;'>🏢 Supplier</div>
+                    <div style='color: #2e7d32; font-weight: bold; margin-bottom: 8px;'>🏢 Furnizor</div>
                     <div style='color: #424242; line-height: 1.6;'>
                         <strong>{supplierName}</strong>{(string.IsNullOrEmpty(supplierContact) ? "" : $"<br/>Contact: {supplierContact}")}
                     </div>
@@ -987,13 +987,13 @@ public class BrevoEmailService : IEmailService
         {
             transportSection = $@"
                 <div style='background-color: #e3f2fd; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #2196f3;'>
-                    <div style='color: #1565c0; font-weight: bold; margin-bottom: 8px;'>🚚 Transport Details</div>
+                    <div style='color: #1565c0; font-weight: bold; margin-bottom: 8px;'>🚚 Detalii Transport</div>
                     <div style='color: #424242; line-height: 1.6;'>
-                        <strong>Vehicle:</strong> {transportCarName}<br/>
-                        {(!string.IsNullOrEmpty(transportNumberPlate) ? $"<strong>Number Plate:</strong> {transportNumberPlate}<br/>" : "")}
-                        {(string.IsNullOrEmpty(transportPhoneNumber) ? "" : $"<strong>Phone:</strong> {transportPhoneNumber}<br/>")}
-                        {(transportDate.HasValue ? $"<strong>Date:</strong> {transportDate.Value:MMM dd, yyyy}<br/>" : "")}
-                        {(string.IsNullOrEmpty(transportNotes) ? "" : $"<strong>Notes:</strong> {transportNotes}")}
+                        <strong>Vehicul:</strong> {transportCarName}<br/>
+                        {(!string.IsNullOrEmpty(transportNumberPlate) ? $"<strong>Număr Înmatriculare:</strong> {transportNumberPlate}<br/>" : "")}
+                        {(string.IsNullOrEmpty(transportPhoneNumber) ? "" : $"<strong>Telefon:</strong> {transportPhoneNumber}<br/>")}
+                        {(transportDate.HasValue ? $"<strong>Data:</strong> {transportDate.Value:dd MMM yyyy}<br/>" : "")}
+                        {(string.IsNullOrEmpty(transportNotes) ? "" : $"<strong>Note:</strong> {transportNotes}")}
                     </div>
                 </div>";
         }
@@ -1004,8 +1004,8 @@ public class BrevoEmailService : IEmailService
         {
             costSection = $@"
                 <div style='background-color: #fff3e0; padding: 15px; border-radius: 6px; margin-bottom: 15px; border-left: 4px solid #ff9800;'>
-                    <div style='color: #e65100; font-weight: bold; margin-bottom: 8px;'>💰 Total Cost</div>
-                    <div style='color: #424242; font-size: 24px; font-weight: bold;'>${totalActualCost.Value:N2}</div>
+                    <div style='color: #e65100; font-weight: bold; margin-bottom: 8px;'>💰 Cost Total</div>
+                    <div style='color: #424242; font-size: 24px; font-weight: bold;'>{totalActualCost.Value:N2} RON</div>
                 </div>";
         }
 
@@ -1024,8 +1024,8 @@ public class BrevoEmailService : IEmailService
                                 <!-- Header -->
                                 <tr>
                                     <td style='background: linear-gradient(135deg, #4caf50 0%, #45a049 100%); padding: 30px; text-align: center;'>
-                                        <h1 style='color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;'>✅ Acquisition Received</h1>
-                                        <p style='color: #e8f5e9; margin: 8px 0 0 0; font-size: 14px;'>Materials successfully added to inventory</p>
+                                        <h1 style='color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;'>✅ Achiziție Primită</h1>
+                                        <p style='color: #e8f5e9; margin: 8px 0 0 0; font-size: 14px;'>Materialele au fost adăugate cu succes în inventar</p>
                                     </td>
                                 </tr>
                                 
@@ -1034,13 +1034,13 @@ public class BrevoEmailService : IEmailService
                                     <td style='padding: 30px;'>
                                         <!-- Greeting -->
                                         <p style='color: #424242; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;'>
-                                            Hi <strong>{userName}</strong>,
+                                            Bună ziua <strong>{userName}</strong>,
                                         </p>
                                         
                                         <!-- Success Message -->
                                         <div style='background-color: #c8e6c9; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #81c784;'>
                                             <p style='color: #1b5e20; font-size: 16px; margin: 0; text-align: center;'>
-                                                <strong>🎉 The acquisition has been successfully received and the materials have been added to your inventory!</strong>
+                                                <strong>🎉 Achiziția a fost primită cu succes și materialele au fost adăugate în inventarul dvs.!</strong>
                                             </p>
                                         </div>
                                         
@@ -1051,26 +1051,26 @@ public class BrevoEmailService : IEmailService
                                             </h2>
                                             <table width='100%' cellpadding='5' cellspacing='0'>
                                                 <tr>
-                                                    <td style='color: #757575; padding: 8px 0;'><strong>Acquisition Number:</strong></td>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Număr Achiziție:</strong></td>
                                                     <td style='color: #424242; padding: 8px 0;'>{acquisitionNumber}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style='color: #757575; padding: 8px 0;'><strong>Type:</strong></td>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Tip:</strong></td>
                                                     <td style='color: #424242; padding: 8px 0;'>{acquisitionType}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style='color: #757575; padding: 8px 0;'><strong>Received By:</strong></td>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Primită De:</strong></td>
                                                     <td style='color: #424242; padding: 8px 0;'>{receivedBy}</td>
                                                 </tr>
                                                 {(string.IsNullOrEmpty(assignedToUser) ? "" : $@"
                                                 <tr>
-                                                    <td style='color: #757575; padding: 8px 0;'><strong>Assigned To:</strong></td>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Atribuită Lui:</strong></td>
                                                     <td style='color: #424242; padding: 8px 0;'>{assignedToUser}</td>
                                                 </tr>")}
                                                 {(string.IsNullOrEmpty(description) ? "" : $@"
                                                 <tr>
                                                     <td colspan='2' style='color: #424242; padding: 12px 0 8px 0;'>
-                                                        <strong style='color: #757575;'>Description:</strong><br/>
+                                                        <strong style='color: #757575;'>Descriere:</strong><br/>
                                                         {description}
                                                     </td>
                                                 </tr>")}
@@ -1092,7 +1092,7 @@ public class BrevoEmailService : IEmailService
                                         <!-- Action Button -->
                                         <div style='text-align: center; margin-top: 30px;'>
                                             <a href='http://localhost:5173/acquisitions' style='display: inline-block; padding: 14px 32px; background-color: #4caf50; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 2px 4px rgba(76, 175, 80, 0.3);'>
-                                                View Acquisitions
+                                                Vezi Achizițiile
                                             </a>
                                         </div>
                                     </td>
@@ -1102,8 +1102,8 @@ public class BrevoEmailService : IEmailService
                                 <tr>
                                     <td style='background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #e0e0e0;'>
                                         <p style='color: #757575; font-size: 12px; margin: 0; line-height: 1.5;'>
-                                            © 2025 Production Management System. All rights reserved.<br/>
-                                            This is an automated notification. Please do not reply to this email.
+                                            © 2025 Sistemul de Management al Producției. Toate drepturile rezervate.<br/>
+                                            Aceasta este o notificare automată. Vă rugăm să nu răspundeți la acest email.
                                         </p>
                                     </td>
                                 </tr>
@@ -1130,7 +1130,7 @@ public class BrevoEmailService : IEmailService
         List<AcquisitionItemEmailDto>? items = null,
         List<ProcessedMaterialEmailDto>? processedMaterials = null)
     {
-        var subject = $"🔄 Acquisition Processed: {acquisitionTitle} ({acquisitionNumber})";
+        var subject = $"🔄 Achiziție Procesată: {acquisitionTitle} ({acquisitionNumber})";
         
         // Build INPUT recyclable materials table
         var itemsHtml = "";
@@ -1138,13 +1138,13 @@ public class BrevoEmailService : IEmailService
         {
             itemsHtml = @"
                 <div style='margin-top: 30px;'>
-                    <h3 style='color: #ff9800; margin-bottom: 15px; border-bottom: 2px solid #ffb74d; padding-bottom: 8px;'>♻️ Input - Recyclable Materials</h3>
+                    <h3 style='color: #ff9800; margin-bottom: 15px; border-bottom: 2px solid #ffb74d; padding-bottom: 8px;'>♻️ Intrare - Materiale Reciclabile</h3>
                     <table style='width: 100%; border-collapse: collapse; margin-top: 10px;'>
                         <thead>
                             <tr style='background-color: #ffe0b2; color: #e65100;'>
                                 <th style='padding: 12px; text-align: left; border: 1px solid #ffcc80;'>Material</th>
-                                <th style='padding: 12px; text-align: left; border: 1px solid #ffcc80;'>Color</th>
-                                <th style='padding: 12px; text-align: right; border: 1px solid #ffcc80;'>Quantity</th>
+                                <th style='padding: 12px; text-align: left; border: 1px solid #ffcc80;'>Culoare</th>
+                                <th style='padding: 12px; text-align: right; border: 1px solid #ffcc80;'>Cantitate</th>
                             </tr>
                         </thead>
                         <tbody>";
@@ -1171,13 +1171,13 @@ public class BrevoEmailService : IEmailService
         {
             processedMaterialsHtml = @"
                 <div style='margin-top: 30px;'>
-                    <h3 style='color: #4caf50; margin-bottom: 15px; border-bottom: 2px solid #81c784; padding-bottom: 8px;'>✨ Output - Cleaned Raw Materials</h3>
+                    <h3 style='color: #4caf50; margin-bottom: 15px; border-bottom: 2px solid #81c784; padding-bottom: 8px;'>✨ Ieșire - Materiale Prime Curățate</h3>
                     <table style='width: 100%; border-collapse: collapse; margin-top: 10px;'>
                         <thead>
                             <tr style='background-color: #c8e6c9; color: #1b5e20;'>
                                 <th style='padding: 12px; text-align: left; border: 1px solid #a5d6a7;'>Material</th>
-                                <th style='padding: 12px; text-align: left; border: 1px solid #a5d6a7;'>Color</th>
-                                <th style='padding: 12px; text-align: right; border: 1px solid #a5d6a7;'>Quantity</th>
+                                <th style='padding: 12px; text-align: left; border: 1px solid #a5d6a7;'>Culoare</th>
+                                <th style='padding: 12px; text-align: right; border: 1px solid #a5d6a7;'>Cantitate</th>
                             </tr>
                         </thead>
                         <tbody>";
@@ -1196,8 +1196,8 @@ public class BrevoEmailService : IEmailService
                         </tbody>
                         <tfoot>
                             <tr style='background-color: #c8e6c9; font-weight: bold;'>
-                                <td colspan='2' style='padding: 12px; border: 1px solid #a5d6a7; color: #1b5e20;'>Total Output:</td>
-                                <td style='padding: 12px; text-align: right; border: 1px solid #a5d6a7; color: #1b5e20;'>{totalOutputQuantity:N2} units</td>
+                                <td colspan='2' style='padding: 12px; border: 1px solid #a5d6a7; color: #1b5e20;'>Total Ieșire:</td>
+                                <td style='padding: 12px; text-align: right; border: 1px solid #a5d6a7; color: #1b5e20;'>{totalOutputQuantity:N2} unități</td>
                             </tr>
                         </tfoot>
                     </table>
@@ -1219,8 +1219,8 @@ public class BrevoEmailService : IEmailService
                                 <!-- Header -->
                                 <tr>
                                     <td style='background: linear-gradient(135deg, #2196f3 0%, #1976d2 100%); padding: 30px; text-align: center;'>
-                                        <h1 style='color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;'>🔄 Recyclables Processed</h1>
-                                        <p style='color: #e3f2fd; margin: 8px 0 0 0; font-size: 14px;'>Materials successfully converted to raw materials</p>
+                                        <h1 style='color: #ffffff; margin: 0; font-size: 28px; font-weight: 600;'>🔄 Materiale Reciclabile Procesate</h1>
+                                        <p style='color: #e3f2fd; margin: 8px 0 0 0; font-size: 14px;'>Materialele au fost convertite cu succes în materiale prime</p>
                                     </td>
                                 </tr>
                                 
@@ -1229,13 +1229,13 @@ public class BrevoEmailService : IEmailService
                                     <td style='padding: 30px;'>
                                         <!-- Greeting -->
                                         <p style='color: #424242; font-size: 16px; line-height: 1.6; margin: 0 0 20px 0;'>
-                                            Hi <strong>{userName}</strong>,
+                                            Bună ziua <strong>{userName}</strong>,
                                         </p>
                                         
                                         <!-- Success Message -->
                                         <div style='background-color: #bbdefb; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #64b5f6;'>
                                             <p style='color: #0d47a1; font-size: 16px; margin: 0; text-align: center;'>
-                                                <strong>🎉 The recyclable materials have been successfully processed and are now available in inventory!</strong>
+                                                <strong>🎉 Materialele reciclabile au fost procesate cu succes și sunt acum disponibile în inventar!</strong>
                                             </p>
                                         </div>
                                         
@@ -1246,22 +1246,22 @@ public class BrevoEmailService : IEmailService
                                             </h2>
                                             <table width='100%' cellpadding='5' cellspacing='0'>
                                                 <tr>
-                                                    <td style='color: #757575; padding: 8px 0;'><strong>Acquisition Number:</strong></td>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Număr Achiziție:</strong></td>
                                                     <td style='color: #424242; padding: 8px 0;'>{acquisitionNumber}</td>
                                                 </tr>
                                                 <tr>
-                                                    <td style='color: #757575; padding: 8px 0;'><strong>Processed By:</strong></td>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Procesat De:</strong></td>
                                                     <td style='color: #424242; padding: 8px 0;'>{processedBy}</td>
                                                 </tr>
                                                 {(string.IsNullOrEmpty(assignedToUser) ? "" : $@"
                                                 <tr>
-                                                    <td style='color: #757575; padding: 8px 0;'><strong>Assigned To:</strong></td>
+                                                    <td style='color: #757575; padding: 8px 0;'><strong>Atribuită Lui:</strong></td>
                                                     <td style='color: #424242; padding: 8px 0;'>{assignedToUser}</td>
                                                 </tr>")}
                                                 {(string.IsNullOrEmpty(description) ? "" : $@"
                                                 <tr>
                                                     <td colspan='2' style='color: #424242; padding: 12px 0 8px 0;'>
-                                                        <strong style='color: #757575;'>Description:</strong><br/>
+                                                        <strong style='color: #757575;'>Descriere:</strong><br/>
                                                         {description}
                                                     </td>
                                                 </tr>")}
@@ -1270,15 +1270,15 @@ public class BrevoEmailService : IEmailService
                                         
                                         <!-- Processing Summary -->
                                         <div style='background-color: #e1f5fe; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #0288d1;'>
-                                            <h3 style='color: #01579b; margin: 0 0 15px 0; font-size: 18px;'>📊 Processing Summary</h3>
+                                            <h3 style='color: #01579b; margin: 0 0 15px 0; font-size: 18px;'>📊 Rezumat Procesare</h3>
                                             <div style='display: flex; justify-content: space-around; text-align: center;'>
                                                 <div>
                                                     <div style='font-size: 32px; font-weight: bold; color: #0277bd;'>{materialsProcessed}</div>
-                                                    <div style='color: #546e7a; font-size: 14px; margin-top: 5px;'>Material Types</div>
+                                                    <div style='color: #546e7a; font-size: 14px; margin-top: 5px;'>Tipuri Materiale</div>
                                                 </div>
                                                 <div>
                                                     <div style='font-size: 32px; font-weight: bold; color: #0277bd;'>{totalOutputQuantity:N0}</div>
-                                                    <div style='color: #546e7a; font-size: 14px; margin-top: 5px;'>Total Output</div>
+                                                    <div style='color: #546e7a; font-size: 14px; margin-top: 5px;'>Total Ieșire</div>
                                                 </div>
                                             </div>
                                         </div>
@@ -1292,7 +1292,7 @@ public class BrevoEmailService : IEmailService
                                         <!-- Action Button -->
                                         <div style='text-align: center; margin-top: 30px;'>
                                             <a href='http://localhost:5173/acquisitions' style='display: inline-block; padding: 14px 32px; background-color: #2196f3; color: #ffffff; text-decoration: none; border-radius: 6px; font-weight: 600; font-size: 16px; box-shadow: 0 2px 4px rgba(33, 150, 243, 0.3);'>
-                                                View Acquisitions
+                                                Vezi Achizițiile
                                             </a>
                                         </div>
                                     </td>
@@ -1302,8 +1302,8 @@ public class BrevoEmailService : IEmailService
                                 <tr>
                                     <td style='background-color: #f5f5f5; padding: 20px; text-align: center; border-top: 1px solid #e0e0e0;'>
                                         <p style='color: #757575; font-size: 12px; margin: 0; line-height: 1.5;'>
-                                            © 2025 Production Management System. All rights reserved.<br/>
-                                            This is an automated notification. Please do not reply to this email.
+                                            © 2025 Sistemul de Management al Producției. Toate drepturile rezervate.<br/>
+                                            Aceasta este o notificare automată. Vă rugăm să nu răspundeți la acest email.
                                         </p>
                                     </td>
                                 </tr>
@@ -1319,7 +1319,7 @@ public class BrevoEmailService : IEmailService
 
     public async Task<bool> SendProductionCompletedAsync(string toEmail, string productionPlanName, int quantityProduced)
     {
-        var subject = $"✅ Production Completed: {productionPlanName}";
+        var subject = $"✅ Producție Finalizată: {productionPlanName}";
         var htmlContent = $@"
             <!DOCTYPE html>
             <html>
@@ -1338,30 +1338,30 @@ public class BrevoEmailService : IEmailService
             <body>
                 <div class='container'>
                     <div class='header'>
-                        <h1>✅ Production Completed</h1>
+                        <h1>✅ Producție Finalizată</h1>
                     </div>
                     <div class='content'>
                         <div class='info-box'>
                             <h2>{productionPlanName}</h2>
-                            <div class='highlight'>{quantityProduced} Units Produced</div>
-                            <p>The production has been successfully completed and the products have been added to the inventory.</p>
+                            <div class='highlight'>{quantityProduced} Unități Produse</div>
+                            <p>Producția a fost finalizată cu succes și produsele au fost adăugate în inventar.</p>
                         </div>
                         
-                        <a href='http://localhost:5173/production' class='button'>View Production Plans</a>
+                        <a href='http://localhost:5173/production' class='button'>Vezi Planurile de Producție</a>
                     </div>
                     <div class='footer'>
-                        <p>© 2025 Production Management System. All rights reserved.</p>
+                        <p>© 2025 Sistemul de Management al Producției. Toate drepturile rezervate.</p>
                     </div>
                 </div>
             </body>
             </html>";
 
-        return await SendEmailAsync(toEmail, "Production Manager", subject, htmlContent);
+        return await SendEmailAsync(toEmail, "Manager Producție", subject, htmlContent);
     }
 
     public async Task<bool> SendOrderProcessedAsync(string toEmail, string clientName, string orderNumber)
     {
-        var subject = $"✅ Order Processed: #{orderNumber}";
+        var subject = $"✅ Comandă Procesată: #{orderNumber}";
         var htmlContent = $@"
             <!DOCTYPE html>
             <html>
@@ -1379,20 +1379,20 @@ public class BrevoEmailService : IEmailService
             <body>
                 <div class='container'>
                     <div class='header'>
-                        <h1>✅ Order Processed</h1>
+                        <h1>✅ Comandă Procesată</h1>
                     </div>
                     <div class='content'>
                         <div class='info-box'>
-                            <h2>Order #{orderNumber}</h2>
+                            <h2>Comandă #{orderNumber}</h2>
                             <p><strong>Client:</strong> {clientName}</p>
-                            <p><strong>Status:</strong> Processing</p>
-                            <p>The order has been successfully processed and is being prepared for shipment.</p>
+                            <p><strong>Status:</strong> Finalizată</p>
+                            <p>Comanda a fost procesată cu succes și este pregătită pentru expediere.</p>
                         </div>
                         
-                        <a href='http://localhost:5173/orders' class='button'>View Orders</a>
+                        <a href='http://localhost:5173/orders' class='button'>Vezi Comenzile</a>
                     </div>
                     <div class='footer'>
-                        <p>© 2025 Production Management System. All rights reserved.</p>
+                        <p>© 2025 Sistemul de Management al Producției. Toate drepturile rezervate.</p>
                     </div>
                 </div>
             </body>

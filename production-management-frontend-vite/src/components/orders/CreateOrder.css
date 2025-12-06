@@ -475,7 +475,7 @@
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: var(--danger-600);
+  background: var(--error-600);
   border-color: var(--danger-600);
 }
 

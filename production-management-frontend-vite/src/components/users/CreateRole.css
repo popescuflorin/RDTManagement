@@ -64,7 +64,7 @@
 }
 
 .header-content svg {
-  color: var(--success-600);
+  color: white;
 }
 
 .create-role-header h2 {
