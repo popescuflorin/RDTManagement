@@ -15,7 +15,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { usePermissions, Permissions } from '../hooks/usePermissions';
 import LanguageSwitcher from './LanguageSwitcher';
-import logoImage from '../../public/logorodut.png';
+import logoImage from '../assets/logorodut.png';
 import './Sidebar.css';
 
 interface SidebarProps {

@@ -4,7 +4,6 @@ import { clientApi } from '../../services/api';
 import type { Client, UpdateClientRequest } from '../../types';
 import { UserCircle } from 'lucide-react';
 import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Checkbox } from '../atoms';
-import './CreateClient.css';
 
 interface EditClientProps {
   isOpen: boolean;

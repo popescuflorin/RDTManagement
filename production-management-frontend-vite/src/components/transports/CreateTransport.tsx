@@ -4,7 +4,6 @@ import { transportApi } from '../../services/api';
 import type { CreateTransportRequest } from '../../types';
 import { Truck } from 'lucide-react';
 import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input } from '../atoms';
-import './CreateTransport.css';
 
 interface CreateTransportProps {
   isOpen: boolean;

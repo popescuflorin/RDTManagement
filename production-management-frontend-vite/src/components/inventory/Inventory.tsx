@@ -3,10 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { 
   Package, 
   AlertTriangle, 
-  CheckCircle,
   XCircle,
-  ChevronLeft,
-  ChevronRight
+  CheckCircle,
 } from 'lucide-react';
 import { inventoryApi } from '../../services/api';
 import type { RawMaterial, InventoryStatistics, PagedResult } from '../../types';
@@ -22,7 +20,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table, PageContainer, PageHeader, Loader, SearchInput, Pagination, ErrorMessage } from '../atoms';
+import { Table, PageContainer, Loader, Pagination, ErrorMessage, FiltersControl, Checkbox } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Inventory.css';
 
@@ -205,62 +203,58 @@ const Inventory: React.FC = () => {
       )}
 
       {/* Filters and Search */}
-      <div className="inventory-controls">
-        <SearchInput
-          placeholder={t('searchPlaceholder')}
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1); // Reset to first page on search
-          }}
-          iconSize={16}
-        />
-        
-        {/* Type Filter Buttons */}
-        <div className="filter-buttons">
-          <button
-            className={`filter-btn ${filterBy === MaterialType.RawMaterial ? 'active' : ''}`}
-            onClick={() => {
-              setFilterBy(MaterialType.RawMaterial);
-              setCurrentPage(1);
-            }}
-          >
-            {t('filters.rawMaterials')}
-          </button>
-          <button
-            className={`filter-btn ${filterBy === MaterialType.RecyclableMaterial ? 'active' : ''}`}
-            onClick={() => {
-              setFilterBy(MaterialType.RecyclableMaterial);
-              setCurrentPage(1);
-            }}
-          >
-            {t('filters.recyclableMaterials')}
-          </button>
-          <button
-            className={`filter-btn ${filterBy === MaterialType.FinishedProduct ? 'active' : ''}`}
-            onClick={() => {
-              setFilterBy(MaterialType.FinishedProduct);
-              setCurrentPage(1);
-            }}
-          >
-            {t('filters.finishedProducts')}
-          </button>
-        </div>
-        
-        <div className="checkbox-filter">
-          <label className="checkbox-label">
-            <input
-              type="checkbox"
+      <FiltersControl
+        searchPlaceholder={t('searchPlaceholder')}
+        searchValue={searchTerm}
+        onSearchChange={(e) => {
+          setSearchTerm(e.target.value);
+          setCurrentPage(1); // Reset to first page on search
+        }}
+        searchProps={{ iconSize: 16 }}
+        filters={
+          <>
+            {/* Type Filter Buttons */}
+            <div className="filter-buttons">
+              <button
+                className={`filter-btn ${filterBy === MaterialType.RawMaterial ? 'active' : ''}`}
+                onClick={() => {
+                  setFilterBy(MaterialType.RawMaterial);
+                  setCurrentPage(1);
+                }}
+              >
+                {t('filters.rawMaterials')}
+              </button>
+              <button
+                className={`filter-btn ${filterBy === MaterialType.RecyclableMaterial ? 'active' : ''}`}
+                onClick={() => {
+                  setFilterBy(MaterialType.RecyclableMaterial);
+                  setCurrentPage(1);
+                }}
+              >
+                {t('filters.recyclableMaterials')}
+              </button>
+              <button
+                className={`filter-btn ${filterBy === MaterialType.FinishedProduct ? 'active' : ''}`}
+                onClick={() => {
+                  setFilterBy(MaterialType.FinishedProduct);
+                  setCurrentPage(1);
+                }}
+              >
+                {t('filters.finishedProducts')}
+              </button>
+            </div>
+            
+            <Checkbox
+              label={t('showInactiveMaterials')}
               checked={showInactive}
               onChange={(e) => {
                 setShowInactive(e.target.checked);
                 setCurrentPage(1);
               }}
             />
-            <span>{t('showInactiveMaterials')}</span>
-          </label>
-        </div>
-      </div>
+          </>
+        }
+      />
 
       {error && (
         <ErrorMessage

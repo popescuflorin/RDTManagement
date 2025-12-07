@@ -93,18 +93,9 @@
 
 /* Error message styles are now handled by ErrorMessage.css in atoms folder */
 
-/* Controls */
-.acquisition-controls {
-  display: flex;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-xl);
-  align-items: center;
-  flex-wrap: wrap;
-  padding: 0 var(--space-2xl);
-}
+/* Filters control styles are now handled by FiltersControl.css in atoms folder */
 
-/* Search input styles are now handled by SearchInput.css in atoms folder */
-
+/* Filter container and select styles for Acquisition-specific filters */
 .filter-container {
   display: flex;
   align-items: center;
@@ -380,12 +371,6 @@
     gap: var(--space-lg);
   }
 
-  .acquisition-controls {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .search-container,
   .filter-container {
     min-width: auto;
   }
@@ -506,4 +491,3 @@
   .filter-btn {
     width: 100%;
   }
-}

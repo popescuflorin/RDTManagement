@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import type { Order } from '../../types';
-import { Package, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { Package, AlertTriangle } from 'lucide-react';
 import { orderApi } from '../../services/api';
 import { Modal, ViewContent, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
 
@@ -62,17 +62,11 @@ const ProcessOrder: React.FC<ProcessOrderProps> = ({
       onClose={onClose}
       title={t('processOrder', { defaultValue: 'Process Order' })}
       titleIcon={Package}
-      submitText={isProcessing ? (
-        <>
-          <Loader2 size={16} className="animate-spin" style={{ display: 'inline-block', marginRight: '8px' }} />
-          {t('view.processing', { defaultValue: 'Processing...' })}
-        </>
-      ) : (
-        <>
-          <CheckCircle size={16} style={{ display: 'inline-block', marginRight: '8px' }} />
-          {t('processOrder', { defaultValue: 'Process Order' })}
-        </>
-      )}
+      submitText={
+        isProcessing
+          ? t('view.processing', { defaultValue: 'Processing...' })
+          : t('processOrder', { defaultValue: 'Process Order' })
+      }
       cancelText={t('common:buttons.cancel', { defaultValue: 'Cancel' })}
       submitVariant="success"
       isSubmitting={isProcessing}

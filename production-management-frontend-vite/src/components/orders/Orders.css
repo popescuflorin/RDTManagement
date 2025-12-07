@@ -118,18 +118,9 @@
   color: rgba(255, 255, 255, 0.9);
 }
 
-/* Controls */
-.orders-controls {
-  display: flex;
-  gap: var(--space-lg);
-  margin-bottom: var(--space-xl);
-  align-items: center;
-  flex-wrap: wrap;
-  padding: 0 var(--space-2xl);
-}
+/* Filters control styles are now handled by FiltersControl.css in atoms folder */
 
-/* Search input styles are now handled by SearchInput.css in atoms folder */
-
+/* Filter container and select styles for Orders-specific filter */
 .filter-container {
   display: flex;
   align-items: center;

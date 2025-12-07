@@ -1,16 +1,4 @@
-.suppliers-controls {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
-  align-items: center;
-}
-
-/* Search input styles are now handled by SearchInput.css in atoms folder */
-
-.filter-container {
-  display: flex;
-  align-items: center;
-}
+/* Filters control styles are now handled by FiltersControl.css in atoms folder */
 
 /* Checkbox styles are now handled by Checkbox.css in atoms folder */
 

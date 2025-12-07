@@ -1,55 +1,10 @@
-/* Transports Container */
-.transports-container {
-  padding: 0;
-  width: 100%;
-  background: #ffffff;
-  min-height: 100vh;
-}
+/* Transport-specific styles only */
 
-/* Header */
-.transports-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: var(--space-3xl);
-  padding: var(--space-lg) 0;
-  border-bottom: 1px solid var(--border);
-}
-
-.transports-header h1 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: var(--text-3xl);
-  font-weight: 700;
-}
-
-/* Loading state styles are now handled by Loader.css in atoms folder */
-
-/* Controls */
-.transports-controls {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 24px;
-  align-items: center;
-}
-
-/* Search input styles are now handled by SearchInput.css in atoms folder */
-
-/* Table styles are now handled by Table.css - all tables use the .data-table class */
-
+/* Transport Name */
 .transport-name {
   font-weight: 600;
   color: var(--primary-600);
 }
-
-.no-data {
-  text-align: center;
-  padding: 48px !important;
-  color: var(--text-secondary);
-  font-style: italic;
-}
-
-/* Button styles are now handled by Button.css in atoms folder */
 
 /* Tabs */
 .transports-tabs {
@@ -85,8 +40,6 @@
   border-bottom-color: var(--primary-600);
   font-weight: 600;
 }
-
-/* Pagination styles are now handled by Pagination.css in atoms folder */
 
 /* Transport Records */
 .record-type-badge {
@@ -135,7 +88,3 @@
   background: var(--background-secondary);
   color: var(--text-primary);
 }
-
-/* Error Message */
-/* Error message styles are now handled by ErrorMessage.css in atoms folder */
-

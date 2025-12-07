@@ -91,3 +91,6 @@ export type { SummaryProps, SummaryItem } from './Summary';
 
 export { default as ErrorMessage } from './ErrorMessage';
 export type { ErrorMessageProps } from './ErrorMessage';
+
+export { default as FiltersControl } from './FiltersControl';
+export type { FiltersControlProps } from './FiltersControl';

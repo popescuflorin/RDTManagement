@@ -106,7 +106,7 @@ const ViewOrder: React.FC<ViewOrderProps> = ({ isOpen, order, onClose }) => {
             )}
             <ViewItem>
               <ViewLabel>{t('totalValue')}</ViewLabel>
-              <ViewValue style={{ color: 'var(--primary-600)', fontWeight: 600 }}>{formatCurrency(order.totalValue)}</ViewValue>
+              <ViewValue className="highlighted-value">{formatCurrency(order.totalValue)}</ViewValue>
             </ViewItem>
             <ViewItem>
               <ViewLabel>{t('view.itemsCount', { defaultValue: 'Items Count' })}</ViewLabel>

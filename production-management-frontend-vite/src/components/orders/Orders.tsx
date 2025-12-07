@@ -15,7 +15,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import CancelButton from '../atoms/CancelButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table, PageContainer, Loader, SearchInput, Pagination, ErrorMessage } from '../atoms';
+import { Table, PageContainer, Loader, Select, Pagination, ErrorMessage, FiltersControl } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Orders.css';
 
@@ -317,37 +317,35 @@ const Orders: React.FC = () => {
       )}
 
       {/* Filters and Search */}
-      <div className="orders-controls">
-        <SearchInput
-          placeholder={t('table.searchPlaceholder', { defaultValue: 'Search by client name, email, or phone...' })}
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1); // Reset to first page on search
-          }}
-        />
-        
-        {/* Status Filter */}
-        <div className="filter-container">
-          <Filter size={20} className="filter-icon" />
-          <select
-            value={statusFilter ?? ''}
-            onChange={(e) => {
-              setStatusFilter(e.target.value ? Number(e.target.value) as OrderStatus : null);
-              setCurrentPage(1);
-            }}
-            className="filter-select"
-          >
-            <option value="">{t('table.allStatus', { defaultValue: 'All Status' })}</option>
-            <option value={OrderStatus.Draft}>{t('status.draft')}</option>
-            <option value={OrderStatus.Pending}>{t('status.pending')}</option>
-            <option value={OrderStatus.Processing}>{t('status.processing')}</option>
-            <option value={OrderStatus.Shipped}>{t('status.shipped')}</option>
-            <option value={OrderStatus.Delivered}>{t('status.delivered')}</option>
-            <option value={OrderStatus.Cancelled}>{t('status.cancelled')}</option>
-          </select>
-        </div>
-      </div>
+      <FiltersControl
+        searchPlaceholder={t('table.searchPlaceholder', { defaultValue: 'Search by client name, email, or phone...' })}
+        searchValue={searchTerm}
+        onSearchChange={(e) => {
+          setSearchTerm(e.target.value);
+          setCurrentPage(1); // Reset to first page on search
+        }}
+        filters={
+          <div className="filter-container">
+            <Filter size={20} className="filter-icon" />
+            <Select
+              value={statusFilter ?? ''}
+              onChange={(e) => {
+                setStatusFilter(e.target.value ? Number(e.target.value) as OrderStatus : null);
+                setCurrentPage(1);
+              }}
+              className="filter-select"
+            >
+              <option value="">{t('table.allStatus', { defaultValue: 'All Status' })}</option>
+              <option value={OrderStatus.Draft}>{t('status.draft')}</option>
+              <option value={OrderStatus.Pending}>{t('status.pending')}</option>
+              <option value={OrderStatus.Processing}>{t('status.processing')}</option>
+              <option value={OrderStatus.Shipped}>{t('status.shipped')}</option>
+              <option value={OrderStatus.Delivered}>{t('status.delivered')}</option>
+              <option value={OrderStatus.Cancelled}>{t('status.cancelled')}</option>
+            </Select>
+          </div>
+        }
+      />
 
       {error && (
         <ErrorMessage

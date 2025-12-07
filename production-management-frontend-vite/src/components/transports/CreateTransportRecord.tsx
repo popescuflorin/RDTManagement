@@ -5,7 +5,6 @@ import type { Acquisition, Order, Transport, UpdateAcquisitionRequest, UpdateOrd
 import { AcquisitionStatus, OrderStatus } from '../../types';
 import { Truck, FileText, ClipboardList, Loader2 } from 'lucide-react';
 import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Checkbox } from '../atoms';
-import './CreateTransportRecord.css';
 
 interface CreateTransportRecordProps {
   isOpen: boolean;

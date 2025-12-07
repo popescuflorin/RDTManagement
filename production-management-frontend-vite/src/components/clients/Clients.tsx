@@ -17,7 +17,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table, PageContainer, Loader, SearchInput, Pagination, Summary, ErrorMessage } from '../atoms';
+import { Table, PageContainer, Loader, Pagination, Summary, ErrorMessage, PageHeader, Checkbox, FiltersControl } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Clients.css';
 
@@ -160,52 +160,38 @@ const Clients: React.FC = () => {
 
   const clients = pagedData?.items || [];
 
-  if (isLoading) {
-    return (
-      <PageContainer>
-        <Loader message={t('clients.loading.loadingClients')} />
-      </PageContainer>
-    );
-  }
-
   return (
-    <div className="clients-container">
-      <div className="clients-header">
-        <h1>
-          <UserCircle size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-          {t('clients.title')}
-        </h1>
-        <CreateButton
-          onClick={handleCreateClient}
-          requiredPermission={Permissions.CreateClient}
-          variant="primary"
-        >
-          {t('clients.buttons.createNewClient')}
-        </CreateButton>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('clients.title')}
+        icon={UserCircle}
+        actions={
+          <CreateButton
+            onClick={handleCreateClient}
+            requiredPermission={Permissions.CreateClient}
+            variant="primary"
+          >
+            {t('clients.buttons.createNewClient')}
+          </CreateButton>
+        }
+      />
 
       {/* Search and Filter */}
-      <div className="clients-controls">
-        <SearchInput
-          placeholder={t('clients.search.placeholder')}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        
-        <div className="filter-container">
-          <label className="filter-checkbox">
-            <input
-              type="checkbox"
-              checked={showInactive}
-              onChange={(e) => {
-                setShowInactive(e.target.checked);
-                setCurrentPage(1); // Reset to first page on filter change
-              }}
-            />
-            <span>{t('clients.filters.showInactive')}</span>
-          </label>
-        </div>
-      </div>
+      <FiltersControl
+        searchPlaceholder={t('clients.search.placeholder')}
+        searchValue={searchTerm}
+        onSearchChange={(e) => setSearchTerm(e.target.value)}
+        filters={
+          <Checkbox
+            label={t('clients.filters.showInactive')}
+            checked={showInactive}
+            onChange={(e) => {
+              setShowInactive(e.target.checked);
+              setCurrentPage(1); // Reset to first page on filter change
+            }}
+          />
+        }
+      />
 
       {error && (
         <ErrorMessage
@@ -216,6 +202,10 @@ const Clients: React.FC = () => {
 
       {/* Clients Table */}
       {(() => {
+        if (isLoading) {
+          return <Loader message={t('clients.loading.loadingClients')} />;
+        }
+
         const columns: TableColumn<Client>[] = [
           {
             key: 'id',
@@ -417,7 +407,7 @@ const Clients: React.FC = () => {
           isDeleting={isDeleting}
         />
       )}
-    </div>
+    </PageContainer>
   );
 };
 

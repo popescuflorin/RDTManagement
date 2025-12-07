@@ -17,7 +17,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table, PageContainer, PageHeader, Loader, SearchInput, Checkbox, Pagination, Summary, ErrorMessage } from '../atoms';
+import { Table, PageContainer, PageHeader, Loader, Checkbox, Pagination, Summary, ErrorMessage, FiltersControl } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Suppliers.css';
 
@@ -160,14 +160,6 @@ const Suppliers: React.FC = () => {
 
   const suppliers = pagedData?.items || [];
 
-  if (isLoading) {
-    return (
-      <PageContainer>
-        <Loader message={t('suppliers.loading.loadingSuppliers')} />
-      </PageContainer>
-    );
-  }
-
   return (
     <PageContainer>
       <PageHeader
@@ -185,14 +177,11 @@ const Suppliers: React.FC = () => {
       />
 
       {/* Search and Filter */}
-      <div className="suppliers-controls">
-        <SearchInput
-          placeholder={t('suppliers.search.placeholder')}
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        
-        <div className="filter-container">
+      <FiltersControl
+        searchPlaceholder={t('suppliers.search.placeholder')}
+        searchValue={searchTerm}
+        onSearchChange={(e) => setSearchTerm(e.target.value)}
+        filters={
           <Checkbox
             label={t('suppliers.filters.showInactive')}
             checked={showInactive}
@@ -201,8 +190,8 @@ const Suppliers: React.FC = () => {
               setCurrentPage(1); // Reset to first page on filter change
             }}
           />
-        </div>
-      </div>
+        }
+      />
 
       {error && (
         <ErrorMessage
@@ -213,6 +202,10 @@ const Suppliers: React.FC = () => {
 
       {/* Suppliers Table */}
       {(() => {
+        if (isLoading) {
+          return <Loader message={t('suppliers.loading.loadingSuppliers')} />;
+        }
+
         const columns: TableColumn<Supplier>[] = [
           {
             key: 'id',
@@ -334,6 +327,10 @@ const Suppliers: React.FC = () => {
           />
         );
       })()}
+
+      {isLoading && (
+        <Loader message={t('suppliers.loading.loadingSuppliers')} />
+      )}
 
       {/* Pagination Controls */}
       {pagedData && pagedData.totalPages > 0 && (

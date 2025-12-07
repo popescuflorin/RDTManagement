@@ -1,0 +1,30 @@
+/* Standardized FiltersControl Component - Centralized styles for all filter controls */
+
+.filters-control {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.filters-control-extra {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .filters-control {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  .filters-control-extra {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

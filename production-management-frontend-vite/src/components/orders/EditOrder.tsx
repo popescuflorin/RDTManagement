@@ -935,7 +935,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
                     placeholder="0"
                   />
                 </FormGroup>
-                <FormGroup style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--space-sm)' }}>
+                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--space-sm)' }}>
                   <button
                     type="button"
                     className="btn btn-primary"
@@ -954,7 +954,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
                   >
                     {t('common:buttons.cancel', { defaultValue: 'Cancel' })}
                   </button>
-                </FormGroup>
+                </div>
               </FormRow>
             </div>
           )}

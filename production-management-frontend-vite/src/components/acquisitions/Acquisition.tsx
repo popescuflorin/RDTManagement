@@ -15,7 +15,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table, SearchInput, Pagination, ErrorMessage } from '../atoms';
+import { Table, Select, Pagination, ErrorMessage, FiltersControl } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Acquisition.css';
 
@@ -244,66 +244,67 @@ const Acquisition: React.FC = () => {
       )}
 
       {/* Controls */}
-      <div className="acquisition-controls">
-        <SearchInput
-          placeholder={t('searchPlaceholder')}
-          value={searchTerm}
-          onChange={(e) => {
-            setSearchTerm(e.target.value);
-            setCurrentPage(1); // Reset to first page on search
-          }}
-        />
-        
-        {/* Type Filter Buttons */}
-        <div className="filter-buttons">
-          <button
-            className={`filter-btn ${typeFilter === null ? 'active' : ''}`}
-            onClick={() => {
-              setTypeFilter(null);
-              setCurrentPage(1);
-            }}
-          >
-            {t('allTypes')}
-          </button>
-          <button
-            className={`filter-btn ${typeFilter === AcqType.RawMaterials ? 'active' : ''}`}
-            onClick={() => {
-              setTypeFilter(AcqType.RawMaterials);
-              setCurrentPage(1);
-            }}
-          >
-            {t('type.rawMaterials')}
-          </button>
-          <button
-            className={`filter-btn ${typeFilter === AcqType.RecyclableMaterials ? 'active' : ''}`}
-            onClick={() => {
-              setTypeFilter(AcqType.RecyclableMaterials);
-              setCurrentPage(1);
-            }}
-          >
-            {t('type.recyclableMaterials')}
-          </button>
-        </div>
+      <FiltersControl
+        searchPlaceholder={t('searchPlaceholder')}
+        searchValue={searchTerm}
+        onSearchChange={(e) => {
+          setSearchTerm(e.target.value);
+          setCurrentPage(1); // Reset to first page on search
+        }}
+        filters={
+          <>
+            {/* Type Filter Buttons */}
+            <div className="filter-buttons">
+              <button
+                className={`filter-btn ${typeFilter === null ? 'active' : ''}`}
+                onClick={() => {
+                  setTypeFilter(null);
+                  setCurrentPage(1);
+                }}
+              >
+                {t('allTypes')}
+              </button>
+              <button
+                className={`filter-btn ${typeFilter === AcqType.RawMaterials ? 'active' : ''}`}
+                onClick={() => {
+                  setTypeFilter(AcqType.RawMaterials);
+                  setCurrentPage(1);
+                }}
+              >
+                {t('type.rawMaterials')}
+              </button>
+              <button
+                className={`filter-btn ${typeFilter === AcqType.RecyclableMaterials ? 'active' : ''}`}
+                onClick={() => {
+                  setTypeFilter(AcqType.RecyclableMaterials);
+                  setCurrentPage(1);
+                }}
+              >
+                {t('type.recyclableMaterials')}
+              </button>
+            </div>
 
-        {/* Status Filter */}
-        <div className="filter-container">
-          <Filter size={20} className="filter-icon" />
-          <select
-            value={statusFilter ?? ''}
-            onChange={(e) => {
-              setStatusFilter(e.target.value ? Number(e.target.value) as AcquisitionStatus : null);
-              setCurrentPage(1);
-            }}
-            className="filter-select"
-          >
-            <option value="">{t('allStatus')}</option>
-            <option value={AcquisitionStatus.Draft}>{t('status.draft')}</option>
-            <option value={AcquisitionStatus.Received}>{t('status.received')}</option>
-            <option value={AcquisitionStatus.ReadyForProcessing}>{t('status.readyForProcessing')}</option>
-            <option value={AcquisitionStatus.Cancelled}>{t('status.cancelled')}</option>
-          </select>
-        </div>
-      </div>
+            {/* Status Filter */}
+            <div className="filter-container">
+              <Filter size={20} className="filter-icon" />
+              <Select
+                value={statusFilter ?? ''}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value ? Number(e.target.value) as AcquisitionStatus : null);
+                  setCurrentPage(1);
+                }}
+                className="filter-select"
+              >
+                <option value="">{t('allStatus')}</option>
+                <option value={AcquisitionStatus.Draft}>{t('status.draft')}</option>
+                <option value={AcquisitionStatus.Received}>{t('status.received')}</option>
+                <option value={AcquisitionStatus.ReadyForProcessing}>{t('status.readyForProcessing')}</option>
+                <option value={AcquisitionStatus.Cancelled}>{t('status.cancelled')}</option>
+              </Select>
+            </div>
+          </>
+        }
+      />
 
       {/* Table */}
       {acquisitions.length === 0 ? (

@@ -14,7 +14,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import DeleteButton from '../atoms/DeleteButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table, PageContainer, Loader, Pagination, SearchInput } from '../atoms';
+import { Table, PageContainer, Loader, Pagination, ErrorMessage, FiltersControl, PageHeader } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Transports.css';
 import DeleteTransport from './DeleteTransport';
@@ -180,22 +180,13 @@ const Transports: React.FC = () => {
   const transports = pagedTransports?.items || [];
   const transportRecords = pagedRecords?.items || [];
 
-  if (isLoading && activeTab === 'transports') {
-    return (
-      <PageContainer>
-        <Loader message={t('transports.loading.loadingTransports')} />
-      </PageContainer>
-    );
-  }
 
   return (
-    <div className="transports-container">
-      <div className="transports-header">
-        <h1>
-          <Truck size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-          {t('transports.title')}
-        </h1>
-        {activeTab === 'transports' && (
+    <PageContainer>
+      <PageHeader
+        title={t('transports.title')}
+        icon={Truck}
+        actions={
           <CreateButton
             onClick={handleCreateTransport}
             requiredPermission={Permissions.CreateTransport}
@@ -203,8 +194,8 @@ const Transports: React.FC = () => {
           >
             {t('transports.buttons.createNewTransportVehicle')}
           </CreateButton>
-        )}
-      </div>
+        }
+      />
 
       {/* Tabs */}
       <div className="transports-tabs">
@@ -225,25 +216,23 @@ const Transports: React.FC = () => {
       </div>
 
       {/* Search */}
-      <div className="transports-controls">
-        <SearchInput
-          placeholder={
-            activeTab === 'transports'
-              ? t('transports.search.vehicles')
-              : t('transports.search.records')
+      <FiltersControl
+        searchPlaceholder={
+          activeTab === 'transports'
+            ? t('transports.search.vehicles')
+            : t('transports.search.records')
+        }
+        searchValue={activeTab === 'transports' ? searchTerm : recordsSearchTerm}
+        onSearchChange={(e) => {
+          if (activeTab === 'transports') {
+            setSearchTerm(e.target.value);
+            setTransportsPage(1); // Reset to first page on search
+          } else {
+            setRecordsSearchTerm(e.target.value);
+            setRecordsPage(1); // Reset to first page on search
           }
-          value={activeTab === 'transports' ? searchTerm : recordsSearchTerm}
-          onChange={(e) => {
-            if (activeTab === 'transports') {
-              setSearchTerm(e.target.value);
-              setTransportsPage(1); // Reset to first page on search
-            } else {
-              setRecordsSearchTerm(e.target.value);
-              setRecordsPage(1); // Reset to first page on search
-            }
-          }}
-        />
-      </div>
+        }}
+      />
 
       {error && (
         <ErrorMessage
@@ -256,6 +245,10 @@ const Transports: React.FC = () => {
       {activeTab === 'transports' && (
         <>
           {(() => {
+            if (isLoading) {
+              return <Loader message={t('transports.loading.loadingTransports')} />;
+            }
+
             const columns: TableColumn<Transport>[] = [
               {
                 key: 'id',
@@ -507,7 +500,7 @@ const Transports: React.FC = () => {
           isDeleting={isDeleting}
         />
       )}
-    </div>
+    </PageContainer>
   );
 };
 

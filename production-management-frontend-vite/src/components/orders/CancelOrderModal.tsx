@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from 'lucide-react';
 import { Modal } from '../atoms';
 import type { Order } from '../../types';
-import './CancelOrderModal.css';
 
 interface CancelOrderModalProps {
   isOpen: boolean;
