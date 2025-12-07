@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { clientApi } from '../../services/api';
 import type { Client, UpdateClientRequest } from '../../types';
 import { UserCircle } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea } from '../atoms';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Checkbox } from '../atoms';
 import './CreateClient.css';
 
 interface EditClientProps {
@@ -258,15 +258,13 @@ const EditClient: React.FC<EditClientProps> = ({
 
           <FormRow>
             <FormGroup>
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  name="isActive"
-                  checked={formData.isActive}
-                  onChange={handleChange}
-                />
-                <span>{t('editClient.fields.active')}</span>
-              </label>
+              <Checkbox
+                name="isActive"
+                checked={formData.isActive}
+                onChange={handleChange}
+                label={t('editClient.fields.active')}
+                labelUppercase={true}
+              />
             </FormGroup>
           </FormRow>
         </FormSection>

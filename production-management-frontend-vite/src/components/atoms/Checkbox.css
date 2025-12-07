@@ -1,0 +1,136 @@
+/* Standardized Checkbox System - Centralized styles for all checkbox components */
+
+/* Checkbox Wrapper */
+.checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  cursor: pointer;
+  user-select: none;
+  font-weight: normal;
+}
+
+.checkbox-wrapper.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Checkbox Container */
+.checkbox-container {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
+/* Native Checkbox Input (hidden visually, but accessible) */
+.checkbox-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+/* Custom Checkbox Visual */
+.checkbox-container::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  transition: all var(--transition-fast);
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.checkbox-wrapper .checkbox-input:checked ~ .checkbox-container::before {
+  background: var(--success-500);
+  border-color: var(--success-500);
+}
+
+.checkbox-wrapper .checkbox-input:focus ~ .checkbox-container::before {
+  outline: 2px solid var(--primary-200);
+  outline-offset: 2px;
+}
+
+.checkbox-wrapper .checkbox-input:hover:not(:disabled) ~ .checkbox-container::before {
+  border-color: var(--primary-400);
+}
+
+.checkbox-wrapper .checkbox-input:checked:hover:not(:disabled) ~ .checkbox-container::before {
+  background: var(--success-600);
+  border-color: var(--success-600);
+}
+
+.checkbox-wrapper .checkbox-input:disabled ~ .checkbox-container::before {
+  background: var(--surface-hover);
+  border-color: var(--border);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Checkmark Icon */
+.checkbox-checkmark {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+  color: white;
+  z-index: 1;
+}
+
+/* Label Text */
+.checkbox-label-text {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-weight: 500;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.checkbox-label-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-left: 10px;
+}
+
+.checkbox-wrapper.disabled .checkbox-label-text {
+  color: var(--text-secondary);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .checkbox-container::before {
+    width: 18px;
+    height: 18px;
+  }
+
+  .checkbox-checkmark {
+    width: 18px;
+    height: 18px;
+  }
+
+  .checkbox-checkmark svg {
+    width: 12px;
+    height: 12px;
+  }
+}

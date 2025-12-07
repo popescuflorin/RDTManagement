@@ -44,6 +44,9 @@ export type { InputProps } from './Input';
 export { default as Textarea } from './Textarea';
 export type { TextareaProps } from './Textarea';
 
+export { default as Checkbox } from './Checkbox';
+export type { CheckboxProps } from './Checkbox';
+
 export { default as ViewContent } from './ViewContent';
 export type { ViewContentProps } from './ViewContent';
 
