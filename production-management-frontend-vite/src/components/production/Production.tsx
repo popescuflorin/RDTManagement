@@ -6,7 +6,6 @@ import {
   CheckCircle, 
   Wrench, 
   BarChart3, 
-  Plus, 
   Search, 
   Filter,
   Play,

@@ -145,25 +145,7 @@
   color: var(--success-600);
 }
 
-.status-badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.status-active {
-  background: var(--success-100);
-  color: var(--success-700);
-}
-
-.status-inactive {
-  background: var(--error-100);
-  color: var(--error-700);
-}
+/* Status badge styles are now handled by View.css in atoms folder */
 
 .no-data {
   text-align: center;
@@ -172,7 +154,12 @@
   font-style: italic;
 }
 
-/* Button styles are now handled by Button.css in atoms folder */
+/* Atomic Component Styles - Handled by atoms CSS files:
+ * - Button styles: Button.css (btn, btn-primary, action-buttons, actions-cell)
+ * - Form styles: Form.css (form, form-section, form-row, form-group, label, input, textarea)
+ * - Modal styles: Modal.css (modal-backdrop, modal-content, modal-header, etc.)
+ * - Table styles: Table.css (table-container, data-table, table-wrapper)
+ */
 
 /* Pagination */
 .pagination-container {

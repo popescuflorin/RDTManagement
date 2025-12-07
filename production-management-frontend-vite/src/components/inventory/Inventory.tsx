@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next';
 import { 
   Package, 
   AlertTriangle, 
-  Plus, 
   Search, 
   CheckCircle,
   Loader2,

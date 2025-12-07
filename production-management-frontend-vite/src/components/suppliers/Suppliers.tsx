@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Building2, 
-  Plus, 
   Search, 
   Loader2,
   Mail,
@@ -16,7 +15,6 @@ import type { Supplier, PagedResult } from '../../types';
 import CreateSupplier from './CreateSupplier';
 import EditSupplier from './EditSupplier';
 import ViewSupplier from './ViewSupplier';
-import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
@@ -146,7 +144,7 @@ const Suppliers: React.FC = () => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'RON'
     }).format(amount);
   };
 

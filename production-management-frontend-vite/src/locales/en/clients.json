@@ -159,5 +159,12 @@
     "buttons": {
       "close": "Close"
     }
+  },
+  "deleteModal": {
+    "title": "Deactivate Client",
+    "confirmation": "Are you sure you want to deactivate {{name}}?",
+    "warning": "This will mark the client as inactive. The client data will be preserved but they will no longer appear in active client lists.",
+    "confirm": "Deactivate",
+    "cancel": "Cancel"
   }
 }

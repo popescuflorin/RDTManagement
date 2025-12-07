@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   UserCircle, 
-  Plus, 
   Search, 
   Loader2,
   Mail,
@@ -16,7 +15,7 @@ import type { Client, PagedResult } from '../../types';
 import CreateClient from './CreateClient';
 import EditClient from './EditClient';
 import ViewClient from './ViewClient';
-import ProtectedButton from '../ProtectedButton';
+import DeleteClient from './DeleteClient';
 import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
@@ -43,6 +42,7 @@ const Clients: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -119,19 +119,31 @@ const Clients: React.FC = () => {
     setSelectedClient(null);
   };
 
-  const handleDeleteClient = async (client: Client) => {
-    if (!window.confirm(t('clients.messages.confirmDeactivate', { name: client.name }))) {
-      return;
-    }
+  const handleDeleteClient = (client: Client) => {
+    setSelectedClient(client);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedClient) return;
 
     try {
       setIsDeleting(true);
-      await clientApi.deleteClient(client.id);
+      await clientApi.deleteClient(selectedClient.id);
+      setShowDeleteModal(false);
+      setSelectedClient(null);
       await loadData();
     } catch (err: any) {
       setError(err.response?.data?.message || t('clients.messages.failedToDeactivateClient'));
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (!isDeleting) {
+      setShowDeleteModal(false);
+      setSelectedClient(null);
     }
   };
 
@@ -146,7 +158,7 @@ const Clients: React.FC = () => {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'RON'
     }).format(amount);
   };
 
@@ -442,6 +454,7 @@ const Clients: React.FC = () => {
       {/* Modals */}
       {showCreateModal && (
         <CreateClient
+          isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
           onClientCreated={handleClientCreated}
         />
@@ -461,6 +474,16 @@ const Clients: React.FC = () => {
           onClose={handleCloseEditModal}
           onSuccess={handleClientUpdated}
           client={selectedClient}
+        />
+      )}
+
+      {showDeleteModal && selectedClient && (
+        <DeleteClient
+          isOpen={showDeleteModal}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleConfirmDelete}
+          client={selectedClient}
+          isDeleting={isDeleting}
         />
       )}
     </div>

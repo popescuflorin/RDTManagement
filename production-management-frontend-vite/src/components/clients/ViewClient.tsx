@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Client } from '../../types';
-import { X, UserCircle, Mail, Phone, MapPin, Calendar, User } from 'lucide-react';
-import './CreateClient.css';
+import { UserCircle, Mail, Phone, MapPin, Calendar, User } from 'lucide-react';
+import { Modal, ViewContent, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
 
 interface ViewClientProps {
   isOpen: boolean;
@@ -16,9 +16,6 @@ const ViewClient: React.FC<ViewClientProps> = ({
   client
 }) => {
   const { t } = useTranslation(['clients', 'common']);
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -31,159 +28,137 @@ const ViewClient: React.FC<ViewClientProps> = ({
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'RON'
     }).format(amount);
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal-content create-client-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>
-            <UserCircle size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            {t('viewClient.title')}
-          </h2>
-          <button className="close-button" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('viewClient.title')}
+      titleIcon={UserCircle}
+      showCancel={true}
+      cancelText={t('viewClient.buttons.close', { defaultValue: 'Close' })}
+      maxWidth="700px"
+    >
+      <ViewContent>
+        <ViewSection title={t('viewClient.sections.basicInformation')}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('viewClient.fields.name')}</ViewLabel>
+              <ViewValue>{client.name}</ViewValue>
+            </ViewItem>
+            {client.contactPerson && (
+              <ViewItem>
+                <ViewLabel>{t('viewClient.fields.contactPerson')}</ViewLabel>
+                <ViewValue>{client.contactPerson}</ViewValue>
+              </ViewItem>
+            )}
+            <ViewItem>
+              <ViewLabel>{t('viewClient.fields.status')}</ViewLabel>
+              <ViewValue>
+                <span className={`status-badge ${client.isActive ? 'status-active' : 'status-inactive'}`}>
+                  {client.isActive ? t('clients.status.active') : t('clients.status.inactive')}
+                </span>
+              </ViewValue>
+            </ViewItem>
+          </ViewGrid>
+        </ViewSection>
 
-        <div className="client-view-content">
-          <div className="view-section">
-            <h3>{t('viewClient.sections.basicInformation')}</h3>
-            <div className="view-grid">
-              <div className="view-item">
-                <label>{t('viewClient.fields.name')}</label>
-                <div className="view-value">{client.name}</div>
-              </div>
-              {client.contactPerson && (
-                <div className="view-item">
-                  <label>{t('viewClient.fields.contactPerson')}</label>
-                  <div className="view-value">{client.contactPerson}</div>
-                </div>
-              )}
-              <div className="view-item">
-                <label>{t('viewClient.fields.status')}</label>
-                <div className="view-value">
-                  <span className={`status-badge ${client.isActive ? 'status-active' : 'status-inactive'}`}>
-                    {client.isActive ? t('clients.status.active') : t('clients.status.inactive')}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+        <ViewSection title={t('viewClient.sections.contactInformation')}>
+          <ViewGrid>
+            {client.email && (
+              <ViewItem>
+                <ViewLabel icon={Mail}>{t('viewClient.fields.email')}</ViewLabel>
+                <ViewValue>{client.email}</ViewValue>
+              </ViewItem>
+            )}
+            {client.phone && (
+              <ViewItem>
+                <ViewLabel icon={Phone}>{t('viewClient.fields.phone')}</ViewLabel>
+                <ViewValue>{client.phone}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
 
-          <div className="view-section">
-            <h3>{t('viewClient.sections.contactInformation')}</h3>
-            <div className="view-grid">
-              {client.email && (
-                <div className="view-item">
-                  <label><Mail size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewClient.fields.email')}</label>
-                  <div className="view-value">{client.email}</div>
-                </div>
-              )}
-              {client.phone && (
-                <div className="view-item">
-                  <label><Phone size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewClient.fields.phone')}</label>
-                  <div className="view-value">{client.phone}</div>
-                </div>
-              )}
-            </div>
-          </div>
+        <ViewSection title={t('viewClient.sections.address')}>
+          <ViewGrid>
+            {client.address && (
+              <ViewItem fullWidth>
+                <ViewLabel>{t('viewClient.fields.streetAddress')}</ViewLabel>
+                <ViewValue>{client.address}</ViewValue>
+              </ViewItem>
+            )}
+            {client.city && (
+              <ViewItem>
+                <ViewLabel>{t('viewClient.fields.city')}</ViewLabel>
+                <ViewValue>{client.city}</ViewValue>
+              </ViewItem>
+            )}
+            {client.postalCode && (
+              <ViewItem>
+                <ViewLabel>{t('viewClient.fields.postalCode')}</ViewLabel>
+                <ViewValue>{client.postalCode}</ViewValue>
+              </ViewItem>
+            )}
+            {client.country && (
+              <ViewItem>
+                <ViewLabel icon={MapPin}>{t('viewClient.fields.country')}</ViewLabel>
+                <ViewValue>{client.country}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
 
-          <div className="view-section">
-            <h3>{t('viewClient.sections.address')}</h3>
-            <div className="view-grid">
-              {client.address && (
-                <div className="view-item full-width">
-                  <label>{t('viewClient.fields.streetAddress')}</label>
-                  <div className="view-value">{client.address}</div>
-                </div>
-              )}
-              {client.city && (
-                <div className="view-item">
-                  <label>{t('viewClient.fields.city')}</label>
-                  <div className="view-value">{client.city}</div>
-                </div>
-              )}
-              {client.postalCode && (
-                <div className="view-item">
-                  <label>{t('viewClient.fields.postalCode')}</label>
-                  <div className="view-value">{client.postalCode}</div>
-                </div>
-              )}
-              {client.country && (
-                <div className="view-item">
-                  <label><MapPin size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewClient.fields.country')}</label>
-                  <div className="view-value">{client.country}</div>
-                </div>
-              )}
-            </div>
-          </div>
+        <ViewSection title={t('viewClient.sections.statistics')}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('viewClient.fields.totalOrders')}</ViewLabel>
+              <ViewValue>{client.totalOrders}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('viewClient.fields.totalOrderValue')}</ViewLabel>
+              <ViewValue>{formatCurrency(client.totalOrderValue)}</ViewValue>
+            </ViewItem>
+            {client.lastOrderDate && (
+              <ViewItem>
+                <ViewLabel>{t('viewClient.fields.lastOrderDate')}</ViewLabel>
+                <ViewValue>{formatDate(client.lastOrderDate)}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
 
-          <div className="view-section">
-            <h3>{t('viewClient.sections.statistics')}</h3>
-            <div className="view-grid">
-              <div className="view-item">
-                <label>{t('viewClient.fields.totalOrders')}</label>
-                <div className="view-value">{client.totalOrders}</div>
-              </div>
-              <div className="view-item">
-                <label>{t('viewClient.fields.totalOrderValue')}</label>
-                <div className="view-value">{formatCurrency(client.totalOrderValue)}</div>
-              </div>
-              {client.lastOrderDate && (
-                <div className="view-item">
-                  <label>{t('viewClient.fields.lastOrderDate')}</label>
-                  <div className="view-value">{formatDate(client.lastOrderDate)}</div>
-                </div>
-              )}
-            </div>
-          </div>
+        {client.notes && (
+          <ViewSection title={t('viewClient.sections.notes')}>
+            <ViewItem fullWidth>
+              <ViewValue>{client.notes}</ViewValue>
+            </ViewItem>
+          </ViewSection>
+        )}
 
-          {client.notes && (
-            <div className="view-section">
-              <h3>{t('viewClient.sections.notes')}</h3>
-              <div className="view-item full-width">
-                <div className="view-value">{client.notes}</div>
-              </div>
-            </div>
-          )}
-
-          <div className="view-section">
-            <h3>{t('viewClient.sections.metadata')}</h3>
-            <div className="view-grid">
-              <div className="view-item">
-                <label><User size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewClient.fields.createdBy')}</label>
-                <div className="view-value">{client.createdByUserName}</div>
-              </div>
-              <div className="view-item">
-                <label><Calendar size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewClient.fields.createdAt')}</label>
-                <div className="view-value">{formatDate(client.createdAt)}</div>
-              </div>
-              {client.updatedAt && (
-                <div className="view-item">
-                  <label><Calendar size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewClient.fields.updatedAt')}</label>
-                  <div className="view-value">{formatDate(client.updatedAt)}</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="form-actions">
-          <button
-            type="button"
-            className="cancel-button"
-            onClick={onClose}
-          >
-            {t('viewClient.buttons.close')}
-          </button>
-        </div>
-      </div>
-    </div>
+        <ViewSection title={t('viewClient.sections.metadata')}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel icon={User}>{t('viewClient.fields.createdBy')}</ViewLabel>
+              <ViewValue>{client.createdByUserName}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel icon={Calendar}>{t('viewClient.fields.createdAt')}</ViewLabel>
+              <ViewValue>{formatDate(client.createdAt)}</ViewValue>
+            </ViewItem>
+            {client.updatedAt && (
+              <ViewItem>
+                <ViewLabel icon={Calendar}>{t('viewClient.fields.updatedAt')}</ViewLabel>
+                <ViewValue>{formatDate(client.updatedAt)}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
+      </ViewContent>
+    </Modal>
   );
 };
 
