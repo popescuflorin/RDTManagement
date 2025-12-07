@@ -92,21 +92,29 @@
 
 /* Form Input */
 .form-input,
-.form-textarea {
+.form-textarea,
+.form-select {
   width: 100%;
   padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--border);
+  border: 1px solid var(--secondary-300);
   border-radius: var(--radius-md);
   font-size: var(--text-sm);
   font-family: inherit;
   color: var(--text-primary);
-  background-color: var(--surface);
+  background-color: #ffffff;
   transition: all var(--transition-fast);
   box-sizing: border-box;
 }
 
+.form-input:hover:not(:disabled),
+.form-textarea:hover:not(:disabled),
+.form-select:hover:not(:disabled) {
+  border-color: var(--secondary-400);
+}
+
 .form-input:focus,
-.form-textarea:focus {
+.form-textarea:focus,
+.form-select:focus {
   outline: none;
   border-color: var(--primary-500);
   box-shadow: 0 0 0 3px var(--primary-100);
@@ -118,7 +126,8 @@
 }
 
 .form-input:disabled,
-.form-textarea:disabled {
+.form-textarea:disabled,
+.form-select:disabled {
   background-color: var(--surface-hover);
   color: var(--text-muted);
   cursor: not-allowed;
@@ -162,15 +171,32 @@
   min-height: 120px;
 }
 
+/* Select Specific */
+.form-select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23333' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-md) center;
+  background-size: 12px;
+  padding-right: calc(var(--space-md) * 2.5);
+}
+
+.form-select:hover:not(:disabled) {
+  border-color: var(--border-hover);
+}
+
 /* Error State */
 .form-input-error,
-.form-textarea.form-input-error {
+.form-textarea.form-input-error,
+.form-select.form-input-error {
   border-color: var(--error-500);
   box-shadow: 0 0 0 3px var(--error-100);
 }
 
 .form-input-error:focus,
-.form-textarea.form-input-error:focus {
+.form-textarea.form-input-error:focus,
+.form-select.form-input-error:focus {
   border-color: var(--error-600);
   box-shadow: 0 0 0 3px var(--error-100);
 }

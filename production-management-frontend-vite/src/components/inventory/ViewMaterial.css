@@ -159,26 +159,7 @@
   color: #721c24;
 }
 
-/* Form Layout */
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-lg);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.form-group label {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+/* Form styles are now handled by Form.css in atoms folder */
 
 /* Read-only Fields */
 .read-only-field {
@@ -305,10 +286,7 @@
     gap: var(--space-lg);
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: var(--space-md);
-  }
+  /* Form styles are now handled by Form.css in atoms folder */
 
   .view-material-actions {
     padding: 0 var(--space-xl) var(--space-xl);

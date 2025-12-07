@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { orderApi, inventoryApi, transportApi, clientApi, userApi } from '../../services/api';
 import type { RawMaterial, UpdateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest, Order, User } from '../../types';
 import { MaterialType } from '../../types';
-import { X, Plus, Trash2, UserCircle, Truck, Package, FileText } from 'lucide-react';
+import { Plus, Trash2, UserCircle, Truck, Package, FileText } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select } from '../atoms';
 import './CreateOrder.css';
 
 interface EditOrderProps {
@@ -394,9 +395,7 @@ const EditOrder: React.FC<EditOrderProps> = ({
     transport.carName.toLowerCase().includes(transportSearchTerm.toLowerCase())
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (!selectedClientId) {
       setError(t('messages.selectClient'));
       return;
@@ -449,487 +448,517 @@ const EditOrder: React.FC<EditOrderProps> = ({
     }
   };
 
-  const handleClose = () => {
-    onClose();
-  };
-
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   if (!isOpen) return null;
 
   const totalValue = items.reduce((sum, item) => sum + item.totalPrice, 0);
 
   return (
-    <div className="create-order-overlay" onClick={handleBackdropClick}>
-      <div className="create-order-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="create-order-header">
-          <div className="header-content">
-            <div className="header-title">
-              <Package className="header-icon" />
-              <h2>{t('editOrder')}</h2>
-            </div>
-            <button className="close-button" onClick={handleClose}>
-              <X size={20} />
-            </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('editOrder', { defaultValue: 'Edit Order' })}
+      titleIcon={Package}
+      submitText={isLoading ? t('form.updating', { defaultValue: 'Updating...' }) : t('form.updateOrder', { defaultValue: 'Update Order' })}
+      cancelText={t('common:buttons.cancel', { defaultValue: 'Cancel' })}
+      submitVariant="primary"
+      isSubmitting={isLoading || !selectedClientId || items.length === 0}
+      onSubmit={handleSubmit}
+      maxWidth="1000px"
+      showCancel={true}
+    >
+      <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+        {error && (
+          <div className="error-message">
+            {error}
+            <button type="button" onClick={() => setError(null)}>×</button>
           </div>
-        </div>
+        )}
 
-        <form onSubmit={handleSubmit} className="create-order-form">
-          {error && (
-            <div className="error-message">
-              {error}
-              <button onClick={() => setError(null)}>×</button>
+        <FormSection title={t('common:labels.information', { defaultValue: 'Information' })} titleIcon={FileText}>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="description">{t('common:labels.description', { defaultValue: 'Description' })}</Label>
+              <Input
+                type="text"
+                id="description"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={t('form.descriptionPlaceholder', { defaultValue: 'Order description...' })}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="status">{t('common:labels.status', { defaultValue: 'Status' })}</Label>
+              <Input
+                type="text"
+                id="status"
+                value={order.statusLabel || t('status.draft', { defaultValue: 'Draft' })}
+                disabled
+                className="disabled-field"
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="orderDate">{t('orderDate', { defaultValue: 'Order Date' })}</Label>
+              <Input
+                type="date"
+                id="orderDate"
+                value={orderDate}
+                onChange={(e) => setOrderDate(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="expectedDeliveryDate">{t('expectedDeliveryDate', { defaultValue: 'Expected Delivery Date' })}</Label>
+              <Input
+                type="date"
+                id="expectedDeliveryDate"
+                value={expectedDeliveryDate}
+                onChange={(e) => setExpectedDeliveryDate(e.target.value)}
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormGroup>
+            <Label htmlFor="notes">{t('common:labels.notes', { defaultValue: 'Notes' })}</Label>
+            <Textarea
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              placeholder={t('common:labels.notes', { defaultValue: 'Additional notes' })}
+              rows={3}
+            />
+          </FormGroup>
+        </FormSection>
+
+        <FormSection title={t('client', { defaultValue: 'Client' })} titleIcon={UserCircle}>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="assignedUser">{t('assignedTo', { defaultValue: 'Assigned To' })}</Label>
+              <Select
+                id="assignedUser"
+                value={selectedAssignedUserId || ''}
+                onChange={(e) => setSelectedAssignedUserId(e.target.value ? parseInt(e.target.value) : null)}
+                disabled={isLoading}
+              >
+                <option value="">{t('common:labels.noAssignment', { defaultValue: 'No Assignment' })}</option>
+                {users.map((user) => (
+                  <option key={user.id} value={user.id}>
+                    {user.firstName} {user.lastName} ({user.username})
+                  </option>
+                ))}
+              </Select>
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="client" required>{t('client', { defaultValue: 'Client' })}</Label>
+              <Select
+                id="client"
+                value={selectedClientId || 'none'}
+                onChange={(e) => handleClientChange(e.target.value)}
+                disabled={isLoading}
+              >
+                <option value="none">{t('form.noClient', { defaultValue: 'No Client' })}</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id}>
+                    {client.name}
+                  </option>
+                ))}
+                <option value="new">+ {t('form.createNewClient', { defaultValue: 'Create New Client' })}</option>
+              </Select>
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="clientContact">{t('clientContact', { defaultValue: 'Client Contact' })}</Label>
+              <Input
+                type="text"
+                id="clientContact"
+                value={clientContact}
+                onChange={(e) => setClientContact(e.target.value)}
+                disabled={isLoading}
+                placeholder={t('form.clientContactPlaceholder', { defaultValue: 'Contact information' })}
+              />
+            </FormGroup>
+          </FormRow>
+
+          {/* Create New Client Form */}
+          {showCreateClient && (
+            <div className="supplier-creation-form" style={{ 
+              marginTop: 'var(--space-lg)', 
+              padding: 'var(--space-lg)', 
+              border: '1px solid var(--border)', 
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--background-secondary)'
+            }}>
+              <h4 style={{ marginTop: 0, marginBottom: 'var(--space-md)' }}>{t('form.createNewClient', { defaultValue: 'Create New Client' })}</h4>
+              <FormRow>
+                <FormGroup>
+                  <Label htmlFor="clientName" required>{t('form.clientName', { defaultValue: 'Client Name' })}</Label>
+                  <Input
+                    type="text"
+                    id="clientName"
+                    value={newClientData.name || ''}
+                    onChange={(e) => setNewClientData({ ...newClientData, name: e.target.value })}
+                    placeholder={t('form.clientNamePlaceholder', { defaultValue: 'Enter client name' })}
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="clientContactPerson">{t('form.contactPerson', { defaultValue: 'Contact Person' })}</Label>
+                  <Input
+                    type="text"
+                    id="clientContactPerson"
+                    value={newClientData.contactPerson || ''}
+                    onChange={(e) => setNewClientData({ ...newClientData, contactPerson: e.target.value })}
+                    placeholder={t('form.contactPersonPlaceholder', { defaultValue: 'Contact person name' })}
+                  />
+                </FormGroup>
+              </FormRow>
+
+              <FormRow>
+                <FormGroup>
+                  <Label htmlFor="clientPhone">{t('common:labels.phone', { defaultValue: 'Phone' })}</Label>
+                  <Input
+                    type="tel"
+                    id="clientPhone"
+                    value={newClientData.phone || ''}
+                    onChange={(e) => setNewClientData({ ...newClientData, phone: e.target.value })}
+                    placeholder={t('common:labels.phone', { defaultValue: 'Phone number' })}
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="clientEmail">{t('common:labels.email', { defaultValue: 'Email' })}</Label>
+                  <Input
+                    type="email"
+                    id="clientEmail"
+                    value={newClientData.email || ''}
+                    onChange={(e) => setNewClientData({ ...newClientData, email: e.target.value })}
+                    placeholder={t('common:labels.email', { defaultValue: 'Email address' })}
+                  />
+                </FormGroup>
+              </FormRow>
+
+              <FormRow>
+                <FormGroup>
+                  <Label htmlFor="clientAddress">{t('common:labels.address', { defaultValue: 'Address' })}</Label>
+                  <Input
+                    type="text"
+                    id="clientAddress"
+                    value={newClientData.address || ''}
+                    onChange={(e) => setNewClientData({ ...newClientData, address: e.target.value })}
+                    placeholder={t('common:labels.address', { defaultValue: 'Street address' })}
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="clientCity">{t('common:labels.city', { defaultValue: 'City' })}</Label>
+                  <Input
+                    type="text"
+                    id="clientCity"
+                    value={newClientData.city || ''}
+                    onChange={(e) => setNewClientData({ ...newClientData, city: e.target.value })}
+                    placeholder={t('common:labels.city', { defaultValue: 'City' })}
+                  />
+                </FormGroup>
+              </FormRow>
+
+              <FormRow>
+                <FormGroup>
+                  <Label htmlFor="clientPostalCode">{t('common:labels.postalCode', { defaultValue: 'Postal Code' })}</Label>
+                  <Input
+                    type="text"
+                    id="clientPostalCode"
+                    value={newClientData.postalCode || ''}
+                    onChange={(e) => setNewClientData({ ...newClientData, postalCode: e.target.value })}
+                    placeholder={t('common:labels.postalCode', { defaultValue: 'Postal code' })}
+                  />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="clientCountry">{t('common:labels.country', { defaultValue: 'Country' })}</Label>
+                  <Input
+                    type="text"
+                    id="clientCountry"
+                    value={newClientData.country || ''}
+                    onChange={(e) => setNewClientData({ ...newClientData, country: e.target.value })}
+                    placeholder={t('common:labels.country', { defaultValue: 'Country' })}
+                  />
+                </FormGroup>
+              </FormRow>
+
+              <FormGroup>
+                <Label htmlFor="clientNotes">{t('common:labels.notes', { defaultValue: 'Notes' })}</Label>
+                <Textarea
+                  id="clientNotes"
+                  value={newClientData.notes || ''}
+                  onChange={(e) => setNewClientData({ ...newClientData, notes: e.target.value })}
+                  placeholder={t('common:labels.notes', { defaultValue: 'Additional notes' })}
+                  rows={2}
+                />
+              </FormGroup>
+
+              <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)' }}>
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleCreateClient}
+                >
+                  <UserCircle size={16} style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'middle' }} />
+                  {t('form.createClient', { defaultValue: 'Create Client' })}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowCreateClient(false)}
+                >
+                  {t('common:buttons.cancel', { defaultValue: 'Cancel' })}
+                </button>
+              </div>
             </div>
           )}
+        </FormSection>
 
-          {/* Basic Information */}
-          <div className="form-section">
-            <h3><FileText size={20} />{t('common:labels.information', { defaultValue: 'Information' })}</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="description">{t('common:labels.description')}</label>
-                <input
+        <FormSection title={t('form.transportDetails', { defaultValue: 'Transport Details' })} titleIcon={Truck}>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="transportCarName">{t('form.carName', { defaultValue: 'Car Name' })}</Label>
+              <div className="transport-search-container" style={{ position: 'relative' }}>
+                <Input
                   type="text"
-                  id="description"
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder={t('form.descriptionPlaceholder')}
+                  id="transportCarName"
+                  value={transportSearchTerm}
+                  onChange={(e) => handleTransportSearchChange(e.target.value)}
+                  onFocus={() => setShowTransportDropdown(true)}
+                  placeholder={t('transport.searchPlaceholder', { defaultValue: 'Search transport...' })}
                 />
+                {showTransportDropdown && (
+                  <div className="material-dropdown" style={{
+                    position: 'absolute',
+                    top: '100%',
+                    left: 0,
+                    right: 0,
+                    zIndex: 1000,
+                    backgroundColor: 'var(--surface)',
+                    border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius-md)',
+                    boxShadow: 'var(--shadow-lg)',
+                    maxHeight: '200px',
+                    overflowY: 'auto',
+                    marginTop: '4px'
+                  }}>
+                    {filteredTransports.length > 0 ? (
+                      filteredTransports.map((transport) => (
+                        <div
+                          key={transport.id}
+                          className="material-option"
+                          onClick={() => handleTransportSelect(transport)}
+                          style={{
+                            padding: 'var(--space-sm) var(--space-md)',
+                            cursor: 'pointer',
+                            borderBottom: '1px solid var(--border)'
+                          }}
+                        >
+                          <div>
+                            <strong>{transport.carName}</strong>
+                            {transport.numberPlate && <small> - {transport.numberPlate}</small>}
+                            <small> {transport.phoneNumber}</small>
+                          </div>
+                        </div>
+                      ))
+                    ) : transportSearchTerm ? (
+                      <div className="material-option material-option-create" style={{
+                        padding: 'var(--space-sm) var(--space-md)',
+                        cursor: 'pointer',
+                        borderBottom: '1px solid var(--border)'
+                      }}>
+                        <div>
+                          <strong>{t('transport.createNew', { defaultValue: 'Create New' })}:</strong> {transportSearchTerm}
+                          <small> {t('transport.enterPhoneNumber', { defaultValue: 'Enter phone number' })}</small>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="material-option" style={{
+                        padding: 'var(--space-sm) var(--space-md)',
+                        color: 'var(--text-secondary)'
+                      }}>
+                        <div>
+                          <small>{t('transport.startTyping', { defaultValue: 'Start typing...' })}</small>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
-              <div className="form-group">
-                <label htmlFor="status">{t('common:labels.status')}</label>
-                <input
-                  type="text"
-                  id="status"
-                  value={order.statusLabel || t('status.draft')}
-                  disabled
-                  className="disabled-field"
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="orderDate">{t('orderDate')}</label>
-                <input
-                  type="date"
-                  id="orderDate"
-                  value={orderDate}
-                  onChange={(e) => setOrderDate(e.target.value)}
-                  placeholder={t('form.orderDatePlaceholder', { defaultValue: 'Select order date' })}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="expectedDeliveryDate">{t('expectedDeliveryDate')}</label>
-                <input
-                  type="date"
-                  id="expectedDeliveryDate"
-                  value={expectedDeliveryDate}
-                  onChange={(e) => setExpectedDeliveryDate(e.target.value)}
-                  placeholder={t('form.expectedDeliveryDatePlaceholder', { defaultValue: 'Select expected delivery date' })}
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="notes">{t('common:labels.notes')}</label>
-              <textarea
-                id="notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder={t('common:labels.notes', { defaultValue: 'Additional notes' })}
-                rows={3}
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="transportNumberPlate">{t('form.numberPlate', { defaultValue: 'Number Plate' })}</Label>
+              <Input
+                type="text"
+                id="transportNumberPlate"
+                value={transportNumberPlate}
+                onChange={(e) => setTransportNumberPlate(e.target.value)}
+                placeholder={t('transport.numberPlatePlaceholder', { defaultValue: 'Number plate' })}
               />
-            </div>
-          </div>
-
-          {/* Client Information Section */}
-          <div className="form-section">
-            <h3><UserCircle size={20} /> {t('client')}</h3>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="assignedUser">{t('assignedTo')}</label>
-                <select
-                  id="assignedUser"
-                  value={selectedAssignedUserId || ''}
-                  onChange={(e) => setSelectedAssignedUserId(e.target.value ? parseInt(e.target.value) : null)}
-                  disabled={isLoading}
+            </FormGroup>
+          </FormRow>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="transportPhoneNumber">{t('form.phoneNumber', { defaultValue: 'Phone Number' })}</Label>
+              <Input
+                type="tel"
+                id="transportPhoneNumber"
+                value={transportPhoneNumber}
+                onChange={(e) => setTransportPhoneNumber(e.target.value)}
+                placeholder={t('transport.phoneNumberPlaceholder', { defaultValue: 'Phone number' })}
+              />
+              {transportSearchTerm.trim() && !selectedTransportId && transportPhoneNumber.trim() && (
+                <button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleCreateNewTransport}
+                  style={{ marginTop: 'var(--space-sm)' }}
                 >
-                  <option value="">{t('common:labels.noAssignment')}</option>
-                  {users.map((user) => (
-                    <option key={user.id} value={user.id}>
-                      {user.firstName} {user.lastName} ({user.username})
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
+                  {t('form.createNewTransport', { defaultValue: 'Create New Transport' })}
+                </button>
+              )}
+            </FormGroup>
+          </FormRow>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="transportDate">{t('form.transportDate', { defaultValue: 'Transport Date' })}</Label>
+              <Input
+                type="date"
+                id="transportDate"
+                value={transportDate}
+                onChange={(e) => setTransportDate(e.target.value)}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="transportNotes">{t('form.transportNotes', { defaultValue: 'Transport Notes' })}</Label>
+              <Input
+                type="text"
+                id="transportNotes"
+                value={transportNotes}
+                onChange={(e) => setTransportNotes(e.target.value)}
+                placeholder={t('transport.transportNotesPlaceholder', { defaultValue: 'Transport notes' })}
+              />
+            </FormGroup>
+          </FormRow>
+        </FormSection>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="client">{t('client')} *</label>
-                <select
-                  id="client"
-                  value={selectedClientId || 'none'}
-                  onChange={(e) => handleClientChange(e.target.value)}
-                  disabled={isLoading}
-                >
-                  <option value="none">{t('form.noClient')}</option>
-                  {clients.map((client) => (
-                    <option key={client.id} value={client.id}>
-                      {client.name}
-                    </option>
-                  ))}
-                  <option value="new">+ {t('form.createNewClient')}</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label htmlFor="clientContact">{t('clientContact')}</label>
-                <input
-                  type="text"
-                  id="clientContact"
-                  value={clientContact}
-                  onChange={(e) => setClientContact(e.target.value)}
-                  disabled={isLoading}
-                  placeholder={t('form.clientContactPlaceholder')}
-                />
-              </div>
-            </div>
-
-            {/* Create New Client Form */}
-            {showCreateClient && (
-              <div className="supplier-creation-form">
-                <h4>{t('form.createNewClient')}</h4>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="clientName">{t('form.clientName')} *</label>
-                    <input
-                      type="text"
-                      id="clientName"
-                      value={newClientData.name || ''}
-                      onChange={(e) => setNewClientData({ ...newClientData, name: e.target.value })}
-                      placeholder={t('form.clientNamePlaceholder')}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="clientContactPerson">{t('form.contactPerson')}</label>
-                    <input
-                      type="text"
-                      id="clientContactPerson"
-                      value={newClientData.contactPerson || ''}
-                      onChange={(e) => setNewClientData({ ...newClientData, contactPerson: e.target.value })}
-                      placeholder={t('form.contactPersonPlaceholder')}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="clientPhone">{t('common:labels.phone')}</label>
-                    <input
-                      type="text"
-                      id="clientPhone"
-                      value={newClientData.phone || ''}
-                      onChange={(e) => setNewClientData({ ...newClientData, phone: e.target.value })}
-                      placeholder={t('common:labels.phone', { defaultValue: 'Phone number' })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="clientEmail">{t('common:labels.email')}</label>
-                    <input
-                      type="email"
-                      id="clientEmail"
-                      value={newClientData.email || ''}
-                      onChange={(e) => setNewClientData({ ...newClientData, email: e.target.value })}
-                      placeholder={t('common:labels.email', { defaultValue: 'Email address' })}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="clientAddress">{t('common:labels.address')}</label>
-                    <input
-                      type="text"
-                      id="clientAddress"
-                      value={newClientData.address || ''}
-                      onChange={(e) => setNewClientData({ ...newClientData, address: e.target.value })}
-                      placeholder={t('common:labels.address', { defaultValue: 'Street address' })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="clientCity">{t('common:labels.city')}</label>
-                    <input
-                      type="text"
-                      id="clientCity"
-                      value={newClientData.city || ''}
-                      onChange={(e) => setNewClientData({ ...newClientData, city: e.target.value })}
-                      placeholder={t('common:labels.city', { defaultValue: 'City' })}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="clientPostalCode">{t('common:labels.postalCode')}</label>
-                    <input
-                      type="text"
-                      id="clientPostalCode"
-                      value={newClientData.postalCode || ''}
-                      onChange={(e) => setNewClientData({ ...newClientData, postalCode: e.target.value })}
-                      placeholder={t('common:labels.postalCode', { defaultValue: 'Postal code' })}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="clientCountry">{t('common:labels.country')}</label>
-                    <input
-                      type="text"
-                      id="clientCountry"
-                      value={newClientData.country || ''}
-                      onChange={(e) => setNewClientData({ ...newClientData, country: e.target.value })}
-                      placeholder={t('common:labels.country', { defaultValue: 'Country' })}
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="clientNotes">{t('common:labels.notes')}</label>
-                  <textarea
-                    id="clientNotes"
-                    value={newClientData.notes || ''}
-                    onChange={(e) => setNewClientData({ ...newClientData, notes: e.target.value })}
-                    placeholder={t('common:labels.notes', { defaultValue: 'Additional notes' })}
-                    rows={2}
-                  />
-                </div>
-
-                <div className="form-actions">
-                  <button
-                    type="button"
-                    className="save-item-button"
-                    onClick={handleCreateClient}
-                  >
-                    <UserCircle size={16} />
-                    {t('form.createClient')}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-button"
-                    onClick={() => setShowCreateClient(false)}
-                  >
-                    {t('common:buttons.cancel')}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-
-          {/* Transport Details Section */}
-          <div className="form-section">
-            <h3><Truck size={20} /> {t('form.transportDetails')}</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="transportCarName">{t('form.carName')}</label>
-                <div className="transport-search-container">
-                  <input
+        <FormSection title={t('form.products', { defaultValue: 'Products' })} titleIcon={Package}>
+          {!showAddItemForm ? (
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={() => setShowAddItemForm(true)}
+              disabled={isLoading}
+            >
+              <Plus size={16} style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'middle' }} />
+              {t('form.addProduct', { defaultValue: 'Add Product' })}
+            </button>
+          ) : (
+            <div className="add-item-form" style={{ 
+              padding: 'var(--space-lg)', 
+              border: '1px solid var(--border)', 
+              borderRadius: 'var(--radius-md)',
+              backgroundColor: 'var(--background-secondary)'
+            }}>
+              <FormGroup>
+                <Label htmlFor="materialSearch" required>{t('form.productName', { defaultValue: 'Product Name' })}</Label>
+                <div className="material-search-container" style={{ position: 'relative' }}>
+                  <Input
                     type="text"
-                    id="transportCarName"
-                    value={transportSearchTerm}
-                    onChange={(e) => handleTransportSearchChange(e.target.value)}
-                    onFocus={() => setShowTransportDropdown(true)}
-                    placeholder={t('transport.searchPlaceholder')}
+                    id="materialSearch"
+                    value={materialSearchTerm}
+                    onChange={handleMaterialSearchChange}
+                    onFocus={() => setShowMaterialDropdown(true)}
+                    placeholder={t('form.searchFinishedProducts', { defaultValue: 'Search finished products...' })}
                   />
-                  {showTransportDropdown && (
-                    <div className="material-dropdown">
-                      {filteredTransports.length > 0 ? (
-                        filteredTransports.map((transport) => (
+                  {showMaterialDropdown && (
+                    <div className="material-dropdown" style={{
+                      position: 'absolute',
+                      top: '100%',
+                      left: 0,
+                      right: 0,
+                      zIndex: 1000,
+                      backgroundColor: 'var(--surface)',
+                      border: '1px solid var(--border)',
+                      borderRadius: 'var(--radius-md)',
+                      boxShadow: 'var(--shadow-lg)',
+                      maxHeight: '200px',
+                      overflowY: 'auto',
+                      marginTop: '4px'
+                    }}>
+                      {filteredMaterials.length > 0 ? (
+                        filteredMaterials.map(material => (
                           <div
-                            key={transport.id}
+                            key={material.id}
                             className="material-option"
-                            onClick={() => handleTransportSelect(transport)}
+                            onClick={() => handleMaterialSelect(material)}
+                            style={{
+                              padding: 'var(--space-sm) var(--space-md)',
+                              cursor: 'pointer',
+                              borderBottom: '1px solid var(--border)'
+                            }}
                           >
-                            <div>
-                              <strong>{transport.carName}</strong>
-                              {transport.numberPlate && <small> - {transport.numberPlate}</small>}
-                              <small>{transport.phoneNumber}</small>
+                            <div className="material-option-main" style={{ fontWeight: 500 }}>
+                              <span className="material-name">{material.name}</span>
+                              <span className="material-color"> ({material.color})</span>
+                            </div>
+                            <div className="material-option-details" style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                              {material.quantity} {material.quantityType} {t('form.available', { defaultValue: 'available' }).toLowerCase()}
                             </div>
                           </div>
                         ))
-                      ) : transportSearchTerm ? (
-                        <div className="material-option material-option-create">
-                          <div>
-                            <strong>{t('transport.createNew')}:</strong> {transportSearchTerm}
-                            <small>{t('transport.enterPhoneNumber')}</small>
-                          </div>
-                        </div>
                       ) : (
-                        <div className="material-option">
-                          <div>
-                            <small>{t('transport.startTyping')}</small>
-                          </div>
+                        <div className="material-option no-results" style={{
+                          padding: 'var(--space-sm) var(--space-md)',
+                          color: 'var(--text-secondary)'
+                        }}>
+                          {t('form.noProductsFound', { defaultValue: 'No products found' })}
                         </div>
                       )}
                     </div>
                   )}
                 </div>
-              </div>
-              <div className="form-group">
-                <label htmlFor="transportNumberPlate">{t('form.numberPlate')}</label>
-                <input
-                  type="text"
-                  id="transportNumberPlate"
-                  value={transportNumberPlate}
-                  onChange={(e) => setTransportNumberPlate(e.target.value)}
-                  placeholder={t('transport.numberPlatePlaceholder')}
-                />
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="transportPhoneNumber">{t('form.phoneNumber')}</label>
-                <input
-                  type="tel"
-                  id="transportPhoneNumber"
-                  value={transportPhoneNumber}
-                  onChange={(e) => setTransportPhoneNumber(e.target.value)}
-                  placeholder={t('transport.phoneNumberPlaceholder')}
-                />
-                {transportSearchTerm.trim() && !selectedTransportId && transportPhoneNumber.trim() && (
+              </FormGroup>
+
+              <FormRow>
+                <FormGroup>
+                  <Label htmlFor="itemQuantity" required>{t('form.itemQuantity', { defaultValue: 'Quantity' })}</Label>
+                  <Input
+                    type="number"
+                    id="itemQuantity"
+                    value={newItem.quantity || ''}
+                    onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
+                    onWheel={handleWheel}
+                    min="0"
+                    step="0.01"
+                    placeholder="0"
+                  />
+                </FormGroup>
+                <FormGroup style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--space-sm)' }}>
                   <button
                     type="button"
-                    className="save-item-button"
-                    onClick={handleCreateNewTransport}
-                    style={{ marginTop: '8px' }}
-                  >
-                    {t('form.createNewTransport')}
-                  </button>
-                )}
-              </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="transportDate">{t('form.transportDate')}</label>
-                <input
-                  type="date"
-                  id="transportDate"
-                  value={transportDate}
-                  onChange={(e) => setTransportDate(e.target.value)}
-                  placeholder={t('form.transportDatePlaceholder', { defaultValue: 'Select transport date' })}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="transportNotes">{t('form.transportNotes')}</label>
-                <input
-                  type="text"
-                  id="transportNotes"
-                  value={transportNotes}
-                  onChange={(e) => setTransportNotes(e.target.value)}
-                  placeholder={t('transport.transportNotesPlaceholder')}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Products Section */}
-          <div className="form-section">
-            <div className="section-header">
-              <h3><Package size={20} /> {t('form.products')}</h3>
-              <button
-                type="button"
-                className="add-item-button"
-                onClick={() => setShowAddItemForm(!showAddItemForm)}
-              >
-                <Plus size={20} />
-                {t('form.addProduct')}
-              </button>
-            </div>
-
-            {/* Add Item Form */}
-            {showAddItemForm && (
-              <div className="add-item-form">
-                <div className="form-row">
-                  <div className="form-group material-search-group">
-                    <label htmlFor="materialSearch">{t('form.productName')} *</label>
-                    <div className="material-search-container">
-                      <input
-                        type="text"
-                        id="materialSearch"
-                        value={materialSearchTerm}
-                        onChange={handleMaterialSearchChange}
-                        onFocus={() => setShowMaterialDropdown(true)}
-                        placeholder={t('form.searchFinishedProducts')}
-                        className="material-search-input"
-                      />
-                      {showMaterialDropdown && (
-                        <div className="material-dropdown">
-                          {filteredMaterials.length > 0 ? (
-                            filteredMaterials.map(material => (
-                              <div
-                                key={material.id}
-                                className="material-option"
-                                onClick={() => handleMaterialSelect(material)}
-                              >
-                                <div className="material-option-main">
-                                  <span className="material-name">{material.name}</span>
-                                  <span className="material-color">({material.color})</span>
-                                </div>
-                                <div className="material-option-details">
-                                  {material.quantity} {material.quantityType} {t('form.available', { defaultValue: 'available' }).toLowerCase()}
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="material-option no-results">
-                              {t('form.noProductsFound', { defaultValue: 'No products found' })}
-                            </div>
-                          )}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="itemQuantity">{t('form.itemQuantity')} *</label>
-                    <input
-                      type="number"
-                      id="itemQuantity"
-                      value={newItem.quantity || ''}
-                      onChange={(e) => setNewItem({ ...newItem, quantity: parseFloat(e.target.value) || 0 })}
-                      onWheel={handleWheel}
-                      min="0"
-                      step="0.01"
-                      placeholder="0"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-actions">
-                  <button
-                    type="button"
-                    className="save-item-button"
+                    className="btn btn-primary"
                     onClick={handleAddItem}
                   >
-                    {t('form.addProduct')}
+                    {t('form.addProduct', { defaultValue: 'Add Product' })}
                   </button>
                   <button
                     type="button"
-                    className="cancel-button"
+                    className="btn btn-secondary"
                     onClick={() => {
                       setShowAddItemForm(false);
                       setMaterialSearchTerm('');
                       setNewItem({ rawMaterialId: 0, quantity: 1 });
                     }}
                   >
-                    {t('common:buttons.cancel')}
+                    {t('common:buttons.cancel', { defaultValue: 'Cancel' })}
                   </button>
-                </div>
-              </div>
-            )}
+                </FormGroup>
+              </FormRow>
+            </div>
+          )}
 
             {/* Selected Items */}
             {items.length > 0 && (
@@ -990,28 +1019,10 @@ const EditOrder: React.FC<EditOrderProps> = ({
                 </strong>
               </div>
             )}
-          </div>
+        </FormSection>
 
-          {/* Form Actions */}
-          <div className="form-actions">
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={handleClose}
-            >
-              {t('common:buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isLoading || !selectedClientId || items.length === 0}
-            >
-              {isLoading ? t('form.updating') : t('form.updateOrder')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </Form>
+    </Modal>
   );
 };
 

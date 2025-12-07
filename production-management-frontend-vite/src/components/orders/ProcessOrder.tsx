@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { useTranslation, Trans } from 'react-i18next';
 import type { Order } from '../../types';
-import { X, Package, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
+import { Package, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import { orderApi } from '../../services/api';
+import { Modal, ViewContent, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
 import './ProcessOrder.css';
 
 interface ProcessOrderProps {
-  order: Order;
+  isOpen: boolean;
+  order: Order | null;
   onClose: () => void;
   onSuccess: () => void;
 }
 
 const ProcessOrder: React.FC<ProcessOrderProps> = ({
+  isOpen,
   order,
   onClose,
   onSuccess
@@ -19,6 +22,8 @@ const ProcessOrder: React.FC<ProcessOrderProps> = ({
   const { t } = useTranslation(['orders', 'common']);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  if (!order) return null;
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -52,144 +57,119 @@ const ProcessOrder: React.FC<ProcessOrderProps> = ({
     }
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   return (
-    <div className="process-order-overlay" onClick={handleBackdropClick}>
-      <div className="process-order-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="process-order-header">
-          <div className="header-content">
-            <div className="header-title">
-              <Package className="header-icon" />
-              <h2>{t('processOrder')}</h2>
-            </div>
-            <button className="close-button" onClick={onClose} disabled={isProcessing}>
-              <X size={20} />
-            </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('processOrder', { defaultValue: 'Process Order' })}
+      titleIcon={Package}
+      submitText={isProcessing ? (
+        <>
+          <Loader2 size={16} className="animate-spin" style={{ display: 'inline-block', marginRight: '8px' }} />
+          {t('view.processing', { defaultValue: 'Processing...' })}
+        </>
+      ) : (
+        <>
+          <CheckCircle size={16} style={{ display: 'inline-block', marginRight: '8px' }} />
+          {t('processOrder', { defaultValue: 'Process Order' })}
+        </>
+      )}
+      cancelText={t('common:buttons.cancel', { defaultValue: 'Cancel' })}
+      submitVariant="success"
+      isSubmitting={isProcessing}
+      onSubmit={handleProcessOrder}
+      maxWidth="800px"
+      showCancel={true}
+    >
+      <ViewContent>
+        {error && (
+          <div className="error-message" style={{ marginBottom: 'var(--space-lg)' }}>
+            <AlertTriangle size={16} style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'middle' }} />
+            {error}
           </div>
+        )}
+
+        <div className="process-warning" style={{ 
+          padding: 'var(--space-md)', 
+          backgroundColor: 'var(--warning-50)', 
+          border: '1px solid var(--warning-200)', 
+          borderRadius: 'var(--radius-md)',
+          marginBottom: 'var(--space-lg)',
+          display: 'flex',
+          gap: 'var(--space-sm)',
+          alignItems: 'flex-start'
+        }}>
+          <AlertTriangle size={20} style={{ color: 'var(--warning-600)', flexShrink: 0, marginTop: '2px' }} />
+          <p style={{ margin: 0, fontSize: 'var(--text-sm)', color: 'var(--text-primary)', lineHeight: 'var(--line-height-relaxed)' }}>
+            <Trans
+              i18nKey="view.processOrderWarning"
+              ns="orders"
+              values={{ count: order.orderMaterials.length }}
+              components={{ strong: <strong /> }}
+            />
+          </p>
         </div>
 
-        <div className="process-order-content">
-          {error && (
-            <div className="error-message">
-              <AlertTriangle size={16} />
-              {error}
-            </div>
-          )}
+        <ViewSection title={t('view.orderInformation', { defaultValue: 'Order Information' })} titleIcon={Package}>
+          <ViewGrid columns={2}>
+            <ViewItem>
+              <ViewLabel>{t('table.orderId')}</ViewLabel>
+              <ViewValue>#{order.id}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('client')}</ViewLabel>
+              <ViewValue>{order.clientName}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('orderDate')}</ViewLabel>
+              <ViewValue>{formatDate(order.orderDate)}</ViewValue>
+            </ViewItem>
+            {order.expectedDeliveryDate && (
+              <ViewItem>
+                <ViewLabel>{t('expectedDeliveryDate')}</ViewLabel>
+                <ViewValue>{formatDate(order.expectedDeliveryDate)}</ViewValue>
+              </ViewItem>
+            )}
+            <ViewItem>
+              <ViewLabel>{t('totalValue')}</ViewLabel>
+              <ViewValue>{formatCurrency(order.totalValue)}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('items')}</ViewLabel>
+              <ViewValue>{order.orderMaterials.length} {t('view.products', { defaultValue: 'product(s)' })}</ViewValue>
+            </ViewItem>
+          </ViewGrid>
+        </ViewSection>
 
-          <div className="process-warning">
-            <AlertTriangle size={20} className="warning-icon" />
-            <p>
-              <Trans
-                i18nKey="view.processOrderWarning"
-                ns="orders"
-                values={{ count: order.orderMaterials.length }}
-                components={{ strong: <strong /> }}
-              />
-            </p>
-          </div>
-
-          {/* Order Details */}
-          <div className="order-details-section">
-            <div className="section-header">
-              <Package className="section-icon" />
-              <h3>{t('view.orderInformation', { defaultValue: 'Order Information' })}</h3>
-            </div>
-            
-            <div className="detail-grid">
-              <div className="detail-item">
-                <label>{t('table.orderId')}</label>
-                <div className="detail-value">#{order.id}</div>
-              </div>
-              
-              <div className="detail-item">
-                <label>{t('client')}</label>
-                <div className="detail-value">{order.clientName}</div>
-              </div>
-
-              <div className="detail-item">
-                <label>{t('orderDate')}</label>
-                <div className="detail-value">{formatDate(order.orderDate)}</div>
-              </div>
-
-              {order.expectedDeliveryDate && (
-                <div className="detail-item">
-                  <label>{t('expectedDeliveryDate')}</label>
-                  <div className="detail-value">{formatDate(order.expectedDeliveryDate)}</div>
-                </div>
-              )}
-
-              <div className="detail-item">
-                <label>{t('totalValue')}</label>
-                <div className="detail-value">{formatCurrency(order.totalValue)}</div>
-              </div>
-
-              <div className="detail-item">
-                <label>{t('items')}</label>
-                <div className="detail-value">{order.orderMaterials.length} {t('view.products', { defaultValue: 'product(s)' })}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Products to be Subtracted */}
-          <div className="products-section">
-            <div className="section-header">
-              <Package className="section-icon" />
-              <h3>{t('view.productsToSubtract', { defaultValue: 'Products to Subtract from Inventory' })}</h3>
-            </div>
-            
-            <div className="products-list">
-              {order.orderMaterials.map((item, index) => (
-                <div key={item.id || index} className="product-item">
-                  <div className="product-info">
-                    <div className="product-name">{item.materialName}</div>
-                    <div className="product-details">
-                      <span>{t('form.color')}: {item.materialColor}</span>
-                      <span>•</span>
-                      <span>{item.quantity} {item.quantityType}</span>
-                    </div>
-                  </div>
-                  <div className="product-price">
-                    {formatCurrency(item.totalPrice)}
+        <ViewSection title={t('view.productsToSubtract', { defaultValue: 'Products to Subtract from Inventory' })} titleIcon={Package}>
+          <div className="products-list" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+            {order.orderMaterials.map((item, index) => (
+              <div key={item.id || index} className="product-item" style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: 'var(--space-md)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--surface)'
+              }}>
+                <div className="product-info">
+                  <div className="product-name" style={{ fontWeight: 600, marginBottom: '4px' }}>{item.materialName}</div>
+                  <div className="product-details" style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                    <span>{t('form.color')}: {item.materialColor}</span>
+                    <span> • </span>
+                    <span>{item.quantity} {item.quantityType}</span>
                   </div>
                 </div>
-              ))}
-            </div>
+                <div className="product-price" style={{ fontWeight: 600, color: 'var(--primary-600)' }}>
+                  {formatCurrency(item.totalPrice)}
+                </div>
+              </div>
+            ))}
           </div>
-
-          <div className="action-buttons">
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={onClose}
-              disabled={isProcessing}
-            >
-              {t('common:buttons.cancel')}
-            </button>
-            <button
-              type="button"
-              className="process-button"
-              onClick={handleProcessOrder}
-              disabled={isProcessing}
-            >
-              {isProcessing ? (
-                <>
-                  <Loader2 size={16} className="animate-spin" />
-                  {t('view.processing', { defaultValue: 'Processing...' })}
-                </>
-              ) : (
-                <>
-                  <CheckCircle size={16} />
-                  {t('processOrder')}
-                </>
-              )}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+        </ViewSection>
+      </ViewContent>
+    </Modal>
   );
 };
 

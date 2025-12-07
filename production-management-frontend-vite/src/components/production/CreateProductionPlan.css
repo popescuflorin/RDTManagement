@@ -225,91 +225,7 @@
   font-size: var(--text-sm);
 }
 
-/* Form Sections */
-.form-section {
-  padding: var(--space-xl);
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-lg);
-}
-
-.form-section h3 {
-  margin: 0;
-  font-size: var(--text-lg);
-  color: var(--primary-700);
-  font-weight: 600;
-  border-bottom: 2px solid var(--primary-200);
-  padding-bottom: var(--space-sm);
-}
-
-.form-section h4 {
-  margin: var(--space-md) 0 var(--space-sm) 0;
-  font-size: var(--text-base);
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-/* Form Layout */
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-lg);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.form-group label {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  padding: var(--space-md);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: var(--text-base);
-  transition: all var(--transition-fast);
-  font-family: inherit;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-group input:disabled,
-.form-group select:disabled,
-.form-group textarea:disabled {
-  background-color: var(--surface-hover);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* Remove spinner arrows from number inputs */
-.form-group input[type="number"]::-webkit-inner-spin-button,
-.form-group input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.form-group input[type="number"] {
-  -moz-appearance: textfield;
-}
+/* Form styles are now handled by Form.css in atoms folder */
 
 .read-only-field {
   padding: var(--space-md);
@@ -419,61 +335,8 @@
   color: #b91c1c;
 }
 
-/* Form Actions */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-md);
-  padding-top: var(--space-xl);
-  border-top: 1px solid var(--border);
-  position: sticky;
-  bottom: 0;
-  background: white;
-  margin: 0 calc(-1 * var(--space-3xl)) calc(-1 * var(--space-3xl));
-  padding: var(--space-xl) var(--space-3xl);
-}
-
-.form-actions .btn {
-  padding: var(--space-md) var(--space-xl);
-  font-size: var(--text-base);
-  font-weight: 500;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.form-actions .btn-secondary {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-}
-
-.form-actions .btn-secondary:hover:not(:disabled) {
-  background: var(--surface-secondary);
-  border-color: var(--text-secondary);
-}
-
-.form-actions .btn-primary {
-  background: var(--primary-600);
-  color: white;
-}
-
-.form-actions .btn-primary:hover:not(:disabled) {
-  background: var(--primary-700);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-}
-
-.form-actions .btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* Button styles are now handled by Button.css in atoms folder */
+/* Form styles are now handled by Form.css in atoms folder */
+/* Button styles are now handled by Button.css and Modal.css in atoms folder */
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -496,25 +359,7 @@
     gap: var(--space-xl);
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
-    gap: var(--space-md);
-  }
-
-  .form-section {
-    padding: var(--space-lg);
-  }
-
-  .form-actions {
-    flex-direction: column-reverse;
-    padding: var(--space-lg) var(--space-xl);
-    margin: 0 calc(-1 * var(--space-xl)) calc(-1 * var(--space-xl));
-  }
-
-  .form-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
+  /* Form styles are now handled by Form.css in atoms folder */
 
   .materials-table {
     font-size: var(--text-xs);

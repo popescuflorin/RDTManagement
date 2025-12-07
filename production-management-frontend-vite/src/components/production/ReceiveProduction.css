@@ -98,21 +98,7 @@
   border-color: var(--warning-300);
 }
 
-/* Form */
-.receive-production-form {
-  flex: 1;
-  overflow-y: auto;
-  padding: var(--space-lg);
-}
-
-/* Form Sections */
-.form-section {
-  margin-bottom: var(--space-xl);
-  background: white;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--surface-200);
-  overflow: hidden;
-}
+/* Form styles are now handled by Form.css in atoms folder */
 
 .section-header {
   display: flex;
@@ -183,96 +169,7 @@
   color: var(--text-tertiary);
 }
 
-/* Form Groups */
-.form-group {
-  margin-bottom: var(--space-lg);
-  padding: 0;
-}
-
-.form-group:last-child {
-  margin-bottom: 0;
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: var(--space-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  width: 100%;
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--surface-300);
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  background: white;
-  min-height: 40px;
-  box-sizing: border-box;
-}
-
-.form-group input {
-  height: 40px;
-}
-
-.form-group textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-.form-group select {
-  height: 40px;
-  cursor: pointer;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: var(--success-500);
-  box-shadow: 0 0 0 3px var(--success-100);
-}
-
-.form-group input:disabled,
-.form-group textarea:disabled,
-.form-group select:disabled {
-  background: var(--surface-100);
-  color: var(--text-tertiary);
-  cursor: not-allowed;
-}
-
-/* Remove spinner arrows from number inputs */
-.form-group input[type="number"]::-webkit-inner-spin-button,
-.form-group input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  appearance: none;
-  margin: 0;
-}
-
-.form-group input[type="number"] {
-  -moz-appearance: textfield;
-  appearance: textfield;
-}
-
-.quantity-input::-webkit-inner-spin-button,
-.quantity-input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  appearance: none;
-  margin: 0;
-}
-
-.quantity-input {
-  -moz-appearance: textfield;
-  appearance: textfield;
-}
-
-.form-group select option {
-  padding: var(--space-xs);
-}
+/* Form styles are now handled by Form.css in atoms folder */
 
 .input-help {
   margin-top: var(--space-xs);
@@ -367,15 +264,8 @@
   border: 1px solid var(--warning-200);
 }
 
-/* Form Actions */
-.form-actions {
-  display: flex;
-  gap: var(--space-md);
-  justify-content: flex-end;
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--surface-200);
-  margin-top: var(--space-xl);
-}
+/* Form styles are now handled by Form.css in atoms folder */
+/* Button styles are now handled by Button.css and Modal.css in atoms folder */
 
 /* Error Message */
 .error-message {
@@ -457,23 +347,7 @@
   }
 }
 
-/* Form Row */
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-lg);
-  align-items: start;
-  margin-bottom: var(--space-lg);
-}
-
-.form-row:last-child {
-  margin-bottom: 0;
-}
-
-.form-row .form-group {
-  margin-bottom: 0;
-  padding: 0;
-}
+/* Form styles are now handled by Form.css in atoms folder */
 
 /* Produced Materials */
 .produced-materials {
@@ -536,18 +410,7 @@
   border: 1px solid var(--surface-200);
 }
 
-.add-material-section .form-row {
-  margin-bottom: var(--space-md);
-}
-
-.add-material-section .form-row:last-child {
-  margin-bottom: 0;
-}
-
-.add-material-section .form-group {
-  padding: 0;
-  margin-bottom: 0;
-}
+/* Form styles are now handled by Form.css in atoms folder */
 
 .mode-button {
   flex: 1;
@@ -591,18 +454,7 @@
   border: 1px solid var(--surface-200);
 }
 
-.new-material-form .form-row {
-  margin-bottom: var(--space-md);
-}
-
-.new-material-form .form-row:last-child {
-  margin-bottom: 0;
-}
-
-.new-material-form .form-group {
-  padding: 0;
-  margin-bottom: 0;
-}
+/* Form styles are now handled by Form.css in atoms folder */
 
 /* Section Toggle */
 .section-toggle {
@@ -678,14 +530,7 @@
     padding: var(--space-sm);
   }
 
-  .form-actions {
-    flex-direction: column-reverse;
-    gap: var(--space-sm);
-  }
-
-  .form-row {
-    grid-template-columns: 1fr;
-  }
+  /* Form styles are now handled by Form.css in atoms folder */
 
   .btn {
     width: 100%;
@@ -697,13 +542,9 @@
     padding: var(--space-md);
   }
 
-  .form-section {
-    margin-bottom: var(--space-lg);
-  }
-
+  /* Form styles are now handled by Form.css in atoms folder */
   .section-header,
   .info-grid,
-  .form-group,
   .materials-summary {
     padding: var(--space-md);
   }

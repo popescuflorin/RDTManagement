@@ -184,55 +184,8 @@
   padding: var(--space-xs);
 }
 
-/* Form Actions */
-.delete-confirmation-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-md);
-  padding: 0 var(--space-3xl) var(--space-3xl);
-  border-top: 1px solid var(--border);
-  margin-top: var(--space-lg);
-  padding-top: var(--space-xl);
-}
-
-.cancel-button,
-.delete-button {
-  padding: var(--space-md) var(--space-xl);
-  border-radius: var(--radius-md);
-  font-size: var(--text-base);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  min-width: 120px;
-  border: none;
-}
-
-.cancel-button {
-  background: var(--surface);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-
-.cancel-button:hover:not(:disabled) {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-}
-
-.delete-button {
-  background: var(--error-600);
-  color: var(--text-inverse);
-}
-
-.delete-button:hover:not(:disabled) {
-  background: var(--error-700);
-}
-
-.cancel-button:disabled,
-.delete-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
+/* Form styles are now handled by Form.css in atoms folder */
+/* Button styles are now handled by Button.css and Modal.css in atoms folder */
 
 /* Responsive Design */
 @media (max-width: 768px) {

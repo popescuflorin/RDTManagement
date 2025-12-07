@@ -230,70 +230,7 @@
   right: 0;
 }
 
-/* Form Sections */
-.form-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-lg);
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-sm);
-}
-
-.form-group label {
-  font-weight: 500;
-  color: var(--text-primary);
-  font-size: var(--text-sm);
-}
-
-.form-group input,
-.form-group textarea,
-.form-group select {
-  padding: var(--space-md);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: var(--text-base);
-  transition: border-color var(--transition-fast);
-  background: var(--surface);
-  color: var(--text-primary);
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  outline: none;
-  border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
-}
-
-.form-group textarea {
-  resize: vertical;
-  min-height: 80px;
-}
-
-.form-group input:disabled,
-.form-group textarea:disabled,
-.form-group select:disabled {
-  background-color: var(--surface-hover);
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* Remove spinner arrows from number inputs */
-.form-group input[type="number"]::-webkit-inner-spin-button,
-.form-group input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  appearance: none;
-  margin: 0;
-}
-
-.form-group input[type="number"] {
-  -moz-appearance: textfield;
-  appearance: textfield;
-}
+/* Form styles are now handled by Form.css in atoms folder */
 
 .field-hint {
   font-size: var(--text-xs);
@@ -351,54 +288,8 @@
   font-weight: 600;
 }
 
-/* Form Actions */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-md);
-  padding-top: var(--space-xl);
-  border-top: 1px solid var(--border);
-}
-
-.form-actions .btn {
-  padding: var(--space-md) var(--space-xl);
-  font-size: var(--text-base);
-  font-weight: 500;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  border: none;
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.form-actions .btn-secondary {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-  border: 1px solid var(--border);
-}
-
-.form-actions .btn-secondary:hover:not(:disabled) {
-  background: var(--surface-secondary);
-  border-color: var(--text-secondary);
-}
-
-.form-actions .btn-primary {
-  background: var(--primary-500);
-  color: white;
-}
-
-.form-actions .btn-primary:hover:not(:disabled) {
-  background: var(--primary-600);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.2);
-}
-
-.form-actions .btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+/* Form styles are now handled by Form.css in atoms folder */
+/* Button styles are now handled by Button.css and Modal.css in atoms folder */
 
 /* Responsive Design */
 @media (max-width: 768px) {
@@ -421,22 +312,13 @@
     gap: var(--space-xl);
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
-  }
+  /* Form styles are now handled by Form.css in atoms folder */
 
   .material-types-grid {
     grid-template-columns: 1fr;
   }
 
-  .form-actions {
-    flex-direction: column-reverse;
-  }
-
-  .form-actions .btn {
-    width: 100%;
-    justify-content: center;
-  }
+  /* Form styles are now handled by Form.css in atoms folder */
 }
 
 /* Scrollbar Styling */

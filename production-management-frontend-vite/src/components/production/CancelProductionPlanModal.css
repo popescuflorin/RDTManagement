@@ -71,33 +71,7 @@
   border: 1px solid;
 }
 
-.cancel-plan-actions .cancel-button {
-  background: var(--surface-100);
-  border-color: var(--surface-300);
-  color: var(--text-secondary);
-}
-
-.cancel-plan-actions .cancel-button:hover:not(:disabled) {
-  background: var(--surface-200);
-  border-color: var(--surface-400);
-  color: var(--text-primary);
-}
-
-.cancel-plan-actions .delete-button {
-  background: #dc2626;
-  color: white;
-}
-
-.cancel-plan-actions .delete-button:hover:not(:disabled) {
-  background: var(--danger-600);
-  border-color: var(--danger-600);
-}
-
-.cancel-plan-actions .btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
+/* Button styles are now handled by Button.css and Modal.css in atoms folder */
 
 /* Animations */
 @keyframes fadeIn {

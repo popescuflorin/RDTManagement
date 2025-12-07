@@ -89,12 +89,14 @@
   z-index: 1;
 }
 
-.form-group {
+/* Login-specific form styles - scoped to login page only */
+/* Note: Login form uses custom glassmorphism styling */
+.login-container .form-group {
   margin-bottom: var(--space-xl);
   position: relative;
 }
 
-.form-group label {
+.login-container .form-group label {
   display: block;
   margin-bottom: var(--space-sm);
   color: var(--text-inverse);
@@ -105,7 +107,7 @@
   opacity: 0.9;
 }
 
-.form-group input {
+.login-container .form-group input {
   width: 100%;
   padding: var(--space-lg) var(--space-xl);
   background: rgba(255, 255, 255, 0.1);
@@ -120,11 +122,11 @@
   font-weight: 400;
 }
 
-.form-group input::placeholder {
+.login-container .form-group input::placeholder {
   color: rgba(255, 255, 255, 0.6);
 }
 
-.form-group input:focus {
+.login-container .form-group input:focus {
   outline: none;
   border-color: rgba(255, 255, 255, 0.4);
   background: rgba(255, 255, 255, 0.15);
@@ -204,7 +206,8 @@
   max-width: 300px;
 }
 
-.error-message {
+/* Error message - scoped to login page */
+.login-container .error-message {
   background: rgba(244, 67, 54, 0.15);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
@@ -292,7 +295,7 @@
     font-size: var(--text-base);
   }
 
-  .form-group input {
+  .login-container .form-group input {
     padding: var(--space-md) var(--space-lg);
   }
 
@@ -354,7 +357,7 @@
   }
   
   .login-button:hover:not(:disabled),
-  .form-group input:focus {
+  .login-container .form-group input:focus {
     transform: none;
   }
 }

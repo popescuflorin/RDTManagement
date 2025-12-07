@@ -49,96 +49,7 @@
   padding: var(--space-lg);
 }
 
-.form-section {
-  margin-bottom: var(--space-xl);
-}
-
-.form-section h3 {
-  color: var(--text-primary);
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 var(--space-lg) 0;
-  padding-bottom: var(--space-sm);
-  border-bottom: 2px solid var(--primary-100);
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.form-section h3::before {
-  content: '';
-  width: 4px;
-  height: 20px;
-  background: var(--primary-500);
-  border-radius: 2px;
-}
-
-.form-group {
-  margin-bottom: var(--space-lg);
-}
-
-.form-group label {
-  display: block;
-  margin-bottom: var(--space-sm);
-  color: var(--text-secondary);
-  font-weight: 500;
-  font-size: 0.875rem;
-}
-
-.form-group input,
-.form-group select,
-.form-group textarea {
-  width: 100%;
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--surface-300);
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  background: white;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px var(--primary-100);
-}
-
-.form-group input:disabled,
-.form-group select:disabled,
-.form-group textarea:disabled {
-  background: var(--surface-100);
-  color: var(--text-tertiary);
-  cursor: not-allowed;
-}
-
-/* Remove spinner arrows from number inputs */
-.form-group input[type="number"]::-webkit-inner-spin-button,
-.form-group input[type="number"]::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.form-group input[type="number"] {
-  -moz-appearance: textfield;
-}
-
-.quantity-input::-webkit-inner-spin-button,
-.quantity-input::-webkit-outer-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.quantity-input {
-  -moz-appearance: textfield;
-}
-
-.form-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--space-lg);
-}
+/* Form styles are now handled by Form.css in atoms folder */
 
 /* Add Material Section */
 .add-material-section {
@@ -262,17 +173,10 @@
   color: var(--warning-700);
 }
 
-/* Form Actions */
-.form-actions {
-  display: flex;
-  gap: var(--space-md);
-  justify-content: flex-end;
-  padding-top: var(--space-lg);
-  border-top: 1px solid var(--surface-200);
-  margin-top: var(--space-xl);
-}
+/* Form styles are now handled by Form.css in atoms folder */
+/* Button styles are now handled by Button.css and Modal.css in atoms folder */
 
-/* Error Message */
+/* Component-specific error message styles */
 .error-message {
   background: var(--danger-50);
   color: var(--danger-700);
@@ -290,8 +194,6 @@
   content: '⚠️';
   font-size: 1rem;
 }
-
-/* Button styles are now handled by Button.css in atoms folder */
 
 /* Animations */
 @keyframes fadeIn {
@@ -321,13 +223,7 @@
     margin: var(--space-md);
   }
 
-  .form-row {
-    grid-template-columns: 1fr;
-  }
-
-  .form-actions {
-    flex-direction: column-reverse;
-  }
+  /* Form styles are now handled by Form.css in atoms folder */
 
   .materials-table {
     font-size: 0.75rem;

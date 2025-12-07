@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { orderApi, inventoryApi } from '../../services/api';
 import type { Order, OrderStatistics, RawMaterial, PagedResult } from '../../types';
 import { OrderStatus } from '../../types';
-import { Plus, Package, Search, Filter, Clock, Loader2, Truck, CheckCircle, BarChart3, Play, ChevronLeft, ChevronRight, Edit } from 'lucide-react';
+import { Package, Search, Filter, Clock, Loader2, Truck, CheckCircle, BarChart3, Play, ChevronLeft, ChevronRight, Edit } from 'lucide-react';
 import CreateOrder from './CreateOrder';
 import ViewOrder from './ViewOrder';
 import EditOrder from './EditOrder';
@@ -599,6 +599,7 @@ const Orders: React.FC = () => {
       {/* Modals */}
       {showCreateModal && (
         <CreateOrder
+          isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
           onOrderCreated={loadData}
         />
@@ -615,6 +616,7 @@ const Orders: React.FC = () => {
 
       {showProcessModal && selectedOrder && (
         <ProcessOrder
+          isOpen={showProcessModal}
           order={selectedOrder}
           onClose={handleCloseProcessModal}
           onSuccess={handleProcessSuccess}
@@ -623,6 +625,7 @@ const Orders: React.FC = () => {
 
       {showViewModal && selectedOrder && (
         <ViewOrder
+          isOpen={showViewModal}
           order={selectedOrder}
           onClose={() => {
             setShowViewModal(false);
@@ -633,6 +636,7 @@ const Orders: React.FC = () => {
 
       {showCancelModal && selectedOrder && (
         <CancelOrderModal
+          isOpen={showCancelModal}
           order={selectedOrder}
           onClose={handleCloseCancelModal}
           onConfirm={handleConfirmCancel}
