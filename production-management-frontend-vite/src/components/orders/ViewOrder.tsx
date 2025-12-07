@@ -4,7 +4,6 @@ import type { Order } from '../../types';
 import { OrderStatus } from '../../types';
 import { Package, UserCircle, Truck, FileText, MapPin, Phone, Mail } from 'lucide-react';
 import { Modal, ViewContent, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
-import './ViewOrder.css';
 
 interface ViewOrderProps {
   isOpen: boolean;

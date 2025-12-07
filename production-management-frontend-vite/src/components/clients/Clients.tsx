@@ -2,13 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   UserCircle, 
-  Search, 
-  Loader2,
   Mail,
   Phone,
-  MapPin,
-  ChevronLeft,
-  ChevronRight
+  MapPin
 } from 'lucide-react';
 import { clientApi } from '../../services/api';
 import type { Client, PagedResult } from '../../types';
@@ -21,7 +17,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table } from '../atoms';
+import { Table, PageContainer, Loader, SearchInput, Pagination, Summary, ErrorMessage } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Clients.css';
 
@@ -166,10 +162,9 @@ const Clients: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="clients-loading">
-        <Loader2 size={32} className="animate-spin" />
-        <p>{t('clients.loading.loadingClients')}</p>
-      </div>
+      <PageContainer>
+        <Loader message={t('clients.loading.loadingClients')} />
+      </PageContainer>
     );
   }
 
@@ -191,18 +186,11 @@ const Clients: React.FC = () => {
 
       {/* Search and Filter */}
       <div className="clients-controls">
-        <div className="search-container">
-          <div className="search-input-wrapper">
-            <Search size={20} className="search-icon" />
-            <input
-              type="text"
-              placeholder={t('clients.search.placeholder')}
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="search-input"
-            />
-          </div>
-        </div>
+        <SearchInput
+          placeholder={t('clients.search.placeholder')}
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
         
         <div className="filter-container">
           <label className="filter-checkbox">
@@ -220,10 +208,10 @@ const Clients: React.FC = () => {
       </div>
 
       {error && (
-        <div className="error-message">
-          {error}
-          <button type="button" onClick={() => setError(null)}>×</button>
-        </div>
+        <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
       )}
 
       {/* Clients Table */}
@@ -349,106 +337,49 @@ const Clients: React.FC = () => {
 
       {/* Pagination Controls */}
       {pagedData && pagedData.totalPages > 0 && (
-        <div className="pagination-container">
-          <div className="pagination-info">
-            {t('clients.pagination.showing', {
+        <Pagination
+          data={pagedData}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setCurrentPage(1);
+          }}
+          labels={{
+            showing: t('clients.pagination.showing', {
               start: ((pagedData.page - 1) * pagedData.pageSize) + 1,
               end: Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount),
               total: pagedData.totalCount
-            })}
-          </div>
-          
-          <div className="pagination-controls">
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(1)}
-              disabled={!pagedData.hasPreviousPage}
-            >
-              {t('clients.pagination.first')}
-            </button>
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={!pagedData.hasPreviousPage}
-            >
-              <ChevronLeft size={16} />
-              {t('clients.pagination.previous')}
-            </button>
-            
-            <div className="pagination-pages">
-              {Array.from({ length: Math.min(5, pagedData.totalPages) }, (_, i) => {
-                let pageNum;
-                if (pagedData.totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= pagedData.totalPages - 2) {
-                  pageNum = pagedData.totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-                
-                return (
-                  <button
-                    key={pageNum}
-                    className={`pagination-page ${currentPage === pageNum ? 'active' : ''}`}
-                    onClick={() => setCurrentPage(pageNum)}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-            </div>
-            
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={!pagedData.hasNextPage}
-            >
-              {t('clients.pagination.next')}
-              <ChevronRight size={16} />
-            </button>
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(pagedData.totalPages)}
-              disabled={!pagedData.hasNextPage}
-            >
-              {t('clients.pagination.last')}
-            </button>
-          </div>
-          
-          <div className="page-size-selector">
-            <label>{t('clients.pagination.show')}</label>
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-            <span>{t('clients.pagination.perPage')}</span>
-          </div>
-        </div>
+            }),
+            first: t('clients.pagination.first'),
+            previous: t('clients.pagination.previous'),
+            next: t('clients.pagination.next'),
+            last: t('clients.pagination.last'),
+            show: t('clients.pagination.show'),
+            perPage: t('clients.pagination.perPage')
+          }}
+        />
       )}
 
       {/* Summary */}
       {pagedData && (
-        <div className="clients-summary">
-          <div className="summary-item">
-            <strong>{t('clients.summary.totalClients')}</strong> {pagedData.totalCount}
-          </div>
-          <div className="summary-item">
-            <strong>{t('clients.summary.active')}</strong> {clients.filter(c => c.isActive).length} {t('clients.summary.of')} {pagedData.totalCount}
-          </div>
-          <div className="summary-item">
-            <strong>{t('clients.summary.inactive')}</strong> {clients.filter(c => !c.isActive).length} {t('clients.summary.of')} {pagedData.totalCount}
-          </div>
-        </div>
+        <Summary
+          items={[
+            {
+              label: t('clients.summary.totalClients'),
+              value: pagedData.totalCount
+            },
+            {
+              label: t('clients.summary.active'),
+              value: `${clients.filter(c => c.isActive).length} ${t('clients.summary.of')} ${pagedData.totalCount}`
+            },
+            {
+              label: t('clients.summary.inactive'),
+              value: `${clients.filter(c => !c.isActive).length} ${t('clients.summary.of')} ${pagedData.totalCount}`
+            }
+          ]}
+        />
       )}
 
       {/* Modals */}

@@ -5,7 +5,6 @@ import type { RawMaterial, UpdateOrderRequest, Transport, CreateTransportRequest
 import { MaterialType } from '../../types';
 import { Plus, Trash2, UserCircle, Truck, Package, FileText } from 'lucide-react';
 import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select } from '../atoms';
-import './CreateOrder.css';
 
 interface EditOrderProps {
   isOpen: boolean;

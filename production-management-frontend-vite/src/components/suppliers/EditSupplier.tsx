@@ -4,7 +4,6 @@ import { supplierApi } from '../../services/api';
 import type { Supplier, UpdateSupplierRequest } from '../../types';
 import { Building2 } from 'lucide-react';
 import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Checkbox } from '../atoms';
-import './CreateSupplier.css';
 
 interface EditSupplierProps {
   isOpen: boolean;

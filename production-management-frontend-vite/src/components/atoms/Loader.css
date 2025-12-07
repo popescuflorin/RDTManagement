@@ -1,0 +1,27 @@
+/* Standardized Loader Component - Centralized styles for all loading states */
+
+.loader {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.loader-icon {
+  animation: spin 1s linear infinite;
+  color: var(--primary-600);
+}
+
+.loader-message {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: var(--text-base);
+  text-align: center;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

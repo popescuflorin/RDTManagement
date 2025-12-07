@@ -2,12 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Truck, 
-  Search, 
-  Loader2,
   FileText,
-  ClipboardList,
-  ChevronLeft,
-  ChevronRight
+  ClipboardList
 } from 'lucide-react';
 import { transportApi } from '../../services/api';
 import type { Transport, TransportRecord, PagedResult } from '../../types';
@@ -18,7 +14,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import DeleteButton from '../atoms/DeleteButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table } from '../atoms';
+import { Table, PageContainer, Loader, Pagination, SearchInput } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Transports.css';
 import DeleteTransport from './DeleteTransport';
@@ -186,10 +182,9 @@ const Transports: React.FC = () => {
 
   if (isLoading && activeTab === 'transports') {
     return (
-      <div className="transports-loading">
-        <Loader2 size={32} className="animate-spin" />
-        <p>{t('transports.loading.loadingTransports')}</p>
-      </div>
+      <PageContainer>
+        <Loader message={t('transports.loading.loadingTransports')} />
+      </PageContainer>
     );
   }
 
@@ -231,37 +226,30 @@ const Transports: React.FC = () => {
 
       {/* Search */}
       <div className="transports-controls">
-        <div className="search-container">
-          <div className="search-input-wrapper">
-            <Search size={20} className="search-icon" />
-            <input
-              type="text"
-              placeholder={
-                activeTab === 'transports'
-                  ? t('transports.search.vehicles')
-                  : t('transports.search.records')
-              }
-              value={activeTab === 'transports' ? searchTerm : recordsSearchTerm}
-              onChange={(e) => {
-                if (activeTab === 'transports') {
-                  setSearchTerm(e.target.value);
-                  setTransportsPage(1); // Reset to first page on search
-                } else {
-                  setRecordsSearchTerm(e.target.value);
-                  setRecordsPage(1); // Reset to first page on search
-                }
-              }}
-              className="search-input"
-            />
-          </div>
-        </div>
+        <SearchInput
+          placeholder={
+            activeTab === 'transports'
+              ? t('transports.search.vehicles')
+              : t('transports.search.records')
+          }
+          value={activeTab === 'transports' ? searchTerm : recordsSearchTerm}
+          onChange={(e) => {
+            if (activeTab === 'transports') {
+              setSearchTerm(e.target.value);
+              setTransportsPage(1); // Reset to first page on search
+            } else {
+              setRecordsSearchTerm(e.target.value);
+              setRecordsPage(1); // Reset to first page on search
+            }
+          }}
+        />
       </div>
 
       {error && (
-        <div className="error-message">
-          {error}
-          <button type="button" onClick={() => setError(null)}>×</button>
-        </div>
+        <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
       )}
 
       {/* Transport Vehicles Tab Content */}
@@ -335,91 +323,29 @@ const Transports: React.FC = () => {
 
           {/* Pagination Controls */}
           {pagedTransports && pagedTransports.totalPages > 0 && (
-            <div className="pagination-container">
-              <div className="pagination-info">
-                {t('transports.pagination.showing', {
+            <Pagination
+              data={pagedTransports}
+              currentPage={transportsPage}
+              pageSize={transportsPageSize}
+              onPageChange={setTransportsPage}
+              onPageSizeChange={(newSize) => {
+                setTransportsPageSize(newSize);
+                setTransportsPage(1);
+              }}
+              labels={{
+                showing: t('transports.pagination.showing', {
                   start: ((pagedTransports.page - 1) * pagedTransports.pageSize) + 1,
                   end: Math.min(pagedTransports.page * pagedTransports.pageSize, pagedTransports.totalCount),
                   total: pagedTransports.totalCount
-                })}
-              </div>
-              
-              <div className="pagination-controls">
-                <button
-                  className="pagination-btn"
-                  onClick={() => setTransportsPage(1)}
-                  disabled={!pagedTransports.hasPreviousPage}
-                >
-                  {t('transports.pagination.first')}
-                </button>
-                <button
-                  className="pagination-btn"
-                  onClick={() => setTransportsPage(transportsPage - 1)}
-                  disabled={!pagedTransports.hasPreviousPage}
-                >
-                  <ChevronLeft size={16} />
-                  {t('transports.pagination.previous')}
-                </button>
-                
-                <div className="pagination-pages">
-                  {Array.from({ length: Math.min(5, pagedTransports.totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (pagedTransports.totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (transportsPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (transportsPage >= pagedTransports.totalPages - 2) {
-                      pageNum = pagedTransports.totalPages - 4 + i;
-                    } else {
-                      pageNum = transportsPage - 2 + i;
-                    }
-                    
-                    return (
-                      <button
-                        key={pageNum}
-                        className={`pagination-page ${transportsPage === pageNum ? 'active' : ''}`}
-                        onClick={() => setTransportsPage(pageNum)}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-                </div>
-                
-                <button
-                  className="pagination-btn"
-                  onClick={() => setTransportsPage(transportsPage + 1)}
-                  disabled={!pagedTransports.hasNextPage}
-                >
-                  {t('transports.pagination.next')}
-                  <ChevronRight size={16} />
-                </button>
-                <button
-                  className="pagination-btn"
-                  onClick={() => setTransportsPage(pagedTransports.totalPages)}
-                  disabled={!pagedTransports.hasNextPage}
-                >
-                  {t('transports.pagination.last')}
-                </button>
-              </div>
-              
-              <div className="page-size-selector">
-                <label>{t('transports.pagination.show')}</label>
-                <select
-                  value={transportsPageSize}
-                  onChange={(e) => {
-                    setTransportsPageSize(Number(e.target.value));
-                    setTransportsPage(1);
-                  }}
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-                <span>{t('transports.pagination.perPage')}</span>
-              </div>
-            </div>
+                }),
+                first: t('transports.pagination.first'),
+                previous: t('transports.pagination.previous'),
+                next: t('transports.pagination.next'),
+                last: t('transports.pagination.last'),
+                show: t('transports.pagination.show'),
+                perPage: t('transports.pagination.perPage')
+              }}
+            />
           )}
         </>
       )}
@@ -438,10 +364,7 @@ const Transports: React.FC = () => {
           </div>
 
           {isLoadingRecords ? (
-            <div className="transports-loading">
-              <Loader2 size={32} className="animate-spin" />
-              <p>{t('transports.loading.loadingRecords')}</p>
-            </div>
+            <Loader message={t('transports.loading.loadingRecords')} />
           ) : (
             <>
               {(() => {
@@ -517,91 +440,29 @@ const Transports: React.FC = () => {
 
               {/* Pagination Controls */}
               {pagedRecords && pagedRecords.totalPages > 0 && (
-                <div className="pagination-container">
-                  <div className="pagination-info">
-                    {t('transports.pagination.showingRecords', {
+                <Pagination
+                  data={pagedRecords}
+                  currentPage={recordsPage}
+                  pageSize={recordsPageSize}
+                  onPageChange={setRecordsPage}
+                  onPageSizeChange={(newSize) => {
+                    setRecordsPageSize(newSize);
+                    setRecordsPage(1);
+                  }}
+                  labels={{
+                    showing: t('transports.pagination.showingRecords', {
                       start: ((pagedRecords.page - 1) * pagedRecords.pageSize) + 1,
                       end: Math.min(pagedRecords.page * pagedRecords.pageSize, pagedRecords.totalCount),
                       total: pagedRecords.totalCount
-                    })}
-                  </div>
-                  
-                  <div className="pagination-controls">
-                    <button
-                      className="pagination-btn"
-                      onClick={() => setRecordsPage(1)}
-                      disabled={!pagedRecords.hasPreviousPage}
-                    >
-                      {t('transports.pagination.first')}
-                    </button>
-                    <button
-                      className="pagination-btn"
-                      onClick={() => setRecordsPage(recordsPage - 1)}
-                      disabled={!pagedRecords.hasPreviousPage}
-                    >
-                      <ChevronLeft size={16} />
-                      {t('transports.pagination.previous')}
-                    </button>
-                    
-                    <div className="pagination-pages">
-                      {Array.from({ length: Math.min(5, pagedRecords.totalPages) }, (_, i) => {
-                        let pageNum;
-                        if (pagedRecords.totalPages <= 5) {
-                          pageNum = i + 1;
-                        } else if (recordsPage <= 3) {
-                          pageNum = i + 1;
-                        } else if (recordsPage >= pagedRecords.totalPages - 2) {
-                          pageNum = pagedRecords.totalPages - 4 + i;
-                        } else {
-                          pageNum = recordsPage - 2 + i;
-                        }
-                        
-                        return (
-                          <button
-                            key={pageNum}
-                            className={`pagination-page ${recordsPage === pageNum ? 'active' : ''}`}
-                            onClick={() => setRecordsPage(pageNum)}
-                          >
-                            {pageNum}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    
-                    <button
-                      className="pagination-btn"
-                      onClick={() => setRecordsPage(recordsPage + 1)}
-                      disabled={!pagedRecords.hasNextPage}
-                    >
-                      {t('transports.pagination.next')}
-                      <ChevronRight size={16} />
-                    </button>
-                    <button
-                      className="pagination-btn"
-                      onClick={() => setRecordsPage(pagedRecords.totalPages)}
-                      disabled={!pagedRecords.hasNextPage}
-                    >
-                      {t('transports.pagination.last')}
-                    </button>
-                  </div>
-                  
-                  <div className="page-size-selector">
-                    <label>{t('transports.pagination.show')}</label>
-                    <select
-                      value={recordsPageSize}
-                      onChange={(e) => {
-                        setRecordsPageSize(Number(e.target.value));
-                        setRecordsPage(1);
-                      }}
-                    >
-                      <option value={10}>10</option>
-                      <option value={25}>25</option>
-                      <option value={50}>50</option>
-                      <option value={100}>100</option>
-                    </select>
-                    <span>{t('transports.pagination.perPage')}</span>
-                  </div>
-                </div>
+                    }),
+                    first: t('transports.pagination.first'),
+                    previous: t('transports.pagination.previous'),
+                    next: t('transports.pagination.next'),
+                    last: t('transports.pagination.last'),
+                    show: t('transports.pagination.show'),
+                    perPage: t('transports.pagination.perPage')
+                  }}
+                />
               )}
             </>
           )}

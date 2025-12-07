@@ -25,29 +25,7 @@
 
 /* Create button styles are now handled by CreateButton component in atoms folder */
 
-/* Loading State */
-.inventory-loading {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 400px;
-  gap: 16px;
-}
-
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e9ecef;
-  border-top: 4px solid #667eea;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
+/* Loading state styles are now handled by Loader.css in atoms folder */
 
 /* Statistics Cards */
 .inventory-stats {
@@ -125,26 +103,7 @@
   flex-wrap: wrap;
 }
 
-.search-container {
-  flex: 1;
-  min-width: 300px;
-}
-
-.search-input {
-  width: 100%;
-  padding: var(--space-md) var(--space-lg);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: var(--text-base);
-  transition: border-color 0.2s ease;
-  background: var(--surface);
-}
-
-.search-input:focus {
-  outline: none;
-  border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
-}
+/* Search input styles are now handled by SearchInput.css in atoms folder */
 
 .filter-container {
   min-width: 180px;
@@ -334,114 +293,7 @@
   border-color: var(--primary-600);
 }
 
-/* Pagination Container */
-.pagination-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-xl) var(--space-2xl);
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  flex-wrap: wrap;
-  gap: var(--space-lg);
-}
-
-.pagination-info {
-  color: var(--text-secondary);
-  font-size: var(--text-sm);
-}
-
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.pagination-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.pagination-btn:hover:not(:disabled) {
-  background: var(--primary-50);
-  border-color: var(--primary-600);
-  color: var(--primary-600);
-}
-
-.pagination-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.pagination-pages {
-  display: flex;
-  gap: var(--space-xs);
-}
-
-.pagination-page {
-  min-width: 36px;
-  height: 36px;
-  padding: var(--space-sm);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.pagination-page:hover {
-  background: var(--primary-50);
-  border-color: var(--primary-600);
-  color: var(--primary-600);
-}
-
-.pagination-page.active {
-  background: var(--primary-600);
-  color: var(--text-inverse);
-  border-color: var(--primary-600);
-}
-
-.page-size-selector {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.page-size-selector select {
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  color: var(--text-primary);
-  font-size: var(--text-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.page-size-selector select:hover {
-  border-color: var(--primary-600);
-}
-
-.page-size-selector select:focus {
-  outline: none;
-  border-color: var(--primary-600);
-  box-shadow: 0 0 0 3px var(--primary-50);
-}
+/* Pagination styles are now handled by Pagination.css in atoms folder */
 
 /* Responsive Design */
 @media (max-width: 1600px) {

@@ -47,7 +47,7 @@ const Select: React.FC<SelectProps> = ({
   return (
     <div className="form-input-wrapper">
       <select
-        className={`form-select form-select-${size} ${error ? 'form-input-error' : ''} ${className}`.trim()}
+        className={`form-input form-select-${size} ${error ? 'form-input-error' : ''} ${className}`.trim()}
         {...restProps}
       >
         {options

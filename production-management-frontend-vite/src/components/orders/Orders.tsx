@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { orderApi, inventoryApi } from '../../services/api';
 import type { Order, OrderStatistics, RawMaterial, PagedResult } from '../../types';
 import { OrderStatus } from '../../types';
-import { Package, Search, Filter, Clock, Loader2, Truck, CheckCircle, BarChart3, Play, ChevronLeft, ChevronRight, Edit } from 'lucide-react';
+import { Package, Filter, Clock, Loader2, Truck, CheckCircle, BarChart3, Play, Edit } from 'lucide-react';
 import CreateOrder from './CreateOrder';
 import ViewOrder from './ViewOrder';
 import EditOrder from './EditOrder';
@@ -15,7 +15,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import CancelButton from '../atoms/CancelButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table } from '../atoms';
+import { Table, PageContainer, Loader, SearchInput, Pagination, ErrorMessage } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Orders.css';
 
@@ -225,10 +225,9 @@ const Orders: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="orders-loading">
-        <Loader2 size={32} className="animate-spin" />
-        <p>{t('common:messages.loading')}</p>
-      </div>
+      <PageContainer>
+        <Loader message={t('common:messages.loading')} />
+      </PageContainer>
     );
   }
 
@@ -319,21 +318,14 @@ const Orders: React.FC = () => {
 
       {/* Filters and Search */}
       <div className="orders-controls">
-        <div className="search-container">
-          <div className="search-input-wrapper">
-            <Search size={20} className="search-icon" />
-            <input
-              type="text"
-              placeholder={t('table.searchPlaceholder', { defaultValue: 'Search by client name, email, or phone...' })}
-              value={searchTerm}
-              onChange={(e) => {
-                setSearchTerm(e.target.value);
-                setCurrentPage(1); // Reset to first page on search
-              }}
-              className="search-input"
-            />
-          </div>
-        </div>
+        <SearchInput
+          placeholder={t('table.searchPlaceholder', { defaultValue: 'Search by client name, email, or phone...' })}
+          value={searchTerm}
+          onChange={(e) => {
+            setSearchTerm(e.target.value);
+            setCurrentPage(1); // Reset to first page on search
+          }}
+        />
         
         {/* Status Filter */}
         <div className="filter-container">
@@ -358,9 +350,10 @@ const Orders: React.FC = () => {
       </div>
 
       {error && (
-        <div className="error-message">
-          {error}
-        </div>
+        <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
       )}
 
       {/* Orders Table */}
@@ -509,91 +502,29 @@ const Orders: React.FC = () => {
 
       {/* Pagination Controls */}
       {pagedData && pagedData.totalPages > 0 && (
-        <div className="pagination-container">
-          <div className="pagination-info">
-            {t('table.paginationInfo', { 
+        <Pagination
+          data={pagedData}
+          currentPage={currentPage}
+          pageSize={pageSize}
+          onPageChange={setCurrentPage}
+          onPageSizeChange={(newSize) => {
+            setPageSize(newSize);
+            setCurrentPage(1);
+          }}
+          labels={{
+            showing: t('table.paginationInfo', { 
               start: ((pagedData.page - 1) * pagedData.pageSize) + 1,
               end: Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount),
               total: pagedData.totalCount
-            })}
-          </div>
-          
-          <div className="pagination-controls">
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(1)}
-              disabled={!pagedData.hasPreviousPage}
-            >
-              {t('common:buttons.first')}
-            </button>
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(currentPage - 1)}
-              disabled={!pagedData.hasPreviousPage}
-            >
-              <ChevronLeft size={16} />
-              {t('common:buttons.previous')}
-            </button>
-            
-            <div className="pagination-pages">
-              {Array.from({ length: Math.min(5, pagedData.totalPages) }, (_, i) => {
-                let pageNum;
-                if (pagedData.totalPages <= 5) {
-                  pageNum = i + 1;
-                } else if (currentPage <= 3) {
-                  pageNum = i + 1;
-                } else if (currentPage >= pagedData.totalPages - 2) {
-                  pageNum = pagedData.totalPages - 4 + i;
-                } else {
-                  pageNum = currentPage - 2 + i;
-                }
-                
-                return (
-                  <button
-                    key={pageNum}
-                    className={`pagination-page ${currentPage === pageNum ? 'active' : ''}`}
-                    onClick={() => setCurrentPage(pageNum)}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-            </div>
-            
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(currentPage + 1)}
-              disabled={!pagedData.hasNextPage}
-            >
-              {t('common:buttons.next')}
-              <ChevronRight size={16} />
-            </button>
-            <button
-              className="pagination-btn"
-              onClick={() => setCurrentPage(pagedData.totalPages)}
-              disabled={!pagedData.hasNextPage}
-            >
-              {t('common:buttons.last')}
-            </button>
-          </div>
-          
-          <div className="page-size-selector">
-            <label>{t('table.show', { defaultValue: 'Show:' })}</label>
-            <select
-              value={pageSize}
-              onChange={(e) => {
-                setPageSize(Number(e.target.value));
-                setCurrentPage(1);
-              }}
-            >
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
-              <option value={100}>100</option>
-            </select>
-            <span>{t('table.perPage', { defaultValue: 'per page' })}</span>
-          </div>
-        </div>
+            }),
+            first: t('common:buttons.first'),
+            previous: t('common:buttons.previous'),
+            next: t('common:buttons.next'),
+            last: t('common:buttons.last'),
+            show: t('table.show', { defaultValue: 'Show:' }),
+            perPage: t('table.perPage', { defaultValue: 'per page' })
+          }}
+        />
       )}
 
       {/* Modals */}

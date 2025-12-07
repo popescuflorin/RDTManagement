@@ -5,7 +5,6 @@ import type { RawMaterial, CreateOrderRequest, Transport, CreateTransportRequest
 import { MaterialType } from '../../types';
 import { Plus, Trash2, UserCircle, Truck, Package } from 'lucide-react';
 import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select } from '../atoms';
-import './CreateOrder.css';
 
 interface CreateOrderProps {
   isOpen: boolean;
@@ -967,7 +966,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                     disabled={isLoading}
                   />
                 </FormGroup>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--space-sm)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', justifyContent: 'center' }}>
                   <button
                     type="button"
                     className="btn btn-primary"

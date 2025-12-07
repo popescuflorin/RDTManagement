@@ -4,7 +4,6 @@ import type { Order } from '../../types';
 import { Package, CheckCircle, AlertTriangle, Loader2 } from 'lucide-react';
 import { orderApi } from '../../services/api';
 import { Modal, ViewContent, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
-import './ProcessOrder.css';
 
 interface ProcessOrderProps {
   isOpen: boolean;

@@ -1,0 +1,33 @@
+/* Standardized Summary Component - Centralized styles for all summary displays */
+
+.summary {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 24px;
+  padding: 16px;
+  background: var(--background-secondary);
+  border-radius: var(--radius-md);
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.summary-item strong {
+  color: var(--text-primary);
+  margin-right: 8px;
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .summary {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+}
