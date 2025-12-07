@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Edit, Package, FileText } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, ErrorMessage, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
 import { inventoryApi } from '../../services/api';
 import type { RawMaterial, UpdateRawMaterialRequest } from '../../types';
 import { MaterialType } from '../../types';
-import './EditMaterial.css';
 
 interface EditMaterialProps {
   material: RawMaterial;
@@ -44,8 +45,7 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
 
@@ -65,48 +65,57 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
   const commonQuantityTypes = ['kg', 'liters', 'pieces', 'meters', 'grams', 'tons'];
 
   return (
-    <div className="edit-material-overlay">
-      <div className="edit-material-modal">
-        <div className="edit-material-header">
-          <h2>✏️ {t('edit.title')}</h2>
-          <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
-        </div>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('edit.title')}
+      titleIcon={Edit}
+      submitText={isLoading ? t('edit.buttons.updating') : t('edit.buttons.updateMaterial')}
+      cancelText={t('edit.buttons.cancel')}
+      submitVariant="primary"
+      isSubmitting={isLoading}
+      onSubmit={handleSubmit}
+      maxWidth="800px"
+    >
+      {error && (
+        <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
+      )}
 
-        <form onSubmit={handleSubmit} className="edit-material-form">
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+      <Form onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}>
+        <ViewSection title={t('edit.currentMaterial')} titleIcon={Package}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('form.labels.name')}</ViewLabel>
+              <ViewValue>{material.name} ({material.color})</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('form.labels.type')}</ViewLabel>
+              <ViewValue>
+                {material.type === MaterialType.RawMaterial 
+                  ? t('filters.rawMaterials')
+                  : material.type === MaterialType.RecyclableMaterial
+                  ? t('filters.recyclableMaterials')
+                  : t('filters.finishedProducts')}
+              </ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('edit.fields.lastUpdated')}</ViewLabel>
+              <ViewValue>{new Date(material.updatedAt).toLocaleDateString()}</ViewValue>
+            </ViewItem>
+          </ViewGrid>
+        </ViewSection>
 
-          <div className="material-summary">
-            <h3>{t('edit.currentMaterial')}</h3>
-            <div className="summary-details">
-              <div className="summary-item">
-                <span className="label">{t('form.labels.name')}</span>
-                <span className="value">{material.name} ({material.color})</span>
-              </div>
-              <div className="summary-item">
-                <span className="label">{t('form.labels.type')}</span>
-                <span className="value">
-                  {material.type === MaterialType.RawMaterial 
-                    ? t('filters.rawMaterials')
-                    : material.type === MaterialType.RecyclableMaterial
-                    ? t('filters.recyclableMaterials')
-                    : t('filters.finishedProducts')}
-                </span>
-              </div>
-              <div className="summary-item">
-                <span className="label">{t('edit.fields.lastUpdated')}</span>
-                <span className="value">{new Date(material.updatedAt).toLocaleDateString()}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="name">{t('form.fields.materialName')} *</label>
-              <input
+        <FormSection title={t('edit.materialDetails')} titleIcon={FileText}>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="name">{t('form.fields.materialName')} *</Label>
+              <Input
                 type="text"
                 id="name"
                 name="name"
@@ -116,10 +125,10 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
                 required
                 disabled={isLoading}
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="color">{t('form.fields.color')} *</label>
-              <input
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="color">{t('form.fields.color')} *</Label>
+              <Input
                 type="text"
                 id="color"
                 name="color"
@@ -129,13 +138,13 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
                 required
                 disabled={isLoading}
               />
-            </div>
-          </div>
+            </FormGroup>
+          </FormRow>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="type">{t('form.fields.materialType')} *</label>
-              <select
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="type">{t('form.fields.materialType')} *</Label>
+              <Select
                 id="type"
                 name="type"
                 value={formData.type}
@@ -146,11 +155,11 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
                 <option value={MaterialType.RawMaterial}>{t('filters.rawMaterials')}</option>
                 <option value={MaterialType.RecyclableMaterial}>{t('filters.recyclableMaterials')}</option>
                 <option value={MaterialType.FinishedProduct}>{t('filters.finishedProducts')}</option>
-              </select>
-            </div>
-            <div className="form-group">
-              <label htmlFor="quantityType">{t('form.fields.unitType')} *</label>
-              <input
+              </Select>
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="quantityType">{t('form.fields.unitType')} *</Label>
+              <Input
                 type="text"
                 id="quantityType"
                 name="quantityType"
@@ -166,13 +175,13 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
                   <option key={type} value={type} />
                 ))}
               </datalist>
-            </div>
-          </div>
+            </FormGroup>
+          </FormRow>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="quantity">{t('edit.fields.currentQuantity')} *</label>
-              <input
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="quantity">{t('edit.fields.currentQuantity')} *</Label>
+              <Input
                 type="number"
                 id="quantity"
                 name="quantity"
@@ -184,10 +193,10 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
                 required
                 disabled={isLoading}
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="minimumStock">{t('form.fields.minimumStockLevel')}</label>
-              <input
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="minimumStock">{t('form.fields.minimumStockLevel')}</Label>
+              <Input
                 type="number"
                 id="minimumStock"
                 name="minimumStock"
@@ -198,12 +207,12 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
                 step="0.01"
                 disabled={isLoading}
               />
-            </div>
-          </div>
+            </FormGroup>
+          </FormRow>
 
-          <div className="form-group">
-            <label htmlFor="description">{t('form.fields.description')}</label>
-            <textarea
+          <FormGroup>
+            <Label htmlFor="description">{t('form.fields.description')}</Label>
+            <Textarea
               id="description"
               name="description"
               value={formData.description}
@@ -212,43 +221,35 @@ const EditMaterial: React.FC<EditMaterialProps> = ({ material, onClose, onMateri
               rows={3}
               disabled={isLoading}
             />
-          </div>
+          </FormGroup>
 
           {/* Stock Status Indicators */}
-          <div className="stock-indicators">
-            <div className={`stock-indicator ${formData.quantity <= formData.minimumStock ? 'warning' : 'good'}`}>
-              <div className="indicator-icon">
-                {formData.quantity <= formData.minimumStock ? '⚠️' : '✅'}
-              </div>
-              <div className="indicator-text">
-                {formData.quantity <= formData.minimumStock 
-                  ? t('edit.stockIndicators.lowStockWarning', { quantity: formData.quantity, minimum: formData.minimumStock })
-                  : t('edit.stockIndicators.stockLevelOk', { quantity: formData.quantity, minimum: formData.minimumStock })
-                }
-              </div>
-            </div>
+          <div style={{
+            padding: 'var(--space-md)',
+            borderRadius: 'var(--radius-md)',
+            marginTop: 'var(--space-md)',
+            backgroundColor: formData.quantity <= formData.minimumStock ? 'var(--warning-50)' : 'var(--success-50)',
+            border: `1px solid ${formData.quantity <= formData.minimumStock ? 'var(--warning-200)' : 'var(--success-200)'}`,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 'var(--space-sm)'
+          }}>
+            <span style={{ fontSize: 'var(--text-lg)' }}>
+              {formData.quantity <= formData.minimumStock ? '⚠️' : '✅'}
+            </span>
+            <span style={{
+              color: formData.quantity <= formData.minimumStock ? 'var(--warning-700)' : 'var(--success-700)',
+              fontSize: 'var(--text-sm)'
+            }}>
+              {formData.quantity <= formData.minimumStock 
+                ? t('edit.stockIndicators.lowStockWarning', { quantity: formData.quantity, minimum: formData.minimumStock })
+                : t('edit.stockIndicators.stockLevelOk', { quantity: formData.quantity, minimum: formData.minimumStock })
+              }
+            </span>
           </div>
-
-          <div className="form-actions">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn btn-secondary"
-              disabled={isLoading}
-            >
-              {t('edit.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={isLoading}
-            >
-              {isLoading ? t('edit.buttons.updating') : t('edit.buttons.updateMaterial')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </FormSection>
+      </Form>
+    </Modal>
   );
 };
 

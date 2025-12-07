@@ -1,8 +1,9 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { Eye, Package, FileText } from 'lucide-react';
+import { Modal, ViewContent, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
 import type { RawMaterial } from '../../types';
 import { MaterialType } from '../../types';
-import './ViewMaterial.css';
 
 interface ViewMaterialProps {
   material: RawMaterial;
@@ -22,129 +23,138 @@ const ViewMaterial: React.FC<ViewMaterialProps> = ({ material, onClose }) => {
   };
 
   return (
-    <div className="view-material-overlay">
-      <div className="view-material-modal">
-        <div className="view-material-header">
-          <h2>👁️ {t('view.title')}</h2>
-          <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
-        </div>
-
-        <div className="view-material-content">
-          <div className="material-summary">
-            <h3>{t('view.materialInformation')}</h3>
-            <div className="summary-details">
-              <div className="summary-item">
-                <span className="label">{t('form.labels.name')}</span>
-                <span className="value">{material.name} ({material.color})</span>
-              </div>
-              <div className="summary-item">
-                <span className="label">{t('form.labels.type')}</span>
-                <span className="value">
-                  {material.type === MaterialType.RawMaterial 
-                    ? t('filters.rawMaterials')
-                    : material.type === MaterialType.RecyclableMaterial 
-                    ? t('filters.recyclableMaterials')
-                    : t('filters.finishedProducts')}
-                </span>
-              </div>
-              <div className="summary-item">
-                <span className="label">{t('table.status')}</span>
-                <span className={`status-badge ${material.isActive ? 'status-active' : 'status-inactive'}`}>
-                  {material.isActive ? t('status.active') : t('status.inactive')}
-                </span>
-              </div>
-              <div className="summary-item">
-                <span className="label">{t('table.lastUpdated')}</span>
-                <span className="value">{formatDate(material.updatedAt)}</span>
-              </div>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>{t('view.fields.materialName')}</label>
-              <div className="read-only-field">{material.name}</div>
-            </div>
-            <div className="form-group">
-              <label>{t('view.fields.color')}</label>
-              <div className="read-only-field">
-                <span 
-                  className="color-dot" 
-                  style={{ backgroundColor: material.color.toLowerCase() }}
-                ></span>
-                {material.color}
-              </div>
-            </div>
-          </div>
-
-          <div className="form-row">
-            <div className="form-group">
-              <label>{t('view.fields.materialType')}</label>
-              <div className="read-only-field">
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('view.title')}
+      titleIcon={Eye}
+      showCancel={true}
+      cancelText={t('view.buttons.close')}
+      maxWidth="800px"
+    >
+      <ViewContent>
+        <ViewSection title={t('view.materialInformation')} titleIcon={Package}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('form.labels.name')}</ViewLabel>
+              <ViewValue>{material.name} ({material.color})</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('form.labels.type')}</ViewLabel>
+              <ViewValue>
                 {material.type === MaterialType.RawMaterial 
                   ? t('filters.rawMaterials')
                   : material.type === MaterialType.RecyclableMaterial 
                   ? t('filters.recyclableMaterials')
                   : t('filters.finishedProducts')}
-              </div>
-            </div>
-            <div className="form-group">
-              <label>{t('view.fields.unitType')}</label>
-              <div className="read-only-field">{material.quantityType}</div>
-            </div>
-          </div>
+              </ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('table.status')}</ViewLabel>
+              <ViewValue>
+                <span style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  padding: '4px 8px',
+                  borderRadius: 'var(--radius-md)',
+                  fontSize: 'var(--text-sm)',
+                  fontWeight: 500,
+                  backgroundColor: material.isActive ? 'var(--success-100)' : 'var(--error-100)',
+                  color: material.isActive ? 'var(--success-700)' : 'var(--error-700)'
+                }}>
+                  {material.isActive ? t('status.active') : t('status.inactive')}
+                </span>
+              </ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('table.lastUpdated')}</ViewLabel>
+              <ViewValue>{formatDate(material.updatedAt)}</ViewValue>
+            </ViewItem>
+          </ViewGrid>
+        </ViewSection>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>{t('view.fields.currentQuantity')}</label>
-              <div className="read-only-field quantity-field">
-                {material.quantity.toLocaleString()} {material.quantityType}
-              </div>
-            </div>
-            <div className="form-group">
-              <label>{t('view.fields.minimumStockLevel')}</label>
-              <div className="read-only-field">
-                {material.minimumStock.toLocaleString()} {material.quantityType}
-              </div>
-            </div>
-          </div>
+        <ViewSection title={t('view.materialDetails')} titleIcon={FileText}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('view.fields.materialName')}</ViewLabel>
+              <ViewValue>{material.name}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('view.fields.color')}</ViewLabel>
+              <ViewValue>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span 
+                    style={{ 
+                      width: '16px', 
+                      height: '16px', 
+                      borderRadius: '50%', 
+                      backgroundColor: material.color.toLowerCase(),
+                      display: 'inline-block'
+                    }}
+                  />
+                  {material.color}
+                </div>
+              </ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('view.fields.materialType')}</ViewLabel>
+              <ViewValue>
+                {material.type === MaterialType.RawMaterial 
+                  ? t('filters.rawMaterials')
+                  : material.type === MaterialType.RecyclableMaterial 
+                  ? t('filters.recyclableMaterials')
+                  : t('filters.finishedProducts')}
+              </ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('view.fields.unitType')}</ViewLabel>
+              <ViewValue>{material.quantityType}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('view.fields.currentQuantity')}</ViewLabel>
+              <ViewValue>{material.quantity.toLocaleString()} {material.quantityType}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('view.fields.minimumStockLevel')}</ViewLabel>
+              <ViewValue>{material.minimumStock.toLocaleString()} {material.quantityType}</ViewValue>
+            </ViewItem>
+          </ViewGrid>
+        </ViewSection>
 
-          {material.description && (
-            <div className="form-group">
-              <label>{t('view.fields.description')}</label>
-              <div className="read-only-field description-field">
-                {material.description}
-              </div>
-            </div>
-          )}
+        {material.description && (
+          <ViewSection title={t('view.fields.description')} titleIcon={FileText}>
+            <ViewItem fullWidth>
+              <ViewValue>{material.description}</ViewValue>
+            </ViewItem>
+          </ViewSection>
+        )}
 
-          {/* Stock Status Indicators */}
-          <div className="stock-indicators">
-            <div className={`stock-indicator ${material.isLowStock ? 'warning' : 'good'}`}>
-              <div className="indicator-icon">
-                {material.isLowStock ? '⚠️' : '✅'}
-              </div>
-              <div className="indicator-text">
-                {material.isLowStock 
-                  ? t('view.stockIndicators.lowStockWarning', { quantity: material.quantity, minimum: material.minimumStock })
-                  : t('view.stockIndicators.stockLevelOk', { quantity: material.quantity, minimum: material.minimumStock })
-                }
-              </div>
-            </div>
-          </div>
+        {/* Stock Status Indicators */}
+        <div style={{
+          padding: 'var(--space-md)',
+          borderRadius: 'var(--radius-md)',
+          marginTop: 'var(--space-md)',
+          backgroundColor: material.isLowStock ? 'var(--warning-50)' : 'var(--success-50)',
+          border: `1px solid ${material.isLowStock ? 'var(--warning-200)' : 'var(--success-200)'}`,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-sm)'
+        }}>
+          <span style={{ fontSize: 'var(--text-lg)' }}>
+            {material.isLowStock ? '⚠️' : '✅'}
+          </span>
+          <span style={{
+            color: material.isLowStock ? 'var(--warning-700)' : 'var(--success-700)',
+            fontSize: 'var(--text-sm)'
+          }}>
+            {material.isLowStock 
+              ? t('view.stockIndicators.lowStockWarning', { quantity: material.quantity, minimum: material.minimumStock })
+              : t('view.stockIndicators.stockLevelOk', { quantity: material.quantity, minimum: material.minimumStock })
+            }
+          </span>
         </div>
-
-        <div className="view-material-actions">
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn btn-primary"
-          >
-            {t('view.buttons.close')}
-          </button>
-        </div>
-      </div>
-    </div>
+      </ViewContent>
+    </Modal>
   );
 };
 

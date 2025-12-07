@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CheckCircle, Package, FileText } from 'lucide-react';
+import { Modal, ErrorMessage, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
 import { inventoryApi } from '../../services/api';
 import type { RawMaterial } from '../../types';
 import { MaterialType } from '../../types';
-import './ActivateMaterialModal.css';
 
 interface ActivateMaterialModalProps {
   material: RawMaterial;
@@ -50,95 +51,84 @@ const ActivateMaterialModal: React.FC<ActivateMaterialModalProps> = ({
   };
 
   return (
-    <div className="activate-material-overlay">
-      <div className="activate-material-modal">
-        <div className="activate-material-header">
-          <h2>✅ {t('activate.title')}</h2>
-          <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
-        </div>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('activate.title')}
+      titleIcon={CheckCircle}
+      submitText={isLoading ? t('activate.buttons.activating') : t('activate.buttons.activateMaterial')}
+      cancelText={t('activate.buttons.cancel')}
+      submitVariant="success"
+      isSubmitting={isLoading}
+      onSubmit={handleActivate}
+      maxWidth="600px"
+    >
+      {error && (
+        <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
+      )}
 
-        <div className="activate-material-content">
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+      <p style={{ marginBottom: 'var(--space-lg)' }}>
+        {t('activate.confirmationText')}
+      </p>
 
-          <p className="confirmation-text">
-            {t('activate.confirmationText')}
-          </p>
+      <ViewSection title={t('activate.materialDetails')} titleIcon={Package}>
+        <ViewGrid>
+          <ViewItem>
+            <ViewLabel>{t('activate.labels.name')}</ViewLabel>
+            <ViewValue>{material.name} ({material.color})</ViewValue>
+          </ViewItem>
+          <ViewItem>
+            <ViewLabel>{t('activate.labels.type')}</ViewLabel>
+            <ViewValue>
+              {material.type === MaterialType.RawMaterial 
+                ? t('filters.rawMaterials')
+                : material.type === MaterialType.RecyclableMaterial
+                ? t('filters.recyclableMaterials')
+                : t('filters.finishedProducts')}
+            </ViewValue>
+          </ViewItem>
+          <ViewItem>
+            <ViewLabel>{t('activate.labels.currentStock')}</ViewLabel>
+            <ViewValue>{material.quantity.toLocaleString()} {material.quantityType}</ViewValue>
+          </ViewItem>
+          <ViewItem>
+            <ViewLabel>{t('activate.labels.minimumStock')}</ViewLabel>
+            <ViewValue>{material.minimumStock.toLocaleString()} {material.quantityType}</ViewValue>
+          </ViewItem>
+          <ViewItem>
+            <ViewLabel>{t('activate.labels.lastUpdated')}</ViewLabel>
+            <ViewValue>{formatDate(material.updatedAt)}</ViewValue>
+          </ViewItem>
+        </ViewGrid>
+      </ViewSection>
 
-          <div className="material-summary">
-            <h3>{t('activate.materialDetails')}</h3>
-            <div className="summary-details">
-              <div className="summary-item">
-                <span className="label">{t('activate.labels.name')}</span>
-                <span className="value">{material.name} ({material.color})</span>
-              </div>
-              <div className="summary-item">
-                <span className="label">{t('activate.labels.type')}</span>
-                <span className="value">
-                  {material.type === MaterialType.RawMaterial 
-                    ? t('filters.rawMaterials')
-                    : material.type === MaterialType.RecyclableMaterial
-                    ? t('filters.recyclableMaterials')
-                    : t('filters.finishedProducts')}
-                </span>
-              </div>
-              <div className="summary-item">
-                <span className="label">{t('activate.labels.currentStock')}</span>
-                <span className="value">
-                  {material.quantity.toLocaleString()} {material.quantityType}
-                </span>
-              </div>
-              <div className="summary-item">
-                <span className="label">{t('activate.labels.minimumStock')}</span>
-                <span className="value">
-                  {material.minimumStock.toLocaleString()} {material.quantityType}
-                </span>
-              </div>
-              <div className="summary-item">
-                <span className="label">{t('activate.labels.lastUpdated')}</span>
-                <span className="value">{formatDate(material.updatedAt)}</span>
-              </div>
-            </div>
-          </div>
+      {material.description && (
+        <ViewSection title={t('activate.labels.description')} titleIcon={FileText}>
+          <ViewItem fullWidth>
+            <ViewValue>{material.description}</ViewValue>
+          </ViewItem>
+        </ViewSection>
+      )}
 
-          {material.description && (
-            <div className="material-description-section">
-              <strong>{t('activate.labels.description')}</strong>
-              <p>{material.description}</p>
-            </div>
-          )}
-
-          <div className="info-section">
-            <div className="info-icon">ℹ️</div>
-            <div className="info-text">
-              <strong>{t('common:labels.notes', { defaultValue: 'Note' })}:</strong> {t('activate.note')}
-            </div>
-          </div>
-        </div>
-
-        <div className="activate-material-actions">
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn btn-secondary"
-            disabled={isLoading}
-          >
-            {t('activate.buttons.cancel')}
-          </button>
-          <button
-            type="button"
-            onClick={handleActivate}
-            className="btn btn-success"
-            disabled={isLoading}
-          >
-            {isLoading ? t('activate.buttons.activating') : t('activate.buttons.activateMaterial')}
-          </button>
+      <div style={{
+        padding: 'var(--space-md)',
+        borderRadius: 'var(--radius-md)',
+        marginTop: 'var(--space-md)',
+        backgroundColor: 'var(--info-50)',
+        border: '1px solid var(--info-200)',
+        display: 'flex',
+        alignItems: 'flex-start',
+        gap: 'var(--space-sm)'
+      }}>
+        <span style={{ fontSize: 'var(--text-lg)', marginTop: '2px' }}>ℹ️</span>
+        <div style={{ fontSize: 'var(--text-sm)', color: 'var(--info-700)' }}>
+          <strong>{t('common:labels.notes', { defaultValue: 'Note' })}:</strong> {t('activate.note')}
         </div>
       </div>
-    </div>
+    </Modal>
   );
 };
 

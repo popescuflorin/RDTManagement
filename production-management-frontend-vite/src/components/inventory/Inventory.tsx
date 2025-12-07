@@ -20,7 +20,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table, PageContainer, Loader, Pagination, ErrorMessage, FiltersControl, Checkbox, StatCard, StatisticsContainer } from '../atoms';
+import { Table, PageContainer, PageHeader, Loader, Pagination, ErrorMessage, FiltersControl, Checkbox, StatCard, StatisticsContainer } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Inventory.css';
 
@@ -153,20 +153,20 @@ const Inventory: React.FC = () => {
   }
 
   return (
-    <div className="inventory-container">
-      <div className="inventory-header">
-        <h1>
-          <Package size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-          {t('inventoryManagement')}
-        </h1>
-        <CreateButton
-          onClick={() => setShowAddModal(true)}
-          requiredPermission={Permissions.AddMaterial}
-          variant="primary"
-        >
-          {t('addMaterial')}
-        </CreateButton>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('inventoryManagement')}
+        icon={Package}
+        actions={
+          <CreateButton
+            onClick={() => setShowAddModal(true)}
+            requiredPermission={Permissions.AddMaterial}
+            variant="primary"
+          >
+            {t('addMaterial')}
+          </CreateButton>
+        }
+      />
 
       {/* Statistics Cards */}
       {statistics && (
@@ -471,7 +471,7 @@ const Inventory: React.FC = () => {
           onMaterialActivated={handleMaterialActivated}
         />
       )}
-    </div>
+    </PageContainer>
   );
 };
 
