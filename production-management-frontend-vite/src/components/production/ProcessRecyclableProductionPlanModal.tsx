@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Package, CheckCircle as CheckCircleIcon, AlertTriangle } from 'lucide-react';
+import { Modal, FormSection, FormRow, FormGroup, Label, Input, Table } from '../atoms';
 import type { RecyclableProductionPlan } from '../../types';
-import './EditProductionPlan.css';
+import type { TableColumn } from '../atoms';
 
 interface Props {
   plan: RecyclableProductionPlan;
@@ -17,79 +18,115 @@ const ProcessRecyclableProductionPlanModal: React.FC<Props> = ({ plan, onClose, 
     return plan.requiredRecyclables.every(m => (m.availableQuantity ?? 0) >= (m.requiredQuantity * plan.quantityToProduce));
   }, [plan]);
 
+  const tableColumns: TableColumn<typeof plan.requiredRecyclables[0] & { totalNeed: number; available: number; ok: boolean }>[] = [
+    {
+      key: 'material',
+      label: t('processRecyclablePlan.table.material'),
+      render: (_, m) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <span style={{ fontWeight: 500 }}>{m.materialName}</span>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>({m.materialColor})</span>
+        </div>
+      )
+    },
+    {
+      key: 'totalNeed',
+      label: t('processRecyclablePlan.table.totalNeed'),
+      render: (_, m) => `${m.totalNeed.toFixed(2)} ${m.quantityType}`
+    },
+    {
+      key: 'available',
+      label: t('processRecyclablePlan.table.available'),
+      render: (_, m) => `${m.available.toFixed(2)} ${m.quantityType}`
+    },
+    {
+      key: 'status',
+      label: t('processRecyclablePlan.table.status'),
+      render: (_, m) => (
+        <span style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          padding: '4px 8px',
+          borderRadius: 'var(--radius-md)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 500,
+          backgroundColor: m.ok ? 'var(--success-100)' : 'var(--warning-100)',
+          color: m.ok ? 'var(--success-700)' : 'var(--warning-700)'
+        }}>
+          {m.ok ? <CheckCircleIcon size={14} /> : <AlertTriangle size={14} />}
+          {m.ok ? t('processRecyclablePlan.status.available') : t('processRecyclablePlan.status.short', { amount: (m.totalNeed - m.available).toFixed(2) })}
+        </span>
+      )
+    }
+  ];
+
+  const tableData = plan.requiredRecyclables.map((m) => {
+    const totalNeed = m.requiredQuantity * plan.quantityToProduce;
+    const available = m.availableQuantity ?? 0;
+    const ok = available >= totalNeed;
+    return {
+      ...m,
+      totalNeed,
+      available,
+      ok
+    };
+  });
+
   return (
-    <div className="edit-production-plan-overlay" onClick={onClose}>
-      <div className="edit-production-plan-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="edit-production-plan-header">
-          <h2><CheckCircle size={18} style={{ marginRight: 8 }} /> {t('processRecyclablePlan.title')}</h2>
-          <button className="btn btn-secondary btn-sm" onClick={onClose}>×</button>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('processRecyclablePlan.title')}
+      titleIcon={CheckCircle}
+      maxWidth="900px"
+      footer={
+        <div style={{ display: 'flex', gap: 'var(--space-md)', justifyContent: 'flex-end' }}>
+          <button
+            type="button"
+            className="btn btn-md btn-secondary"
+            onClick={onClose}
+            disabled={isLoading}
+          >
+            {t('processRecyclablePlan.buttons.close')}
+          </button>
+          <button
+            type="button"
+            className="btn btn-md btn-primary"
+            onClick={onConfirm}
+            disabled={isLoading || !canProcess}
+          >
+            {isLoading ? t('processRecyclablePlan.buttons.processing') : t('processRecyclablePlan.buttons.confirmProcess')}
+          </button>
         </div>
-        <div className="edit-production-plan-form">
-          <div className="form-section">
-            <h3>{t('processRecyclablePlan.sections.overview')}</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label>{t('processRecyclablePlan.fields.planName')}</label>
-                <input value={plan.name} disabled />
-              </div>
-              <div className="form-group">
-                <label>{t('processRecyclablePlan.fields.targetRawMaterial')}</label>
-                <input value={plan.targetRawMaterialName} disabled />
-              </div>
-              <div className="form-group">
-                <label>{t('processRecyclablePlan.fields.quantityToProduce')}</label>
-                <input value={`${plan.quantityToProduce} ${plan.targetRawMaterialQuantityType}`} disabled />
-              </div>
-            </div>
-          </div>
-          <div className="form-section">
-            <h3>{t('processRecyclablePlan.sections.recyclablesToConsume')}</h3>
-            <div className="selected-materials">
-              <table className="materials-table">
-                <thead>
-                  <tr>
-                    <th>{t('processRecyclablePlan.table.material')}</th>
-                    <th>{t('processRecyclablePlan.table.totalNeed')}</th>
-                    <th>{t('processRecyclablePlan.table.available')}</th>
-                    <th>{t('processRecyclablePlan.table.status')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {plan.requiredRecyclables.map((m, idx) => {
-                    const totalNeed = m.requiredQuantity * plan.quantityToProduce;
-                    const available = m.availableQuantity ?? 0;
-                    const ok = available >= totalNeed;
-                    return (
-                      <tr key={idx} className={!ok ? 'insufficient-stock' : ''}>
-                        <td>
-                          <div className="material-info">
-                            <span className="material-name">{m.materialName}</span>
-                            <span className="material-color">({m.materialColor})</span>
-                          </div>
-                        </td>
-                        <td>{totalNeed.toFixed(2)} {m.quantityType}</td>
-                        <td>{available.toFixed(2)} {m.quantityType}</td>
-                        <td>
-                          <span className={`status-badge ${ok ? 'status-available' : 'status-insufficient'}`}>
-                            {ok ? t('processRecyclablePlan.status.available') : t('processRecyclablePlan.status.short', { amount: (totalNeed - available).toFixed(2) })}
-                          </span>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-          <div className="form-actions">
-            <button className="btn btn-secondary" onClick={onClose} disabled={isLoading}>{t('processRecyclablePlan.buttons.close')}</button>
-            <button className="btn btn-primary" onClick={onConfirm} disabled={isLoading || !canProcess}>
-              {isLoading ? t('processRecyclablePlan.buttons.processing') : t('processRecyclablePlan.buttons.confirmProcess')}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      }
+    >
+      <FormSection title={t('processRecyclablePlan.sections.overview')} titleIcon={Package}>
+        <FormRow>
+          <FormGroup>
+            <Label>{t('processRecyclablePlan.fields.planName')}</Label>
+            <Input value={plan.name} disabled />
+          </FormGroup>
+          <FormGroup>
+            <Label>{t('processRecyclablePlan.fields.targetRawMaterial')}</Label>
+            <Input value={plan.targetRawMaterialName} disabled />
+          </FormGroup>
+          <FormGroup>
+            <Label>{t('processRecyclablePlan.fields.quantityToProduce')}</Label>
+            <Input value={`${plan.quantityToProduce} ${plan.targetRawMaterialQuantityType}`} disabled />
+          </FormGroup>
+        </FormRow>
+      </FormSection>
+      <FormSection title={t('processRecyclablePlan.sections.recyclablesToConsume')} titleIcon={Package}>
+        <Table
+          columns={tableColumns}
+          data={tableData}
+          getRowKey={(_, index) => index.toString()}
+          getRowClassName={(m) => !m.ok ? 'insufficient-stock' : ''}
+          showContainer={false}
+        />
+      </FormSection>
+    </Modal>
   );
 };
 

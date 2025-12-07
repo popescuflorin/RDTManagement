@@ -5,14 +5,14 @@ import {
   Package, 
   CheckCircle, 
   Clock,
-  X,
   Plus,
-  Trash2
+  AlertTriangle
 } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, ErrorMessage, Table, DeleteButton, Checkbox, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
 import { productionPlanApi, inventoryApi } from '../../services/api';
 import type { CreateRawMaterialRequest, ProductionPlan, RawMaterial } from '../../types';
 import { ProductionPlanStatus, MaterialType } from '../../types';
-import './ReceiveProduction.css';
+import type { TableColumn } from '../atoms';
 
 interface ReceiveProductionProps {
   plan: ProductionPlan;
@@ -197,8 +197,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
 
@@ -290,166 +289,305 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
   const statusInfo = getStatusInfo(plan.status);
   const StatusIcon = statusInfo.icon;
 
+  const producedMaterialsTableColumns: TableColumn<ProducedMaterial>[] = [
+    {
+      key: 'material',
+      label: t('receiveProduction.fields.material'),
+      render: (_, m) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <span style={{ fontWeight: 500 }}>{m.materialName}</span>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>({m.materialColor})</span>
+        </div>
+      )
+    },
+    {
+      key: 'type',
+      label: t('receiveProduction.fields.type'),
+      render: (_, m) => (
+        <span style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          padding: '4px 8px',
+          borderRadius: 'var(--radius-md)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 500,
+          backgroundColor: m.materialType === MaterialType.RawMaterial ? 'var(--info-100)' :
+                         m.materialType === MaterialType.RecyclableMaterial ? 'var(--success-100)' : 'var(--warning-100)',
+          color: m.materialType === MaterialType.RawMaterial ? 'var(--info-700)' :
+                 m.materialType === MaterialType.RecyclableMaterial ? 'var(--success-700)' : 'var(--warning-700)'
+        }}>
+          {m.materialType === MaterialType.RawMaterial ? t('receiveProduction.labels.rawMaterial') : 
+           m.materialType === MaterialType.RecyclableMaterial ? t('receiveProduction.labels.recyclableMaterial') : t('receiveProduction.labels.finishedProduct')}
+        </span>
+      )
+    },
+    {
+      key: 'quantity',
+      label: t('receiveProduction.fields.quantity'),
+      render: (_, m) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Input
+            type="number"
+            value={m.quantity}
+            onChange={(e) => handleUpdateProducedMaterialQuantity(m.id, parseFloat(e.target.value) || 0)}
+            onWheel={handleWheel}
+            min="0.01"
+            step="0.01"
+            disabled={isLoading}
+            style={{ width: '100px' }}
+          />
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+            {m.quantityType}
+          </span>
+        </div>
+      )
+    },
+    {
+      key: 'actions',
+      label: t('common:table.actions'),
+      align: 'center',
+      render: (_, m) => (
+        <DeleteButton
+          title={t('receiveProduction.buttons.remove')}
+          onClick={() => handleRemoveProducedMaterial(m.id)}
+          disabled={isLoading}
+        />
+      )
+    }
+  ];
+
+  const materialsUsedTableColumns: TableColumn<typeof plan.requiredMaterials[0] & { totalUsed: number; isAvailable: boolean }>[] = [
+    {
+      key: 'material',
+      label: t('receiveProduction.fields.material'),
+      render: (_, m) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <span style={{ fontWeight: 500 }}>{m.materialName}</span>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>({m.materialColor})</span>
+        </div>
+      )
+    },
+    {
+      key: 'requiredPerUnit',
+      label: t('receiveProduction.fields.requiredPerUnit'),
+      render: (_, m) => `${m.requiredQuantity} ${m.quantityType}`
+    },
+    {
+      key: 'totalUsed',
+      label: t('receiveProduction.fields.totalUsed'),
+      render: (_, m) => `${m.totalUsed.toFixed(2)} ${m.quantityType}`
+    },
+    {
+      key: 'status',
+      label: t('receiveProduction.fields.status'),
+      render: (_, m) => (
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          padding: '4px 8px',
+          borderRadius: 'var(--radius-md)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 500,
+          backgroundColor: m.isAvailable ? 'var(--success-100)' : 'var(--error-100)',
+          color: m.isAvailable ? 'var(--success-700)' : 'var(--error-700)'
+        }}>
+          {m.isAvailable ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
+          {m.isAvailable ? t('receiveProduction.labels.available') : t('receiveProduction.labels.insufficient')}
+        </div>
+      )
+    }
+  ];
+
+  const materialsUsedTableData = plan.requiredMaterials.map((material) => {
+    const totalUsed = material.requiredQuantity * actualQuantityProduced;
+    const isAvailable = material.availableQuantity >= totalUsed;
+    return {
+      ...material,
+      totalUsed,
+      isAvailable
+    };
+  });
+
   return (
-    <div className="receive-production-overlay">
-      <div className="receive-production-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="receive-production-header">
-          <div className="header-content">
-            <div className="header-title">
-              <Truck className="header-icon" />
-              <h2>{t('receiveProduction.title')}</h2>
-            </div>
-            <button className="close-button" onClick={onClose}>
-              <X size={20} />
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('receiveProduction.title')}
+      titleIcon={Truck}
+      submitText={isLoading ? t('receiveProduction.buttons.completing') : isAddingToInventory ? t('receiveProduction.buttons.addingToInventory') : t('receiveProduction.buttons.completeProduction')}
+      cancelText={t('receiveProduction.buttons.cancel')}
+      submitVariant="success"
+      isSubmitting={isLoading || actualQuantityProduced <= 0 || isAddingToInventory}
+      onSubmit={handleSubmit}
+      maxWidth="1200px"
+      footer={
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', justifyContent: 'space-between', width: '100%' }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 12px',
+            borderRadius: 'var(--radius-md)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 500,
+            backgroundColor: statusInfo.color === 'status-in-progress' ? 'var(--warning-100)' : 'var(--surface-hover)',
+            color: statusInfo.color === 'status-in-progress' ? 'var(--warning-700)' : 'var(--text-primary)'
+          }}>
+            <StatusIcon size={16} />
+            <span>{statusInfo.label}</span>
+          </div>
+          <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
+            <button
+              type="button"
+              className="btn btn-secondary"
+              onClick={onClose}
+              disabled={isLoading}
+            >
+              {t('receiveProduction.buttons.cancel')}
+            </button>
+            <button
+              type="button"
+              className="btn btn-success"
+              onClick={handleSubmit}
+              disabled={isLoading || actualQuantityProduced <= 0 || isAddingToInventory}
+            >
+              {isLoading ? t('receiveProduction.buttons.completing') : isAddingToInventory ? t('receiveProduction.buttons.addingToInventory') : t('receiveProduction.buttons.completeProduction')}
             </button>
           </div>
-          <div className="header-status">
-            <div className={`status-badge ${statusInfo.color}`}>
-              <StatusIcon size={16} />
-              <span>{statusInfo.label}</span>
-            </div>
-          </div>
         </div>
+      }
+    >
+      {error && (
+        <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
+      )}
 
-        <form onSubmit={handleSubmit} className="receive-production-form">
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+      {inventoryUpdateStatus && (
+        <div style={{
+          padding: 'var(--space-md)',
+          borderRadius: 'var(--radius-md)',
+          marginBottom: 'var(--space-md)',
+          backgroundColor: isAddingToInventory ? 'var(--info-50)' : 'var(--success-50)',
+          border: `1px solid ${isAddingToInventory ? 'var(--info-200)' : 'var(--success-200)'}`,
+          color: isAddingToInventory ? 'var(--info-700)' : 'var(--success-700)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-sm)'
+        }}>
+          {isAddingToInventory && <div className="loading-spinner" style={{ width: '16px', height: '16px', border: '2px solid currentColor', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></div>}
+          {inventoryUpdateStatus}
+        </div>
+      )}
 
-          {inventoryUpdateStatus && (
-            <div className={`status-message ${isAddingToInventory ? 'status-loading' : 'status-success'}`}>
-              {isAddingToInventory && <div className="loading-spinner"></div>}
-              {inventoryUpdateStatus}
-            </div>
-          )}
+      <Form onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}>
 
-          {/* Plan Overview Section */}
-          <div className="form-section">
-            <div className="section-header">
-              <Package className="section-icon" />
-              <h3>{t('receiveProduction.sections.productionPlanOverview')}</h3>
-            </div>
-            
-            <div className="info-grid">
-              <div className="info-item">
-                <label>{t('receiveProduction.fields.planName')}</label>
-                <div className="info-value">{plan.name}</div>
-              </div>
-              
-              <div className="info-item">
-                <label>{t('receiveProduction.fields.targetProduct')}</label>
-                <div className="info-value">
-                  <div className="product-info">
-                    <span className="product-name">{plan.targetProductName}</span>
-                    <span className="product-color">({plan.targetProductColor})</span>
-                  </div>
+        <ViewSection title={t('receiveProduction.sections.productionPlanOverview')} titleIcon={Package}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('receiveProduction.fields.planName')}</ViewLabel>
+              <ViewValue>{plan.name}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('receiveProduction.fields.targetProduct')}</ViewLabel>
+              <ViewValue>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span style={{ fontWeight: 500 }}>{plan.targetProductName}</span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>({plan.targetProductColor})</span>
                 </div>
-              </div>
-              
-              <div className="info-item">
-                <label>{t('receiveProduction.fields.startedAt')}</label>
-                <div className="info-value">
-                  {plan.startedAt ? formatDateTime(plan.startedAt) : t('receiveProduction.labels.notStarted')}
-                </div>
-              </div>
-              
-              <div className="info-item">
-                <label>{t('receiveProduction.fields.materialsRequired')}</label>
-                <div className="info-value">{plan.requiredMaterials.length} {t('receiveProduction.labels.materials')}</div>
-              </div>
+              </ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('receiveProduction.fields.startedAt')}</ViewLabel>
+              <ViewValue>{plan.startedAt ? formatDateTime(plan.startedAt) : t('receiveProduction.labels.notStarted')}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('receiveProduction.fields.materialsRequired')}</ViewLabel>
+              <ViewValue>{plan.requiredMaterials.length} {t('receiveProduction.labels.materials')}</ViewValue>
+            </ViewItem>
+          </ViewGrid>
+        </ViewSection>
+
+        <FormSection title={t('receiveProduction.sections.finalProductionResults')} titleIcon={CheckCircle}>
+          <FormGroup>
+            <Label htmlFor="actualQuantityProduced">{t('receiveProduction.fields.actualQuantityProduced')} *</Label>
+            <Input
+              type="number"
+              id="actualQuantityProduced"
+              value={actualQuantityProduced}
+              onChange={(e) => setActualQuantityProduced(parseFloat(e.target.value) || 0)}
+              onWheel={handleWheel}
+              min="0.01"
+              step="0.01"
+              required
+              disabled={isLoading}
+              placeholder={t('receiveProduction.placeholders.actualQuantityProduced')}
+            />
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              {t('receiveProduction.labels.plannedQuantity')} {plan.quantityToProduce} {t('receiveProduction.labels.units')}
+            </div>
+          </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="actualProductionTimeMinutes">{t('receiveProduction.fields.actualProductionTimeMinutes')}</Label>
+            <Input
+              type="number"
+              id="actualProductionTimeMinutes"
+              value={actualProductionTimeMinutes}
+              onChange={(e) => setActualProductionTimeMinutes(parseInt(e.target.value) || 0)}
+              onWheel={handleWheel}
+              min="0"
+              step="1"
+              disabled={isLoading}
+              placeholder={t('receiveProduction.placeholders.actualProductionTime')}
+            />
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              {t('receiveProduction.labels.optionalRecordTime')}
+            </div>
+          </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="notes">{t('receiveProduction.fields.productionNotes')}</Label>
+            <Textarea
+              id="notes"
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              disabled={isLoading}
+              placeholder={t('receiveProduction.placeholders.productionNotes')}
+            />
+          </FormGroup>
+        </FormSection>
+
+        <FormSection title={t('receiveProduction.sections.materialsProduced')} titleIcon={Package}>
+          <div style={{ marginBottom: 'var(--space-md)' }}>
+            <Checkbox
+              checked={useProducedMaterials}
+              onChange={(e) => setUseProducedMaterials(e.target.checked)}
+              disabled={isLoading}
+            >
+              {t('receiveProduction.labels.specifyProducedMaterials')}
+            </Checkbox>
+            <div style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              {useProducedMaterials 
+                ? t('receiveProduction.labels.addSpecificMaterials')
+                : t('receiveProduction.labels.usePlannedMaterials')
+              }
             </div>
           </div>
-
-          {/* Production Results Section */}
-          <div className="form-section">
-            <div className="section-header">
-              <CheckCircle className="section-icon" />
-              <h3>{t('receiveProduction.sections.finalProductionResults')}</h3>
-            </div>
             
-            <div className="form-group">
-              <label htmlFor="actualQuantityProduced">{t('receiveProduction.fields.actualQuantityProduced')} *</label>
-              <input
-                type="number"
-                id="actualQuantityProduced"
-                value={actualQuantityProduced}
-                onChange={(e) => setActualQuantityProduced(parseFloat(e.target.value) || 0)}
-                onWheel={handleWheel}
-                min="0.01"
-                step="0.01"
-                required
-                disabled={isLoading}
-                placeholder={t('receiveProduction.placeholders.actualQuantityProduced')}
-              />
-              <div className="input-help">
-                {t('receiveProduction.labels.plannedQuantity')} {plan.quantityToProduce} {t('receiveProduction.labels.units')}
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="actualProductionTimeMinutes">{t('receiveProduction.fields.actualProductionTimeMinutes')}</label>
-              <input
-                type="number"
-                id="actualProductionTimeMinutes"
-                value={actualProductionTimeMinutes}
-                onChange={(e) => setActualProductionTimeMinutes(parseInt(e.target.value) || 0)}
-                onWheel={handleWheel}
-                min="0"
-                step="1"
-                disabled={isLoading}
-                placeholder={t('receiveProduction.placeholders.actualProductionTime')}
-              />
-              <div className="input-help">
-                {t('receiveProduction.labels.optionalRecordTime')}
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="notes">{t('receiveProduction.fields.productionNotes')}</label>
-              <textarea
-                id="notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                rows={3}
-                disabled={isLoading}
-                placeholder={t('receiveProduction.placeholders.productionNotes')}
-              />
-            </div>
-          </div>
-
-          {/* Produced Materials Section */}
-          <div className="form-section">
-            <div className="section-header">
-              <Package className="section-icon" />
-              <h3>{t('receiveProduction.sections.materialsProduced')}</h3>
-              <div className="section-toggle">
-                <label className="toggle-checkbox">
-                  <input
-                    type="checkbox"
-                    checked={useProducedMaterials}
-                    onChange={(e) => setUseProducedMaterials(e.target.checked)}
-                    disabled={isLoading}
-                  />
-                  <span className="toggle-label">{t('receiveProduction.labels.specifyProducedMaterials')}</span>
-                </label>
-                <div className="toggle-help">
-                  {useProducedMaterials 
-                    ? t('receiveProduction.labels.addSpecificMaterials')
-                    : t('receiveProduction.labels.usePlannedMaterials')
-                  }
-                </div>
-              </div>
-            </div>
-            
-            {useProducedMaterials && (
-              <div className="add-material-section">
+          {useProducedMaterials && (
+            <>
               {/* Mode Selector */}
-              <div className="mode-selector">
+              <div style={{ display: 'flex', gap: 'var(--space-sm)', marginBottom: 'var(--space-md)' }}>
                 <button 
                   type="button"
-                  className={`mode-button ${materialMode === 'existing' ? 'active' : ''}`}
+                  className={`btn ${materialMode === 'existing' ? 'btn-primary' : 'btn-secondary'}`}
                   onClick={() => setMaterialMode('existing')}
                   disabled={isLoading}
                 >
@@ -457,7 +595,7 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                 </button>
                 <button 
                   type="button"
-                  className={`mode-button ${materialMode === 'new' ? 'active' : ''}`}
+                  className={`btn ${materialMode === 'new' ? 'btn-primary' : 'btn-secondary'}`}
                   onClick={() => setMaterialMode('new')}
                   disabled={isLoading}
                 >
@@ -466,26 +604,28 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
               </div>
 
               {materialMode === 'existing' ? (
-                <div className="form-row">
-                  <div className="form-group" style={{ flex: 2 }}>
-                    <label htmlFor="currentMaterial">{t('receiveProduction.fields.selectProducedMaterial')}</label>
-                    <select
-                      id="currentMaterial"
-                      value={currentMaterial.materialId}
-                      onChange={(e) => setCurrentMaterial(prev => ({ ...prev, materialId: parseInt(e.target.value) }))}
-                      disabled={isLoading}
-                    >
-                      <option value={0}>{t('receiveProduction.fields.selectMaterial')}</option>
-                      {availableMaterials.map(material => (
-                        <option key={material.id} value={material.id}>
-                          {material.name} ({material.color}) - {material.quantityType}
-                        </option>
-                      ))}
-                    </select>
+                <FormRow>
+                  <div style={{ flex: 2 }}>
+                    <FormGroup>
+                      <Label htmlFor="currentMaterial">{t('receiveProduction.fields.selectProducedMaterial')}</Label>
+                      <Select
+                        id="currentMaterial"
+                        value={currentMaterial.materialId}
+                        onChange={(e) => setCurrentMaterial(prev => ({ ...prev, materialId: parseInt(e.target.value) }))}
+                        disabled={isLoading}
+                      >
+                        <option value={0}>{t('receiveProduction.fields.selectMaterial')}</option>
+                        {availableMaterials.map(material => (
+                          <option key={material.id} value={material.id}>
+                            {material.name} ({material.color}) - {material.quantityType}
+                          </option>
+                        ))}
+                      </Select>
+                    </FormGroup>
                   </div>
-                  <div className="form-group">
-                    <label htmlFor="materialQuantity">{t('receiveProduction.fields.quantityProduced')}</label>
-                    <input
+                  <FormGroup>
+                    <Label htmlFor="materialQuantity">{t('receiveProduction.fields.quantityProduced')}</Label>
+                    <Input
                       type="number"
                       id="materialQuantity"
                       value={currentMaterial.quantity}
@@ -495,25 +635,29 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                       step="0.01"
                       disabled={isLoading}
                     />
+                  </FormGroup>
+                  <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                    <FormGroup>
+                      <Label>&nbsp;</Label>
+                      <button
+                        type="button"
+                        onClick={handleAddProducedMaterial}
+                        className="btn btn-secondary"
+                        disabled={isLoading}
+                        style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                      >
+                        <Plus size={16} />
+                        {t('receiveProduction.buttons.add')}
+                      </button>
+                    </FormGroup>
                   </div>
-                  <div className="form-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-                    <button
-                      type="button"
-                      onClick={handleAddProducedMaterial}
-                      className="btn btn-secondary"
-                      disabled={isLoading}
-                    >
-                      <Plus size={16} />
-                      {t('receiveProduction.buttons.add')}
-                    </button>
-                  </div>
-                </div>
+                </FormRow>
               ) : (
-                <div className="new-material-form">
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="newMaterialName">{t('receiveProduction.fields.materialName')} *</label>
-                      <input
+                <>
+                  <FormRow>
+                    <FormGroup>
+                      <Label htmlFor="newMaterialName">{t('receiveProduction.fields.materialName')} *</Label>
+                      <Input
                         type="text"
                         id="newMaterialName"
                         name="name"
@@ -523,10 +667,10 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                         required
                         disabled={isLoading}
                       />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="newMaterialColor">{t('receiveProduction.fields.color')} *</label>
-                      <input
+                    </FormGroup>
+                    <FormGroup>
+                      <Label htmlFor="newMaterialColor">{t('receiveProduction.fields.color')} *</Label>
+                      <Input
                         type="text"
                         id="newMaterialColor"
                         name="color"
@@ -536,13 +680,13 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                         required
                         disabled={isLoading}
                       />
-                    </div>
-                  </div>
+                    </FormGroup>
+                  </FormRow>
 
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="newMaterialType">{t('receiveProduction.fields.materialType')} *</label>
-                      <select
+                  <FormRow>
+                    <FormGroup>
+                      <Label htmlFor="newMaterialType">{t('receiveProduction.fields.materialType')} *</Label>
+                      <Select
                         id="newMaterialType"
                         name="type"
                         value={newMaterialData.type}
@@ -553,11 +697,11 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                         <option value={MaterialType.RawMaterial}>{t('receiveProduction.labels.rawMaterial')}</option>
                         <option value={MaterialType.RecyclableMaterial}>{t('receiveProduction.labels.recyclableMaterial')}</option>
                         <option value={MaterialType.FinishedProduct}>{t('receiveProduction.labels.finishedProduct')}</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="newMaterialQuantityType">{t('receiveProduction.fields.unitType')} *</label>
-                      <input
+                      </Select>
+                    </FormGroup>
+                    <FormGroup>
+                      <Label htmlFor="newMaterialQuantityType">{t('receiveProduction.fields.unitType')} *</Label>
+                      <Input
                         type="text"
                         id="newMaterialQuantityType"
                         name="quantityType"
@@ -567,13 +711,13 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                         required
                         disabled={isLoading}
                       />
-                    </div>
-                  </div>
+                    </FormGroup>
+                  </FormRow>
 
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="newMaterialQuantity">{t('receiveProduction.fields.quantityProduced')} *</label>
-                      <input
+                  <FormRow>
+                    <FormGroup>
+                      <Label htmlFor="newMaterialQuantity">{t('receiveProduction.fields.quantityProduced')} *</Label>
+                      <Input
                         type="number"
                         id="newMaterialQuantity"
                         value={currentMaterial.quantity}
@@ -584,23 +728,27 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                         required
                         disabled={isLoading}
                       />
+                    </FormGroup>
+                    <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                      <FormGroup>
+                        <Label>&nbsp;</Label>
+                        <button
+                          type="button"
+                          onClick={handleAddProducedMaterial}
+                          className="btn btn-primary"
+                          disabled={isLoading}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                        >
+                          <Plus size={16} />
+                          {t('receiveProduction.buttons.createAndAdd')}
+                        </button>
+                      </FormGroup>
                     </div>
-                    <div className="form-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-                      <button
-                        type="button"
-                        onClick={handleAddProducedMaterial}
-                        className="btn btn-primary"
-                        disabled={isLoading}
-                      >
-                        <Plus size={16} />
-                        {t('receiveProduction.buttons.createAndAdd')}
-                      </button>
-                    </div>
-                  </div>
+                  </FormRow>
 
-                  <div className="form-group">
-                    <label htmlFor="newMaterialDescription">{t('receiveProduction.fields.description')}</label>
-                    <textarea
+                  <FormGroup>
+                    <Label htmlFor="newMaterialDescription">{t('receiveProduction.fields.description')}</Label>
+                    <Textarea
                       id="newMaterialDescription"
                       name="description"
                       value={newMaterialData.description}
@@ -609,145 +757,34 @@ const ReceiveProduction: React.FC<ReceiveProductionProps> = ({ plan, onClose, on
                       rows={2}
                       disabled={isLoading}
                     />
-                  </div>
-                </div>
+                  </FormGroup>
+                </>
               )}
-              </div>
-            )}
 
-            {useProducedMaterials && producedMaterials.length > 0 && (
-              <div className="produced-materials">
-                <h4>{t('receiveProduction.fields.producedMaterials')}</h4>
-                <table className="materials-table">
-                  <thead>
-                    <tr>
-                      <th>{t('receiveProduction.fields.material')}</th>
-                      <th>{t('receiveProduction.fields.type')}</th>
-                      <th>{t('receiveProduction.fields.quantity')}</th>
-                      <th>{t('common:table.actions')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {producedMaterials.map(material => (
-                      <tr key={material.id}>
-                        <td>
-                          <div className="material-info">
-                            <span className="material-name">{material.materialName}</span>
-                            <span className="material-color">({material.materialColor})</span>
-                          </div>
-                        </td>
-                        <td>
-                          <span className={`material-type-badge ${material.materialType === MaterialType.RawMaterial ? 'raw-material' : 
-                            material.materialType === MaterialType.RecyclableMaterial ? 'recyclable-material' : 'finished-product'}`}>
-                            {material.materialType === MaterialType.RawMaterial ? t('receiveProduction.labels.rawMaterial') : 
-                             material.materialType === MaterialType.RecyclableMaterial ? t('receiveProduction.labels.recyclableMaterial') : t('receiveProduction.labels.finishedProduct')}
-                          </span>
-                        </td>
-                        <td>
-                          <input
-                            type="number"
-                            value={material.quantity}
-                            onChange={(e) => handleUpdateProducedMaterialQuantity(material.id, parseFloat(e.target.value) || 0)}
-                            onWheel={handleWheel}
-                            min="0.01"
-                            step="0.01"
-                            className="quantity-input"
-                            disabled={isLoading}
-                          />
-                          {material.quantityType}
-                        </td>
-                        <td>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveProducedMaterial(material.id)}
-                            className="btn btn-sm btn-danger"
-                            disabled={isLoading}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+              {producedMaterials.length > 0 && (
+                <Table
+                  columns={producedMaterialsTableColumns}
+                  data={producedMaterials}
+                  getRowKey={(m) => m.id}
+                  showContainer={false}
+                />
+              )}
+            </>
+          )}
+        </FormSection>
 
-          {/* Materials Summary */}
-          <div className="form-section">
-            <div className="section-header">
-              <Package className="section-icon" />
-              <h3>{t('receiveProduction.sections.materialsUsed')}</h3>
-            </div>
-            
-            <div className="materials-summary">
-              <table className="materials-table">
-                <thead>
-                  <tr>
-                    <th>{t('receiveProduction.fields.material')}</th>
-                    <th>{t('receiveProduction.fields.requiredPerUnit')}</th>
-                    <th>{t('receiveProduction.fields.totalUsed')}</th>
-                    <th>{t('receiveProduction.fields.status')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {plan.requiredMaterials.map((material, index) => {
-                    const totalUsed = material.requiredQuantity * actualQuantityProduced;
-                    const isAvailable = material.availableQuantity >= totalUsed;
-                    
-                    return (
-                      <tr key={index} className={!isAvailable ? 'insufficient-stock' : ''}>
-                        <td>
-                          <div className="material-info">
-                            <span className="material-name">{material.materialName}</span>
-                            <span className="material-color">({material.materialColor})</span>
-                          </div>
-                        </td>
-                        <td>{material.requiredQuantity} {material.quantityType}</td>
-                        <td>{totalUsed.toFixed(2)} {material.quantityType}</td>
-                        <td>
-                          <div className={`availability-badge ${isAvailable ? 'available' : 'unavailable'}`}>
-                            {isAvailable ? (
-                              <>
-                                <CheckCircle size={14} />
-                                <span>{t('receiveProduction.labels.available')}</span>
-                              </>
-                            ) : (
-                              <>
-                                <span>{t('receiveProduction.labels.insufficient')}</span>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
 
-          <div className="form-actions">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn btn-secondary"
-              disabled={isLoading}
-            >
-              {t('receiveProduction.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="btn btn-success"
-              disabled={isLoading || actualQuantityProduced <= 0 || isAddingToInventory}
-            >
-              {isLoading ? t('receiveProduction.buttons.completing') : isAddingToInventory ? t('receiveProduction.buttons.addingToInventory') : t('receiveProduction.buttons.completeProduction')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <FormSection title={t('receiveProduction.sections.materialsUsed')} titleIcon={Package}>
+          <Table
+            columns={materialsUsedTableColumns}
+            data={materialsUsedTableData}
+            getRowKey={(_, index) => index.toString()}
+            getRowClassName={(m) => !m.isAvailable ? 'insufficient-stock' : ''}
+            showContainer={false}
+          />
+        </FormSection>
+      </Form>
+    </Modal>
   );
 };
 

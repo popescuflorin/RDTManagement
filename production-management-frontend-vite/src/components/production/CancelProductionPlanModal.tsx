@@ -1,7 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { XCircle } from 'lucide-react';
+import { Modal } from '../atoms';
 import type { ProductionPlan } from '../../types';
-import './CancelProductionPlanModal.css';
 
 interface CancelProductionPlanModalProps {
   plan: ProductionPlan;
@@ -18,37 +19,22 @@ const CancelProductionPlanModal: React.FC<CancelProductionPlanModalProps> = ({
 }) => {
   const { t } = useTranslation(['production', 'common']);
   return (
-    <div className="cancel-plan-overlay" onClick={onClose}>
-      <div className="cancel-plan-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="cancel-plan-header">
-          <h2>{t('cancelPlan.title')}</h2>
-        </div>
-
-        <div className="cancel-plan-content">
-          <p>{t('cancelPlan.confirmation', { planName: plan.name })}</p>
-          <p className="warning-text">{t('cancelPlan.warning')}</p>
-        </div>
-
-        <div className="cancel-plan-actions">
-          <button
-            type="button"
-            onClick={onClose}
-            className="cancel-button"
-            disabled={isLoading}
-          >
-            {t('cancelPlan.buttons.goBack')}
-          </button>
-          <button
-            type="button"
-            onClick={onConfirm}
-            className="delete-button"
-            disabled={isLoading}
-          >
-            {isLoading ? t('cancelPlan.buttons.cancelling') : t('cancelPlan.buttons.cancelPlan')}
-          </button>
-        </div>
-      </div>
-    </div>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('cancelPlan.title')}
+      titleIcon={XCircle}
+      submitText={isLoading ? t('cancelPlan.buttons.cancelling') : t('cancelPlan.buttons.cancelPlan')}
+      cancelText={t('cancelPlan.buttons.goBack')}
+      submitVariant="danger"
+      isSubmitting={isLoading}
+      onSubmit={onConfirm}
+    >
+      <p>{t('cancelPlan.confirmation', { planName: plan.name })}</p>
+      <p style={{ color: 'var(--warning-700)', fontWeight: 500, marginTop: 'var(--space-md)' }}>
+        {t('cancelPlan.warning')}
+      </p>
+    </Modal>
   );
 };
 

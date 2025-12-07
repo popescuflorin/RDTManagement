@@ -10,9 +10,10 @@ import {
   Eye,
   X
 } from 'lucide-react';
+import { Modal, ViewContent, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue, Table } from '../atoms';
 import type { RecyclableProductionPlan } from '../../types';
 import { ProductionPlanStatus } from '../../types';
-import './ViewProductionPlan.css';
+import type { TableColumn } from '../atoms';
 
 interface ViewRecyclableProductionPlanProps {
   plan: RecyclableProductionPlan;
@@ -59,170 +60,179 @@ const ViewRecyclableProductionPlan: React.FC<ViewRecyclableProductionPlanProps> 
   const statusInfo = getStatusInfo(plan.status);
   const StatusIcon = statusInfo.icon;
 
+  const recyclablesTableColumns: TableColumn<typeof plan.requiredRecyclables[0] & { totalNeeded: number; isAvailable: boolean; shortage: number }>[] = [
+    {
+      key: 'material',
+      label: t('viewPlan.table.material'),
+      render: (_, m) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <span style={{ fontWeight: 500 }}>{m.materialName}</span>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>({m.materialColor})</span>
+        </div>
+      )
+    },
+    {
+      key: 'requiredPerUnit',
+      label: t('viewPlan.table.requiredPerUnit'),
+      render: (_, m) => `${m.requiredQuantity} ${m.quantityType}`
+    },
+    {
+      key: 'totalNeed',
+      label: t('viewPlan.table.totalNeed'),
+      render: (_, m) => `${m.totalNeeded.toFixed(2)} ${m.quantityType}`
+    },
+    {
+      key: 'available',
+      label: t('viewPlan.table.available'),
+      render: (_, m) => `${m.availableQuantity.toFixed(2)} ${m.quantityType}`
+    },
+    {
+      key: 'status',
+      label: t('viewPlan.table.status'),
+      render: (_, m) => (
+        <div style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          padding: '4px 8px',
+          borderRadius: 'var(--radius-md)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 500,
+          backgroundColor: m.isAvailable ? 'var(--success-100)' : 'var(--warning-100)',
+          color: m.isAvailable ? 'var(--success-700)' : 'var(--warning-700)'
+        }}>
+          {m.isAvailable ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
+          {m.isAvailable ? t('viewPlan.status.available') : t('viewPlan.status.short', { amount: m.shortage.toFixed(2) })}
+        </div>
+      )
+    }
+  ];
+
+  const recyclablesTableData = plan.requiredRecyclables.map((m) => {
+    const totalNeeded = m.requiredQuantity * plan.quantityToProduce;
+    const isAvailable = m.availableQuantity >= totalNeeded;
+    const shortage = totalNeeded - m.availableQuantity;
+    return {
+      ...m,
+      totalNeeded,
+      isAvailable,
+      shortage
+    };
+  });
+
   return (
-    <div className="view-production-plan-overlay" onClick={onClose}>
-      <div className="view-production-plan-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="view-production-plan-header">
-          <div className="header-content">
-            <div className="header-title">
-              <Eye className="header-icon" />
-              <h2>{t('viewPlan.recyclableTitle')}</h2>
-            </div>
-            <button className="close-button" onClick={onClose}>
-              <X size={20} />
-            </button>
-          </div>
-          <div className="header-status">
-            <div className={`status-badge ${statusInfo.color}`}>
-              <StatusIcon size={16} />
-              <span>{statusInfo.label}</span>
-            </div>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('viewPlan.recyclableTitle')}
+      titleIcon={Eye}
+      showCancel={true}
+      cancelText={t('viewPlan.buttons.close')}
+      maxWidth="1000px"
+      footer={
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)' }}>
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 12px',
+            borderRadius: 'var(--radius-md)',
+            fontSize: 'var(--text-sm)',
+            fontWeight: 500,
+            backgroundColor: statusInfo.color === 'status-completed' ? 'var(--success-100)' : 
+                           statusInfo.color === 'status-cancelled' ? 'var(--error-100)' :
+                           statusInfo.color === 'status-in-progress' ? 'var(--warning-100)' :
+                           statusInfo.color === 'status-planned' ? 'var(--info-100)' : 'var(--surface-hover)',
+            color: statusInfo.color === 'status-completed' ? 'var(--success-700)' : 
+                   statusInfo.color === 'status-cancelled' ? 'var(--error-700)' :
+                   statusInfo.color === 'status-in-progress' ? 'var(--warning-700)' :
+                   statusInfo.color === 'status-planned' ? 'var(--info-700)' : 'var(--text-primary)'
+          }}>
+            <StatusIcon size={16} />
+            <span>{statusInfo.label}</span>
           </div>
         </div>
-
-        <div className="view-production-plan-content">
-          {/* Plan Overview */}
-          <div className="info-section">
-            <div className="section-header">
-              <Package className="section-icon" />
-              <h3>{t('viewPlan.sections.planOverview')}</h3>
-            </div>
-            <div className="info-grid">
-              <div className="info-item">
-                <label>{t('viewPlan.fields.planName')}</label>
-                <div className="info-value">{plan.name}</div>
-              </div>
-              {plan.description && (
-                <div className="info-item full-width">
-                  <label>{t('viewPlan.fields.description')}</label>
-                  <div className="info-value">{plan.description}</div>
+      }
+    >
+      <ViewContent>
+        <ViewSection title={t('viewPlan.sections.planOverview')} titleIcon={Package}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('viewPlan.fields.planName')}</ViewLabel>
+              <ViewValue>{plan.name}</ViewValue>
+            </ViewItem>
+            {plan.description && (
+              <ViewItem fullWidth>
+                <ViewLabel>{t('viewPlan.fields.description')}</ViewLabel>
+                <ViewValue>{plan.description}</ViewValue>
+              </ViewItem>
+            )}
+            <ViewItem>
+              <ViewLabel>{t('viewPlan.fields.targetRawMaterial')}</ViewLabel>
+              <ViewValue>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <span style={{ fontWeight: 500 }}>{plan.targetRawMaterialName}</span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>({plan.targetRawMaterialColor})</span>
                 </div>
-              )}
-              <div className="info-item">
-                <label>{t('viewPlan.fields.targetRawMaterial')}</label>
-                <div className="info-value">
-                  <div className="product-info">
-                    <span className="product-name">{plan.targetRawMaterialName}</span>
-                    <span className="product-color">({plan.targetRawMaterialColor})</span>
-                  </div>
-                </div>
-              </div>
-              <div className="info-item">
-                <label>{t('viewPlan.fields.quantityToProduce')}</label>
-                <div className="info-value">{plan.quantityToProduce} {plan.targetRawMaterialQuantityType}</div>
-              </div>
-            </div>
-          </div>
+              </ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('viewPlan.fields.quantityToProduce')}</ViewLabel>
+              <ViewValue>{plan.quantityToProduce} {plan.targetRawMaterialQuantityType}</ViewValue>
+            </ViewItem>
+          </ViewGrid>
+        </ViewSection>
 
-          {/* Timing */}
-          <div className="info-section">
-            <div className="section-header">
-              <Clock className="section-icon" />
-              <h3>{t('viewPlan.sections.timing')}</h3>
-            </div>
-            <div className="info-grid">
-              <div className="info-item">
-                <label>{t('viewPlan.fields.estimatedProductionTime')}</label>
-                <div className="info-value">{plan.estimatedProductionTimeMinutes} {t('viewPlan.labels.min')}</div>
-              </div>
-              {plan.plannedStartDate && (
-                <div className="info-item">
-                  <label>{t('viewPlan.fields.plannedStartDate')}</label>
-                  <div className="info-value">{formatDate(plan.plannedStartDate)}</div>
-                </div>
-              )}
-              <div className="info-item">
-                <label>{t('viewPlan.fields.created')}</label>
-                <div className="info-value">{formatDateTime(plan.createdAt)}</div>
-              </div>
-              {plan.startedAt && (
-                <div className="info-item">
-                  <label>{t('viewPlan.fields.startedAt')}</label>
-                  <div className="info-value">{formatDateTime(plan.startedAt)}</div>
-                </div>
-              )}
-              {plan.completedAt && (
-                <div className="info-item">
-                  <label>{t('viewPlan.fields.completedAt')}</label>
-                  <div className="info-value">{formatDateTime(plan.completedAt)}</div>
-                </div>
-              )}
-            </div>
-          </div>
+        <ViewSection title={t('viewPlan.sections.timing')} titleIcon={Clock}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('viewPlan.fields.estimatedProductionTime')}</ViewLabel>
+              <ViewValue>{plan.estimatedProductionTimeMinutes} {t('viewPlan.labels.min')}</ViewValue>
+            </ViewItem>
+            {plan.plannedStartDate && (
+              <ViewItem>
+                <ViewLabel>{t('viewPlan.fields.plannedStartDate')}</ViewLabel>
+                <ViewValue>{formatDate(plan.plannedStartDate)}</ViewValue>
+              </ViewItem>
+            )}
+            <ViewItem>
+              <ViewLabel>{t('viewPlan.fields.created')}</ViewLabel>
+              <ViewValue>{formatDateTime(plan.createdAt)}</ViewValue>
+            </ViewItem>
+            {plan.startedAt && (
+              <ViewItem>
+                <ViewLabel>{t('viewPlan.fields.startedAt')}</ViewLabel>
+                <ViewValue>{formatDateTime(plan.startedAt)}</ViewValue>
+              </ViewItem>
+            )}
+            {plan.completedAt && (
+              <ViewItem>
+                <ViewLabel>{t('viewPlan.fields.completedAt')}</ViewLabel>
+                <ViewValue>{formatDateTime(plan.completedAt)}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
 
-          {/* Required Recyclables */}
-          <div className="info-section">
-            <div className="section-header">
-              <Package className="section-icon" />
-              <h3>{t('viewPlan.sections.requiredRecyclables')}</h3>
-            </div>
-            <div className="materials-container">
-              <table className="materials-table">
-                <thead>
-                  <tr>
-                    <th>{t('viewPlan.table.material')}</th>
-                    <th>{t('viewPlan.table.requiredPerUnit')}</th>
-                    <th>{t('viewPlan.table.totalNeed')}</th>
-                    <th>{t('viewPlan.table.available')}</th>
-                    <th>{t('viewPlan.table.status')}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {plan.requiredRecyclables.map((m, idx) => {
-                    const totalNeeded = m.requiredQuantity * plan.quantityToProduce;
-                    const isAvailable = m.availableQuantity >= totalNeeded;
-                    const shortage = totalNeeded - m.availableQuantity;
-                    return (
-                      <tr key={idx} className={!isAvailable ? 'insufficient-stock' : ''}>
-                        <td>
-                          <div className="material-info">
-                            <span className="material-name">{m.materialName}</span>
-                            <span className="material-color">({m.materialColor})</span>
-                          </div>
-                        </td>
-                        <td>{m.requiredQuantity} {m.quantityType}</td>
-                        <td>{totalNeeded.toFixed(2)} {m.quantityType}</td>
-                        <td>{m.availableQuantity.toFixed(2)} {m.quantityType}</td>
-                        <td>
-                          <div className={`availability-badge ${isAvailable ? 'available' : 'unavailable'}`}>
-                            {isAvailable ? (
-                              <>
-                                <CheckCircle size={14} />
-                                <span>{t('viewPlan.status.available')}</span>
-                              </>
-                            ) : (
-                              <>
-                                <AlertTriangle size={14} />
-                                <span>{t('viewPlan.status.short', { amount: shortage.toFixed(2) })}</span>
-                              </>
-                            )}
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
+        <ViewSection title={t('viewPlan.sections.requiredRecyclables')} titleIcon={Package}>
+          <Table
+            columns={recyclablesTableColumns}
+            data={recyclablesTableData}
+            getRowKey={(_, index) => index.toString()}
+            getRowClassName={(m) => !m.isAvailable ? 'insufficient-stock' : ''}
+            showContainer={false}
+          />
+        </ViewSection>
 
-          {/* Notes */}
-          {plan.notes && (
-            <div className="info-section">
-              <div className="section-header">
-                <FileText className="section-icon" />
-                <h3>{t('viewPlan.sections.notes')}</h3>
-              </div>
-              <div className="notes-content">{plan.notes}</div>
-            </div>
-          )}
-        </div>
-
-        <div className="view-production-plan-footer">
-          <button className="btn btn-secondary" onClick={onClose}>{t('viewPlan.buttons.close')}</button>
-        </div>
-      </div>
-    </div>
+        {plan.notes && (
+          <ViewSection title={t('viewPlan.sections.notes')} titleIcon={FileText}>
+            <ViewItem fullWidth>
+              <ViewValue>{plan.notes}</ViewValue>
+            </ViewItem>
+          </ViewSection>
+        )}
+      </ViewContent>
+    </Modal>
   );
 };
 

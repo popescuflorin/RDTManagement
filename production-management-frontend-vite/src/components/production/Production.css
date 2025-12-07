@@ -1,41 +1,4 @@
-/* Production Container */
-.production-container {
-  padding: 0;
-  width: 100%;
-  background: #ffffff;
-  min-height: 100vh;
-}
-
-/* Header */
-.production-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--space-xl);
-  padding: var(--space-3xl);
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border);
-}
-
-.production-header .header-left h1 {
-  margin: 0 0 var(--space-sm) 0;
-  color: var(--text-primary);
-  font-size: var(--text-3xl);
-  font-weight: 700;
-}
-
-.production-header .header-left p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: var(--text-lg);
-}
-
-.production-header .header-right {
-  display: flex;
-  align-items: center;
-}
+/* Page container and header styles are now handled by PageContainer.css and PageHeader.css in atoms folder */
 
 /* Tab Navigation */
 .tab-navigation {
@@ -82,80 +45,9 @@
 
 /* Create button styles are now handled by CreateButton component in atoms folder */
 
-/* Loading State */
-.production-loading {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 400px;
-  gap: 16px;
-}
+/* Loading state styles are now handled by Loader.css in atoms folder */
 
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #e9ecef;
-  border-top: 4px solid #667eea;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Statistics Cards */
-.production-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 32px;
-}
-
-.stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  transition: transform 0.2s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-}
-
-.stat-card.warning {
-  border-left: 4px solid #ffc107;
-  background: linear-gradient(135deg, #fff8e1 0%, #ffffff 100%);
-}
-
-.stat-icon {
-  font-size: 2.5rem;
-  opacity: 0.8;
-}
-
-.stat-content {
-  flex: 1;
-}
-
-.stat-number {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
+/* Statistics styles are now handled by StatCard.css and StatisticsContainer.css in atoms folder */
 
 /* Controls */
 .production-controls {
@@ -447,129 +339,9 @@
   font-style: italic;
 }
 
-/* Pagination Container */
-.pagination-container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--space-xl) var(--space-2xl);
-  background: var(--surface);
-  border-top: 1px solid var(--border);
-  flex-wrap: wrap;
-  gap: var(--space-lg);
-}
+/* Pagination styles are now handled by Pagination.css in atoms folder */
 
-.pagination-info {
-  color: var(--text-secondary);
-  font-size: var(--text-sm);
-}
-
-.pagination-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-}
-
-.pagination-btn {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.pagination-btn:hover:not(:disabled) {
-  background: var(--primary-50);
-  border-color: var(--primary-600);
-  color: var(--primary-600);
-}
-
-.pagination-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.pagination-pages {
-  display: flex;
-  gap: var(--space-xs);
-}
-
-.pagination-page {
-  min-width: 36px;
-  height: 36px;
-  padding: var(--space-sm);
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.pagination-page:hover {
-  background: var(--primary-50);
-  border-color: var(--primary-600);
-  color: var(--primary-600);
-}
-
-.pagination-page.active {
-  background: var(--primary-600);
-  color: var(--text-inverse);
-  border-color: var(--primary-600);
-}
-
-.page-size-selector {
-  display: flex;
-  align-items: center;
-  gap: var(--space-sm);
-  font-size: var(--text-sm);
-  color: var(--text-secondary);
-}
-
-.page-size-selector select {
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  color: var(--text-primary);
-  font-size: var(--text-sm);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.page-size-selector select:hover {
-  border-color: var(--primary-600);
-}
-
-.page-size-selector select:focus {
-  outline: none;
-  border-color: var(--primary-600);
-  box-shadow: 0 0 0 3px var(--primary-50);
-}
-
-/* Responsive Design */
-@media (max-width: 1600px) {
-  .production-stats {
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  }
-  
-  .stat-card {
-    padding: 20px;
-  }
-  
-  .stat-number {
-    font-size: 1.6rem;
-  }
-}
+/* Statistics responsive styles are handled by StatisticsContainer.css and StatCard.css in atoms folder */
 
 /* Recyclable Container */
 .recyclable-container {
@@ -613,57 +385,15 @@
 }
 
 @media (max-width: 768px) {
-  .production-container {
-    padding: 16px;
-  }
+  /* Page container and header responsive styles are handled by PageContainer.css in atoms folder */
 
-  .production-header {
-    flex-direction: column;
-    gap: 16px;
-    align-items: stretch;
-  }
+  /* Statistics responsive styles are handled by StatisticsContainer.css in atoms folder */
 
-  .production-header h1 {
-    font-size: 1.8rem;
-    text-align: center;
-  }
-
-  /* Create button styles are now handled by CreateButton component in atoms folder */
-
-  .production-stats {
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  }
-
-  .production-controls {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .search-container,
   .filter-container {
     min-width: auto;
   }
 
-  .pagination-container {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .pagination-info {
-    text-align: center;
-    order: 3;
-  }
-
-  .pagination-controls {
-    order: 1;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-
-  .page-size-selector {
-    order: 2;
-    justify-content: center;
-  }
+  /* Pagination responsive styles are handled by Pagination.css in atoms folder */
 
   /* Table responsive styles are handled by Table.css */
 
@@ -680,28 +410,9 @@
 }
 
 @media (max-width: 480px) {
-  .production-container {
-    padding: 12px;
-  }
+  /* Page container and header responsive styles are handled by PageContainer.css in atoms folder */
 
-  .production-header h1 {
-    font-size: 1.5rem;
-  }
-
-  .stat-card {
-    padding: 16px;
-    flex-direction: column;
-    text-align: center;
-    gap: 12px;
-  }
-
-  .stat-icon {
-    font-size: 2rem;
-  }
-
-  .stat-number {
-    font-size: 1.4rem;
-  }
+  /* Statistics responsive styles are handled by StatCard.css in atoms folder */
 
   /* Table responsive styles are handled by Table.css */
 
@@ -727,14 +438,10 @@
 
 /* Print Styles */
 @media print {
-  .production-header,
-  .production-controls,
-  .actions-cell,
-  /* Create button styles are now handled by CreateButton component in atoms folder */
+  /* Page container and header print styles are handled by PageContainer.css in atoms folder */
 
-  .production-container {
-    padding: 0;
-    background: white;
+  .actions-cell {
+    display: none;
   }
 
   /* Print styles for tables are handled by Table.css */

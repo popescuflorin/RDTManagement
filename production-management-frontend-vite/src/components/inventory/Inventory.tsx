@@ -20,7 +20,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table, PageContainer, Loader, Pagination, ErrorMessage, FiltersControl, Checkbox } from '../atoms';
+import { Table, PageContainer, Loader, Pagination, ErrorMessage, FiltersControl, Checkbox, StatCard, StatisticsContainer } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Inventory.css';
 
@@ -170,36 +170,26 @@ const Inventory: React.FC = () => {
 
       {/* Statistics Cards */}
       {statistics && (
-        <div className="inventory-stats">
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Package size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.totalMaterials}</div>
-              <div className="stat-label">{t('statistics.totalMaterials')}</div>
-            </div>
-          </div>
-          <div className={`stat-card ${statistics.lowStockCount > 0 ? 'warning' : ''}`}>
-            <div className="stat-icon">
-              <AlertTriangle size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.lowStockCount}</div>
-              <div className="stat-label">{t('statistics.lowStock')}</div>
-            </div>
-          </div>
-          <div className={`stat-card ${statistics.insufficientStockCount > 0 ? 'error' : ''}`}>
-            <div className="stat-icon">
-              <XCircle size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.insufficientStockCount}</div>
-              <div className="stat-label">{t('statistics.insufficientStock')}</div>
-              <div className="stat-description">{t('statistics.insufficientStockDescription')}</div>
-            </div>
-          </div>
-        </div>
+        <StatisticsContainer minCardWidth="250px">
+          <StatCard
+            icon={Package}
+            value={statistics.totalMaterials}
+            label={t('statistics.totalMaterials')}
+          />
+          <StatCard
+            icon={AlertTriangle}
+            value={statistics.lowStockCount}
+            label={t('statistics.lowStock')}
+            variant={statistics.lowStockCount > 0 ? 'warning' : 'default'}
+          />
+          <StatCard
+            icon={XCircle}
+            value={statistics.insufficientStockCount}
+            label={t('statistics.insufficientStock')}
+            description={t('statistics.insufficientStockDescription')}
+            variant={statistics.insufficientStockCount > 0 ? 'error' : 'default'}
+          />
+        </StatisticsContainer>
       )}
 
       {/* Filters and Search */}

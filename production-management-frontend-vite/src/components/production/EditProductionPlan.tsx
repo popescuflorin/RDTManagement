@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Edit, Package, Plus, FileText, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, ErrorMessage, Table, DeleteButton } from '../atoms';
 import { productionPlanApi, inventoryApi } from '../../services/api';
 import type { 
   ProductionPlan, 
@@ -8,7 +10,7 @@ import type {
   CreateProductionPlanMaterialRequest 
 } from '../../types';
 import { MaterialType } from '../../types';
-import './EditProductionPlan.css';
+import type { TableColumn } from '../atoms';
 
 interface EditProductionPlanProps {
   plan: ProductionPlan;
@@ -138,8 +140,7 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
     );
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
 
@@ -177,252 +178,273 @@ const EditProductionPlan: React.FC<EditProductionPlanProps> = ({ plan, onClose, 
     }
   };
 
-  return (
-    <div className="edit-production-plan-overlay">
-      <div className="edit-production-plan-modal">
-        <div className="edit-production-plan-header">
-          <h2>✏️ {t('editPlan.title')}</h2>
-          <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
+  const materialsTableColumns: TableColumn<MaterialSelection & { totalNeeded: number; isAvailable: boolean }>[] = [
+    {
+      key: 'material',
+      label: t('createPlan.table.material'),
+      render: (_, m) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <span style={{ fontWeight: 500 }}>{m.materialName}</span>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>({m.materialColor})</span>
         </div>
+      )
+    },
+    {
+      key: 'requiredPerUnit',
+      label: t('createPlan.table.requiredPerUnit'),
+      render: (_, m) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Input
+            type="number"
+            value={m.requiredQuantity}
+            onChange={(e) => handleUpdateMaterialQuantity(m.id, parseFloat(e.target.value) || 0)}
+            onWheel={handleWheel}
+            min="0.01"
+            step="0.01"
+            disabled={isLoading}
+            style={{ width: '100px' }}
+          />
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+            {m.quantityType}
+          </span>
+        </div>
+      )
+    },
+    {
+      key: 'totalNeed',
+      label: t('createPlan.table.totalNeed'),
+      render: (_, m) => `${m.totalNeeded.toFixed(2)} ${m.quantityType}`
+    },
+    {
+      key: 'available',
+      label: t('createPlan.table.available'),
+      render: (_, m) => `${m.availableQuantity.toFixed(2)} ${m.quantityType}`
+    },
+    {
+      key: 'status',
+      label: t('createPlan.table.status'),
+      render: (_, m) => (
+        <span style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          padding: '4px 8px',
+          borderRadius: 'var(--radius-md)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 500,
+          backgroundColor: m.isAvailable ? 'var(--success-100)' : 'var(--warning-100)',
+          color: m.isAvailable ? 'var(--success-700)' : 'var(--warning-700)'
+        }}>
+          {m.isAvailable ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
+          {m.isAvailable ? t('createPlan.status.available') : t('createPlan.status.insufficient')}
+        </span>
+      )
+    },
+    {
+      key: 'actions',
+      label: t('createPlan.table.actions'),
+      align: 'center',
+      render: (_, m) => (
+        <DeleteButton
+          title={t('createPlan.buttons.remove')}
+          onClick={() => handleRemoveMaterial(m.id)}
+          disabled={isLoading}
+        />
+      )
+    }
+  ];
 
-        <form onSubmit={handleSubmit} className="edit-production-plan-form">
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+  const materialsTableData = selectedMaterials.map((material) => {
+    const totalNeeded = material.requiredQuantity * formData.quantityToProduce;
+    const isAvailable = material.availableQuantity >= totalNeeded;
+    return {
+      ...material,
+      totalNeeded,
+      isAvailable
+    };
+  });
 
-          {/* Plan Details Section */}
-          <div className="form-section">
-            <h3>{t('createPlan.sections.planDetails')}</h3>
-            
-            <div className="form-group">
-              <label htmlFor="name">{t('createPlan.fields.planName')} *</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
+  return (
+    <Modal  
+      isOpen={true}
+      onClose={onClose}
+      title={t('editPlan.title')}
+      titleIcon={Edit}
+      submitText={isLoading ? t('editPlan.buttons.updating') : t('editPlan.buttons.updateProductionPlan')}
+      cancelText={t('createPlan.buttons.cancel')}
+      submitVariant="primary"
+      isSubmitting={isLoading || selectedMaterials.length === 0}
+      onSubmit={handleSubmit}
+      maxWidth="1000px"
+    >
+      {error && (
+        <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
+      )}
+
+      <Form onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}>
+
+        <FormSection title={t('createPlan.sections.planDetails')} titleIcon={FileText}>
+          <FormGroup>
+            <Label htmlFor="name">{t('createPlan.fields.planName')} *</Label>
+            <Input
+              type="text"
+              id="name"
+              name="name"
+              value={formData.name}
+              onChange={handleInputChange}
+              placeholder={t('createPlan.placeholders.planName')}
+              required
+              disabled={isLoading}
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="description">{t('createPlan.fields.description')}</Label>
+            <Textarea
+              id="description"
+              name="description"
+              value={formData.description}
+              onChange={handleInputChange}
+              placeholder={t('createPlan.placeholders.description')}
+              rows={2}
+              disabled={isLoading}
+            />
+          </FormGroup>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="quantityToProduce">{t('createPlan.fields.quantityToProduce')} *</Label>
+              <Input
+                type="number"
+                id="quantityToProduce"
+                name="quantityToProduce"
+                value={formData.quantityToProduce}
                 onChange={handleInputChange}
-                placeholder={t('createPlan.placeholders.planName')}
+                onWheel={handleWheel}
+                min="0.01"
+                step="0.01"
                 required
                 disabled={isLoading}
               />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="description">{t('createPlan.fields.description')}</label>
-              <textarea
-                id="description"
-                name="description"
-                value={formData.description}
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="estimatedProductionTimeMinutes">{t('createPlan.fields.estimatedTimeMinutes')} *</Label>
+              <Input
+                type="number"
+                id="estimatedProductionTimeMinutes"
+                name="estimatedProductionTimeMinutes"
+                value={formData.estimatedProductionTimeMinutes}
                 onChange={handleInputChange}
-                placeholder={t('createPlan.placeholders.description')}
-                rows={2}
+                onWheel={handleWheel}
+                min="1"
+                step="1"
+                required
                 disabled={isLoading}
               />
-            </div>
+            </FormGroup>
+          </FormRow>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="quantityToProduce">{t('createPlan.fields.quantityToProduce')} *</label>
-                <input
-                  type="number"
-                  id="quantityToProduce"
-                  name="quantityToProduce"
-                  value={formData.quantityToProduce}
-                  onChange={handleInputChange}
-                  onWheel={handleWheel}
-                  min="0.01"
-                  step="0.01"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="estimatedProductionTimeMinutes">{t('createPlan.fields.estimatedTimeMinutes')} *</label>
-                <input
-                  type="number"
-                  id="estimatedProductionTimeMinutes"
-                  name="estimatedProductionTimeMinutes"
-                  value={formData.estimatedProductionTimeMinutes}
-                  onChange={handleInputChange}
-                  onWheel={handleWheel}
-                  min="1"
-                  step="1"
-                  required
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="plannedStartDate">{t('createPlan.fields.plannedStartDate')}</label>
-              <input
-                type="date"
-                id="plannedStartDate"
-                name="plannedStartDate"
-                value={formData.plannedStartDate}
-                onChange={handleInputChange}
-                disabled={isLoading}
-              />
-            </div>
-
-            <div className="form-group">
-              <label htmlFor="notes">{t('createPlan.fields.notes')}</label>
-              <textarea
-                id="notes"
-                name="notes"
-                value={formData.notes}
-                onChange={handleInputChange}
-                placeholder={t('createPlan.placeholders.notes')}
-                rows={2}
-                disabled={isLoading}
-              />
-            </div>
-          </div>
-
-          {/* Required Materials Section */}
-          <div className="form-section">
-            <h3>{t('createPlan.sections.requiredMaterials')}</h3>
-
-            {/* Materials Error Message */}
-            {materialsError && (
-              <div className="error-message">
-                {materialsError}
-                <button onClick={() => setMaterialsError(null)} style={{ marginLeft: '10px', background: 'none', border: 'none', cursor: 'pointer', fontSize: '18px' }}>×</button>
-              </div>
-            )}
-            
-            <div className="add-material-section">
-              <div className="form-row">
-                <div className="form-group" style={{ flex: 2 }}>
-                  <label htmlFor="currentMaterial">{t('createPlan.fields.selectMaterial')}</label>
-                  <select
-                    id="currentMaterial"
-                    value={currentMaterial.rawMaterialId}
-                    onChange={(e) => setCurrentMaterial(prev => ({ ...prev, rawMaterialId: parseInt(e.target.value) }))}
-                    disabled={isLoading}
-                  >
-                    <option value={0}>{t('createPlan.fields.selectRawMaterial')}</option>
-                    {rawMaterials.map(material => (
-                      <option key={material.id} value={material.id}>
-                        {material.name} ({material.color}) - {t('createPlan.labels.available')} {material.quantity} {material.quantityType}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="materialQuantity">{t('createPlan.fields.quantity')}</label>
-                  <input
-                    type="number"
-                    id="materialQuantity"
-                    value={currentMaterial.requiredQuantity}
-                    onChange={(e) => setCurrentMaterial(prev => ({ ...prev, requiredQuantity: parseFloat(e.target.value) || 0 }))}
-                    onWheel={handleWheel}
-                    min="0.01"
-                    step="0.01"
-                    disabled={isLoading}
-                  />
-                </div>
-                <div className="form-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-                  <button
-                    type="button"
-                    onClick={handleAddMaterial}
-                    className="btn btn-secondary"
-                    disabled={isLoading}
-                  >
-                    {t('createPlan.buttons.add')}
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            {selectedMaterials.length > 0 && (
-              <div className="selected-materials">
-                <h4>{t('createPlan.labels.selectedMaterials')}</h4>
-                <table className="materials-table">
-                  <thead>
-                    <tr>
-                      <th>{t('createPlan.table.material')}</th>
-                      <th>{t('createPlan.table.requiredPerUnit')}</th>
-                      <th>{t('createPlan.table.totalNeed')}</th>
-                      <th>{t('createPlan.table.available')}</th>
-                      <th>{t('createPlan.table.status')}</th>
-                      <th>{t('createPlan.table.actions')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedMaterials.map(material => {
-                      const totalNeeded = material.requiredQuantity * formData.quantityToProduce;
-                      const isAvailable = material.availableQuantity >= totalNeeded;
-                      return (
-                        <tr key={material.id} className={!isAvailable ? 'insufficient-stock' : ''}>
-                          <td>
-                            <div className="material-info">
-                              <span className="material-name">{material.materialName}</span>
-                              <span className="material-color">({material.materialColor})</span>
-                            </div>
-                          </td>
-                          <td>
-                            <input
-                              type="number"
-                              value={material.requiredQuantity}
-                              onChange={(e) => handleUpdateMaterialQuantity(material.id, parseFloat(e.target.value) || 0)}
-                              onWheel={handleWheel}
-                              min="0.01"
-                              step="0.01"
-                              className="quantity-input"
-                              disabled={isLoading}
-                            />
-                            {material.quantityType}
-                          </td>
-                          <td>{totalNeeded.toFixed(2)} {material.quantityType}</td>
-                          <td>{material.availableQuantity.toFixed(2)} {material.quantityType}</td>
-                          <td>
-                            <span className={`status-badge ${isAvailable ? 'status-available' : 'status-insufficient'}`}>
-                              {isAvailable ? t('createPlan.status.available') : t('createPlan.status.insufficient')}
-                            </span>
-                          </td>
-                          <td>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveMaterial(material.id)}
-                              className="btn btn-sm btn-danger"
-                              disabled={isLoading}
-                            >
-                              {t('createPlan.buttons.remove')}
-                            </button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-
-          <div className="form-actions">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn btn-secondary"
+          <FormGroup>
+            <Label htmlFor="plannedStartDate">{t('createPlan.fields.plannedStartDate')}</Label>
+            <Input
+              type="date"
+              id="plannedStartDate"
+              name="plannedStartDate"
+              value={formData.plannedStartDate}
+              onChange={handleInputChange}
               disabled={isLoading}
-            >
-              {t('createPlan.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="btn btn-primary"
-              disabled={isLoading || selectedMaterials.length === 0}
-            >
-              {isLoading ? t('editPlan.buttons.updating') : t('editPlan.buttons.updateProductionPlan')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+            />
+          </FormGroup>
+
+          <FormGroup>
+            <Label htmlFor="notes">{t('createPlan.fields.notes')}</Label>
+            <Textarea
+              id="notes"
+              name="notes"
+              value={formData.notes}
+              onChange={handleInputChange}
+              placeholder={t('createPlan.placeholders.notes')}
+              rows={2}
+              disabled={isLoading}
+            />
+          </FormGroup>
+        </FormSection>
+
+        <FormSection title={t('createPlan.sections.requiredMaterials')} titleIcon={Package}>
+          {materialsError && (
+            <ErrorMessage
+              message={materialsError}
+              onDismiss={() => setMaterialsError(null)}
+            />
+          )}
+
+          <FormRow>
+            <div style={{ flex: 2 }}>
+              <FormGroup>
+                <Label htmlFor="currentMaterial">{t('createPlan.fields.selectMaterial')}</Label>
+                <Select
+                  id="currentMaterial"
+                  value={currentMaterial.rawMaterialId}
+                  onChange={(e) => setCurrentMaterial(prev => ({ ...prev, rawMaterialId: parseInt(e.target.value) }))}
+                  disabled={isLoading}
+                >
+                  <option value={0}>{t('createPlan.fields.selectRawMaterial')}</option>
+                  {rawMaterials.map(material => (
+                    <option key={material.id} value={material.id}>
+                      {material.name} ({material.color}) - {t('createPlan.labels.available')} {material.quantity} {material.quantityType}
+                    </option>
+                  ))}
+                </Select>
+              </FormGroup>
+            </div>
+            <FormGroup>
+              <Label htmlFor="materialQuantity">{t('createPlan.fields.quantity')}</Label>
+              <Input
+                type="number"
+                id="materialQuantity"
+                value={currentMaterial.requiredQuantity}
+                onChange={(e) => setCurrentMaterial(prev => ({ ...prev, requiredQuantity: parseFloat(e.target.value) || 0 }))}
+                onWheel={handleWheel}
+                min="0.01"
+                step="0.01"
+                disabled={isLoading}
+              />
+            </FormGroup>
+            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+              <FormGroup>
+                <Label>&nbsp;</Label>
+                <button
+                  type="button"
+                  onClick={handleAddMaterial}
+                  className="btn btn-secondary"
+                  disabled={isLoading}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                >
+                  <Plus size={16} />
+                  {t('createPlan.buttons.add')}
+                </button>
+              </FormGroup>
+            </div>
+          </FormRow>
+
+          {selectedMaterials.length > 0 && (
+            <Table
+              columns={materialsTableColumns}
+              data={materialsTableData}
+              getRowKey={(m) => m.id}
+              getRowClassName={(m) => !m.isAvailable ? 'insufficient-stock' : ''}
+              showContainer={false}
+            />
+          )}
+        </FormSection>
+      </Form>
+    </Modal>
   );
 };
 

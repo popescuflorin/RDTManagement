@@ -54,69 +54,7 @@
 
 /* Loading state styles are now handled by Loader.css in atoms folder */
 
-/* Statistics Cards */
-.orders-stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin-bottom: 32px;
-}
-
-.stat-card {
-  background: white;
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  transition: transform 0.2s ease;
-}
-
-.stat-card:hover {
-  transform: translateY(-2px);
-}
-
-.stat-card.stat-card-primary {
-  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
-  color: white;
-}
-
-.stat-icon {
-  font-size: 2.5rem;
-  opacity: 0.8;
-  color: var(--primary-500);
-}
-
-.stat-card-primary .stat-icon {
-  color: white;
-}
-
-.stat-content {
-  flex: 1;
-}
-
-.stat-number {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-.stat-card-primary .stat-number {
-  color: white;
-}
-
-.stat-label {
-  font-size: 0.9rem;
-  color: #666;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.stat-card-primary .stat-label {
-  color: rgba(255, 255, 255, 0.9);
-}
+/* Statistics styles are now handled by StatCard.css and StatisticsContainer.css in atoms folder */
 
 /* Filters control styles are now handled by FiltersControl.css in atoms folder */
 
@@ -186,12 +124,7 @@
   color: var(--primary-600);
 }
 
-.no-data {
-  text-align: center;
-  padding: 48px !important;
-  color: #999;
-  font-style: italic;
-}
+/* Empty state styles are handled by Table.css in atoms folder */
 
 /* Pagination styles are now handled by Pagination.css in atoms folder */
 

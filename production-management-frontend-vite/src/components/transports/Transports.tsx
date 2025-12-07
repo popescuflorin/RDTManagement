@@ -187,13 +187,23 @@ const Transports: React.FC = () => {
         title={t('transports.title')}
         icon={Truck}
         actions={
-          <CreateButton
-            onClick={handleCreateTransport}
-            requiredPermission={Permissions.CreateTransport}
-            variant="primary"
-          >
-            {t('transports.buttons.createNewTransportVehicle')}
-          </CreateButton>
+          activeTab === 'transports' ? (
+            <CreateButton
+              onClick={handleCreateTransport}
+              requiredPermission={Permissions.CreateTransport}
+              variant="primary"
+            >
+              {t('transports.buttons.createNewTransportVehicle')}
+            </CreateButton>
+          ) : (
+            <CreateButton
+              onClick={() => setShowCreateRecordModal(true)}
+              requiredPermission={Permissions.EditAcquisition}
+              variant="primary"
+            >
+              {t('transports.buttons.createTransportRecord')}
+            </CreateButton>
+          )
         }
       />
 
@@ -346,16 +356,6 @@ const Transports: React.FC = () => {
       {/* Transport Records Tab Content */}
       {activeTab === 'records' && (
         <>
-          <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-            <CreateButton
-              onClick={() => setShowCreateRecordModal(true)}
-              requiredPermission={Permissions.EditAcquisition}
-              variant="primary"
-            >
-              {t('transports.buttons.createTransportRecord')}
-            </CreateButton>
-          </div>
-
           {isLoadingRecords ? (
             <Loader message={t('transports.loading.loadingRecords')} />
           ) : (

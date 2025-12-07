@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Recycle, Package, Plus, FileText, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, ErrorMessage, Table, DeleteButton } from '../atoms';
 import { productionPlanApi, inventoryApi } from '../../services/api';
 import type { 
   ProductionPlan,
@@ -8,7 +10,7 @@ import type {
   CreateRecyclableProductionPlanRequest
 } from '../../types';
 import { MaterialType } from '../../types';
-import './CreateProductionPlan.css';
+import type { TableColumn } from '../atoms';
 
 interface CreateRecyclableProductionPlanProps {
   onClose: () => void;
@@ -144,8 +146,7 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
     setSelectedRecyclables(prev => prev.map(m => (m.id === id ? { ...m, requiredQuantity: qty } : m)));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
 
@@ -195,190 +196,248 @@ const CreateRecyclableProductionPlan: React.FC<CreateRecyclableProductionPlanPro
 
   const commonQuantityTypes = ['pieces', 'kg', 'liters', 'meters', 'grams', 'tons'];
 
-  return (
-    <div className="create-production-plan-overlay">
-      <div className="create-production-plan-modal">
-        <div className="create-production-plan-header">
-          <h2>♻️ {t('createRecyclablePlan.title')}</h2>
-          <button className="btn btn-sm btn-secondary" onClick={onClose}>×</button>
+  const recyclablesTableColumns: TableColumn<RecyclableSelection & { totalNeeded: number; isAvailable: boolean }>[] = [
+    {
+      key: 'material',
+      label: t('createPlan.table.material'),
+      render: (_, m) => (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          <span style={{ fontWeight: 500 }}>{m.materialName}</span>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>({m.materialColor})</span>
         </div>
+      )
+    },
+    {
+      key: 'requiredPerUnit',
+      label: t('createPlan.table.requiredPerUnit'),
+      render: (_, m) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Input
+            type="number"
+            value={m.requiredQuantity}
+            onChange={(e) => handleUpdateRecyclableQty(m.id, parseFloat(e.target.value) || 0)}
+            onWheel={handleWheel}
+            min="0.01"
+            step="0.01"
+            disabled={isLoading}
+            style={{ width: '100px' }}
+          />
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+            {m.quantityType}
+          </span>
+        </div>
+      )
+    },
+    {
+      key: 'totalNeed',
+      label: t('createPlan.table.totalNeed'),
+      render: (_, m) => `${m.totalNeeded.toFixed(2)} ${m.quantityType}`
+    },
+    {
+      key: 'available',
+      label: t('createPlan.table.available'),
+      render: (_, m) => `${m.availableQuantity.toFixed(2)} ${m.quantityType}`
+    },
+    {
+      key: 'status',
+      label: t('createPlan.table.status'),
+      render: (_, m) => (
+        <span style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '4px',
+          padding: '4px 8px',
+          borderRadius: 'var(--radius-md)',
+          fontSize: 'var(--text-sm)',
+          fontWeight: 500,
+          backgroundColor: m.isAvailable ? 'var(--success-100)' : 'var(--warning-100)',
+          color: m.isAvailable ? 'var(--success-700)' : 'var(--warning-700)'
+        }}>
+          {m.isAvailable ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
+          {m.isAvailable ? t('createPlan.status.available') : t('createPlan.status.insufficient')}
+        </span>
+      )
+    },
+    {
+      key: 'actions',
+      label: t('createPlan.table.actions'),
+      align: 'center',
+      render: (_, m) => (
+        <DeleteButton
+          title={t('createRecyclablePlan.buttons.remove')}
+          onClick={() => handleRemoveRecyclable(m.id)}
+          disabled={isLoading}
+        />
+      )
+    }
+  ];
 
-        <form onSubmit={handleSubmit} className="create-production-plan-form">
-          {error && (
-            <div className="error-message">{error}</div>
+  const recyclablesTableData = selectedRecyclables.map((m) => {
+    const totalNeeded = m.requiredQuantity * formData.quantityToProduce;
+    const isAvailable = m.availableQuantity >= totalNeeded;
+    return {
+      ...m,
+      totalNeeded,
+      isAvailable
+    };
+  });
+
+  return (
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('createRecyclablePlan.title')}
+      titleIcon={Recycle}
+      submitText={isLoading ? t('createRecyclablePlan.buttons.creating') : t('createRecyclablePlan.buttons.createRecyclablesPlan')}
+      cancelText={t('createRecyclablePlan.buttons.cancel')}
+      submitVariant="primary"
+      isSubmitting={isLoading || selectedRecyclables.length === 0}
+      onSubmit={handleSubmit}
+      maxWidth="1000px"
+    >
+      {error && (
+        <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
+      )}
+
+      <Form onSubmit={(e) => {
+        e.preventDefault();
+        handleSubmit();
+      }}>
+
+        <FormSection title={t('createRecyclablePlan.sections.outputRawMaterial')} titleIcon={Package}>
+          <FormGroup>
+            <Label htmlFor="targetRawMaterialId">{t('createRecyclablePlan.fields.selectRawMaterial')} *</Label>
+            <Select
+              id="targetRawMaterialId"
+              name="targetRawMaterialId"
+              value={useNewRawMaterial ? 'new' : formData.targetRawMaterialId}
+              onChange={handleInputChange}
+              required
+              disabled={isLoading}
+            >
+              <option value={0}>{t('createRecyclablePlan.fields.selectRawMaterialOption')}</option>
+              {rawMaterials.map(material => (
+                <option key={material.id} value={material.id}>
+                  {material.name} ({material.color}) - {t('createRecyclablePlan.labels.currentStock')} {material.quantity} {material.quantityType}
+                </option>
+              ))}
+              <option value="new">{t('createRecyclablePlan.fields.createNewRawMaterial')}</option>
+            </Select>
+          </FormGroup>
+
+          {useNewRawMaterial && (
+            <>
+              <FormRow>
+                <FormGroup>
+                  <Label htmlFor="newRawName">{t('createRecyclablePlan.fields.name')} *</Label>
+                  <Input id="newRawName" name="name" value={newRawMaterial.name} onChange={handleNewRawChange} required disabled={isLoading} />
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="newRawColor">{t('createRecyclablePlan.fields.color')} *</Label>
+                  <Input id="newRawColor" name="color" value={newRawMaterial.color} onChange={handleNewRawChange} required disabled={isLoading} />
+                </FormGroup>
+              </FormRow>
+              <FormRow>
+                <FormGroup>
+                  <Label htmlFor="newRawQtyType">{t('createRecyclablePlan.fields.unitType')} *</Label>
+                  <Input id="newRawQtyType" name="quantityType" value={newRawMaterial.quantityType} onChange={handleNewRawChange} required disabled={isLoading} list="qtyTypes" />
+                  <datalist id="qtyTypes">
+                    {commonQuantityTypes.map(type => (<option key={type} value={type} />))}
+                  </datalist>
+                </FormGroup>
+                <FormGroup>
+                  <Label htmlFor="newRawMinStock">{t('createRecyclablePlan.fields.minimumStock')}</Label>
+                  <Input type="number" id="newRawMinStock" name="minimumStock" value={newRawMaterial.minimumStock} onChange={handleNewRawChange} onWheel={handleWheel} min={0} step={1} disabled={isLoading} />
+                </FormGroup>
+              </FormRow>
+              <FormGroup>
+                <Label htmlFor="newRawDesc">{t('createRecyclablePlan.fields.description')}</Label>
+                <Textarea id="newRawDesc" name="description" value={newRawMaterial.description || ''} onChange={handleNewRawChange} rows={2} disabled={isLoading} />
+              </FormGroup>
+            </>
           )}
+        </FormSection>
 
-          {/* Output Raw Material Section */}
-          <div className="form-section">
-            <h3>{t('createRecyclablePlan.sections.outputRawMaterial')}</h3>
-            <div className="form-group">
-              <label htmlFor="targetRawMaterialId">{t('createRecyclablePlan.fields.selectRawMaterial')} *</label>
-              <select
-                id="targetRawMaterialId"
-                name="targetRawMaterialId"
-                value={useNewRawMaterial ? 'new' : formData.targetRawMaterialId}
-                onChange={handleInputChange}
-                required
-                disabled={isLoading}
-              >
-                <option value={0}>{t('createRecyclablePlan.fields.selectRawMaterialOption')}</option>
-                {rawMaterials.map(material => (
-                  <option key={material.id} value={material.id}>
-                    {material.name} ({material.color}) - {t('createRecyclablePlan.labels.currentStock')} {material.quantity} {material.quantityType}
-                  </option>
-                ))}
-                <option value="new">{t('createRecyclablePlan.fields.createNewRawMaterial')}</option>
-              </select>
-            </div>
+        <FormSection title={t('createRecyclablePlan.sections.planDetails')} titleIcon={FileText}>
+          <FormGroup>
+            <Label htmlFor="name">{t('createRecyclablePlan.fields.planName')} *</Label>
+            <Input id="name" name="name" value={formData.name} onChange={handleInputChange} required disabled={isLoading} placeholder={t('createRecyclablePlan.placeholders.planName')} />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="description">{t('createRecyclablePlan.fields.description')}</Label>
+            <Textarea id="description" name="description" value={formData.description} onChange={handleInputChange} rows={2} disabled={isLoading} />
+          </FormGroup>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="quantityToProduce">{t('createRecyclablePlan.fields.quantityToProduce')} *</Label>
+              <Input type="number" id="quantityToProduce" name="quantityToProduce" value={formData.quantityToProduce} onChange={handleInputChange} onWheel={handleWheel} min={0.01} step={0.01} required disabled={isLoading} />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="estimatedProductionTimeMinutes">{t('createRecyclablePlan.fields.estimatedTimeMinutes')} *</Label>
+              <Input type="number" id="estimatedProductionTimeMinutes" name="estimatedProductionTimeMinutes" value={formData.estimatedProductionTimeMinutes} onChange={handleInputChange} onWheel={handleWheel} min={1} step={1} required disabled={isLoading} />
+            </FormGroup>
+          </FormRow>
+          <FormGroup>
+            <Label htmlFor="plannedStartDate">{t('createRecyclablePlan.fields.plannedStartDate')}</Label>
+            <Input type="date" id="plannedStartDate" name="plannedStartDate" value={formData.plannedStartDate} onChange={handleInputChange} disabled={isLoading} />
+          </FormGroup>
+          <FormGroup>
+            <Label htmlFor="notes">{t('createRecyclablePlan.fields.notes')}</Label>
+            <Textarea id="notes" name="notes" value={formData.notes} onChange={handleInputChange} rows={2} disabled={isLoading} />
+          </FormGroup>
+        </FormSection>
 
-            {useNewRawMaterial && (
-              <div className="new-product-form">
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="newRawName">{t('createRecyclablePlan.fields.name')} *</label>
-                    <input id="newRawName" name="name" value={newRawMaterial.name} onChange={handleNewRawChange} required disabled={isLoading} />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="newRawColor">{t('createRecyclablePlan.fields.color')} *</label>
-                    <input id="newRawColor" name="color" value={newRawMaterial.color} onChange={handleNewRawChange} required disabled={isLoading} />
-                  </div>
-                </div>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="newRawQtyType">{t('createRecyclablePlan.fields.unitType')} *</label>
-                    <input id="newRawQtyType" name="quantityType" value={newRawMaterial.quantityType} onChange={handleNewRawChange} required disabled={isLoading} list="qtyTypes" />
-                    <datalist id="qtyTypes">
-                      {commonQuantityTypes.map(type => (<option key={type} value={type} />))}
-                    </datalist>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="newRawMinStock">{t('createRecyclablePlan.fields.minimumStock')}</label>
-                    <input type="number" id="newRawMinStock" name="minimumStock" value={newRawMaterial.minimumStock} onChange={handleNewRawChange} onWheel={handleWheel} min={0} step={1} disabled={isLoading} />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="newRawDesc">{t('createRecyclablePlan.fields.description')}</label>
-                  <textarea id="newRawDesc" name="description" value={newRawMaterial.description || ''} onChange={handleNewRawChange} rows={2} disabled={isLoading} />
-                </div>
-              </div>
-            )}
-          </div>
+        <FormSection title={t('createRecyclablePlan.sections.requiredRecyclables')} titleIcon={Package}>
+          <FormRow>
+            <div style={{ flex: 2 }}>
+              <FormGroup>
+                <Label htmlFor="currentRecyclable">{t('createRecyclablePlan.fields.selectRecyclable')}</Label>
+                <Select id="currentRecyclable" value={currentRecyclable.rawMaterialId} onChange={(e) => setCurrentRecyclable(prev => ({ ...prev, rawMaterialId: parseInt(e.target.value) }))} disabled={isLoading}>
+                  <option value={0}>{t('createRecyclablePlan.fields.selectRecyclableOption')}</option>
+                  {recyclables.map(mat => (
+                    <option key={mat.id} value={mat.id}>
+                      {mat.name} ({mat.color}) - {t('createRecyclablePlan.labels.available')} {mat.quantity} {mat.quantityType}
+                    </option>
+                  ))}
+                </Select>
+              </FormGroup>
+            </div>
+            <FormGroup>
+              <Label htmlFor="recyclableQty">{t('createRecyclablePlan.fields.quantity')}</Label>
+              <Input type="number" id="recyclableQty" value={currentRecyclable.requiredQuantity} onChange={(e) => setCurrentRecyclable(prev => ({ ...prev, requiredQuantity: parseFloat(e.target.value) || 0 }))} onWheel={handleWheel} min={0.01} step={0.01} disabled={isLoading} />
+            </FormGroup>
+            <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+              <FormGroup>
+                <Label>&nbsp;</Label>
+                <button
+                  type="button"
+                  onClick={handleAddRecyclable}
+                  className="btn btn-secondary"
+                  disabled={isLoading}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                >
+                  <Plus size={16} />
+                  {t('createRecyclablePlan.buttons.add')}
+                </button>
+              </FormGroup>
+            </div>
+          </FormRow>
 
-          {/* Plan Details */}
-          <div className="form-section">
-            <h3>{t('createRecyclablePlan.sections.planDetails')}</h3>
-            <div className="form-group">
-              <label htmlFor="name">{t('createRecyclablePlan.fields.planName')} *</label>
-              <input id="name" name="name" value={formData.name} onChange={handleInputChange} required disabled={isLoading} placeholder={t('createRecyclablePlan.placeholders.planName')} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="description">{t('createRecyclablePlan.fields.description')}</label>
-              <textarea id="description" name="description" value={formData.description} onChange={handleInputChange} rows={2} disabled={isLoading} />
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="quantityToProduce">{t('createRecyclablePlan.fields.quantityToProduce')} *</label>
-                <input type="number" id="quantityToProduce" name="quantityToProduce" value={formData.quantityToProduce} onChange={handleInputChange} onWheel={handleWheel} min={0.01} step={0.01} required disabled={isLoading} />
-              </div>
-              <div className="form-group">
-                <label htmlFor="estimatedProductionTimeMinutes">{t('createRecyclablePlan.fields.estimatedTimeMinutes')} *</label>
-                <input type="number" id="estimatedProductionTimeMinutes" name="estimatedProductionTimeMinutes" value={formData.estimatedProductionTimeMinutes} onChange={handleInputChange} onWheel={handleWheel} min={1} step={1} required disabled={isLoading} />
-              </div>
-            </div>
-            <div className="form-group">
-              <label htmlFor="plannedStartDate">{t('createRecyclablePlan.fields.plannedStartDate')}</label>
-              <input type="date" id="plannedStartDate" name="plannedStartDate" value={formData.plannedStartDate} onChange={handleInputChange} disabled={isLoading} />
-            </div>
-            <div className="form-group">
-              <label htmlFor="notes">{t('createRecyclablePlan.fields.notes')}</label>
-              <textarea id="notes" name="notes" value={formData.notes} onChange={handleInputChange} rows={2} disabled={isLoading} />
-            </div>
-          </div>
-
-          {/* Required Recyclables */}
-          <div className="form-section">
-            <h3>{t('createRecyclablePlan.sections.requiredRecyclables')}</h3>
-            <div className="add-material-section">
-              <div className="form-row">
-                <div className="form-group" style={{ flex: 2 }}>
-                  <label htmlFor="currentRecyclable">{t('createRecyclablePlan.fields.selectRecyclable')}</label>
-                  <select id="currentRecyclable" value={currentRecyclable.rawMaterialId} onChange={(e) => setCurrentRecyclable(prev => ({ ...prev, rawMaterialId: parseInt(e.target.value) }))} disabled={isLoading}>
-                    <option value={0}>{t('createRecyclablePlan.fields.selectRecyclableOption')}</option>
-                    {recyclables.map(mat => (
-                      <option key={mat.id} value={mat.id}>
-                        {mat.name} ({mat.color}) - {t('createRecyclablePlan.labels.available')} {mat.quantity} {mat.quantityType}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="recyclableQty">{t('createRecyclablePlan.fields.quantity')}</label>
-                  <input type="number" id="recyclableQty" value={currentRecyclable.requiredQuantity} onChange={(e) => setCurrentRecyclable(prev => ({ ...prev, requiredQuantity: parseFloat(e.target.value) || 0 }))} onWheel={handleWheel} min={0.01} step={0.01} disabled={isLoading} />
-                </div>
-                <div className="form-group" style={{ display: 'flex', alignItems: 'flex-end' }}>
-                  <button type="button" onClick={handleAddRecyclable} className="btn btn-secondary" disabled={isLoading}>{t('createRecyclablePlan.buttons.add')}</button>
-                </div>
-              </div>
-            </div>
-
-            {selectedRecyclables.length > 0 && (
-              <div className="selected-materials">
-                <h4>{t('createRecyclablePlan.labels.selectedRecyclables')}</h4>
-                <table className="materials-table">
-                  <thead>
-                    <tr>
-                      <th>{t('createPlan.table.material')}</th>
-                      <th>{t('createPlan.table.requiredPerUnit')}</th>
-                      <th>{t('createPlan.table.totalNeed')}</th>
-                      <th>{t('createPlan.table.available')}</th>
-                      <th>{t('createPlan.table.status')}</th>
-                      <th>{t('createPlan.table.actions')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {selectedRecyclables.map(m => {
-                      const totalNeeded = m.requiredQuantity * formData.quantityToProduce;
-                      const isAvailable = m.availableQuantity >= totalNeeded;
-                      return (
-                        <tr key={m.id} className={!isAvailable ? 'insufficient-stock' : ''}>
-                          <td>
-                            <div className="material-info">
-                              <span className="material-name">{m.materialName}</span>
-                              <span className="material-color">({m.materialColor})</span>
-                            </div>
-                          </td>
-                          <td>
-                            <input type="number" value={m.requiredQuantity} onChange={(e) => handleUpdateRecyclableQty(m.id, parseFloat(e.target.value) || 0)} onWheel={handleWheel} min={0.01} step={0.01} className="quantity-input" disabled={isLoading} />
-                            {m.quantityType}
-                          </td>
-                          <td>{totalNeeded.toFixed(2)} {m.quantityType}</td>
-                          <td>{m.availableQuantity.toFixed(2)} {m.quantityType}</td>
-                          <td>
-                            <span className={`status-badge ${isAvailable ? 'status-available' : 'status-insufficient'}`}>
-                              {isAvailable ? t('createPlan.status.available') : t('createPlan.status.insufficient')}
-                            </span>
-                          </td>
-                          <td>
-                            <button type="button" onClick={() => handleRemoveRecyclable(m.id)} className="btn btn-sm btn-danger" disabled={isLoading}>{t('createRecyclablePlan.buttons.remove')}</button>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-
-          <div className="form-actions">
-            <button type="button" onClick={onClose} className="btn btn-secondary" disabled={isLoading}>{t('createRecyclablePlan.buttons.cancel')}</button>
-            <button type="submit" className="btn btn-primary" disabled={isLoading || selectedRecyclables.length === 0}>
-              {isLoading ? t('createRecyclablePlan.buttons.creating') : t('createRecyclablePlan.buttons.createRecyclablesPlan')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          {selectedRecyclables.length > 0 && (
+            <Table
+              columns={recyclablesTableColumns}
+              data={recyclablesTableData}
+              getRowKey={(m) => m.id}
+              getRowClassName={(m) => !m.isAvailable ? 'insufficient-stock' : ''}
+              showContainer={false}
+            />
+          )}
+        </FormSection>
+      </Form>
+    </Modal>
   );
 };
 

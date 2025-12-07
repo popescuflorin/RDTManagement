@@ -65,6 +65,9 @@
     "failedToCreateTransport": "Failed to create transport",
     "failedToProcessOrder": "Failed to process order"
   },
+  "loading": {
+    "loadingOrders": "Loading orders..."
+  },
   "form": {
     "noClient": "No Client",
     "createClient": "Create Client",

@@ -15,7 +15,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table, Select, Pagination, ErrorMessage, FiltersControl } from '../atoms';
+import { Table, Select, Pagination, ErrorMessage, FiltersControl, StatCard, StatisticsContainer } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Acquisition.css';
 
@@ -204,35 +204,23 @@ const Acquisition: React.FC = () => {
 
       {/* Statistics */}
       {statistics && (
-        <div className="acquisition-statistics">
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Package size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.totalAcquisitions}</div>
-              <div className="stat-label">{t('statistics.totalAcquisitions')}</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Edit size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.draftAcquisitions}</div>
-              <div className="stat-label">{t('statistics.draft')}</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Package size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.receivedAcquisitions}</div>
-              <div className="stat-label">{t('statistics.received')}</div>
-            </div>
-          </div>
-        </div>
+        <StatisticsContainer>
+          <StatCard
+            icon={Package}
+            value={statistics.totalAcquisitions}
+            label={t('statistics.totalAcquisitions')}
+          />
+          <StatCard
+            icon={Edit}
+            value={statistics.draftAcquisitions}
+            label={t('statistics.draft')}
+          />
+          <StatCard
+            icon={Package}
+            value={statistics.receivedAcquisitions}
+            label={t('statistics.received')}
+          />
+        </StatisticsContainer>
       )}
 
       {/* Error Message */}

@@ -15,7 +15,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import CancelButton from '../atoms/CancelButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table, PageContainer, Loader, Select, Pagination, ErrorMessage, FiltersControl } from '../atoms';
+import { Table, PageContainer, Loader, Select, Pagination, ErrorMessage, FiltersControl, PageHeader, StatCard, StatisticsContainer } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Orders.css';
 
@@ -223,97 +223,61 @@ const Orders: React.FC = () => {
     };
   };
 
-  if (isLoading) {
-    return (
-      <PageContainer>
-        <Loader message={t('common:messages.loading')} />
-      </PageContainer>
-    );
-  }
-
   return (
-    <div className="orders-container">
-      <div className="orders-header">
-        <h1>
-          <Package size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-          {t('title')}
-        </h1>
-        <CreateButton
-          onClick={handleCreateOrder}
-          requiredPermission={Permissions.CreateOrder}
-          variant="primary"
-        >
-          {t('createOrder')}
-        </CreateButton>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('title')}
+        icon={Package}
+        actions={
+          <CreateButton
+            onClick={handleCreateOrder}
+            requiredPermission={Permissions.CreateOrder}
+            variant="primary"
+          >
+            {t('createOrder')}
+          </CreateButton>
+        } 
+      />
 
       {/* Statistics Cards */}
       {statistics && (
-        <div className="orders-stats">
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Package size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.totalOrders}</div>
-              <div className="stat-label">{t('statistics.totalOrders')}</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Edit size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.draftOrders}</div>
-              <div className="stat-label">{t('statistics.draftOrders')}</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Clock size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.pendingOrders}</div>
-              <div className="stat-label">{t('statistics.pendingOrders')}</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Loader2 size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.processingOrders}</div>
-              <div className="stat-label">{t('statistics.processingOrders')}</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Truck size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.shippedOrders}</div>
-              <div className="stat-label">{t('statistics.shippedOrders')}</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <CheckCircle size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.deliveredOrders}</div>
-              <div className="stat-label">{t('statistics.deliveredOrders')}</div>
-            </div>
-          </div>
-          <div className="stat-card stat-card-primary">
-            <div className="stat-icon">
-              <BarChart3 size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{formatCurrency(statistics.totalOrderValue)}</div>
-              <div className="stat-label">{t('statistics.totalOrderValue')}</div>
-            </div>
-          </div>
-        </div>
+        <StatisticsContainer>
+          <StatCard
+            icon={Package}
+            value={statistics.totalOrders}
+            label={t('statistics.totalOrders')}
+          />
+          <StatCard
+            icon={Edit}
+            value={statistics.draftOrders}
+            label={t('statistics.draftOrders')}
+          />
+          <StatCard
+            icon={Clock}
+            value={statistics.pendingOrders}
+            label={t('statistics.pendingOrders')}
+          />
+          <StatCard
+            icon={Loader2}
+            value={statistics.processingOrders}
+            label={t('statistics.processingOrders')}
+          />
+          <StatCard
+            icon={Truck}
+            value={statistics.shippedOrders}
+            label={t('statistics.shippedOrders')}
+          />
+          <StatCard
+            icon={CheckCircle}
+            value={statistics.deliveredOrders}
+            label={t('statistics.deliveredOrders')}
+          />
+          <StatCard
+            icon={BarChart3}
+            value={formatCurrency(statistics.totalOrderValue)}
+            label={t('statistics.totalOrderValue')}
+          />
+        </StatisticsContainer>
       )}
 
       {/* Filters and Search */}
@@ -356,6 +320,10 @@ const Orders: React.FC = () => {
 
       {/* Orders Table */}
       {(() => {
+        if (isLoading) {
+          return <Loader message={t('loading.loadingOrders')} />;
+        }
+
         const columns: TableColumn<Order>[] = [
           {
             key: 'id',
@@ -572,7 +540,7 @@ const Orders: React.FC = () => {
           isLoading={isCancelling}
         />
       )}
-    </div>
+    </PageContainer>
   );
 };
 

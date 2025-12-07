@@ -1,7 +1,7 @@
 import React from 'react';
 import './Form.css';
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'children'> {
   /**
    * Input type (default: 'text')
    */
@@ -28,14 +28,14 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
  * Reusable Input component following atomic design principles
  * Provides consistent input styling with error states
  */
-const Input: React.FC<InputProps> = ({
+const Input = ({
   type = 'text',
   size = 'md',
   error = false,
   errorMessage,
   className = '',
   ...restProps
-}) => {
+}: InputProps) => {
   return (
     <div className="form-input-wrapper">
       <input

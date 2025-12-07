@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { orderApi, inventoryApi, transportApi, clientApi, userApi } from '../../services/api';
 import type { RawMaterial, UpdateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest, Order, User } from '../../types';
 import { MaterialType } from '../../types';
-import { Plus, Trash2, UserCircle, Truck, Package, FileText } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select } from '../atoms';
+import { Plus, UserCircle, Truck, Package, FileText } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, DeleteButton } from '../atoms';
 
 interface EditOrderProps {
   isOpen: boolean;
@@ -971,39 +971,37 @@ const EditOrder: React.FC<EditOrderProps> = ({
                         <div className="item-color">{t('form.color')}: {item.materialColor}</div>
                       </div>
                       <div className="item-details">
-                        <div className="form-row">
-                          <div className="form-group">
-                            <label>{t('form.itemQuantity')}</label>
-                            <input
+                        <FormRow>
+                          <FormGroup>
+                            <Label htmlFor={`item-quantity-${index}`}>{t('form.itemQuantity')}</Label>
+                            <Input
                               type="number"
+                              id={`item-quantity-${index}`}
                               value={item.quantity}
                               onChange={(e) => handleUpdateItem(index, { quantity: parseFloat(e.target.value) || 0 })}
                               onWheel={handleWheel}
                               min="0"
                               step="0.01"
                             />
-                          </div>
-                          <div className="form-group">
-                            <label>{t('form.unit', { defaultValue: 'Unit' })}</label>
-                            <input
+                          </FormGroup>
+                          <FormGroup>
+                            <Label htmlFor={`item-unit-${index}`}>{t('form.unit', { defaultValue: 'Unit' })}</Label>
+                            <Input
                               type="text"
+                              id={`item-unit-${index}`}
                               value={item.quantityType}
                               disabled
-                              className="disabled-field"
                             />
-                          </div>
-                        </div>
+                          </FormGroup>
+                        </FormRow>
                         <div className="item-total">
                           {t('form.unitPrice')}: ${item.unitPrice.toFixed(2)} | {t('form.totalPrice')}: ${item.totalPrice.toFixed(2)}
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        className="remove-item-button"
+                      <DeleteButton
+                        title={t('form.removeItem', { defaultValue: 'Remove Item' })}
                         onClick={() => handleRemoveItem(index)}
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      />
                     </div>
                   ))}
                 </div>

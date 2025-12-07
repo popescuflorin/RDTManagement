@@ -6,14 +6,10 @@ import {
   CheckCircle, 
   Wrench, 
   BarChart3, 
-  Search, 
   Filter,
   Play,
   Truck,
-  ChevronLeft,
-  ChevronRight,
-  Recycle,
-  Loader2
+  Recycle
 } from 'lucide-react';
 import { productionPlanApi } from '../../services/api';
 import type { ProductionPlan, ProductionPlanStatistics, PagedResult, RecyclableProductionPlan } from '../../types';
@@ -34,7 +30,7 @@ import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import CancelButton from '../atoms/CancelButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table } from '../atoms';
+import { Table, StatCard, StatisticsContainer, PageContainer, PageHeader, Loader, FiltersControl, ErrorMessage, Pagination, Select } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Production.css';
 
@@ -348,27 +344,14 @@ const Production: React.FC = () => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="production-loading">
-        <Loader2 size={32} className="animate-spin" />
-        <p>{t('loading')}</p>
-      </div>
-    );
-  }
-
   return (
-    <div className="production-container">
-      <div className="production-header">
-        <div className="header-left">
-          <h1>
-            <Factory size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
-            {t('productionManagement')}
-          </h1>
-          <p>{t('subtitle')}</p>
-        </div>
-        <div className="header-right">
-          {activeTab === 'rawMaterial' && (
+    <PageContainer>
+      <PageHeader
+        title={t('productionManagement')}
+        icon={Factory}
+        subtitle={t('subtitle')}
+        actions={
+          activeTab === 'rawMaterial' ? (
             <CreateButton
               onClick={() => setShowCreateModal(true)}
               requiredPermission={Permissions.CreateProductionPlan}
@@ -376,8 +359,7 @@ const Production: React.FC = () => {
             >
               {t('buttons.createProductionPlan')}
             </CreateButton>
-          )}
-          {activeTab === 'recyclable' && (
+          ) : (
             <CreateButton
               onClick={() => setShowCreateRecycleModal(true)}
               requiredPermission={Permissions.CreateProductionPlan}
@@ -385,9 +367,9 @@ const Production: React.FC = () => {
             >
               {t('buttons.createRecyclablesPlan')}
             </CreateButton>
-          )}
-        </div>
-      </div>
+          )
+        }
+      />
 
       {/* Tab Navigation */}
       <div className="tab-navigation">
@@ -409,91 +391,68 @@ const Production: React.FC = () => {
 
       {/* Statistics Cards */}
       {statistics && (
-        <div className="production-stats">
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Package size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.totalPlans}</div>
-              <div className="stat-label">{t('statistics.totalPlans')}</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <CheckCircle size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.completedPlans}</div>
-              <div className="stat-label">{t('statistics.completed')}</div>
-            </div>
-          </div>
-          <div className={`stat-card ${statistics.inProgressPlans > 0 ? 'warning' : ''}`}>
-            <div className="stat-icon">
-              <Wrench size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.inProgressPlans}</div>
-              <div className="stat-label">{t('statistics.inProgress')}</div>
-            </div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <BarChart3 size={24} />
-            </div>
-            <div className="stat-content">
-              <div className="stat-number">{statistics.totalUnitsProduced}</div>
-              <div className="stat-label">{t('statistics.unitsProduced')}</div>
-            </div>
-          </div>
-        </div>
+        <StatisticsContainer>
+          <StatCard
+            icon={Package}
+            value={statistics.totalPlans}
+            label={t('statistics.totalPlans')}
+          />
+          <StatCard
+            icon={CheckCircle}
+            value={statistics.completedPlans}
+            label={t('statistics.completed')}
+          />
+          <StatCard
+            icon={Wrench}
+            value={statistics.inProgressPlans}
+            label={t('statistics.inProgress')}
+            variant={statistics.inProgressPlans > 0 ? 'warning' : 'default'}
+          />
+          <StatCard
+            icon={BarChart3}
+            value={statistics.totalUnitsProduced}
+            label={t('statistics.unitsProduced')}
+          />
+        </StatisticsContainer>
       )}
 
       {activeTab === 'rawMaterial' && (
         <>
           {/* Filters and Search */}
-          <div className="production-controls">
-            <div className="search-container">
-              <div className="search-input-wrapper">
-                <Search size={20} className="search-icon" />
-                <input
-                  type="text"
-                  placeholder={t('filters.searchPlans')}
-                  value={searchTerm}
+          <FiltersControl
+            searchPlaceholder={t('filters.searchPlans')}
+            searchValue={searchTerm}
+            onSearchChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1); // Reset to first page on search
+            }}
+            filters={
+              <div className="filter-container">
+                <Filter size={20} className="filter-icon" />
+                <Select
+                  value={statusFilter ?? ''}
                   onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1); // Reset to first page on search
+                    setStatusFilter(e.target.value ? Number(e.target.value) as ProductionPlanStatus : null);
+                    setCurrentPage(1);
                   }}
-                  className="search-input"
-                />
+                  className="filter-select"
+                >
+                  <option value="">All Status</option>
+                  <option value={ProductionPlanStatus.Draft}>Draft</option>
+                  <option value={ProductionPlanStatus.Planned}>Planned</option>
+                  <option value={ProductionPlanStatus.InProgress}>In Progress</option>
+                  <option value={ProductionPlanStatus.Completed}>Completed</option>
+                  <option value={ProductionPlanStatus.Cancelled}>Cancelled</option>
+                </Select>
               </div>
-            </div>
-            
-            {/* Status Filter */}
-            <div className="filter-container">
-              <Filter size={20} className="filter-icon" />
-              <select
-                value={statusFilter ?? ''}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value ? Number(e.target.value) as ProductionPlanStatus : null);
-                  setCurrentPage(1);
-                }}
-                className="filter-select"
-              >
-                <option value="">All Status</option>
-                <option value={ProductionPlanStatus.Draft}>Draft</option>
-                <option value={ProductionPlanStatus.Planned}>Planned</option>
-                <option value={ProductionPlanStatus.InProgress}>In Progress</option>
-                <option value={ProductionPlanStatus.Completed}>Completed</option>
-                <option value={ProductionPlanStatus.Cancelled}>Cancelled</option>
-              </select>
-            </div>
-          </div>
+            }
+          />
 
           {error && (
-            <div className="error-message">
-              {error}
-            </div>
+            <ErrorMessage
+              message={error}
+              onDismiss={() => setError(null)}
+            />
           )}
         </>
       )}
@@ -501,7 +460,9 @@ const Production: React.FC = () => {
       {activeTab === 'rawMaterial' && (
         <>
           {/* Production Plans Table */}
-          {(() => {
+          {isLoading ? (
+            <Loader message={t('loading')} />
+          ) : (() => {
             const columns: TableColumn<ProductionPlan>[] = [
               {
                 key: 'Name',
@@ -669,91 +630,29 @@ const Production: React.FC = () => {
 
           {/* Pagination Controls */}
           {pagedData && pagedData.totalPages > 0 && (
-            <div className="pagination-container">
-              <div className="pagination-info">
-                {t('pagination.showing', {
+            <Pagination
+              data={pagedData}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setCurrentPage(1);
+              }}
+              labels={{
+                showing: t('pagination.showing', {
                   start: ((pagedData.page - 1) * pagedData.pageSize) + 1,
                   end: Math.min(pagedData.page * pagedData.pageSize, pagedData.totalCount),
                   total: pagedData.totalCount
-                })}
-              </div>
-              
-              <div className="pagination-controls">
-                <button
-                  className="pagination-btn"
-                  onClick={() => setCurrentPage(1)}
-                  disabled={!pagedData.hasPreviousPage}
-                >
-                  {t('pagination.first')}
-                </button>
-                <button
-                  className="pagination-btn"
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  disabled={!pagedData.hasPreviousPage}
-                >
-                  <ChevronLeft size={16} />
-                  {t('pagination.previous')}
-                </button>
-                
-                <div className="pagination-pages">
-                  {Array.from({ length: Math.min(5, pagedData.totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (pagedData.totalPages <= 5) {
-                      pageNum = i + 1;
-                    } else if (currentPage <= 3) {
-                      pageNum = i + 1;
-                    } else if (currentPage >= pagedData.totalPages - 2) {
-                      pageNum = pagedData.totalPages - 4 + i;
-                    } else {
-                      pageNum = currentPage - 2 + i;
-                    }
-                    
-                    return (
-                      <button
-                        key={pageNum}
-                        className={`pagination-page ${currentPage === pageNum ? 'active' : ''}`}
-                        onClick={() => setCurrentPage(pageNum)}
-                      >
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-                </div>
-                
-                <button
-                  className="pagination-btn"
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  disabled={!pagedData.hasNextPage}
-                >
-                  {t('pagination.next')}
-                  <ChevronRight size={16} />
-                </button>
-                <button
-                  className="pagination-btn"
-                  onClick={() => setCurrentPage(pagedData.totalPages)}
-                  disabled={!pagedData.hasNextPage}
-                >
-                  {t('pagination.last')}
-                </button>
-              </div>
-              
-              <div className="page-size-selector">
-                <label>{t('pagination.show')}</label>
-                <select
-                  value={pageSize}
-                  onChange={(e) => {
-                    setPageSize(Number(e.target.value));
-                    setCurrentPage(1);
-                  }}
-                >
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-                <span>{t('pagination.perPage')}</span>
-              </div>
-            </div>
+                }),
+                first: t('pagination.first'),
+                previous: t('pagination.previous'),
+                next: t('pagination.next'),
+                last: t('pagination.last'),
+                show: t('pagination.show'),
+                perPage: t('pagination.perPage')
+              }}
+            />
           )}
         </>
       )}
@@ -761,48 +660,46 @@ const Production: React.FC = () => {
       {activeTab === 'recyclable' && (
         <>
           {/* Filters and Search */}
-          <div className="production-controls">
-            <div className="search-container">
-              <div className="search-input-wrapper">
-                <Search size={20} className="search-icon" />
-                <input
-                  type="text"
-                  placeholder={t('filters.searchRecyclablePlans')}
-                  value={searchTerm}
+          <FiltersControl
+            searchPlaceholder={t('filters.searchRecyclablePlans')}
+            searchValue={searchTerm}
+            onSearchChange={(e) => {
+              setSearchTerm(e.target.value);
+              setCurrentPage(1);
+            }}
+            filters={
+              <div className="filter-container">
+                <Filter size={20} className="filter-icon" />
+                <Select
+                  value={statusFilter ?? ''}
                   onChange={(e) => {
-                    setSearchTerm(e.target.value);
+                    setStatusFilter(e.target.value ? Number(e.target.value) as ProductionPlanStatus : null);
                     setCurrentPage(1);
                   }}
-                  className="search-input"
-                />
+                  className="filter-select"
+                >
+                  <option value="">{t('filters.allStatus')}</option>
+                  <option value={ProductionPlanStatus.Draft}>{t('status.draft')}</option>
+                  <option value={ProductionPlanStatus.Planned}>{t('status.planned')}</option>
+                  <option value={ProductionPlanStatus.InProgress}>{t('status.inProgress')}</option>
+                  <option value={ProductionPlanStatus.Completed}>{t('status.completed')}</option>
+                  <option value={ProductionPlanStatus.Cancelled}>{t('status.cancelled')}</option>
+                </Select>
               </div>
-            </div>
-            <div className="filter-container">
-              <Filter size={20} className="filter-icon" />
-              <select
-                value={statusFilter ?? ''}
-                onChange={(e) => {
-                  setStatusFilter(e.target.value ? Number(e.target.value) as ProductionPlanStatus : null);
-                  setCurrentPage(1);
-                }}
-                className="filter-select"
-              >
-                <option value="">{t('filters.allStatus')}</option>
-                <option value={ProductionPlanStatus.Draft}>{t('status.draft')}</option>
-                <option value={ProductionPlanStatus.Planned}>{t('status.planned')}</option>
-                <option value={ProductionPlanStatus.InProgress}>{t('status.inProgress')}</option>
-                <option value={ProductionPlanStatus.Completed}>{t('status.completed')}</option>
-                <option value={ProductionPlanStatus.Cancelled}>{t('status.cancelled')}</option>
-              </select>
-            </div>
-          </div>
+            }
+          />
 
           {error && (
-            <div className="error-message">{error}</div>
+            <ErrorMessage
+              message={error}
+              onDismiss={() => setError(null)}
+            />
           )}
 
           {/* Recyclable Plans Table */}
-          {(() => {
+          {isLoading ? (
+            <Loader message={t('loading')} />
+          ) : (() => {
             const columns: TableColumn<RecyclableProductionPlan>[] = [
               {
                 key: 'Name',
@@ -937,45 +834,29 @@ const Production: React.FC = () => {
 
           {/* Pagination Controls */}
           {recPagedData && recPagedData.totalPages > 0 && (
-            <div className="pagination-container">
-              <div className="pagination-info">
-                {t('pagination.showing', {
+            <Pagination
+              data={recPagedData}
+              currentPage={currentPage}
+              pageSize={pageSize}
+              onPageChange={setCurrentPage}
+              onPageSizeChange={(newSize) => {
+                setPageSize(newSize);
+                setCurrentPage(1);
+              }}
+              labels={{
+                showing: t('pagination.showing', {
                   start: ((recPagedData.page - 1) * recPagedData.pageSize) + 1,
                   end: Math.min(recPagedData.page * recPagedData.pageSize, recPagedData.totalCount),
                   total: recPagedData.totalCount
-                })}
-              </div>
-              <div className="pagination-controls">
-                <button className="pagination-btn" onClick={() => setCurrentPage(1)} disabled={!recPagedData.hasPreviousPage}>{t('pagination.first')}</button>
-                <button className="pagination-btn" onClick={() => setCurrentPage(currentPage - 1)} disabled={!recPagedData.hasPreviousPage}>
-                  <ChevronLeft size={16} />
-                  {t('pagination.previous')}
-                </button>
-                <div className="pagination-pages">
-                  {Array.from({ length: Math.min(5, recPagedData.totalPages) }, (_, i) => {
-                    let pageNum;
-                    if (recPagedData.totalPages <= 5) pageNum = i + 1; else if (currentPage <= 3) pageNum = i + 1; else if (currentPage >= recPagedData.totalPages - 2) pageNum = recPagedData.totalPages - 4 + i; else pageNum = currentPage - 2 + i;
-                    return (
-                      <button key={pageNum} className={`pagination-page ${currentPage === pageNum ? 'active' : ''}`} onClick={() => setCurrentPage(pageNum)}>
-                        {pageNum}
-                      </button>
-                    );
-                  })}
-                </div>
-                <button className="pagination-btn" onClick={() => setCurrentPage(currentPage + 1)} disabled={!recPagedData.hasNextPage}>{t('pagination.next')}<ChevronRight size={16} /></button>
-                <button className="pagination-btn" onClick={() => setCurrentPage(recPagedData.totalPages)} disabled={!recPagedData.hasNextPage}>{t('pagination.last')}</button>
-              </div>
-              <div className="page-size-selector">
-                <label>{t('pagination.show')}</label>
-                <select value={pageSize} onChange={(e) => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}>
-                  <option value={10}>10</option>
-                  <option value={25}>25</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
-                </select>
-                <span>{t('pagination.perPage')}</span>
-              </div>
-            </div>
+                }),
+                first: t('pagination.first'),
+                previous: t('pagination.previous'),
+                next: t('pagination.next'),
+                last: t('pagination.last'),
+                show: t('pagination.show'),
+                perPage: t('pagination.perPage')
+              }}
+            />
           )}
         </>
       )}
@@ -1058,7 +939,7 @@ const Production: React.FC = () => {
           onPlanReceived={handlePlanReceived}
         />
       )}
-    </div>
+    </PageContainer>
   );
 };
 

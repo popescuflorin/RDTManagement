@@ -1,0 +1,16 @@
+/* Standardized StatisticsContainer Component - Centralized styles for all statistics containers */
+
+.statistics-container {
+  display: grid;
+  margin-bottom: var(--space-3xl);
+  padding: 0 var(--space-2xl);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .statistics-container {
+    grid-template-columns: 1fr !important;
+    padding: 0;
+    gap: var(--space-md) !important;
+  }
+}

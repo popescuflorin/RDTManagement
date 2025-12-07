@@ -4,7 +4,8 @@ import { orderApi, inventoryApi, transportApi, clientApi, userApi } from '../../
 import type { RawMaterial, CreateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest, User } from '../../types';
 import { MaterialType } from '../../types';
 import { Plus, Trash2, UserCircle, Truck, Package } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select } from '../atoms';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, Table, ErrorMessage } from '../atoms';
+import type { TableColumn } from '../atoms';
 
 interface CreateOrderProps {
   isOpen: boolean;
@@ -35,6 +36,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
   const [users, setUsers] = useState<User[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [itemError, setItemError] = useState<string | null>(null);
 
   // Form data
   const [description, setDescription] = useState('');
@@ -139,19 +141,19 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
 
   const handleAddItem = () => {
     if (newItem.rawMaterialId === 0 || newItem.quantity <= 0) {
-      setError(t('messages.selectMaterial'));
+      setItemError(t('messages.selectMaterial'));
       return;
     }
 
     const material = finishedProducts.find(m => m.id === newItem.rawMaterialId);
     if (!material) {
-      setError(t('messages.materialNotFound'));
+      setItemError(t('messages.materialNotFound'));
       return;
     }
 
     // Check if material is already added
     if (items.some(item => item.rawMaterialId === newItem.rawMaterialId)) {
-      setError(t('messages.materialExists'));
+      setItemError(t('messages.materialExists'));
       return;
     }
 
@@ -175,11 +177,12 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
     setMaterialSearchTerm('');
     setShowMaterialDropdown(false);
     setShowAddItemForm(false);
-    setError(null);
+    setItemError(null);
   };
 
   const handleRemoveItem = (id: string) => {
     setItems(items.filter(item => item.id !== id));
+    setItemError(null);
   };
 
   const handleUpdateItemQuantity = (id: string, quantity: number) => {
@@ -361,7 +364,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
     }
 
     if (items.length === 0) {
-      setError(t('messages.addItems'));
+      setItemError(t('messages.addItems'));
       return;
     }
 
@@ -883,6 +886,12 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
         </FormSection>
 
         <FormSection title={t('form.orderItems', { defaultValue: 'Order Items' })} titleIcon={Package}>
+          {itemError && (
+            <ErrorMessage
+              message={itemError}
+              onDismiss={() => setItemError(null)}
+            />
+          )}
           {!showAddItemForm ? (
             <button
               type="button"
@@ -983,6 +992,7 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                       setShowAddItemForm(false);
                       setMaterialSearchTerm('');
                       setNewItem({ rawMaterialId: 0, quantity: 1 });
+                      setItemError(null);
                     }}
                     disabled={isLoading}
                   >
@@ -993,65 +1003,105 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
             </div>
           )}
 
-            {items.length > 0 && (
-              <div className="items-table">
-                <table>
-                  <thead>
-                    <tr>
-                      <th>{t('form.product')}</th>
-                      <th>{t('form.color')}</th>
-                      <th>{t('form.itemQuantity')}</th>
-                      <th>{t('form.unitPrice')}</th>
-                      <th>{t('form.totalPrice')}</th>
-                      <th>{t('common:labels.actions')}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {items.map(item => (
-                      <tr key={item.id}>
-                        <td>{item.materialName}</td>
-                        <td>{item.materialColor}</td>
-                        <td>
-                          <input
+{items.length > 0 && (
+              <>
+                <Table
+                  columns={[
+                    {
+                      key: 'materialName',
+                      label: t('form.product'),
+                      cellClassName: 'order-item-name'
+                    },
+                    {
+                      key: 'materialColor',
+                      label: t('form.color'),
+                      cellClassName: 'order-item-color'
+                    },
+                    {
+                      key: 'quantity',
+                      label: t('form.itemQuantity'),
+                      render: (_, item) => (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Input
                             type="number"
                             value={item.quantity}
                             onChange={(e) => handleUpdateItemQuantity(item.id, parseFloat(e.target.value) || 0)}
                             onWheel={handleWheel}
                             min="0.01"
                             step="0.01"
-                            className="quantity-input"
                             disabled={isLoading}
+                            style={{ width: '100px' }}
                           />
-                          <span className="quantity-type">{item.quantityType}</span>
-                        </td>
-                        <td>${item.unitPrice.toFixed(2)}</td>
-                        <td>${item.totalPrice.toFixed(2)}</td>
-                        <td>
-                          <button
-                            type="button"
-                            className="btn btn-sm btn-danger"
-                            onClick={() => handleRemoveItem(item.id)}
-                            disabled={isLoading}
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot>
-                    <tr>
-                      <td colSpan={4} style={{ textAlign: 'right', fontWeight: 600 }}>
-                        {t('form.totalValue')}:
-                      </td>
-                      <td style={{ fontWeight: 700, color: 'var(--primary-600)' }}>
-                        ${totalValue.toFixed(2)}
-                      </td>
-                      <td></td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
+                          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                            {item.quantityType}
+                          </span>
+                        </div>
+                      ),
+                      cellClassName: 'order-item-quantity'
+                    },
+                    {
+                      key: 'unitPrice',
+                      label: t('form.unitPrice'),
+                      align: 'right',
+                      render: (_, item) => `$${item.unitPrice.toFixed(2)}`,
+                      cellClassName: 'order-item-unit-price'
+                    },
+                    {
+                      key: 'totalPrice',
+                      label: t('form.totalPrice'),
+                      align: 'right',
+                      render: (_, item) => (
+                        <span style={{ fontWeight: 600, color: 'var(--primary-600)' }}>
+                          ${item.totalPrice.toFixed(2)}
+                        </span>
+                      ),
+                      cellClassName: 'order-item-total-price'
+                    },
+                    {
+                      key: 'actions',
+                      label: t('common:labels.actions'),
+                      align: 'center',
+                      render: (_, item) => (
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleRemoveItem(item.id)}
+                          disabled={isLoading}
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      ),
+                      cellClassName: 'order-item-actions'
+                    }
+                  ] as TableColumn<OrderItem>[]}
+                  data={items}
+                  getRowKey={(item) => item.id}
+                  showContainer={false}
+                  tableClassName="order-items-table"
+                />
+                <div style={{ 
+                  marginTop: 'var(--space-lg)', 
+                  padding: 'var(--space-md)', 
+                  display: 'flex', 
+                  justifyContent: 'flex-end',
+                  alignItems: 'center',
+                  gap: 'var(--space-md)',
+                  borderTop: '1px solid var(--border)',
+                  backgroundColor: 'var(--background-secondary)'
+                }}>
+                  <span style={{ fontWeight: 600, fontSize: 'var(--text-base)' }}>
+                    {t('form.totalValue')}:
+                  </span>
+                  <span style={{ 
+                    fontWeight: 700, 
+                    fontSize: 'var(--text-lg)',
+                    color: 'var(--primary-600)' 
+                  }}>
+                    ${totalValue.toFixed(2)}
+                  </span>
+                </div>
+              </>
             )}
         </FormSection>
       </Form>

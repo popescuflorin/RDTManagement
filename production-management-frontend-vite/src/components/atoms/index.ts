@@ -94,3 +94,9 @@ export type { ErrorMessageProps } from './ErrorMessage';
 
 export { default as FiltersControl } from './FiltersControl';
 export type { FiltersControlProps } from './FiltersControl';
+
+export { default as StatCard } from './StatCard';
+export type { StatCardProps } from './StatCard';
+
+export { default as StatisticsContainer } from './StatisticsContainer';
+export type { StatisticsContainerProps } from './StatisticsContainer';

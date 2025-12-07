@@ -65,6 +65,9 @@
     "failedToCreateTransport": "Nu s-a putut crea transportul",
     "failedToProcessOrder": "Nu s-a putut procesa comanda"
   },
+  "loading": {
+    "loadingOrders": "Se încarcă comenzile..."
+  },
   "form": {
     "noClient": "Fără client",
     "createClient": "Creează client",
