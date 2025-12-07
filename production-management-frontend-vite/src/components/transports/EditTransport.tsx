@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { transportApi } from '../../services/api';
 import type { Transport, UpdateTransportRequest } from '../../types';
-import { X, Truck } from 'lucide-react';
+import { Truck } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input } from '../atoms';
 import './CreateTransport.css';
 
 interface EditTransportProps {
@@ -45,9 +46,7 @@ const EditTransport: React.FC<EditTransportProps> = ({
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (!formData.carName.trim()) {
       setError(t('editTransport.messages.carNameRequired'));
       return;
@@ -78,101 +77,82 @@ const EditTransport: React.FC<EditTransportProps> = ({
     }
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal-content create-transport-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>
-            <Truck size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            {t('editTransport.title')}
-          </h2>
-          <button className="close-button" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="transport-form">
-          {error && (
-            <div className="error-message">
-              {error}
-              <button type="button" onClick={() => setError(null)}>×</button>
-            </div>
-          )}
-
-          <div className="form-section">
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="carName">{t('editTransport.fields.carName')} *</label>
-                <input
-                  type="text"
-                  id="carName"
-                  name="carName"
-                  value={formData.carName}
-                  onChange={handleChange}
-                  placeholder={t('editTransport.placeholders.carName')}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="numberPlate">{t('editTransport.fields.numberPlate')}</label>
-                <input
-                  type="text"
-                  id="numberPlate"
-                  name="numberPlate"
-                  value={formData.numberPlate}
-                  onChange={handleChange}
-                  placeholder={t('editTransport.placeholders.numberPlate')}
-                  maxLength={20}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="phoneNumber">{t('editTransport.fields.phoneNumber')} *</label>
-                <input
-                  type="text"
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  placeholder={t('editTransport.placeholders.phoneNumber')}
-                  required
-                  maxLength={20}
-                />
-              </div>
-            </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('editTransport.title')}
+      titleIcon={Truck}
+      submitText={isLoading ? t('editTransport.buttons.updating', { defaultValue: 'Updating...' }) : t('editTransport.buttons.updateTransport', { defaultValue: 'Update Transport' })}
+      cancelText={t('editTransport.buttons.cancel', { defaultValue: 'Cancel' })}
+      submitVariant="primary"
+      isSubmitting={isLoading}
+      onSubmit={handleSubmit}
+      maxWidth="600px"
+    >
+      <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+        {error && (
+          <div className="error-message">
+            {error}
+            <button type="button" onClick={() => setError(null)}>×</button>
           </div>
+        )}
 
-          <div className="form-actions">
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={onClose}
-              disabled={isLoading}
-            >
-              {t('editTransport.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isLoading}
-            >
-              {isLoading ? t('editTransport.buttons.updating') : t('editTransport.buttons.updateTransport')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <FormSection>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="carName" required>
+                {t('editTransport.fields.carName')}
+              </Label>
+              <Input
+                type="text"
+                id="carName"
+                name="carName"
+                value={formData.carName}
+                onChange={handleChange}
+                placeholder={t('editTransport.placeholders.carName')}
+                required
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="numberPlate">
+                {t('editTransport.fields.numberPlate')}
+              </Label>
+              <Input
+                type="text"
+                id="numberPlate"
+                name="numberPlate"
+                value={formData.numberPlate}
+                onChange={handleChange}
+                placeholder={t('editTransport.placeholders.numberPlate')}
+                maxLength={20}
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="phoneNumber" required>
+                {t('editTransport.fields.phoneNumber')}
+              </Label>
+              <Input
+                type="tel"
+                id="phoneNumber"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                placeholder={t('editTransport.placeholders.phoneNumber')}
+                required
+                maxLength={20}
+              />
+            </FormGroup>
+          </FormRow>
+        </FormSection>
+      </Form>
+    </Modal>
   );
 };
 

@@ -1,32 +1,5 @@
-/* Modal Content */
-.create-transport-record-modal {
-  max-width: 700px;
-  max-height: 90vh;
-  overflow-y: auto;
-}
-
-/* Form */
-.transport-record-form {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.form-section {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.form-section h3 {
-  margin: 0;
-  color: var(--text-primary);
-  font-size: var(--text-lg);
-  font-weight: 600;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--border);
-}
+/* Modal styles are now handled by Modal.css in atoms folder */
+/* Form styles are now handled by Form.css in atoms folder */
 
 /* Selection Summary */
 .selection-summary {
@@ -120,10 +93,8 @@
   background: var(--primary-100);
 }
 
-.entity-checkbox {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
+/* Checkbox styles are now handled by Checkbox.css in atoms folder */
+.entity-checkbox-wrapper {
   flex-shrink: 0;
 }
 
@@ -151,37 +122,7 @@
   font-style: italic;
 }
 
-/* Transport Selection */
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-group label {
-  font-size: var(--text-sm);
-  font-weight: 500;
-  color: var(--text-primary);
-}
-
-.form-group select,
-.form-group input,
-.form-group textarea {
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  transition: border-color var(--transition-fast);
-  font-family: inherit;
-}
-
-.form-group select:focus,
-.form-group input:focus,
-.form-group textarea:focus {
-  outline: none;
-  border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px var(--primary-100);
-}
+/* Form group, label, input, textarea styles are now handled by Form.css in atoms folder */
 
 .transport-details {
   margin-top: 4px;
@@ -198,15 +139,6 @@
 .transport-details strong {
   color: var(--text-primary);
   margin: 0 4px;
-}
-
-.form-row {
-  display: flex;
-  gap: 16px;
-}
-
-.form-row .form-group {
-  flex: 1;
 }
 
 /* Loading */
@@ -228,78 +160,6 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Form Actions */
-.form-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-}
-
-.cancel-button,
-.submit-button {
-  padding: 10px 20px;
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  border: none;
-}
-
-.cancel-button {
-  background: var(--background-secondary);
-  color: var(--text-primary);
-}
-
-.cancel-button:hover {
-  background: var(--background-tertiary);
-}
-
-.submit-button {
-  background: var(--primary-600);
-  color: white;
-}
-
-.submit-button:hover {
-  background: var(--primary-700);
-}
-
-.cancel-button:disabled,
-.submit-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-/* Error Message */
-.error-message {
-  background: var(--error-50);
-  color: var(--error-700);
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid var(--error-200);
-}
-
-.error-message button {
-  background: none;
-  border: none;
-  color: var(--error-700);
-  font-size: 20px;
-  cursor: pointer;
-  padding: 0;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.error-message button:hover {
-  background: var(--error-100);
-  border-radius: 50%;
-}
+/* Button styles are now handled by Button.css and Modal.css in atoms folder */
+/* Error message styles are component-specific and remain here */
 

@@ -150,5 +150,12 @@
       "failedToLoadData": "Failed to load data",
       "failedToAssign": "Failed to assign transport to one or more entities"
     }
+  },
+  "deleteModal": {
+    "title": "Delete Transport",
+    "confirmation": "Are you sure you want to delete the transport vehicle \"{{carName}}\"? This action cannot be undone.",
+    "warning": "This will permanently remove the transport vehicle and all associated data.",
+    "confirm": "Delete",
+    "cancel": "Cancel"
   }
 }

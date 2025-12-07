@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { acquisitionApi, orderApi, transportApi } from '../../services/api';
 import type { Acquisition, Order, Transport, UpdateAcquisitionRequest, UpdateOrderRequest } from '../../types';
 import { AcquisitionStatus, OrderStatus } from '../../types';
-import { X, Truck, FileText, ClipboardList, Loader2 } from 'lucide-react';
+import { Truck, FileText, ClipboardList, Loader2 } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Checkbox } from '../atoms';
 import './CreateTransportRecord.css';
 
 interface CreateTransportRecordProps {
@@ -112,9 +113,7 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = async () => {
     const totalSelected = selectedAcquisitionIds.size + selectedOrderIds.size;
     if (totalSelected === 0 || !selectedTransportId) {
       setError(t('createTransportRecord.messages.pleaseSelectEntityAndTransport'));
@@ -195,29 +194,26 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
     }
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
-  if (!isOpen) return null;
-
   const selectedTransport = transports.find(t => t.id === selectedTransportId);
   const totalSelected = selectedAcquisitionIds.size + selectedOrderIds.size;
 
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal-content create-transport-record-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>
-            <Truck size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            {t('createTransportRecord.title')}
-          </h2>
-          <button className="close-button" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="transport-record-form">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('createTransportRecord.title')}
+      titleIcon={Truck}
+      submitText={isLoading 
+        ? t('createTransportRecord.labels.assigningTo', { count: totalSelected, defaultValue: 'Assigning...' })
+        : t('createTransportRecord.labels.assignTransportTo', { count: totalSelected, defaultValue: 'Assign Transport' })}
+      cancelText={t('createTransportRecord.buttons.cancel', { defaultValue: 'Cancel' })}
+      submitVariant="primary"
+      isSubmitting={isLoading || isLoadingData || totalSelected === 0 || !selectedTransportId}
+      onSubmit={handleSubmit}
+      maxWidth="900px"
+      showCancel={true}
+    >
+      <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
           {error && (
             <div className="error-message">
               {error}
@@ -264,12 +260,13 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
                           className={`entity-item ${selectedAcquisitionIds.has(acq.id) ? 'selected' : ''}`}
                           onClick={() => handleAcquisitionToggle(acq.id)}
                         >
-                          <input
-                            type="checkbox"
+                          <Checkbox
                             checked={selectedAcquisitionIds.has(acq.id)}
-                            onChange={() => handleAcquisitionToggle(acq.id)}
-                            onClick={(e) => e.stopPropagation()}
-                            className="entity-checkbox"
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleAcquisitionToggle(acq.id);
+                            }}
+                            wrapperClassName="entity-checkbox-wrapper"
                           />
                           <div className="entity-info">
                             <strong>#{acq.id} - {acq.title}</strong>
@@ -306,12 +303,13 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
                           className={`entity-item ${selectedOrderIds.has(order.id) ? 'selected' : ''}`}
                           onClick={() => handleOrderToggle(order.id)}
                         >
-                          <input
-                            type="checkbox"
+                          <Checkbox
                             checked={selectedOrderIds.has(order.id)}
-                            onChange={() => handleOrderToggle(order.id)}
-                            onClick={(e) => e.stopPropagation()}
-                            className="entity-checkbox"
+                            onChange={(e) => {
+                              e.stopPropagation();
+                              handleOrderToggle(order.id);
+                            }}
+                            wrapperClassName="entity-checkbox-wrapper"
                           />
                           <div className="entity-info">
                             <strong>#{order.id} - {order.clientName}</strong>
@@ -332,85 +330,82 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
 
               {/* Transport Selection */}
               {totalSelected > 0 && (
-                <div className="form-section">
-                  <h3>{t('createTransportRecord.sections.selectTransport')}</h3>
-                  <div className="form-group">
-                    <label htmlFor="transportId">{t('createTransportRecord.fields.transportVehicle')} *</label>
-                    <select
-                      id="transportId"
-                      value={selectedTransportId || ''}
-                      onChange={(e) => setSelectedTransportId(Number(e.target.value) || null)}
-                      required
-                    >
-                      <option value="">{t('createTransportRecord.placeholders.selectTransport')}</option>
-                      {transports.map(transport => (
-                        <option key={transport.id} value={transport.id}>
-                          {transport.carName} {transport.numberPlate ? `(${transport.numberPlate})` : ''} - {transport.phoneNumber}
-                        </option>
-                      ))}
-                    </select>
-                    {selectedTransport && (
-                      <div className="transport-details">
-                        <small>
+                <FormSection>
+                  <FormRow>
+                    <FormGroup>
+                      <Label htmlFor="transportId" required>
+                        {t('createTransportRecord.fields.transportVehicle')}
+                      </Label>
+                      <select
+                        id="transportId"
+                        className="form-input form-input-md"
+                        value={selectedTransportId || ''}
+                        onChange={(e) => setSelectedTransportId(Number(e.target.value) || null)}
+                        required
+                        style={{
+                          padding: 'var(--space-sm) var(--space-md)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius-md)',
+                          fontSize: 'var(--text-sm)',
+                          fontFamily: 'inherit',
+                          backgroundColor: 'var(--surface)',
+                          color: 'var(--text-primary)',
+                          cursor: 'pointer',
+                          transition: 'border-color var(--transition-fast)',
+                          width: '100%'
+                        }}
+                      >
+                        <option value="">{t('createTransportRecord.placeholders.selectTransport')}</option>
+                        {transports.map(transport => (
+                          <option key={transport.id} value={transport.id}>
+                            {transport.carName} {transport.numberPlate ? `(${transport.numberPlate})` : ''} - {transport.phoneNumber}
+                          </option>
+                        ))}
+                      </select>
+                      {selectedTransport && (
+                        <div className="transport-details" style={{ marginTop: 'var(--space-xs)', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
                           <strong>{t('createTransportRecord.labels.car')}</strong> {selectedTransport.carName} | 
                           <strong> {t('createTransportRecord.labels.plate')}</strong> {selectedTransport.numberPlate || t('createTransportRecord.labels.notAvailable')} | 
                           <strong> {t('createTransportRecord.labels.phone')}</strong> {selectedTransport.phoneNumber}
-                        </small>
-                      </div>
-                    )}
-                  </div>
+                        </div>
+                      )}
+                    </FormGroup>
+                  </FormRow>
 
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="transportDate">{t('createTransportRecord.fields.transportDate')}</label>
-                      <input
+                  <FormRow>
+                    <FormGroup>
+                      <Label htmlFor="transportDate">
+                        {t('createTransportRecord.fields.transportDate')}
+                      </Label>
+                      <Input
                         type="date"
                         id="transportDate"
                         value={transportDate}
                         onChange={(e) => setTransportDate(e.target.value)}
                       />
-                    </div>
-                  </div>
+                    </FormGroup>
+                  </FormRow>
 
-                  <div className="form-row">
-                    <div className="form-group">
-                      <label htmlFor="transportNotes">{t('createTransportRecord.fields.transportNotes')}</label>
-                      <textarea
+                  <FormRow>
+                    <FormGroup fullWidth>
+                      <Label htmlFor="transportNotes">
+                        {t('createTransportRecord.fields.transportNotes')}
+                      </Label>
+                      <Textarea
                         id="transportNotes"
                         value={transportNotes}
                         onChange={(e) => setTransportNotes(e.target.value)}
                         placeholder={t('createTransportRecord.placeholders.transportNotes')}
                         rows={3}
                       />
-                    </div>
-                  </div>
-                </div>
+                    </FormGroup>
+                  </FormRow>
+                </FormSection>
               )}
             </>
           )}
-
-          <div className="form-actions">
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={onClose}
-              disabled={isLoading || isLoadingData}
-            >
-              {t('createTransportRecord.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isLoading || isLoadingData || totalSelected === 0 || !selectedTransportId}
-            >
-              {isLoading 
-                ? t('createTransportRecord.labels.assigningTo', { count: totalSelected })
-                : t('createTransportRecord.labels.assignTransportTo', { count: totalSelected })}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </Form>
+    </Modal>
   );
 };
 

@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Truck, 
-  Plus, 
   Search, 
   Loader2,
   FileText,
@@ -15,7 +14,6 @@ import type { Transport, TransportRecord, PagedResult } from '../../types';
 import CreateTransport from './CreateTransport';
 import EditTransport from './EditTransport';
 import CreateTransportRecord from './CreateTransportRecord';
-import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import DeleteButton from '../atoms/DeleteButton';
@@ -23,6 +21,7 @@ import CreateButton from '../atoms/CreateButton';
 import { Table } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Transports.css';
+import DeleteTransport from './DeleteTransport';
 
 type TabType = 'transports' | 'records';
 
@@ -54,6 +53,7 @@ const Transports: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showCreateRecordModal, setShowCreateRecordModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTransport, setSelectedTransport] = useState<Transport | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -116,20 +116,30 @@ const Transports: React.FC = () => {
     setSelectedTransport(null);
   };
 
-  const handleDeleteTransport = async (transport: Transport) => {
-    if (!window.confirm(t('transports.messages.confirmDelete', { carName: transport.carName }))) {
-      return;
-    }
+  const handleDeleteTransport = (transport: Transport) => {
+    setSelectedTransport(transport);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedTransport) return;
 
     try {
       setIsDeleting(true);
-      await transportApi.deleteTransport(transport.id);
+      await transportApi.deleteTransport(selectedTransport.id);
       await loadData();
+      setShowDeleteModal(false);
+      setSelectedTransport(null);
     } catch (err: any) {
       setError(err.response?.data?.message || t('transports.messages.failedToDeleteTransport'));
     } finally {
       setIsDeleting(false);
     }
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setSelectedTransport(null);
   };
 
   const loadTransportRecords = async () => {
@@ -601,6 +611,7 @@ const Transports: React.FC = () => {
       {/* Modals */}
       {showCreateModal && (
         <CreateTransport
+          isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
           onTransportCreated={handleTransportCreated}
         />
@@ -623,6 +634,16 @@ const Transports: React.FC = () => {
             setShowCreateRecordModal(false);
             loadTransportRecords();
           }}
+        />
+      )}
+
+      {showDeleteModal && selectedTransport && (
+        <DeleteTransport
+          isOpen={showDeleteModal}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleConfirmDelete}
+          transport={selectedTransport}
+          isDeleting={isDeleting}
         />
       )}
     </div>

@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { transportApi } from '../../services/api';
 import type { CreateTransportRequest } from '../../types';
-import { X, Truck } from 'lucide-react';
+import { Truck } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input } from '../atoms';
 import './CreateTransport.css';
 
 interface CreateTransportProps {
+  isOpen: boolean;
   onClose: () => void;
   onTransportCreated: () => void;
 }
 
 const CreateTransport: React.FC<CreateTransportProps> = ({
+  isOpen,
   onClose,
   onTransportCreated
 }) => {
@@ -31,9 +34,7 @@ const CreateTransport: React.FC<CreateTransportProps> = ({
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (!formData.carName.trim()) {
       setError(t('createTransport.messages.carNameRequired'));
       return;
@@ -64,99 +65,82 @@ const CreateTransport: React.FC<CreateTransportProps> = ({
     }
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal-content create-transport-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>
-            <Truck size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            {t('createTransport.title')}
-          </h2>
-          <button className="close-button" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="transport-form">
-          {error && (
-            <div className="error-message">
-              {error}
-              <button type="button" onClick={() => setError(null)}>×</button>
-            </div>
-          )}
-
-          <div className="form-section">
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="carName">{t('createTransport.fields.carName')} *</label>
-                <input
-                  type="text"
-                  id="carName"
-                  name="carName"
-                  value={formData.carName}
-                  onChange={handleChange}
-                  placeholder={t('createTransport.placeholders.carName')}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="numberPlate">{t('createTransport.fields.numberPlate')}</label>
-                <input
-                  type="text"
-                  id="numberPlate"
-                  name="numberPlate"
-                  value={formData.numberPlate}
-                  onChange={handleChange}
-                  placeholder={t('createTransport.placeholders.numberPlate')}
-                  maxLength={20}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="phoneNumber">{t('createTransport.fields.phoneNumber')} *</label>
-                <input
-                  type="text"
-                  id="phoneNumber"
-                  name="phoneNumber"
-                  value={formData.phoneNumber}
-                  onChange={handleChange}
-                  placeholder={t('createTransport.placeholders.phoneNumber')}
-                  required
-                  maxLength={20}
-                />
-              </div>
-            </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('createTransport.title')}
+      titleIcon={Truck}
+      submitText={isLoading ? t('createTransport.buttons.creating', { defaultValue: 'Creating...' }) : t('createTransport.buttons.createTransport', { defaultValue: 'Create Transport' })}
+      cancelText={t('createTransport.buttons.cancel', { defaultValue: 'Cancel' })}
+      submitVariant="primary"
+      isSubmitting={isLoading}
+      onSubmit={handleSubmit}
+      maxWidth="600px"
+    >
+      <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+        {error && (
+          <div className="error-message">
+            {error}
+            <button type="button" onClick={() => setError(null)}>×</button>
           </div>
+        )}
 
-          <div className="form-actions">
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={onClose}
-              disabled={isLoading}
-            >
-              {t('createTransport.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isLoading}
-            >
-              {isLoading ? t('createTransport.buttons.creating') : t('createTransport.buttons.createTransport')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <FormSection>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="carName" required>
+                {t('createTransport.fields.carName')}
+              </Label>
+              <Input
+                type="text"
+                id="carName"
+                name="carName"
+                value={formData.carName}
+                onChange={handleChange}
+                placeholder={t('createTransport.placeholders.carName')}
+                required
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="numberPlate">
+                {t('createTransport.fields.numberPlate')}
+              </Label>
+              <Input
+                type="text"
+                id="numberPlate"
+                name="numberPlate"
+                value={formData.numberPlate}
+                onChange={handleChange}
+                placeholder={t('createTransport.placeholders.numberPlate')}
+                maxLength={20}
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="phoneNumber" required>
+                {t('createTransport.fields.phoneNumber')}
+              </Label>
+              <Input
+                type="tel"
+                id="phoneNumber"
+                name="phoneNumber"
+                value={formData.phoneNumber}
+                onChange={handleChange}
+                placeholder={t('createTransport.placeholders.phoneNumber')}
+                required
+                maxLength={20}
+              />
+            </FormGroup>
+          </FormRow>
+        </FormSection>
+      </Form>
+    </Modal>
   );
 };
 
