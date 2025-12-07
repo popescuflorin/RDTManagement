@@ -633,7 +633,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
+@media (max-width: 1600px) {
   .dashboard-content.sidebar-expanded {
     margin-left: 0;
     width: 100%;

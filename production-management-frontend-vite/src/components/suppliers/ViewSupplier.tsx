@@ -1,8 +1,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Supplier } from '../../types';
-import { X, Building2, Mail, Phone, MapPin, Calendar, User } from 'lucide-react';
-import './CreateSupplier.css';
+import { Building2, Mail, Phone, MapPin, Calendar, User } from 'lucide-react';
+import { Modal, ViewContent, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
 
 interface ViewSupplierProps {
   isOpen: boolean;
@@ -16,9 +16,6 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
   supplier
 }) => {
   const { t } = useTranslation(['suppliers', 'common']);
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -35,179 +32,156 @@ const ViewSupplier: React.FC<ViewSupplierProps> = ({
     }).format(amount);
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal-content create-supplier-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>
-            <Building2 size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            {t('viewSupplier.title')}
-          </h2>
-          <button className="close-button" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('viewSupplier.title')}
+      titleIcon={Building2}
+      showCancel={true}
+      cancelText={t('viewSupplier.buttons.close', { defaultValue: 'Close' })}
+      maxWidth="700px"
+    >
+      <ViewContent>
+        <ViewSection title={t('viewSupplier.sections.basicInformation')}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('viewSupplier.fields.name')}</ViewLabel>
+              <ViewValue>{supplier.name}</ViewValue>
+            </ViewItem>
+            {supplier.description && (
+              <ViewItem fullWidth>
+                <ViewLabel>{t('viewSupplier.fields.description')}</ViewLabel>
+                <ViewValue>{supplier.description}</ViewValue>
+              </ViewItem>
+            )}
+            {supplier.contactPerson && (
+              <ViewItem>
+                <ViewLabel>{t('viewSupplier.fields.contactPerson')}</ViewLabel>
+                <ViewValue>{supplier.contactPerson}</ViewValue>
+              </ViewItem>
+            )}
+            <ViewItem>
+              <ViewLabel>{t('viewSupplier.fields.status')}</ViewLabel>
+              <ViewValue>
+                <span className={`status-badge ${supplier.isActive ? 'status-active' : 'status-inactive'}`}>
+                  {supplier.isActive ? t('suppliers.status.active') : t('suppliers.status.inactive')}
+                </span>
+              </ViewValue>
+            </ViewItem>
+          </ViewGrid>
+        </ViewSection>
 
-        <div className="supplier-view-content">
-          <div className="view-section">
-            <h3>{t('viewSupplier.sections.basicInformation')}</h3>
-            <div className="view-grid">
-              <div className="view-item">
-                <label>{t('viewSupplier.fields.name')}</label>
-                <div className="view-value">{supplier.name}</div>
-              </div>
-              {supplier.description && (
-                <div className="view-item full-width">
-                  <label>{t('viewSupplier.fields.description')}</label>
-                  <div className="view-value">{supplier.description}</div>
-                </div>
-              )}
-              {supplier.contactPerson && (
-                <div className="view-item">
-                  <label>{t('viewSupplier.fields.contactPerson')}</label>
-                  <div className="view-value">{supplier.contactPerson}</div>
-                </div>
-              )}
-              <div className="view-item">
-                <label>{t('viewSupplier.fields.status')}</label>
-                <div className="view-value">
-                  <span className={`status-badge ${supplier.isActive ? 'status-active' : 'status-inactive'}`}>
-                    {supplier.isActive ? t('suppliers.status.active') : t('suppliers.status.inactive')}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
+        <ViewSection title={t('viewSupplier.sections.contactInformation')}>
+          <ViewGrid>
+            {supplier.email && (
+              <ViewItem>
+                <ViewLabel icon={Mail}>{t('viewSupplier.fields.email')}</ViewLabel>
+                <ViewValue>{supplier.email}</ViewValue>
+              </ViewItem>
+            )}
+            {supplier.phone && (
+              <ViewItem>
+                <ViewLabel icon={Phone}>{t('viewSupplier.fields.phone')}</ViewLabel>
+                <ViewValue>{supplier.phone}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
 
-          <div className="view-section">
-            <h3>{t('viewSupplier.sections.contactInformation')}</h3>
-            <div className="view-grid">
-              {supplier.email && (
-                <div className="view-item">
-                  <label><Mail size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.email')}</label>
-                  <div className="view-value">{supplier.email}</div>
-                </div>
-              )}
-              {supplier.phone && (
-                <div className="view-item">
-                  <label><Phone size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.phone')}</label>
-                  <div className="view-value">{supplier.phone}</div>
-                </div>
-              )}
-            </div>
-          </div>
+        <ViewSection title={t('viewSupplier.sections.address')}>
+          <ViewGrid>
+            {supplier.address && (
+              <ViewItem fullWidth>
+                <ViewLabel>{t('viewSupplier.fields.streetAddress')}</ViewLabel>
+                <ViewValue>{supplier.address}</ViewValue>
+              </ViewItem>
+            )}
+            {supplier.city && (
+              <ViewItem>
+                <ViewLabel>{t('viewSupplier.fields.city')}</ViewLabel>
+                <ViewValue>{supplier.city}</ViewValue>
+              </ViewItem>
+            )}
+            {supplier.postalCode && (
+              <ViewItem>
+                <ViewLabel>{t('viewSupplier.fields.postalCode')}</ViewLabel>
+                <ViewValue>{supplier.postalCode}</ViewValue>
+              </ViewItem>
+            )}
+            {supplier.country && (
+              <ViewItem>
+                <ViewLabel icon={MapPin}>{t('viewSupplier.fields.country')}</ViewLabel>
+                <ViewValue>{supplier.country}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
 
-          <div className="view-section">
-            <h3>{t('viewSupplier.sections.address')}</h3>
-            <div className="view-grid">
-              {supplier.address && (
-                <div className="view-item full-width">
-                  <label>{t('viewSupplier.fields.streetAddress')}</label>
-                  <div className="view-value">{supplier.address}</div>
-                </div>
-              )}
-              {supplier.city && (
-                <div className="view-item">
-                  <label>{t('viewSupplier.fields.city')}</label>
-                  <div className="view-value">{supplier.city}</div>
-                </div>
-              )}
-              {supplier.postalCode && (
-                <div className="view-item">
-                  <label>{t('viewSupplier.fields.postalCode')}</label>
-                  <div className="view-value">{supplier.postalCode}</div>
-                </div>
-              )}
-              {supplier.country && (
-                <div className="view-item">
-                  <label><MapPin size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.country')}</label>
-                  <div className="view-value">{supplier.country}</div>
-                </div>
-              )}
-            </div>
-          </div>
+        <ViewSection title={t('viewSupplier.sections.businessInformation')}>
+          <ViewGrid>
+            {supplier.taxId && (
+              <ViewItem>
+                <ViewLabel>{t('viewSupplier.fields.taxId')}</ViewLabel>
+                <ViewValue>{supplier.taxId}</ViewValue>
+              </ViewItem>
+            )}
+            {supplier.registrationNumber && (
+              <ViewItem>
+                <ViewLabel>{t('viewSupplier.fields.registrationNumber')}</ViewLabel>
+                <ViewValue>{supplier.registrationNumber}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
 
-          <div className="view-section">
-            <h3>{t('viewSupplier.sections.businessInformation')}</h3>
-            <div className="view-grid">
-              {supplier.taxId && (
-                <div className="view-item">
-                  <label>{t('viewSupplier.fields.taxId')}</label>
-                  <div className="view-value">{supplier.taxId}</div>
-                </div>
-              )}
-              {supplier.registrationNumber && (
-                <div className="view-item">
-                  <label>{t('viewSupplier.fields.registrationNumber')}</label>
-                  <div className="view-value">{supplier.registrationNumber}</div>
-                </div>
-              )}
-            </div>
-          </div>
+        <ViewSection title={t('viewSupplier.sections.statistics')}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('viewSupplier.fields.totalAcquisitions')}</ViewLabel>
+              <ViewValue>{supplier.totalAcquisitions}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('viewSupplier.fields.totalAcquisitionValue')}</ViewLabel>
+              <ViewValue>{formatCurrency(supplier.totalAcquisitionValue)}</ViewValue>
+            </ViewItem>
+            {supplier.lastAcquisitionDate && (
+              <ViewItem>
+                <ViewLabel>{t('viewSupplier.fields.lastAcquisitionDate')}</ViewLabel>
+                <ViewValue>{formatDate(supplier.lastAcquisitionDate)}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
 
-          <div className="view-section">
-            <h3>{t('viewSupplier.sections.statistics')}</h3>
-            <div className="view-grid">
-              <div className="view-item">
-                <label>{t('viewSupplier.fields.totalAcquisitions')}</label>
-                <div className="view-value">{supplier.totalAcquisitions}</div>
-              </div>
-              <div className="view-item">
-                <label>{t('viewSupplier.fields.totalAcquisitionValue')}</label>
-                <div className="view-value">{formatCurrency(supplier.totalAcquisitionValue)}</div>
-              </div>
-              {supplier.lastAcquisitionDate && (
-                <div className="view-item">
-                  <label>{t('viewSupplier.fields.lastAcquisitionDate')}</label>
-                  <div className="view-value">{formatDate(supplier.lastAcquisitionDate)}</div>
-                </div>
-              )}
-            </div>
-          </div>
+        {supplier.notes && (
+          <ViewSection title={t('viewSupplier.sections.notes')}>
+            <ViewItem fullWidth>
+              <ViewValue>{supplier.notes}</ViewValue>
+            </ViewItem>
+          </ViewSection>
+        )}
 
-          {supplier.notes && (
-            <div className="view-section">
-              <h3>{t('viewSupplier.sections.notes')}</h3>
-              <div className="view-item full-width">
-                <div className="view-value">{supplier.notes}</div>
-              </div>
-            </div>
-          )}
-
-          <div className="view-section">
-            <h3>{t('viewSupplier.sections.metadata')}</h3>
-            <div className="view-grid">
-              <div className="view-item">
-                <label><User size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.createdBy')}</label>
-                <div className="view-value">{supplier.createdByUserName}</div>
-              </div>
-              <div className="view-item">
-                <label><Calendar size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.createdAt')}</label>
-                <div className="view-value">{formatDate(supplier.createdAt)}</div>
-              </div>
-              {supplier.updatedAt && (
-                <div className="view-item">
-                  <label><Calendar size={14} style={{ display: 'inline', marginRight: '4px' }} />{t('viewSupplier.fields.updatedAt')}</label>
-                  <div className="view-value">{formatDate(supplier.updatedAt)}</div>
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-
-        <div className="form-actions">
-          <button
-            type="button"
-            className="cancel-button"
-            onClick={onClose}
-          >
-            {t('viewSupplier.buttons.close')}
-          </button>
-        </div>
-      </div>
-    </div>
+        <ViewSection title={t('viewSupplier.sections.metadata')}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel icon={User}>{t('viewSupplier.fields.createdBy')}</ViewLabel>
+              <ViewValue>{supplier.createdByUserName}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel icon={Calendar}>{t('viewSupplier.fields.createdAt')}</ViewLabel>
+              <ViewValue>{formatDate(supplier.createdAt)}</ViewValue>
+            </ViewItem>
+            {supplier.updatedAt && (
+              <ViewItem>
+                <ViewLabel icon={Calendar}>{t('viewSupplier.fields.updatedAt')}</ViewLabel>
+                <ViewValue>{formatDate(supplier.updatedAt)}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
+      </ViewContent>
+    </Modal>
   );
 };
 

@@ -557,7 +557,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
+@media (max-width: 1600px) {
   .production-stats {
     grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }

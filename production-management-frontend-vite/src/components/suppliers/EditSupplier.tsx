@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supplierApi } from '../../services/api';
 import type { Supplier, UpdateSupplierRequest } from '../../types';
-import { X, Building2 } from 'lucide-react';
+import { Building2 } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Checkbox } from '../atoms';
 import './CreateSupplier.css';
 
 interface EditSupplierProps {
@@ -67,9 +68,7 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (!formData.name?.trim()) {
       setError(t('editSupplier.messages.supplierNameRequired'));
       return;
@@ -105,229 +104,226 @@ const EditSupplier: React.FC<EditSupplierProps> = ({
     }
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal-content create-supplier-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>
-            <Building2 size={20} style={{ marginRight: '8px', verticalAlign: 'middle' }} />
-            {t('editSupplier.title')}
-          </h2>
-          <button className="close-button" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="supplier-form">
-          {error && (
-            <div className="error-message">
-              {error}
-              <button type="button" onClick={() => setError(null)}>×</button>
-            </div>
-          )}
-
-          <div className="form-section">
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="name">{t('editSupplier.fields.supplierName')} *</label>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.supplierName')}
-                  required
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="description">{t('editSupplier.fields.description')}</label>
-                <textarea
-                  id="description"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.description')}
-                  rows={2}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="contactPerson">{t('editSupplier.fields.contactPerson')}</label>
-                <input
-                  type="text"
-                  id="contactPerson"
-                  name="contactPerson"
-                  value={formData.contactPerson}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.contactPerson')}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="email">{t('editSupplier.fields.email')}</label>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.email')}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="phone">{t('editSupplier.fields.phone')}</label>
-                <input
-                  type="text"
-                  id="phone"
-                  name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.phone')}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="address">{t('editSupplier.fields.address')}</label>
-                <input
-                  type="text"
-                  id="address"
-                  name="address"
-                  value={formData.address}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.address')}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="city">{t('editSupplier.fields.city')}</label>
-                <input
-                  type="text"
-                  id="city"
-                  name="city"
-                  value={formData.city}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.city')}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="postalCode">{t('editSupplier.fields.postalCode')}</label>
-                <input
-                  type="text"
-                  id="postalCode"
-                  name="postalCode"
-                  value={formData.postalCode}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.postalCode')}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="country">{t('editSupplier.fields.country')}</label>
-                <input
-                  type="text"
-                  id="country"
-                  name="country"
-                  value={formData.country}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.country')}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="taxId">{t('editSupplier.fields.taxId')}</label>
-                <input
-                  type="text"
-                  id="taxId"
-                  name="taxId"
-                  value={formData.taxId}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.taxId')}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="registrationNumber">{t('editSupplier.fields.registrationNumber')}</label>
-                <input
-                  type="text"
-                  id="registrationNumber"
-                  name="registrationNumber"
-                  value={formData.registrationNumber}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.registrationNumber')}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="notes">{t('editSupplier.fields.notes')}</label>
-                <textarea
-                  id="notes"
-                  name="notes"
-                  value={formData.notes}
-                  onChange={handleChange}
-                  placeholder={t('editSupplier.placeholders.notes')}
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            <div className="form-row">
-              <div className="form-group">
-                <label className="checkbox-label">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    checked={formData.isActive}
-                    onChange={handleChange}
-                  />
-                  <span>{t('editSupplier.fields.active')}</span>
-                </label>
-              </div>
-            </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('editSupplier.title')}
+      titleIcon={Building2}
+      submitText={isLoading ? t('editSupplier.buttons.updating', { defaultValue: 'Updating...' }) : t('editSupplier.buttons.updateSupplier', { defaultValue: 'Update Supplier' })}
+      cancelText={t('editSupplier.buttons.cancel', { defaultValue: 'Cancel' })}
+      submitVariant="primary"
+      isSubmitting={isLoading}
+      onSubmit={handleSubmit}
+      maxWidth="700px"
+    >
+      <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+        {error && (
+          <div className="error-message">
+            {error}
+            <button type="button" onClick={() => setError(null)}>×</button>
           </div>
+        )}
 
-          <div className="form-actions">
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={onClose}
-              disabled={isLoading}
-            >
-              {t('editSupplier.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isLoading}
-            >
-              {isLoading ? t('editSupplier.buttons.updating') : t('editSupplier.buttons.updateSupplier')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        <FormSection>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="name" required>
+                {t('editSupplier.fields.supplierName')}
+              </Label>
+              <Input
+                type="text"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.supplierName')}
+                required
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup fullWidth>
+              <Label htmlFor="description">
+                {t('editSupplier.fields.description')}
+              </Label>
+              <Textarea
+                id="description"
+                name="description"
+                value={formData.description}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.description')}
+                rows={2}
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="contactPerson">
+                {t('editSupplier.fields.contactPerson')}
+              </Label>
+              <Input
+                type="text"
+                id="contactPerson"
+                name="contactPerson"
+                value={formData.contactPerson}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.contactPerson')}
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="email">
+                {t('editSupplier.fields.email')}
+              </Label>
+              <Input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.email')}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="phone">
+                {t('editSupplier.fields.phone')}
+              </Label>
+              <Input
+                type="tel"
+                id="phone"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.phone')}
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup fullWidth>
+              <Label htmlFor="address">
+                {t('editSupplier.fields.address')}
+              </Label>
+              <Input
+                type="text"
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.address')}
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="city">
+                {t('editSupplier.fields.city')}
+              </Label>
+              <Input
+                type="text"
+                id="city"
+                name="city"
+                value={formData.city}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.city')}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="postalCode">
+                {t('editSupplier.fields.postalCode')}
+              </Label>
+              <Input
+                type="text"
+                id="postalCode"
+                name="postalCode"
+                value={formData.postalCode}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.postalCode')}
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="country">
+                {t('editSupplier.fields.country')}
+              </Label>
+              <Input
+                type="text"
+                id="country"
+                name="country"
+                value={formData.country}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.country')}
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="taxId">
+                {t('editSupplier.fields.taxId')}
+              </Label>
+              <Input
+                type="text"
+                id="taxId"
+                name="taxId"
+                value={formData.taxId}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.taxId')}
+              />
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="registrationNumber">
+                {t('editSupplier.fields.registrationNumber')}
+              </Label>
+              <Input
+                type="text"
+                id="registrationNumber"
+                name="registrationNumber"
+                value={formData.registrationNumber}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.registrationNumber')}
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup fullWidth>
+              <Label htmlFor="notes">
+                {t('editSupplier.fields.notes')}
+              </Label>
+              <Textarea
+                id="notes"
+                name="notes"
+                value={formData.notes}
+                onChange={handleChange}
+                placeholder={t('editSupplier.placeholders.notes')}
+                rows={3}
+              />
+            </FormGroup>
+          </FormRow>
+
+          <FormRow>
+            <FormGroup>
+              <Checkbox
+                name="isActive"
+                checked={formData.isActive}
+                onChange={handleChange}
+                label={t('editSupplier.fields.active')}
+                labelUppercase={true}
+              />
+            </FormGroup>
+          </FormRow>
+        </FormSection>
+      </Form>
+    </Modal>
   );
 };
 

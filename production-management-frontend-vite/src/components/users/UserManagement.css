@@ -399,7 +399,7 @@
 }
 
 /* Responsive Design */
-@media (max-width: 1200px) {
+@media (max-width: 1600px) {
   .users-table th,
   .users-table td {
     padding: 12px 8px;

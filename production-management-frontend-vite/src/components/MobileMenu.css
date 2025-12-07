@@ -172,8 +172,8 @@
   text-align: center;
 }
 
-/* Responsive - only show on screens < 1200px */
-@media (min-width: 1200px) {
+/* Responsive - only show on screens < 1600px */
+@media (min-width: 1600px) {
   .mobile-menu-overlay,
   .mobile-menu {
     display: none;

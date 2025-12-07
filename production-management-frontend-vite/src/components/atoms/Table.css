@@ -99,8 +99,8 @@
   }
 }
 
-/* Responsive Design - Tablet (480px to 1200px) */
-@media (min-width: 480px) and (max-width: 1200px) {
+/* Responsive Design - Tablet (480px to 1600px) */
+@media (min-width: 480px) and (max-width: 1600px) {
   .table-container {
     margin: 0 var(--space-lg);
   }

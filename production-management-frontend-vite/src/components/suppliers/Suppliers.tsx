@@ -457,6 +457,7 @@ const Suppliers: React.FC = () => {
       {/* Modals */}
       {showCreateModal && (
         <CreateSupplier
+          isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
           onSupplierCreated={handleSupplierCreated}
         />
