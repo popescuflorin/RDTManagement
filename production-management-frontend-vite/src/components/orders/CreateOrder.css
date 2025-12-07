@@ -432,63 +432,7 @@
 }
 
 /* Buttons */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-xs);
-  padding: var(--space-sm) var(--space-md);
-  border: 1px solid;
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-primary {
-  background: var(--primary-500);
-  color: white;
-  border-color: var(--primary-500);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-600);
-  border-color: var(--primary-600);
-}
-
-.btn-secondary {
-  background: var(--surface-100);
-  border-color: var(--surface-300);
-  color: var(--text-secondary);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: var(--surface-200);
-  border-color: var(--surface-400);
-  color: var(--text-primary);
-}
-
-.btn-danger {
-  background: var(--danger-500);
-  color: white;
-  border-color: var(--danger-500);
-}
-
-.btn-danger:hover:not(:disabled) {
-  background: var(--error-600);
-  border-color: var(--danger-600);
-}
-
-.btn-sm {
-  padding: 4px 8px;
-  font-size: 0.75rem;
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 .form-actions {
   display: flex;

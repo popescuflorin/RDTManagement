@@ -9,21 +9,18 @@ import {
   Truck,
   UserCircle,
   Building2,
-  ChevronLeft, 
-  ChevronRight 
+  X
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { usePermissions, Permissions } from '../hooks/usePermissions';
 import LanguageSwitcher from './LanguageSwitcher';
-import logoImage from '../../public/logorodut.png';
-import './Sidebar.css';
+import './MobileMenu.css';
 
-interface SidebarProps {
-  isCollapsed: boolean;
-  onToggle: () => void;
+interface MobileMenuProps {
   currentPage: string;
   onNavigate: (page: string) => void;
   userRole: string;
+  onClose: () => void;
 }
 
 interface MenuItem {
@@ -33,12 +30,11 @@ interface MenuItem {
   requiredPermission?: string;
 }
 
-const Sidebar: React.FC<SidebarProps> = ({
-  isCollapsed,
-  onToggle,
+const MobileMenu: React.FC<MobileMenuProps> = ({
   currentPage,
   onNavigate,
-  userRole
+  userRole,
+  onClose
 }) => {
   const { hasPermission } = usePermissions();
   const { t } = useTranslation('navigation');
@@ -48,7 +44,6 @@ const Sidebar: React.FC<SidebarProps> = ({
       id: 'dashboard',
       label: t('menu.dashboard'),
       icon: BarChart3
-      // Dashboard is accessible to everyone
     },
     {
       id: 'users',
@@ -104,60 +99,55 @@ const Sidebar: React.FC<SidebarProps> = ({
     !item.requiredPermission || hasPermission(item.requiredPermission)
   );
 
+  const handleItemClick = (pageId: string) => {
+    onNavigate(pageId);
+    onClose();
+  };
+
   return (
-    <div className={`sidebar ${isCollapsed ? 'collapsed' : 'expanded'}`}>
-      <div className="sidebar-header">
-        <button 
-          className="sidebar-toggle"
-          onClick={onToggle}
-          aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-        >
-          {isCollapsed ? <ChevronRight size={20} /> : <ChevronLeft size={20} />}
-        </button>
-        {!isCollapsed && (
-          <div className="sidebar-logo-container">
-            <img src={logoImage} alt="RodutPlast" className="sidebar-logo" />
-            <h2 className="sidebar-title">RodutPlast</h2>
-          </div>
-        )}
-        {isCollapsed && (
-          <img src={logoImage} alt="RodutPlast" className="sidebar-logo-collapsed" />
-        )}
-      </div>
+    <div className="mobile-menu" onClick={onClose}>
+      <div className="mobile-menu" onClick={(e) => e.stopPropagation()}>
+        <div className="mobile-menu-header">
+          <h2>RodutPlast</h2>
+          <button 
+            className="mobile-menu-close"
+            onClick={onClose}
+            aria-label="Close menu"
+          >
+            <X size={24} />
+          </button>
+        </div>
+        
+        <nav className="mobile-menu-nav">
+          <ul className="mobile-menu-list">
+            {filteredMenuItems.map((item) => {
+              const Icon = item.icon;
+              return (
+                <li key={item.id} className="mobile-menu-item">
+                  <button
+                    className={`mobile-menu-button ${
+                      currentPage === item.id ? 'active' : ''
+                    }`}
+                    onClick={() => handleItemClick(item.id)}
+                  >
+                    <Icon size={20} className="mobile-menu-icon" />
+                    <span className="mobile-menu-label">{item.label}</span>
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
 
-      <nav className="sidebar-nav">
-        <ul className="sidebar-menu">
-          {filteredMenuItems.map((item) => (
-            <li key={item.id} className="sidebar-menu-item">
-              <button
-                className={`sidebar-menu-button ${
-                  currentPage === item.id ? 'active' : ''
-                }`}
-                onClick={() => onNavigate(item.id)}
-                title={isCollapsed ? item.label : undefined}
-              >
-                <span className="sidebar-icon">
-                  <item.icon size={20} />
-                </span>
-                {!isCollapsed && (
-                  <span className="sidebar-label">{item.label}</span>
-                )}
-              </button>
-            </li>
-          ))}
-        </ul>
-      </nav>
-
-      {!isCollapsed && (
-        <div className="sidebar-footer">
+        <div className="mobile-menu-footer">
           <LanguageSwitcher />
-          <div className="sidebar-user-info">
+          <div className="mobile-menu-user-info">
             <span className="user-role-badge">{userRole}</span>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 };
 
-export default Sidebar;
+export default MobileMenu;

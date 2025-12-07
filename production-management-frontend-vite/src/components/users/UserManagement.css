@@ -79,27 +79,7 @@
   align-items: center;
 }
 
-.add-user-button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
-  background: var(--primary-600);
-  color: var(--text-inverse);
-  border: none;
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  box-shadow: var(--shadow-sm);
-}
-
-.add-user-button:hover {
-  background: var(--primary-700);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
+/* Create button styles are now handled by CreateButton component in atoms folder */
 
 /* Remove old button-icon styles since we're using Lucide icons now */
 
@@ -309,34 +289,7 @@
 }
 
 /* Actions Cell */
-.action-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.action-button {
-  background: none;
-  border: none;
-  padding: 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  transition: background-color 0.2s ease;
-}
-
-.action-button:hover {
-  background: #f8f9fa;
-}
-
-.edit-button:hover {
-  background: #e3f2fd;
-}
-
-.delete-button:hover {
-  background: #ffebee;
-}
-
-.view-button:hover {
+/* Button styles are now handled by Button.css in atoms folder */
   background: #f3e5f5;
 }
 
@@ -532,10 +485,7 @@
     font-size: 1rem;
   }
   
-  .add-user-button {
-    padding: 10px 20px;
-    font-size: 0.9rem;
-  }
+  /* Create button styles are now handled by CreateButton component in atoms folder */
   
   .users-table-container {
     margin: 0 10px;

@@ -1,11 +1,11 @@
 import React from 'react';
-import { SquarePen } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import ProtectedButton from '../ProtectedButton';
 import './Button.css';
 
-export interface EditButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
+export interface CreateButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
   /**
-   * Permission required to show/edit the button
+   * Permission required to show/create the button
    * If not provided, button will always be visible
    */
   requiredPermission?: string;
@@ -22,13 +22,17 @@ export interface EditButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLBut
    */
   iconSize?: number;
   /**
-   * Button variant/size class (default: 'btn btn-sm btn-primary')
+   * Button variant/size class (default: 'btn btn-md btn-primary')
    */
-  variant?: 'primary' | 'warning' | 'secondary' | 'info';
+  variant?: 'primary' | 'success' | 'secondary' | 'info';
   /**
-   * Button size class (default: 'btn-sm')
+   * Button size class (default: 'btn-md')
    */
   size?: 'sm' | 'md' | 'lg';
+  /**
+   * Button label text (displayed next to the icon)
+   */
+  children?: React.ReactNode;
   /**
    * Tooltip text
    */
@@ -44,16 +48,18 @@ export interface EditButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLBut
 }
 
 /**
- * Reusable Edit Button component following atomic design principles
- * Uses SquarePen icon from lucide-react for consistent UI
+ * Reusable Create Button component following atomic design principles
+ * Uses Plus icon from lucide-react for consistent UI
+ * Typically used for "Create", "Add", "New" actions
  */
-const EditButton: React.FC<EditButtonProps> = ({
+const CreateButton: React.FC<CreateButtonProps> = ({
   requiredPermission,
   requireAnyOf,
   requireAllOf,
   iconSize = 16,
   variant = 'primary',
-  size = 'sm',
+  size = 'md',
+  children,
   title,
   onClick,
   className = '',
@@ -63,7 +69,7 @@ const EditButton: React.FC<EditButtonProps> = ({
   // Build button classes
   const variantClasses = {
     primary: 'btn-primary',
-    warning: 'btn-warning',
+    success: 'btn-success',
     secondary: 'btn-secondary',
     info: 'btn-info',
   };
@@ -89,7 +95,8 @@ const EditButton: React.FC<EditButtonProps> = ({
         disabled={disabled}
         {...restProps}
       >
-        <SquarePen size={iconSize} />
+        <Plus size={iconSize} />
+        {children}
       </ProtectedButton>
     );
   }
@@ -103,9 +110,10 @@ const EditButton: React.FC<EditButtonProps> = ({
       disabled={disabled}
       {...restProps}
     >
-      <SquarePen size={iconSize} />
+      <Plus size={iconSize} />
+      {children}
     </button>
   );
 };
 
-export default EditButton;
+export default CreateButton;

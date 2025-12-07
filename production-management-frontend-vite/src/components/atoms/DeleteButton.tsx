@@ -1,6 +1,7 @@
 import React from 'react';
 import { XCircle } from 'lucide-react';
 import ProtectedButton from '../ProtectedButton';
+import './Button.css';
 
 export interface DeleteButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
   /**

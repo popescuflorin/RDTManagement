@@ -14,6 +14,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
+import CreateButton from '../atoms/CreateButton';
 import { Table } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Acquisition.css';
@@ -192,14 +193,13 @@ const Acquisition: React.FC = () => {
           <h1>{t('title')}</h1>
           <p>{t('subtitle')}</p>
         </div>
-        <ProtectedButton
-          className="add-acquisition-button"
+        <CreateButton
           onClick={handleCreateAcquisition}
           requiredPermission={Permissions.CreateAcquisition}
+          variant="primary"
         >
-          <Plus size={20} />
           {t('createAcquisition')}
-        </ProtectedButton>
+        </CreateButton>
       </div>
 
       {/* Statistics */}

@@ -23,27 +23,7 @@
   font-weight: 700;
 }
 
-.add-material-button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
-  background: var(--primary-600);
-  color: var(--text-inverse);
-  border: none;
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  box-shadow: var(--shadow-sm);
-}
-
-.add-material-button:hover {
-  background: var(--primary-700);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
+/* Create button styles are now handled by CreateButton component in atoms folder */
 
 /* Loading State */
 .inventory-loading {
@@ -235,90 +215,7 @@
   font-weight: 500;
 }
 
-/* Table Container */
-.table-container {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  margin: 0 var(--space-2xl);
-}
-
-/* Table Styles */
-.inventory-materials-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--text-sm);
-}
-
-.inventory-materials-table th {
-  background: var(--primary-500);
-  color: var(--text-inverse);
-  padding: var(--space-lg) var(--space-md);
-  text-align: left;
-  font-weight: 600;
-  font-size: var(--text-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.inventory-materials-table th.sortable {
-  cursor: pointer;
-  user-select: none;
-  transition: background var(--transition-fast);
-}
-
-.inventory-materials-table th.sortable:hover {
-  background: var(--primary-600);
-}
-
-.inventory-materials-table th .th-content {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  justify-content: space-between;
-}
-
-.inventory-materials-table th .sort-icon {
-  flex-shrink: 0;
-  transition: all var(--transition-fast);
-}
-
-.inventory-materials-table th .sort-icon.inactive {
-  opacity: 0.4;
-}
-
-.inventory-materials-table th .sort-icon.active {
-  opacity: 1;
-  color: var(--warning-200);
-}
-
-.inventory-materials-table th.sortable:hover .sort-icon.inactive {
-  opacity: 0.7;
-}
-
-.inventory-materials-table td {
-  padding: var(--space-lg) var(--space-md);
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
-}
-
-.inventory-materials-table tbody tr {
-  transition: background-color 0.2s ease;
-}
-
-.inventory-materials-table tbody tr:hover {
-  background-color: var(--surface-hover);
-}
-
-.inventory-materials-table tr.inactive-material {
-  opacity: 0.6;
-}
-
-.inventory-materials-table tr.inactive-material td {
-  background-color: #f8f9fa;
-}
+/* Table styles are now handled by Table.css - all tables use the .data-table class */
 
 /* Table Cell Styles */
 .material-name-cell {
@@ -395,62 +292,7 @@
   color: #721c24;
 }
 
-.actions-cell {
-  min-width: 100px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-}
-
-.action-button {
-  background: none;
-  border: none;
-  font-size: 1.1rem;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.action-button:hover {
-  transform: scale(1.1);
-}
-
-.btn-success {
-  background-color: #22c55e;
-  color: white;
-}
-
-.btn-success:hover:not(:disabled) {
-  background-color: #16a34a;
-  transform: translateY(-1px);
-}
-
-.btn-info {
-  background-color: #3b82f6;
-  color: white;
-}
-
-.btn-info:hover:not(:disabled) {
-  background-color: #2563eb;
-  transform: translateY(-1px);
-}
-
-.edit-button:hover {
-  background-color: #e3f2fd;
-}
-
-.delete-button:hover {
-  background-color: #ffebee;
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 .no-materials {
   text-align: center;
@@ -632,10 +474,7 @@
     text-align: center;
   }
 
-  .add-material-button {
-    width: 100%;
-    padding: 14px;
-  }
+  /* Create button styles are now handled by CreateButton component in atoms folder */
 
   .inventory-stats {
     grid-template-columns: 1fr;
@@ -680,19 +519,7 @@
     width: 100%;
   }
 
-  .table-container {
-    overflow-x: auto;
-  }
-
-  .inventory-materials-table {
-    min-width: 800px;
-  }
-
-  .inventory-materials-table th,
-  .inventory-materials-table td {
-    padding: 12px 8px;
-    font-size: 0.9rem;
-  }
+  /* Table responsive styles are handled by Table.css */
 
   .action-buttons {
     flex-direction: column;
@@ -730,11 +557,7 @@
     font-size: 1.4rem;
   }
 
-  .inventory-materials-table th,
-  .inventory-materials-table td {
-    padding: 10px 6px;
-    font-size: 0.85rem;
-  }
+  /* Table responsive styles are handled by Table.css */
 
   .material-name {
     font-size: 0.9rem;
@@ -759,26 +582,12 @@
   .inventory-header,
   .inventory-controls,
   .actions-cell,
-  .add-material-button {
-    display: none;
-  }
+  /* Create button styles are now handled by CreateButton component in atoms folder */
 
   .inventory-container {
     padding: 0;
     background: white;
   }
 
-  .table-container {
-    box-shadow: none;
-    border: 1px solid #333;
-  }
-
-  .inventory-materials-table th {
-    background: #f0f0f0 !important;
-    color: #333 !important;
-  }
-
-  .inventory-materials-table tr:hover {
-    background-color: transparent;
-  }
+  /* Print styles for tables are handled by Table.css */
 }

@@ -82,48 +82,7 @@
   border-color: var(--primary-500);
 }
 
-/* Table */
-.table-container {
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  margin-bottom: 24px;
-}
-
-.transports-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.transports-table thead {
-  background: var(--primary-600);
-  color: white;
-}
-
-.transports-table th {
-  padding: 16px;
-  text-align: left;
-  font-weight: 600;
-  font-size: var(--text-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.transports-table tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background-color var(--transition-fast);
-}
-
-.transports-table tbody tr:hover {
-  background-color: var(--background-secondary);
-}
-
-.transports-table td {
-  padding: 16px;
-  font-size: var(--text-sm);
-  color: var(--text-primary);
-}
+/* Table styles are now handled by Table.css - all tables use the .data-table class */
 
 .transport-name {
   font-weight: 600;
@@ -137,56 +96,7 @@
   font-style: italic;
 }
 
-.actions-cell {
-  width: 120px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-start;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
-  border: none;
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-primary {
-  background: var(--primary-600);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: var(--primary-700);
-}
-
-.btn-danger {
-  background: var(--error-500);
-  color: white;
-}
-
-.btn-danger:hover {
-  background: var(--error-600);
-}
-
-.btn-sm {
-  padding: 6px 10px;
-  font-size: var(--text-xs);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 /* Tabs */
 .transports-tabs {

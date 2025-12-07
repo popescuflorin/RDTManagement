@@ -34,6 +34,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import CancelButton from '../atoms/CancelButton';
+import CreateButton from '../atoms/CreateButton';
 import { Table } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Production.css';
@@ -369,24 +370,22 @@ const Production: React.FC = () => {
         </div>
         <div className="header-right">
           {activeTab === 'rawMaterial' && (
-            <ProtectedButton
-              requiredPermission={Permissions.CreateProductionPlan}
-              className="btn btn-primary"
+            <CreateButton
               onClick={() => setShowCreateModal(true)}
+              requiredPermission={Permissions.CreateProductionPlan}
+              variant="primary"
             >
-              <Plus size={16} />
               {t('buttons.createProductionPlan')}
-            </ProtectedButton>
+            </CreateButton>
           )}
           {activeTab === 'recyclable' && (
-            <ProtectedButton
-              requiredPermission={Permissions.CreateProductionPlan}
-              className="btn btn-primary"
+            <CreateButton
               onClick={() => setShowCreateRecycleModal(true)}
+              requiredPermission={Permissions.CreateProductionPlan}
+              variant="primary"
             >
-              <Plus size={16} />
               {t('buttons.createRecyclablesPlan')}
-            </ProtectedButton>
+            </CreateButton>
           )}
         </div>
       </div>

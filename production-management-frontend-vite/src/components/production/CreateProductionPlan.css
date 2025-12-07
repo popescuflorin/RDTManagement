@@ -473,19 +473,7 @@
   cursor: not-allowed;
 }
 
-.btn-sm {
-  padding: var(--space-xs) var(--space-sm);
-  font-size: var(--text-sm);
-}
-
-.btn-danger {
-  background: #ef4444;
-  color: white;
-}
-
-.btn-danger:hover:not(:disabled) {
-  background: #dc2626;
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 /* Responsive Design */
 @media (max-width: 768px) {

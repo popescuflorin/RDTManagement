@@ -291,68 +291,7 @@
   font-size: 1rem;
 }
 
-/* Button Styles */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-sm);
-  font-weight: 500;
-  font-size: 0.875rem;
-  text-decoration: none;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  gap: var(--space-sm);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-primary {
-  background: var(--primary-500);
-  color: white;
-  border-color: var(--primary-500);
-}
-
-.btn-primary:hover:not(:disabled) {
-  background: var(--primary-600);
-  border-color: var(--primary-600);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn-secondary {
-  background: var(--surface-100);
-  color: var(--text-secondary);
-  border-color: var(--surface-300);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: var(--surface-200);
-  color: var(--text-primary);
-  border-color: var(--surface-400);
-}
-
-.btn-danger {
-  background: var(--danger-500);
-  color: white;
-  border-color: var(--danger-500);
-}
-
-.btn-danger:hover:not(:disabled) {
-  background: var(--error-600);
-  border-color: var(--danger-600);
-}
-
-.btn-sm {
-  padding: var(--space-xs) var(--space-sm);
-  font-size: 0.75rem;
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 /* Animations */
 @keyframes fadeIn {

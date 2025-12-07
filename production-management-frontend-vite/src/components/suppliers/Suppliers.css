@@ -102,53 +102,7 @@
   cursor: pointer;
 }
 
-/* Table */
-.table-container {
-  background: white;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  overflow: hidden;
-  margin-bottom: 24px;
-}
-
-.suppliers-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.suppliers-table thead {
-  background: var(--primary-600);
-  color: white;
-}
-
-.suppliers-table th {
-  padding: 16px;
-  text-align: left;
-  font-weight: 600;
-  font-size: var(--text-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.suppliers-table tbody tr {
-  border-bottom: 1px solid var(--border);
-  transition: background-color var(--transition-fast);
-}
-
-.suppliers-table tbody tr:hover {
-  background-color: var(--background-secondary);
-}
-
-.suppliers-table tbody tr.inactive-row {
-  opacity: 0.6;
-  background-color: var(--background-secondary);
-}
-
-.suppliers-table td {
-  padding: 16px;
-  font-size: var(--text-sm);
-  color: var(--text-primary);
-}
+/* Table styles are now handled by Table.css - all tables use the .data-table class */
 
 .supplier-name {
   font-weight: 600;
@@ -227,56 +181,7 @@
   font-style: italic;
 }
 
-.actions-cell {
-  width: 150px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-start;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
-  border: none;
-  padding: 8px 12px;
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.btn-primary {
-  background: var(--primary-600);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: var(--primary-700);
-}
-
-.btn-danger {
-  background: var(--error-500);
-  color: white;
-}
-
-.btn-danger:hover {
-  background: var(--error-600);
-}
-
-.btn-sm {
-  padding: 6px 10px;
-  font-size: var(--text-xs);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 /* Pagination */
 .pagination-container {

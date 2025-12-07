@@ -20,6 +20,7 @@ import EditRolePermissions from './EditRolePermissions';
 import CreateRole from './CreateRole';
 import EditButton from '../atoms/EditButton';
 import DeleteButton from '../atoms/DeleteButton';
+import CreateButton from '../atoms/CreateButton';
 import { Table } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './UserManagement.css';
@@ -224,22 +225,20 @@ const UserManagement: React.FC = () => {
         </div>
         <div className="header-right">
           {activeTab === 'users' && (
-            <button
+            <CreateButton
               onClick={() => setShowAddModal(true)}
-              className="btn btn-primary"
+              variant="primary"
             >
-              <UserPlus size={16} />
               {t('userManagement.buttons.addNewUser')}
-            </button>
+            </CreateButton>
           )}
           {activeTab === 'roles' && (
-            <button
+            <CreateButton
               onClick={handleCreateRole}
-              className="btn btn-success"
+              variant="success"
             >
-              <Shield size={16} />
               {t('userManagement.buttons.createNewRole')}
-            </button>
+            </CreateButton>
           )}
         </div>
       </div>
@@ -277,7 +276,7 @@ const UserManagement: React.FC = () => {
         </div>
         <div className="users-count">
           <span className="count-badge">{filteredUsers.length}</span>
-          {t('userManagement.search.usersFound', { count: filteredUsers.length })}
+          {filteredUsers.length == 1 ? t('userManagement.search.usersFound', { count: filteredUsers.length }) : t('userManagement.search.usersFound_plural', { count: filteredUsers.length })}
         </div>
       </div>
 
@@ -292,13 +291,12 @@ const UserManagement: React.FC = () => {
                 : t('userManagement.empty.noUsersInSystem')}
             </p>
             {!searchTerm && (
-              <button
+              <CreateButton
                 onClick={() => setShowAddModal(true)}
-                className="btn btn-primary"
+                variant="primary"
               >
-                <UserPlus size={16} />
                 {t('userManagement.empty.addFirstUser')}
-              </button>
+              </CreateButton>
             )}
           </div>
         ) : (

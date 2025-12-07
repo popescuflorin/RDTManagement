@@ -23,7 +23,8 @@
   font-weight: 700;
 }
 
-.btn {
+/* Button styles are now handled by Button.css in atoms folder */
+/* .btn {
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
@@ -231,87 +232,8 @@
   padding: var(--space-xs);
 }
 
-/* Table Container */
-.table-container {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  margin: 0 var(--space-2xl);
-}
-
-/* Table Styles */
-.orders-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--text-sm);
-}
-
-.orders-table th {
-  background: var(--primary-500);
-  color: var(--text-inverse);
-  padding: var(--space-lg) var(--space-md);
-  text-align: left;
-  font-weight: 600;
-  font-size: var(--text-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.orders-table th.sortable {
-  cursor: pointer;
-  user-select: none;
-  transition: background var(--transition-fast);
-}
-
-.orders-table th.sortable:hover {
-  background: var(--primary-600);
-}
-
-.orders-table th .th-content {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  justify-content: space-between;
-}
-
-.orders-table th .sort-icon {
-  flex-shrink: 0;
-  transition: all var(--transition-fast);
-}
-
-.orders-table th .sort-icon.inactive {
-  opacity: 0.4;
-}
-
-.orders-table th .sort-icon.active {
-  opacity: 1;
-  color: var(--warning-200);
-}
-
-.orders-table th.sortable:hover .sort-icon.inactive {
-  opacity: 0.7;
-}
-
-.orders-table td {
-  padding: var(--space-lg) var(--space-md);
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
-  color: var(--text-primary);
-}
-
-.orders-table tbody tr {
-  transition: background-color 0.2s ease;
-}
-
-.orders-table tbody tr:hover {
-  background-color: var(--surface-hover);
-}
-
-.orders-table tbody tr:last-child td {
-  border-bottom: none;
-}
+/* Table Container - Removed conflicting styles, now handled by Table.css */
+/* Table styles are now handled by Table.css - all tables use the .data-table class */
 
 .client-name {
   font-weight: 600;
@@ -504,68 +426,7 @@
 }
 
 /* Actions */
-.actions-cell {
-  width: 150px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 6px;
-  justify-content: flex-end;
-}
-
-.btn-sm {
-  padding: 6px 10px;
-  font-size: 0.85rem;
-  border-radius: 6px;
-}
-
-.btn-info {
-  background: #0dcaf0;
-  color: white;
-}
-
-.btn-info:hover {
-  background: #0aa2c0;
-}
-
-.btn-primary {
-  background: var(--primary-600);
-  color: white;
-}
-
-.btn-primary:hover {
-  background: var(--primary-700);
-}
-
-.btn-danger {
-  background: #dc3545;
-  color: white;
-}
-
-.btn-danger:hover {
-  background: #bb2d3b;
-}
-
-.btn-success {
-  background: #10b981;
-  border-color: #10b981;
-  color: white;
-}
-
-.btn-success:hover {
-  background: #059669;
-  border-color: #059669;
-}
-
-.btn-secondary {
-  background: #6c757d;
-  color: white;
-}
-
-.btn-secondary:hover {
-  background: #5c636a;
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 /* Delete Modal */
 .delete-modal-overlay {
@@ -640,14 +501,7 @@
     justify-content: center;
   }
 
-  .orders-table {
-    font-size: var(--text-xs);
-  }
-
-  .orders-table th,
-  .orders-table td {
-    padding: var(--space-md) var(--space-sm);
-  }
+  /* Table responsive styles are handled by Table.css */
 
   .action-buttons {
     flex-direction: column;

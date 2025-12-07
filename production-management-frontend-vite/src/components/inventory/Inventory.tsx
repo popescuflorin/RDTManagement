@@ -24,6 +24,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
+import CreateButton from '../atoms/CreateButton';
 import { Table } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Inventory.css';
@@ -164,14 +165,13 @@ const Inventory: React.FC = () => {
           <Package size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
           {t('inventoryManagement')}
         </h1>
-        <ProtectedButton
-          requiredPermission={Permissions.AddMaterial}
-          className="btn btn-primary"
+        <CreateButton
           onClick={() => setShowAddModal(true)}
+          requiredPermission={Permissions.AddMaterial}
+          variant="primary"
         >
-          <Plus size={16} />
           {t('addMaterial')}
-        </ProtectedButton>
+        </CreateButton>
       </div>
 
       {/* Statistics Cards */}

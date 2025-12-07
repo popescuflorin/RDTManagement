@@ -19,6 +19,7 @@ import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import DeleteButton from '../atoms/DeleteButton';
+import CreateButton from '../atoms/CreateButton';
 import { Table } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Transports.css';
@@ -190,14 +191,13 @@ const Transports: React.FC = () => {
           {t('transports.title')}
         </h1>
         {activeTab === 'transports' && (
-          <ProtectedButton
-            requiredPermission={Permissions.CreateTransport}
-            className="btn btn-primary"
+          <CreateButton
             onClick={handleCreateTransport}
+            requiredPermission={Permissions.CreateTransport}
+            variant="primary"
           >
-            <Plus size={16} />
             {t('transports.buttons.createNewTransportVehicle')}
-          </ProtectedButton>
+          </CreateButton>
         )}
       </div>
 
@@ -418,14 +418,13 @@ const Transports: React.FC = () => {
       {activeTab === 'records' && (
         <>
           <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'flex-end' }}>
-            <ProtectedButton
-              requiredPermission={Permissions.EditAcquisition}
-              className="btn btn-primary"
+            <CreateButton
               onClick={() => setShowCreateRecordModal(true)}
+              requiredPermission={Permissions.EditAcquisition}
+              variant="primary"
             >
-              <Plus size={16} />
               {t('transports.buttons.createTransportRecord')}
-            </ProtectedButton>
+            </CreateButton>
           </div>
 
           {isLoadingRecords ? (

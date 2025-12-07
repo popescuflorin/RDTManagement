@@ -159,7 +159,11 @@ const Table = <T extends Record<string, any> = any>({
   );
 
   if (!showContainer) {
-    return <div className={className}>{tableContent}</div>;
+    return (
+      <div className={`table-wrapper ${className}`.trim()}>
+        {tableContent}
+      </div>
+    );
   }
 
   return (

@@ -64,7 +64,7 @@
 }
 
 .header-content svg {
-  color: white;
+  color: #333;
 }
 
 .edit-role-permissions-header h2 {
@@ -252,43 +252,8 @@
   border-radius: 0 0 var(--radius-lg) var(--radius-lg);
 }
 
-.cancel-button,
-.save-button {
-  padding: var(--space-md) var(--space-xl);
-  border-radius: var(--radius-md);
-  font-size: var(--text-base);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  min-width: 120px;
-  border: none;
-}
-
-.cancel-button {
-  background: var(--surface);
-  color: var(--text-secondary);
-  border: 1px solid var(--border);
-}
-
-.cancel-button:hover:not(:disabled) {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-}
-
-.save-button {
-  background: var(--primary-600);
-  color: var(--text-inverse);
-}
-
-.save-button:hover:not(:disabled) {
-  background: var(--primary-700);
-}
-
-.cancel-button:disabled,
-.save-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+/* Button styles are now handled by Button.css in atoms folder */
+/* Note: .save-button is a component-specific button, not part of atomic button system */
 
 /* Responsive Design */
 @media (max-width: 768px) {

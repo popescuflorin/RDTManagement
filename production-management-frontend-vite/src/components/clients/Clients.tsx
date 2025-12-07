@@ -21,6 +21,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
+import CreateButton from '../atoms/CreateButton';
 import { Table } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Clients.css';
@@ -167,14 +168,13 @@ const Clients: React.FC = () => {
           <UserCircle size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
           {t('clients.title')}
         </h1>
-        <ProtectedButton
-          requiredPermission={Permissions.CreateClient}
-          className="btn btn-primary"
+        <CreateButton
           onClick={handleCreateClient}
+          requiredPermission={Permissions.CreateClient}
+          variant="primary"
         >
-          <Plus size={16} />
           {t('clients.buttons.createNewClient')}
-        </ProtectedButton>
+        </CreateButton>
       </div>
 
       {/* Search and Filter */}

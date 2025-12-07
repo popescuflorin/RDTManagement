@@ -14,6 +14,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import CancelButton from '../atoms/CancelButton';
+import CreateButton from '../atoms/CreateButton';
 import { Table } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Orders.css';
@@ -238,14 +239,13 @@ const Orders: React.FC = () => {
           <Package size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
           {t('title')}
         </h1>
-        <ProtectedButton
-          requiredPermission={Permissions.CreateOrder}
-          className="btn btn-primary"
+        <CreateButton
           onClick={handleCreateOrder}
+          requiredPermission={Permissions.CreateOrder}
+          variant="primary"
         >
-          <Plus size={16} />
           {t('createOrder')}
-        </ProtectedButton>
+        </CreateButton>
       </div>
 
       {/* Statistics Cards */}

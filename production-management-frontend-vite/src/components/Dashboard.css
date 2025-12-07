@@ -46,7 +46,7 @@
   padding: 0;
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 100; /* Below overlay (9998) so it gets dimmed */
   transition: all var(--transition-fast);
   margin: 0;
   width: 100%;
@@ -70,6 +70,28 @@
   align-items: center;
   gap: var(--space-xl);
   flex: 1;
+}
+
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: var(--text-xl);
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: var(--space-sm);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-fast);
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.mobile-menu-toggle:hover {
+  background: var(--surface-hover);
+  color: var(--text-primary);
 }
 
 .sidebar-toggle {
@@ -172,7 +194,7 @@
   height: 36px;
   border-radius: var(--radius-full);
   background: linear-gradient(135deg, var(--primary-500) 0%, var(--purple-500) 100%);
-  color: var(--text-inverse);
+  color: var(--secondary-500);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -203,13 +225,13 @@
 }
 
 /* Header buttons styling */
-.create-user-button,
+/* Create button styles are now handled by CreateButton component in atoms folder */
 .logout-button {
   display: inline-flex;
   align-items: center;
   gap: var(--space-sm);
   padding: var(--space-sm) var(--space-lg);
-  background: var(--primary-600);
+  background: var(--error-600);
   color: var(--text-inverse);
   border: none;
   border-radius: var(--radius-lg);
@@ -221,15 +243,10 @@
   text-decoration: none;
 }
 
-.create-user-button:hover,
 .logout-button:hover {
-  background: var(--primary-700);
+  background: var(--error-700);
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
-}
-
-.logout-button {
-  background: var(--error-600);
 }
 
 .logout-button:hover {
@@ -619,14 +636,28 @@
 @media (max-width: 1200px) {
   .dashboard-content.sidebar-expanded {
     margin-left: 0;
+    width: 100%;
   }
 
   .dashboard-content.sidebar-collapsed {
     margin-left: 0;
+    width: 100%;
   }
 
-  .sidebar-toggle {
-    display: block;
+  .dashboard-content.sidebar-expanded .dashboard-header {
+    margin-left: 0;
+    border-left: none;
+    width: 100%;
+  }
+
+  .dashboard-content.sidebar-collapsed .dashboard-header {
+    margin-left: 0;
+    border-left: none;
+    width: 100%;
+  }
+
+  .mobile-menu-toggle {
+    display: flex;
   }
 }
 
@@ -664,7 +695,6 @@
     flex-wrap: wrap;
   }
 
-  .create-user-button,
   .logout-button,
   .debug-button {
     padding: var(--space-xs) var(--space-md);

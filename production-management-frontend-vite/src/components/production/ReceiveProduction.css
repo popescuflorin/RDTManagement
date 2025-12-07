@@ -434,54 +434,7 @@
   100% { transform: rotate(360deg); }
 }
 
-/* Button Styles */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-sm);
-  font-weight: 500;
-  font-size: 0.875rem;
-  text-decoration: none;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  gap: var(--space-sm);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-success {
-  background: var(--success-500);
-  color: white;
-  border-color: var(--success-500);
-}
-
-.btn-success:hover:not(:disabled) {
-  background: var(--success-600);
-  border-color: var(--success-600);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn-secondary {
-  background: var(--surface-100);
-  color: var(--text-secondary);
-  border-color: var(--surface-300);
-}
-
-.btn-secondary:hover:not(:disabled) {
-  background: var(--surface-200);
-  color: var(--text-primary);
-  border-color: var(--surface-400);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 /* Animations */
 @keyframes fadeIn {

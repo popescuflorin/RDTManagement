@@ -5,16 +5,18 @@ import {
   Users, 
   UserCheck, 
   Activity, 
-  UserPlus, 
   LogOut, 
   Clock,
   Mail,
-  User as UserIcon
+  User as UserIcon,
+  Menu,
+  X
 } from 'lucide-react';
 import { userApi, authApi, clearAuthData } from '../services/api';
 import type { User, DashboardData } from '../types';
 import AdminRegister from './users/AdminRegister';
 import Sidebar from './Sidebar';
+import MobileMenu from './MobileMenu';
 import UserManagement from './users/UserManagement';
 import Inventory from './inventory/Inventory';
 import Production from './production/Production';
@@ -23,6 +25,7 @@ import Orders from './orders/Orders';
 import Transports from './transports/Transports';
 import Clients from './clients/Clients';
 import Suppliers from './suppliers/Suppliers';
+import CreateButton from './atoms/CreateButton';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -33,6 +36,7 @@ const Dashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState('dashboard');
   const navigate = useNavigate();
 
@@ -239,17 +243,25 @@ const Dashboard: React.FC = () => {
       <div className={`dashboard-content ${sidebarCollapsed ? 'sidebar-collapsed' : 'sidebar-expanded'}`}>
       <header className="dashboard-header">
         <div className="header-content">
-          <h1>{getPageTitle(currentPage)}</h1>
+          <div className="header-left">
+            <button 
+              className="mobile-menu-toggle"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            <h1>{getPageTitle(currentPage)}</h1>
+          </div>
           <div className="user-info">
             <span>{t('header.welcome', { ns: 'dashboard', firstName: user?.firstName, lastName: user?.lastName, role: user?.role })}</span>
             {isAdmin && currentPage === 'dashboard' && (
-              <button 
-                onClick={() => setShowRegisterModal(true)} 
-                className="btn btn-primary"
+              <CreateButton
+                onClick={() => setShowRegisterModal(true)}
+                variant="primary"
               >
-                <UserPlus size={16} />
                 {t('header.createUser', { ns: 'dashboard' })}
-              </button>
+              </CreateButton>
             )}
             <button onClick={handleLogout} className="btn btn-danger">
               <LogOut size={16} />
@@ -257,6 +269,16 @@ const Dashboard: React.FC = () => {
             </button>
           </div>
         </div>
+        
+        {/* Mobile Menu */}
+        {mobileMenuOpen && (
+          <MobileMenu
+            currentPage={currentPage}
+            onNavigate={handleNavigate}
+            userRole={user?.role || 'User'}
+            onClose={() => setMobileMenuOpen(false)}
+          />
+        )}
       </header>
 
         <main className="dashboard-main">

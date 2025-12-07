@@ -32,27 +32,7 @@
   font-size: var(--text-lg);
 }
 
-.add-acquisition-button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
-  background: var(--primary-600);
-  color: var(--text-inverse);
-  border: none;
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  box-shadow: var(--shadow-sm);
-}
-
-.add-acquisition-button:hover {
-  background: var(--primary-700);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
+/* Create button styles are now handled by CreateButton component in atoms folder */
 
 /* Loading State */
 .acquisition-loading {
@@ -231,81 +211,7 @@
 }
 
 /* Table Container */
-.table-container {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  margin: 0 var(--space-2xl);
-}
-
-/* Table Styles */
-.acquisitions-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--text-sm);
-}
-
-.acquisitions-table th {
-  background: var(--primary-500);
-  color: var(--text-inverse);
-  padding: var(--space-lg) var(--space-md);
-  text-align: left;
-  font-weight: 600;
-  font-size: var(--text-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.acquisitions-table th.sortable {
-  cursor: pointer;
-  user-select: none;
-  transition: background var(--transition-fast);
-}
-
-.acquisitions-table th.sortable:hover {
-  background: var(--primary-600);
-}
-
-.acquisitions-table th .th-content {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  justify-content: space-between;
-}
-
-.acquisitions-table th .sort-icon {
-  flex-shrink: 0;
-  transition: all var(--transition-fast);
-}
-
-.acquisitions-table th .sort-icon.inactive {
-  opacity: 0.4;
-}
-
-.acquisitions-table th .sort-icon.active {
-  opacity: 1;
-  color: var(--warning-200);
-}
-
-.acquisitions-table th.sortable:hover .sort-icon.inactive {
-  opacity: 0.7;
-}
-
-.acquisitions-table td {
-  padding: var(--space-lg) var(--space-md);
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
-}
-
-.acquisitions-table tbody tr {
-  transition: background-color 0.2s ease;
-}
-
-.acquisitions-table tbody tr:hover {
-  background-color: var(--surface-hover);
-}
+/* Table styles are now handled by Table.css - all tables use the .data-table class */
 
 /* Table Cell Styles */
 .acquisition-title .title {
@@ -401,43 +307,7 @@
   color: var(--text-secondary);
 }
 
-/* Action Buttons */
-.action-buttons {
-  display: flex;
-  gap: var(--space-sm);
-}
-
-.action-button {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-md);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition-fast);
-}
-
-.view-button {
-  background: #e8f4f8;
-  color: #0077b6;
-}
-
-.view-button:hover {
-  background: #d1e9f2;
-  color: #005f8a;
-}
-
-.edit-button {
-  background: var(--primary-100);
-  color: var(--primary-600);
-}
-
-.edit-button:hover {
-  background: var(--primary-200);
-  color: var(--primary-700);
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 .receive-button {
   background: var(--success-100);
@@ -459,15 +329,7 @@
   color: var(--warning-800);
 }
 
-.delete-button {
-  background: var(--error-100);
-  color: var(--error-600);
-}
-
-.delete-button:hover {
-  background: var(--error-200);
-  color: var(--error-700);
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 /* Empty State */
 .empty-state {
@@ -573,36 +435,9 @@
   margin-top: var(--space-xl);
 }
 
-.cancel-button {
-  padding: var(--space-md) var(--space-xl);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-md);
-  background: var(--surface);
-  color: var(--text-secondary);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
-.cancel-button:hover {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-}
-
-.modal-content .delete-button {
-  padding: var(--space-md) var(--space-xl);
-  border: none;
-  border-radius: var(--radius-md);
-  background: var(--error-600);
-  color: var(--text-inverse);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.modal-content .delete-button:hover {
-  background: var(--error-700);
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 /* Animations */
 @keyframes fadeIn {
@@ -637,14 +472,7 @@
     grid-template-columns: 1fr;
   }
 
-  .acquisitions-table {
-    font-size: var(--text-xs);
-  }
-
-  .acquisitions-table th,
-  .acquisitions-table td {
-    padding: var(--space-md) var(--space-sm);
-  }
+  /* Table responsive styles are handled by Table.css */
 
   .action-buttons {
     flex-direction: column;
@@ -708,7 +536,8 @@
 }
 
 /* Hover effect for status bars */
-.acquisitions-table tbody tr:hover .status-bar {
+/* Status bar hover effect - applies to any table row */
+.data-table tbody tr:hover .status-bar {
   transform: scaleX(1.2);
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }

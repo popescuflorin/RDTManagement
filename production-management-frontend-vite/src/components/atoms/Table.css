@@ -4,15 +4,21 @@
   border-radius: var(--radius-lg);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   border: 1px solid var(--border);
-  overflow: hidden;
+  overflow-x: auto; /* Enable horizontal scrolling */
+  overflow-y: hidden; /* Prevent vertical scrolling */
   margin: 0 var(--space-2xl);
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  max-width: 100%; /* Prevent container from exceeding parent */
+  display: block; /* Make container a block element for proper width calculation */
 }
 
 /* Table Styles */
 .data-table {
-  width: 100%;
+  width: 100%; /* Fill container width */
+  min-width: 100%; /* Ensure table is at least as wide as container */
   border-collapse: collapse;
   font-size: var(--text-sm);
+  table-layout: auto; /* Allow columns to size based on content */
 }
 
 .data-table th {
@@ -85,15 +91,29 @@
   font-style: italic;
 }
 
-/* Responsive Design */
+/* Responsive Design - All sizes above 480px (Tablet and Desktop) */
+@media (min-width: 480px) {
+  .table-container {
+    overflow-x: auto; /* Horizontal scroll when table doesn't fit */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  }
+}
+
+/* Responsive Design - Tablet (480px to 1200px) */
+@media (min-width: 480px) and (max-width: 1200px) {
+  .table-container {
+    margin: 0 var(--space-lg);
+  }
+}
+
+/* Responsive Design - Mobile (max-width: 768px) */
 @media (max-width: 768px) {
   .table-container {
     margin: 0 var(--space-md);
-    overflow-x: auto;
   }
 
   .data-table {
-    min-width: 600px;
+    min-width: 600px; /* Force minimum width on mobile */
   }
 
   .data-table th,
@@ -102,3 +122,13 @@
     font-size: var(--text-xs);
   }
 }
+
+/* Table wrapper for tables without container (showContainer={false}) */
+.table-wrapper {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+  display: block; /* Make wrapper a block element for proper width calculation */
+}
+

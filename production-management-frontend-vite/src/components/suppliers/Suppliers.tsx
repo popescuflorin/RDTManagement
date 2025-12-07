@@ -21,6 +21,7 @@ import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
+import CreateButton from '../atoms/CreateButton';
 import { Table } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Suppliers.css';
@@ -167,14 +168,13 @@ const Suppliers: React.FC = () => {
           <Building2 size={24} style={{ marginRight: '12px', verticalAlign: 'middle' }} />
           {t('suppliers.title')}
         </h1>
-        <ProtectedButton
-          requiredPermission={Permissions.CreateSupplier}
-          className="btn btn-primary"
+        <CreateButton
           onClick={handleCreateSupplier}
+          requiredPermission={Permissions.CreateSupplier}
+          variant="primary"
         >
-          <Plus size={16} />
           {t('suppliers.buttons.createNewSupplier')}
-        </ProtectedButton>
+        </CreateButton>
       </div>
 
       {/* Search and Filter */}

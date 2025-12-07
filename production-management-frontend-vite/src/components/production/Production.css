@@ -80,27 +80,7 @@
   transform: scale(1.1);
 }
 
-.add-product-button {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-sm);
-  background: var(--primary-600);
-  color: var(--text-inverse);
-  border: none;
-  padding: var(--space-sm) var(--space-lg);
-  border-radius: var(--radius-lg);
-  font-size: var(--text-sm);
-  font-weight: 500;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  box-shadow: var(--shadow-sm);
-}
-
-.add-product-button:hover {
-  background: var(--primary-700);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
+/* Create button styles are now handled by CreateButton component in atoms folder */
 
 /* Loading State */
 .production-loading {
@@ -275,89 +255,7 @@
 }
 
 /* Table Container */
-.table-container {
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border);
-  overflow: hidden;
-  margin: 0 var(--space-2xl);
-}
-
-/* Table Styles */
-.products-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: var(--text-sm);
-}
-
-.products-table th {
-  background: var(--primary-500);
-  color: var(--text-inverse);
-  padding: var(--space-lg) var(--space-md);
-  text-align: left;
-  font-weight: 600;
-  font-size: var(--text-sm);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.products-table th.sortable {
-  cursor: pointer;
-  user-select: none;
-  transition: background var(--transition-fast);
-}
-
-.products-table th.sortable:hover {
-  background: var(--primary-600);
-}
-
-.products-table th .th-content {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  justify-content: space-between;
-}
-
-.products-table th .sort-icon {
-  flex-shrink: 0;
-  transition: all var(--transition-fast);
-}
-
-.products-table th .sort-icon.inactive {
-  opacity: 0.4;
-}
-
-.products-table th .sort-icon.active {
-  opacity: 1;
-  color: var(--warning-200);
-}
-
-.products-table th.sortable:hover .sort-icon.inactive {
-  opacity: 0.7;
-}
-
-.products-table td {
-  padding: var(--space-lg) var(--space-md);
-  border-bottom: 1px solid var(--border);
-  vertical-align: top;
-}
-
-.products-table tbody tr {
-  transition: background-color 0.2s ease;
-}
-
-.products-table tbody tr:hover {
-  background-color: var(--surface-hover);
-}
-
-.products-table tr.inactive-product {
-  opacity: 0.6;
-}
-
-.products-table tr.inactive-product td {
-  background-color: #f8f9fa;
-}
+/* Table styles are now handled by Table.css - all tables use the .data-table class */
 
 /* Table Cell Styles */
 .product-name-cell {
@@ -531,43 +429,7 @@
   color: #856404;
 }
 
-.actions-cell {
-  min-width: 120px;
-}
-
-.action-buttons {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.action-button {
-  background: none;
-  border: none;
-  font-size: 1.1rem;
-  cursor: pointer;
-  padding: 8px;
-  border-radius: 6px;
-  transition: all 0.2s ease;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.action-button:hover:not(.disabled) {
-  transform: scale(1.1);
-}
-
-.edit-button:hover {
-  background-color: #e3f2fd;
-}
-
-.delete-button:hover {
-  background-color: #ffebee;
-}
+/* Button styles are now handled by Button.css in atoms folder */
 
 .produce-button:hover:not(.disabled) {
   background-color: #e8f5e8;
@@ -766,10 +628,7 @@
     text-align: center;
   }
 
-  .add-product-button {
-    width: 100%;
-    padding: 14px;
-  }
+  /* Create button styles are now handled by CreateButton component in atoms folder */
 
   .production-stats {
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
@@ -806,19 +665,7 @@
     justify-content: center;
   }
 
-  .table-container {
-    overflow-x: auto;
-  }
-
-  .products-table {
-    min-width: 1000px;
-  }
-
-  .products-table th,
-  .products-table td {
-    padding: 12px 8px;
-    font-size: 0.9rem;
-  }
+  /* Table responsive styles are handled by Table.css */
 
   .action-buttons {
     flex-direction: column;
@@ -856,11 +703,7 @@
     font-size: 1.4rem;
   }
 
-  .products-table th,
-  .products-table td {
-    padding: 10px 6px;
-    font-size: 0.85rem;
-  }
+  /* Table responsive styles are handled by Table.css */
 
   .product-name {
     font-size: 0.9rem;
@@ -887,26 +730,12 @@
   .production-header,
   .production-controls,
   .actions-cell,
-  .add-product-button {
-    display: none;
-  }
+  /* Create button styles are now handled by CreateButton component in atoms folder */
 
   .production-container {
     padding: 0;
     background: white;
   }
 
-  .table-container {
-    box-shadow: none;
-    border: 1px solid #333;
-  }
-
-  .products-table th {
-    background: #f0f0f0 !important;
-    color: #333 !important;
-  }
-
-  .products-table tr:hover {
-    background-color: transparent;
-  }
+  /* Print styles for tables are handled by Table.css */
 }
