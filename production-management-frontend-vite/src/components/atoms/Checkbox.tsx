@@ -2,9 +2,9 @@ import React from 'react';
 import { Check } from 'lucide-react';
 import './Checkbox.css';
 
-export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'children'> {
   /**
-   * Label text for the checkbox
+   * Label text for the checkbox (can also use children)
    */
   label?: string;
   /**
@@ -19,13 +19,17 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
    * Additional CSS classes for the label
    */
   labelClassName?: string;
+  /**
+   * Children to render as label (alternative to label prop)
+   */
+  children?: React.ReactNode;
 }
 
 /**
  * Reusable Checkbox component following atomic design principles
  * Provides a custom-styled checkbox with consistent appearance
  */
-const Checkbox: React.FC<CheckboxProps> = ({
+const Checkbox = ({
   label,
   labelUppercase = false,
   wrapperClassName = '',
@@ -34,9 +38,15 @@ const Checkbox: React.FC<CheckboxProps> = ({
   id,
   checked,
   disabled,
+  children,
   ...restProps
-}) => {
+}: CheckboxProps) => {
   const checkboxId = id || `checkbox-${Math.random().toString(36).substr(2, 9)}`;
+  
+  // Explicitly exclude children and dangerouslySetInnerHTML from restProps before passing to input
+  const { children: _, dangerouslySetInnerHTML, ...inputProps } = restProps as any;
+  
+  const labelText = label || children;
 
   return (
     <label 
@@ -49,7 +59,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
         className={`checkbox-input ${className}`.trim()}
         checked={checked}
         disabled={disabled}
-        {...restProps}
+        {...inputProps}
       />
       <div className="checkbox-container">
         {checked && (
@@ -58,9 +68,9 @@ const Checkbox: React.FC<CheckboxProps> = ({
           </div>
         )}
       </div>
-      {label && (
+      {labelText && (
         <span className={`checkbox-label-text ${labelUppercase ? 'checkbox-label-uppercase' : ''} ${labelClassName}`.trim()}>
-          {label}
+          {labelText}
         </span>
       )}
     </label>

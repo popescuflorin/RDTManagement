@@ -36,12 +36,15 @@ const Input = ({
   className = '',
   ...restProps
 }: InputProps) => {
+  // Explicitly exclude children and dangerouslySetInnerHTML from restProps
+  const { children, dangerouslySetInnerHTML, ...inputProps } = restProps as any;
+  
   return (
     <div className="form-input-wrapper">
       <input
         type={type}
         className={`form-input form-input-${size} ${error ? 'form-input-error' : ''} ${className}`.trim()}
-        {...restProps}
+        {...inputProps}
       />
       {error && errorMessage && (
         <span className="form-error-message">{errorMessage}</span>
