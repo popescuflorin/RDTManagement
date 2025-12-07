@@ -175,5 +175,12 @@
     "buttons": {
       "close": "Închide"
     }
+  },
+  "deleteModal": {
+    "title": "Dezactivează Furnizor",
+    "confirmation": "Ești sigur că vrei să dezactivezi {{name}}?",
+    "warning": "Aceasta va marca furnizorul ca inactiv. Datele furnizorului vor fi păstrate, dar acesta nu va mai apărea în listele de furnizori activi.",
+    "confirm": "Dezactivează",
+    "cancel": "Anulează"
   }
 }

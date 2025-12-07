@@ -175,5 +175,12 @@
     "buttons": {
       "close": "Close"
     }
+  },
+  "deleteModal": {
+    "title": "Deactivate Supplier",
+    "confirmation": "Are you sure you want to deactivate {{name}}?",
+    "warning": "This will mark the supplier as inactive. The supplier data will be preserved but they will no longer appear in active supplier lists.",
+    "confirm": "Deactivate",
+    "cancel": "Cancel"
   }
 }

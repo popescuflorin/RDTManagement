@@ -15,6 +15,7 @@ import type { Supplier, PagedResult } from '../../types';
 import CreateSupplier from './CreateSupplier';
 import EditSupplier from './EditSupplier';
 import ViewSupplier from './ViewSupplier';
+import DeleteSupplier from './DeleteSupplier';
 import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
@@ -41,6 +42,7 @@ const Suppliers: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showViewModal, setShowViewModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -117,19 +119,31 @@ const Suppliers: React.FC = () => {
     setSelectedSupplier(null);
   };
 
-  const handleDeleteSupplier = async (supplier: Supplier) => {
-    if (!window.confirm(t('suppliers.messages.confirmDeactivate', { name: supplier.name }))) {
-      return;
-    }
+  const handleDeleteSupplier = (supplier: Supplier) => {
+    setSelectedSupplier(supplier);
+    setShowDeleteModal(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedSupplier) return;
 
     try {
       setIsDeleting(true);
-      await supplierApi.deleteSupplier(supplier.id);
+      await supplierApi.deleteSupplier(selectedSupplier.id);
+      setShowDeleteModal(false);
+      setSelectedSupplier(null);
       await loadData();
     } catch (err: any) {
       setError(err.response?.data?.message || t('suppliers.messages.failedToDeactivateSupplier'));
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleCloseDeleteModal = () => {
+    if (!isDeleting) {
+      setShowDeleteModal(false);
+      setSelectedSupplier(null);
     }
   };
 
@@ -462,6 +476,16 @@ const Suppliers: React.FC = () => {
           onClose={handleCloseEditModal}
           onSuccess={handleSupplierUpdated}
           supplier={selectedSupplier}
+        />
+      )}
+
+      {showDeleteModal && selectedSupplier && (
+        <DeleteSupplier
+          isOpen={showDeleteModal}
+          onClose={handleCloseDeleteModal}
+          onConfirm={handleConfirmDelete}
+          supplier={selectedSupplier}
+          isDeleting={isDeleting}
         />
       )}
     </div>
