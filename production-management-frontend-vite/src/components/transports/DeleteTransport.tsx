@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from 'lucide-react';
-import { Modal } from '../atoms';
+import { Modal, ViewContent, ViewValue } from '../atoms';
 import type { Transport } from '../../types';
 
 interface DeleteTransportProps {
@@ -38,24 +38,14 @@ const DeleteTransport: React.FC<DeleteTransportProps> = ({
       isSubmitting={isDeleting}
       showCancel={true}
     >
-      <div style={{ padding: 'var(--space-md) 0' }}>
-        <p style={{ 
-          marginBottom: 'var(--space-lg)', 
-          fontSize: 'var(--text-base)',
-          color: 'var(--text-primary)',
-          lineHeight: 'var(--line-height-relaxed)'
-        }}>
+      <ViewContent>
+        <ViewValue style={{ marginBottom: 'var(--space-lg)', fontSize: 'var(--text-base)' }}>
           {t('deleteModal.confirmation', { carName: transport.carName })}
-        </p>
-        <p style={{ 
-          margin: 0,
-          fontSize: 'var(--text-sm)',
-          color: 'var(--text-secondary)',
-          lineHeight: 'var(--line-height-relaxed)'
-        }}>
+        </ViewValue>
+        <ViewValue style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
           {t('deleteModal.warning')}
-        </p>
-      </div>
+        </ViewValue>
+      </ViewContent>
     </Modal>
   );
 };
