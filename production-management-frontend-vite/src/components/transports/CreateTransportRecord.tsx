@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { acquisitionApi, orderApi, transportApi } from '../../services/api';
 import type { Acquisition, Order, Transport, UpdateAcquisitionRequest, UpdateOrderRequest } from '../../types';
 import { AcquisitionStatus, OrderStatus } from '../../types';
-import { Truck, FileText, ClipboardList, Loader2 } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Checkbox } from '../atoms';
+import { Truck, FileText } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Checkbox, ErrorMessage, Loader, Select, ViewValue, Button } from '../atoms';
 
 interface CreateTransportRecordProps {
   isOpen: boolean;
@@ -214,50 +214,58 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
     >
       <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
           {error && (
-            <div className="error-message">
-              {error}
-              <button type="button" onClick={() => setError(null)}>×</button>
-            </div>
+            <ErrorMessage
+              message={error}
+              onDismiss={() => setError(null)}
+            />
           )}
 
           {isLoadingData ? (
-            <div className="loading-container">
-              <Loader2 size={32} className="animate-spin" />
-              <p>{t('createTransportRecord.messages.loadingDraftEntities')}</p>
-            </div>
+             <Loader message={t('createTransportRecord.messages.loadingDraftEntities')} />
           ) : (
             <>
               {/* Entity Selection */}
-              <div className="form-section">
-                <h3>{t('createTransportRecord.sections.selectEntities')}</h3>
+              <FormSection title={t('createTransportRecord.sections.selectEntities')} titleIcon={FileText}>
                 {totalSelected > 0 && (
-                  <div className="selection-summary">
-                    <strong>{totalSelected}</strong> {t('createTransportRecord.labels.entitiesSelected', { count: totalSelected })}
-                  </div>
+                  <ViewValue style={{ 
+                    marginBottom: 'var(--space-md)', 
+                    fontSize: 'var(--text-sm)', 
+                    fontWeight: 600,
+                    color: 'var(--primary-600)'
+                  }}> {t('createTransportRecord.labels.entitiesSelected', { count: totalSelected })}
+                  </ViewValue>
                 )}
 
                 {/* Acquisitions Section */}
                 {draftAcquisitions.length > 0 && (
-                  <div className="entity-category">
-                    <div className="entity-category-header">
-                      <h4>
-                        <FileText size={18} />
-                        {t('createTransportRecord.labels.acquisitions')} ({draftAcquisitions.length})
-                      </h4>
-                      <button
+                  <FormSection 
+                      title={t('createTransportRecord.labels.acquisitions') + ' (' + draftAcquisitions.length + ')'} 
+                      titleIcon={FileText}>
+                    <div className="entity-list">
+                    <div style={{
+                      display: 'flex',
+                      alignItems: 'flex-end',
+                      marginTop: 'var(--space-md)',
+                      paddingTop: 'var(--space-sm)',
+                      borderTop: '1px solid var(--border)',
+                      justifyContent: 'flex-end'
+                    }}>
+                      <Button
                         type="button"
-                        className="select-all-btn"
+                        variant="secondary"
+                        size="sm"
                         onClick={handleSelectAllAcquisitions}
                       >
                         {selectedAcquisitionIds.size === draftAcquisitions.length ? t('createTransportRecord.labels.deselectAll') : t('createTransportRecord.labels.selectAll')}
-                      </button>
+                      </Button>
                     </div>
-                    <div className="entity-list">
+
                       {draftAcquisitions.map(acq => (
                         <div
                           key={acq.id}
                           className={`entity-item ${selectedAcquisitionIds.has(acq.id) ? 'selected' : ''}`}
                           onClick={() => handleAcquisitionToggle(acq.id)}
+                          style={{ marginBottom: 'var(--space-sm)' }}
                         >
                           <Checkbox
                             checked={selectedAcquisitionIds.has(acq.id)}
@@ -266,93 +274,85 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
                               handleAcquisitionToggle(acq.id);
                             }}
                             wrapperClassName="entity-checkbox-wrapper"
+                            label={`#${acq.id} - ${acq.title} - ${acq.type === 0 ? t('createTransportRecord.labels.rawMaterials') : t('createTransportRecord.labels.recyclableMaterials')} • ${acq.totalItems} ${t('createTransportRecord.labels.items')}`}
                           />
-                          <div className="entity-info">
-                            <strong>#{acq.id} - {acq.title}</strong>
-                            <span className="entity-details">
-                              {acq.type === 0 ? t('createTransportRecord.labels.rawMaterials') : t('createTransportRecord.labels.recyclableMaterials')} • {acq.totalItems} {t('createTransportRecord.labels.items')}
-                            </span>
-                          </div>
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </FormSection>
                 )}
 
                 {/* Orders Section */}
                 {draftOrders.length > 0 && (
-                  <div className="entity-category">
-                    <div className="entity-category-header">
-                      <h4>
-                        <ClipboardList size={18} />
-                        {t('createTransportRecord.labels.orders')} ({draftOrders.length})
-                      </h4>
-                      <button
-                        type="button"
-                        className="select-all-btn"
-                        onClick={handleSelectAllOrders}
-                      >
-                        {selectedOrderIds.size === draftOrders.length ? t('createTransportRecord.labels.deselectAll') : t('createTransportRecord.labels.selectAll')}
-                      </button>
-                    </div>
+                  <FormSection 
+                  title={t('createTransportRecord.labels.orders') + ' (' + draftAcquisitions.length + ')'} 
+                  titleIcon={FileText}>
                     <div className="entity-list">
-                      {draftOrders.map(order => (
-                        <div
-                          key={order.id}
-                          className={`entity-item ${selectedOrderIds.has(order.id) ? 'selected' : ''}`}
-                          onClick={() => handleOrderToggle(order.id)}
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'flex-end',
+                        marginTop: 'var(--space-md)',
+                        paddingTop: 'var(--space-sm)',
+                        borderTop: '1px solid var(--border)',
+                        justifyContent: 'flex-end'
+                      }}>
+                        <Button
+                          type="button"
+                          variant="secondary"
+                          size="sm"
+                          onClick={handleSelectAllOrders}
                         >
-                          <Checkbox
-                            checked={selectedOrderIds.has(order.id)}
-                            onChange={(e) => {
-                              e.stopPropagation();
-                              handleOrderToggle(order.id);
-                            }}
-                            wrapperClassName="entity-checkbox-wrapper"
-                          />
-                          <div className="entity-info">
-                            <strong>#{order.id} - {order.clientName}</strong>
-                            <span className="entity-details">
-                              {order.orderMaterials.length} {t('createTransportRecord.labels.items')} • ${order.totalValue.toFixed(2)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                          {selectedOrderIds.size === draftOrders.length ? t('createTransportRecord.labels.deselectAll') : t('createTransportRecord.labels.selectAll')}
+                        </Button>
+                      </div>
+
+                  {draftOrders.map(order => (
+                    <div
+                      key={order.id}
+                      className={`entity-item ${selectedOrderIds.has(order.id) ? 'selected' : ''}`}
+                      onClick={() => handleAcquisitionToggle(order.id)}
+                      style={{ marginBottom: 'var(--space-sm)' }}
+                    >
+                      <Checkbox
+                        checked={selectedOrderIds.has(order.id)}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleOrderToggle(order.id);
+                        }}
+                        wrapperClassName="entity-checkbox-wrapper"
+                        label={`#${order.id} - ${order.clientName} - ${order.orderMaterials.length} ${t('createTransportRecord.labels.items')} • ${order.totalValue.toFixed(2)}`}
+                      />
                     </div>
-                  </div>
+                  ))}
+                </div>
+                </FormSection>
                 )}
 
                 {draftAcquisitions.length === 0 && draftOrders.length === 0 && (
-                  <div className="no-entities">{t('createTransportRecord.messages.noDraftEntities')}</div>
+                  <ViewValue style={{
+                    textAlign: 'center',
+                    padding: 'var(--space-xl)',
+                    color: 'var(--text-secondary)',
+                    fontStyle: 'italic'
+                  }}>
+                    {t('createTransportRecord.messages.noDraftEntities')}
+                  </ViewValue>
                 )}
-              </div>
+              </FormSection>
 
               {/* Transport Selection */}
               {totalSelected > 0 && (
-                <FormSection>
+                <FormSection title={t('createTransportRecord.sections.selectTransport')} titleIcon={Truck}>
                   <FormRow>
                     <FormGroup>
                       <Label htmlFor="transportId" required>
                         {t('createTransportRecord.fields.transportVehicle')}
                       </Label>
-                      <select
+                      <Select
                         id="transportId"
-                        className="form-input form-input-md"
                         value={selectedTransportId || ''}
                         onChange={(e) => setSelectedTransportId(Number(e.target.value) || null)}
                         required
-                        style={{
-                          padding: 'var(--space-sm) var(--space-md)',
-                          border: '1px solid var(--border)',
-                          borderRadius: 'var(--radius-md)',
-                          fontSize: 'var(--text-sm)',
-                          fontFamily: 'inherit',
-                          backgroundColor: 'var(--surface)',
-                          color: 'var(--text-primary)',
-                          cursor: 'pointer',
-                          transition: 'border-color var(--transition-fast)',
-                          width: '100%'
-                        }}
                       >
                         <option value="">{t('createTransportRecord.placeholders.selectTransport')}</option>
                         {transports.map(transport => (
@@ -360,13 +360,18 @@ const CreateTransportRecord: React.FC<CreateTransportRecordProps> = ({
                             {transport.carName} {transport.numberPlate ? `(${transport.numberPlate})` : ''} - {transport.phoneNumber}
                           </option>
                         ))}
-                      </select>
+                      </Select>
                       {selectedTransport && (
-                        <div className="transport-details" style={{ marginTop: 'var(--space-xs)', fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
+                        <ViewValue style={{ 
+                          marginTop: 'var(--space-xs)', 
+                          fontSize: 'var(--text-xs)', 
+                          color: 'var(--text-secondary)',
+                          lineHeight: 'var(--line-height-relaxed)'
+                        }}>
                           <strong>{t('createTransportRecord.labels.car')}</strong> {selectedTransport.carName} | 
                           <strong> {t('createTransportRecord.labels.plate')}</strong> {selectedTransport.numberPlate || t('createTransportRecord.labels.notAvailable')} | 
                           <strong> {t('createTransportRecord.labels.phone')}</strong> {selectedTransport.phoneNumber}
-                        </div>
+                        </ViewValue>
                       )}
                     </FormGroup>
                   </FormRow>

@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { transportApi } from '../../services/api';
 import type { CreateTransportRequest } from '../../types';
 import { Truck } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input } from '../atoms';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, ErrorMessage } from '../atoms';
 
 interface CreateTransportProps {
   isOpen: boolean;
@@ -79,10 +79,10 @@ const CreateTransport: React.FC<CreateTransportProps> = ({
     >
       <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
         {error && (
-          <div className="error-message">
-            {error}
-            <button type="button" onClick={() => setError(null)}>×</button>
-          </div>
+          <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
         )}
 
         <FormSection>

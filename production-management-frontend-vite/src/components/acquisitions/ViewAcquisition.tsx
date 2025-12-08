@@ -2,8 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Acquisition } from '../../types';
 import { AcquisitionType, AcquisitionStatus } from '../../types';
-import { X, FileText, Truck, Building2, Package, UserCircle, History, Clock } from 'lucide-react';
-import './CreateAcquisition.css';
+import { FileText, Truck, Building2, Package, UserCircle, History, Clock } from 'lucide-react';
+import { Modal, ViewContent, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
 
 interface ViewAcquisitionProps {
   isOpen: boolean;
@@ -17,9 +17,6 @@ const ViewAcquisition: React.FC<ViewAcquisitionProps> = ({
   acquisition
 }) => {
   const { t } = useTranslation(['acquisitions', 'common']);
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
 
   if (!isOpen) return null;
 
@@ -48,70 +45,72 @@ const ViewAcquisition: React.FC<ViewAcquisitionProps> = ({
   };
 
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal-content create-acquisition-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{t('view.title')}</h2>
-          <button className="close-button" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
-
-        <div className="acquisition-form">
-          {/* Acquisition Details */}
-          <div className="form-section">
-            <h3><FileText size={20} /> {t('view.sections.acquisitionDetails')}</h3>
-            <div className="acquisition-summary">
-              <div className="summary-row">
-                <span className="summary-label">{t('view.labels.title')}:</span>
-                <span className="summary-value">{acquisition.title}</span>
-              </div>
-              <div className="summary-row">
-                <span className="summary-label">{t('view.labels.status')}:</span>
-                <span className="summary-value">
-                  <span className={`status-badge ${getStatusClass(acquisition.status)}`}>
-                    {getStatusLabel(acquisition.status)}
-                  </span>
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title={t('view.title')}
+      titleIcon={FileText}
+      maxWidth="900px"
+      showCancel={false}
+      closeOnBackdropClick={false}
+    >
+      <ViewContent>
+        {/* Acquisition Details */}
+        <ViewSection title={t('view.sections.acquisitionDetails')} titleIcon={FileText}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('view.labels.title')}</ViewLabel>
+              <ViewValue>{acquisition.title}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('view.labels.status')}</ViewLabel>
+              <ViewValue>
+                <span className={`status-badge ${getStatusClass(acquisition.status)}`}>
+                  {getStatusLabel(acquisition.status)}
                 </span>
-              </div>
-              <div className="summary-row">
-                <span className="summary-label">{t('view.labels.type')}:</span>
-                <span className="summary-value">{getTypeLabel(acquisition.type)}</span>
-              </div>
-              {acquisition.description && (
-                <div className="summary-row">
-                  <span className="summary-label">{t('view.labels.description')}:</span>
-                  <span className="summary-value">{acquisition.description}</span>
-                </div>
-              )}
-              <div className="summary-row">
-                <span className="summary-label"><UserCircle size={14} style={{display: 'inline', marginRight: '4px'}} />{t('view.labels.assignedTo')}:</span>
-                <span className="summary-value">{acquisition.assignedToUserName || t('view.labels.unassigned')}</span>
-              </div>
-              <div className="summary-row">
-                <span className="summary-label">{t('view.labels.createdBy')}:</span>
-                <span className="summary-value">{acquisition.createdByUserName} {t('view.labels.on')} {new Date(acquisition.createdAt).toLocaleDateString()}</span>
-              </div>
-              {acquisition.receivedByUserName && (
-                <div className="summary-row">
-                  <span className="summary-label">{t('view.labels.receivedBy')}:</span>
-                  <span className="summary-value">{acquisition.receivedByUserName} {t('view.labels.on')} {acquisition.receivedAt ? new Date(acquisition.receivedAt).toLocaleDateString() : '-'}</span>
-                </div>
-              )}
-              {acquisition.dueDate && (
-                <div className="summary-row">
-                  <span className="summary-label">{t('view.labels.dueDate')}:</span>
-                  <span className="summary-value">{new Date(acquisition.dueDate).toLocaleDateString()}</span>
-                </div>
-              )}
-              {acquisition.notes && (
-                <div className="summary-row">
-                  <span className="summary-label">{t('view.labels.notes')}:</span>
-                  <span className="summary-value">{acquisition.notes}</span>
-                </div>
-              )}
-            </div>
-          </div>
+              </ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('view.labels.type')}</ViewLabel>
+              <ViewValue>{getTypeLabel(acquisition.type)}</ViewValue>
+            </ViewItem>
+            {acquisition.description && (
+              <ViewItem>
+                <ViewLabel>{t('view.labels.description')}</ViewLabel>
+                <ViewValue>{acquisition.description}</ViewValue>
+              </ViewItem>
+            )}
+            <ViewItem>
+              <ViewLabel>
+                <UserCircle size={14} style={{display: 'inline', marginRight: '4px'}} />
+                {t('view.labels.assignedTo')}
+              </ViewLabel>
+              <ViewValue>{acquisition.assignedToUserName || t('view.labels.unassigned')}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('view.labels.createdBy')}</ViewLabel>
+              <ViewValue>{acquisition.createdByUserName} {t('view.labels.on')} {new Date(acquisition.createdAt).toLocaleDateString()}</ViewValue>
+            </ViewItem>
+            {acquisition.receivedByUserName && (
+              <ViewItem>
+                <ViewLabel>{t('view.labels.receivedBy')}</ViewLabel>
+                <ViewValue>{acquisition.receivedByUserName} {t('view.labels.on')} {acquisition.receivedAt ? new Date(acquisition.receivedAt).toLocaleDateString() : '-'}</ViewValue>
+              </ViewItem>
+            )}
+            {acquisition.dueDate && (
+              <ViewItem>
+                <ViewLabel>{t('view.labels.dueDate')}</ViewLabel>
+                <ViewValue>{new Date(acquisition.dueDate).toLocaleDateString()}</ViewValue>
+              </ViewItem>
+            )}
+            {acquisition.notes && (
+              <ViewItem>
+                <ViewLabel>{t('view.labels.notes')}</ViewLabel>
+                <ViewValue>{acquisition.notes}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
 
           {/* Transport & Supplier Details */}
           {(acquisition.transportCarName || acquisition.supplierName) && (
@@ -370,19 +369,8 @@ const ViewAcquisition: React.FC<ViewAcquisitionProps> = ({
             </div>
           )}
 
-          {/* Close Button */}
-          <div className="form-actions">
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={onClose}
-            >
-              {t('view.buttons.close')}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+      </ViewContent>
+    </Modal>
   );
 };
 

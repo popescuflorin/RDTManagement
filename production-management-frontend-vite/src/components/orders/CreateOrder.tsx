@@ -4,8 +4,8 @@ import { orderApi, inventoryApi, transportApi, clientApi, userApi } from '../../
 import type { RawMaterial, CreateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest, User } from '../../types';
 import { MaterialType } from '../../types';
 import { Plus, Trash2, UserCircle, Truck, Package } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, Table, ErrorMessage } from '../atoms';
-import type { TableColumn } from '../atoms';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, Table, ErrorMessage, DropdownMenu } from '../atoms';
+import type { TableColumn, DropdownMenuItem } from '../atoms';
 
 interface CreateOrderProps {
   isOpen: boolean;
@@ -639,56 +639,24 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                     disabled={isLoading}
                     placeholder={t('transport.searchPlaceholder', { defaultValue: 'Search transport...' })}
                   />
-                  {showTransportDropdown && (
-                    <div className="dropdown-menu" style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      zIndex: 1000,
-                      backgroundColor: 'var(--surface)',
-                      border: '1px solid var(--border)',
-                      borderRadius: 'var(--radius-md)',
-                      boxShadow: 'var(--shadow-lg)',
-                      maxHeight: '200px',
-                      overflowY: 'auto',
-                      marginTop: '4px'
-                    }}>
-                      {filteredTransports.length > 0 ? (
-                        filteredTransports.map(transport => (
-                          <div
-                            key={transport.id}
-                            className="dropdown-item"
-                            onClick={() => handleTransportSelect(transport)}
-                            style={{
-                              padding: 'var(--space-sm) var(--space-md)',
-                              cursor: 'pointer',
-                              borderBottom: '1px solid var(--border)'
-                            }}
-                          >
-                            <div className="dropdown-item-name" style={{ fontWeight: 500 }}>{transport.carName}{transport.numberPlate ? ` - ${transport.numberPlate}` : ''}</div>
-                            <div className="dropdown-item-detail" style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>{transport.phoneNumber}</div>
-                          </div>
-                        ))
-                      ) : transportSearchTerm ? (
-                        <div className="dropdown-item" style={{
-                          padding: 'var(--space-sm) var(--space-md)',
-                          cursor: 'pointer',
-                          borderBottom: '1px solid var(--border)'
-                        }}>
-                          <div className="dropdown-item-name" style={{ fontWeight: 500 }}>{t('transport.createNew', { defaultValue: 'Create New' })}: {transportSearchTerm}</div>
-                          <div className="dropdown-item-detail" style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>{t('transport.enterPhoneNumber', { defaultValue: 'Enter phone number' })}</div>
-                        </div>
-                      ) : (
-                        <div className="dropdown-item" style={{
-                          padding: 'var(--space-sm) var(--space-md)',
-                          color: 'var(--text-secondary)'
-                        }}>
-                          <div className="dropdown-item-name">{t('transport.startTyping', { defaultValue: 'Start typing...' })}</div>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <DropdownMenu<Transport>
+                    isOpen={showTransportDropdown}
+                    items={filteredTransports.map(transport => ({
+                      id: transport.id,
+                      data: transport,
+                      label: `${transport.carName}${transport.numberPlate ? ` - ${transport.numberPlate}` : ''}`,
+                      detail: transport.phoneNumber
+                    }))}
+                    onItemClick={(item) => handleTransportSelect(item.data)}
+                    emptyMessage={t('transport.startTyping', { defaultValue: 'Start typing...' })}
+                    searchTerm={transportSearchTerm}
+                    createNewMessage={`${t('transport.createNew', { defaultValue: 'Create New' })}: {searchTerm}`}
+                    createNewDetail={t('transport.enterPhoneNumber', { defaultValue: 'Enter phone number' })}
+                    onCreateNew={() => {
+                      setShowNewTransportForm(true);
+                      setShowTransportDropdown(false);
+                    }}
+                  />
                 </div>
               </div>
             </FormGroup>
@@ -921,42 +889,16 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                     disabled={isLoading}
                     placeholder={t('form.searchFinishedProducts', { defaultValue: 'Search finished products...' })}
                   />
-                  {showMaterialDropdown && filteredMaterials.length > 0 && (
-                    <div className="dropdown-menu" style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      zIndex: 1000,
-                      backgroundColor: 'var(--surface)',
-                      border: '1px solid var(--border)',
-                      borderRadius: 'var(--radius-md)',
-                      boxShadow: 'var(--shadow-lg)',
-                      maxHeight: '200px',
-                      overflowY: 'auto',
-                      marginTop: '4px'
-                    }}>
-                      {filteredMaterials.map(material => (
-                        <div
-                          key={material.id}
-                          className="dropdown-item"
-                          onClick={() => handleMaterialSelect(material)}
-                          style={{
-                            padding: 'var(--space-sm) var(--space-md)',
-                            cursor: 'pointer',
-                            borderBottom: '1px solid var(--border)'
-                          }}
-                        >
-                          <div className="dropdown-item-name" style={{ fontWeight: 500 }}>
-                            {material.name} ({material.color})
-                          </div>
-                          <div className="dropdown-item-detail" style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
-                            {t('form.available', { defaultValue: 'Available' })}: {material.quantity} {material.quantityType}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <DropdownMenu<RawMaterial>
+                    isOpen={showMaterialDropdown && filteredMaterials.length > 0}
+                    items={filteredMaterials.map(material => ({
+                      id: material.id,
+                      data: material,
+                      label: `${material.name} (${material.color})`,
+                      detail: `${t('form.available', { defaultValue: 'Available' })}: ${material.quantity} ${material.quantityType}`
+                    }))}
+                    onItemClick={(item) => handleMaterialSelect(item.data)}
+                  />
                 </div>
               </FormGroup>
 

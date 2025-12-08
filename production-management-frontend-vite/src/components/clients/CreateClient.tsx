@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { clientApi } from '../../services/api';
 import type { CreateClientRequest } from '../../types';
 import { UserCircle } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea } from '../atoms';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, ErrorMessage } from '../atoms';
 
 interface CreateClientProps {
   isOpen: boolean;
@@ -86,10 +86,10 @@ const CreateClient: React.FC<CreateClientProps> = ({
     >
       <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
         {error && (
-          <div className="error-message">
-            {error}
-            <button type="button" onClick={() => setError(null)}>×</button>
-          </div>
+          <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
         )}
 
         <FormSection>

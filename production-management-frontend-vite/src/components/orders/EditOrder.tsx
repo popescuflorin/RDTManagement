@@ -4,7 +4,8 @@ import { orderApi, inventoryApi, transportApi, clientApi, userApi } from '../../
 import type { RawMaterial, UpdateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest, Order, User } from '../../types';
 import { MaterialType } from '../../types';
 import { Plus, UserCircle, Truck, Package, FileText } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, DeleteButton } from '../atoms';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, DeleteButton, DropdownMenu } from '../atoms';
+import type { DropdownMenuItem } from '../atoms';
 
 interface EditOrderProps {
   isOpen: boolean;
@@ -728,63 +729,24 @@ const EditOrder: React.FC<EditOrderProps> = ({
                   onFocus={() => setShowTransportDropdown(true)}
                   placeholder={t('transport.searchPlaceholder', { defaultValue: 'Search transport...' })}
                 />
-                {showTransportDropdown && (
-                  <div className="material-dropdown" style={{
-                    position: 'absolute',
-                    top: '100%',
-                    left: 0,
-                    right: 0,
-                    zIndex: 1000,
-                    backgroundColor: 'var(--surface)',
-                    border: '1px solid var(--border)',
-                    borderRadius: 'var(--radius-md)',
-                    boxShadow: 'var(--shadow-lg)',
-                    maxHeight: '200px',
-                    overflowY: 'auto',
-                    marginTop: '4px'
-                  }}>
-                    {filteredTransports.length > 0 ? (
-                      filteredTransports.map((transport) => (
-                        <div
-                          key={transport.id}
-                          className="material-option"
-                          onClick={() => handleTransportSelect(transport)}
-                          style={{
-                            padding: 'var(--space-sm) var(--space-md)',
-                            cursor: 'pointer',
-                            borderBottom: '1px solid var(--border)'
-                          }}
-                        >
-                          <div>
-                            <strong>{transport.carName}</strong>
-                            {transport.numberPlate && <small> - {transport.numberPlate}</small>}
-                            <small> {transport.phoneNumber}</small>
-                          </div>
-                        </div>
-                      ))
-                    ) : transportSearchTerm ? (
-                      <div className="material-option material-option-create" style={{
-                        padding: 'var(--space-sm) var(--space-md)',
-                        cursor: 'pointer',
-                        borderBottom: '1px solid var(--border)'
-                      }}>
-                        <div>
-                          <strong>{t('transport.createNew', { defaultValue: 'Create New' })}:</strong> {transportSearchTerm}
-                          <small> {t('transport.enterPhoneNumber', { defaultValue: 'Enter phone number' })}</small>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="material-option" style={{
-                        padding: 'var(--space-sm) var(--space-md)',
-                        color: 'var(--text-secondary)'
-                      }}>
-                        <div>
-                          <small>{t('transport.startTyping', { defaultValue: 'Start typing...' })}</small>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <DropdownMenu<Transport>
+                  isOpen={showTransportDropdown}
+                  items={filteredTransports.map(transport => ({
+                    id: transport.id,
+                    data: transport,
+                    label: `${transport.carName}${transport.numberPlate ? ` - ${transport.numberPlate}` : ''}`,
+                    detail: transport.phoneNumber
+                  }))}
+                  onItemClick={(item) => handleTransportSelect(item.data)}
+                  emptyMessage={t('transport.startTyping', { defaultValue: 'Start typing...' })}
+                  searchTerm={transportSearchTerm}
+                  createNewMessage={`${t('transport.createNew', { defaultValue: 'Create New' })}: {searchTerm}`}
+                  createNewDetail={t('transport.enterPhoneNumber', { defaultValue: 'Enter phone number' })}
+                  onCreateNew={() => {
+                    setShowNewTransportForm(true);
+                    setShowTransportDropdown(false);
+                  }}
+                />
               </div>
             </FormGroup>
             <FormGroup>
@@ -872,52 +834,17 @@ const EditOrder: React.FC<EditOrderProps> = ({
                     onFocus={() => setShowMaterialDropdown(true)}
                     placeholder={t('form.searchFinishedProducts', { defaultValue: 'Search finished products...' })}
                   />
-                  {showMaterialDropdown && (
-                    <div className="material-dropdown" style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      right: 0,
-                      zIndex: 1000,
-                      backgroundColor: 'var(--surface)',
-                      border: '1px solid var(--border)',
-                      borderRadius: 'var(--radius-md)',
-                      boxShadow: 'var(--shadow-lg)',
-                      maxHeight: '200px',
-                      overflowY: 'auto',
-                      marginTop: '4px'
-                    }}>
-                      {filteredMaterials.length > 0 ? (
-                        filteredMaterials.map(material => (
-                          <div
-                            key={material.id}
-                            className="material-option"
-                            onClick={() => handleMaterialSelect(material)}
-                            style={{
-                              padding: 'var(--space-sm) var(--space-md)',
-                              cursor: 'pointer',
-                              borderBottom: '1px solid var(--border)'
-                            }}
-                          >
-                            <div className="material-option-main" style={{ fontWeight: 500 }}>
-                              <span className="material-name">{material.name}</span>
-                              <span className="material-color"> ({material.color})</span>
-                            </div>
-                            <div className="material-option-details" style={{ fontSize: 'var(--text-xs)', color: 'var(--text-secondary)' }}>
-                              {material.quantity} {material.quantityType} {t('form.available', { defaultValue: 'available' }).toLowerCase()}
-                            </div>
-                          </div>
-                        ))
-                      ) : (
-                        <div className="material-option no-results" style={{
-                          padding: 'var(--space-sm) var(--space-md)',
-                          color: 'var(--text-secondary)'
-                        }}>
-                          {t('form.noProductsFound', { defaultValue: 'No products found' })}
-                        </div>
-                      )}
-                    </div>
-                  )}
+                  <DropdownMenu<RawMaterial>
+                    isOpen={showMaterialDropdown}
+                    items={filteredMaterials.map(material => ({
+                      id: material.id,
+                      data: material,
+                      label: `${material.name} (${material.color})`,
+                      detail: `${material.quantity} ${material.quantityType} ${t('form.available', { defaultValue: 'available' }).toLowerCase()}`
+                    }))}
+                    onItemClick={(item) => handleMaterialSelect(item.data)}
+                    emptyMessage={t('form.noProductsFound', { defaultValue: 'No products found' })}
+                  />
                 </div>
               </FormGroup>
 

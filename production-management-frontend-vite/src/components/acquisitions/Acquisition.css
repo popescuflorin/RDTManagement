@@ -1,45 +1,8 @@
-/* Acquisition Container */
-.acquisition-container {
-  padding: 0;
-  width: 100%;
-  background: #ffffff;
-  min-height: 100vh;
-}
-
-/* Header */
-.acquisition-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--space-3xl);
-  padding: var(--space-3xl);
-  background: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  border: 1px solid var(--border);
-}
-
-.header-left h1 {
-  margin: 0 0 var(--space-sm) 0;
-  color: var(--text-primary);
-  font-size: var(--text-3xl);
-  font-weight: 700;
-}
-
-.header-left p {
-  margin: 0;
-  color: var(--text-secondary);
-  font-size: var(--text-lg);
-}
-
+/* Page container and header styles are now handled by PageContainer.css and PageHeader.css in atoms folder */
 /* Create button styles are now handled by CreateButton component in atoms folder */
-
 /* Loading state styles are now handled by Loader.css in atoms folder */
-
 /* Statistics styles are now handled by StatCard.css and StatisticsContainer.css in atoms folder */
-
 /* Error message styles are now handled by ErrorMessage.css in atoms folder */
-
 /* Filters control styles are now handled by FiltersControl.css in atoms folder */
 
 /* Filter container and select styles for Acquisition-specific filters */
@@ -239,91 +202,13 @@
   box-shadow: var(--shadow-md);
 }
 
-/* Modal Styles */
-.modal-backdrop {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(5px);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  animation: fadeIn 0.3s ease-out;
-}
-
-.modal-content {
-  background-color: var(--surface);
-  border-radius: var(--radius-lg);
-  box-shadow: 0 20px 40px var(--shadow-strong);
-  padding: var(--space-3xl);
-  max-width: 900px;
-  width: 90%;
-  z-index: var(--z-index-modal);
-  position: relative;
-  animation: scaleIn 0.3s ease-out;
-}
-
-.delete-modal {
-  max-width: 400px;
-}
-
-.modal-content h2 {
-  font-size: var(--text-2xl);
-  color: var(--text-primary);
-  font-weight: 700;
-}
-
-.modal-content p {
-  margin: 0 0 var(--space-md) 0;
-  color: var(--text-secondary);
-  line-height: var(--line-height-base);
-}
-
-.warning-text {
-  color: var(--error-600);
-  font-weight: 500;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-md);
-  margin-top: var(--space-xl);
-}
-
+/* Modal styles are now handled by Modal.css in atoms folder */
 /* Button styles are now handled by Button.css in atoms folder */
-
-/* Button styles are now handled by Button.css in atoms folder */
-
-/* Animations */
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes scaleIn {
-  from { transform: scale(0.9); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
 
 /* Responsive Design */
 @media (max-width: 768px) {
-  .acquisition-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: var(--space-lg);
-  }
-
   .filter-container {
     min-width: auto;
-  }
-
-  .acquisition-statistics {
-    grid-template-columns: 1fr;
   }
 
   /* Table responsive styles are handled by Table.css */

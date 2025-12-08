@@ -5,6 +5,9 @@
  * Atoms are the smallest building blocks of the UI.
  */
 
+export { default as Button } from './Button';
+export type { ButtonProps } from './Button';
+
 export { default as EditButton } from './EditButton';
 export type { EditButtonProps } from './EditButton';
 
@@ -100,3 +103,6 @@ export type { StatCardProps } from './StatCard';
 
 export { default as StatisticsContainer } from './StatisticsContainer';
 export type { StatisticsContainerProps } from './StatisticsContainer';
+
+export { default as DropdownMenu } from './DropdownMenu';
+export type { DropdownMenuProps, DropdownMenuItem } from './DropdownMenu';

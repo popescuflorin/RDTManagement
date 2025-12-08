@@ -9,13 +9,14 @@ import EditAcquisition from './EditAcquisition';
 import ReceiveAcquisition from './ReceiveAcquisition';
 import ProcessAcquisition from './ProcessAcquisition';
 import ViewAcquisition from './ViewAcquisition';
+import DeleteAcquisition from './DeleteAcquisition';
 import ProtectedButton from '../ProtectedButton';
 import { Permissions } from '../../hooks/usePermissions';
 import EditButton from '../atoms/EditButton';
 import ViewButton from '../atoms/ViewButton';
 import DeleteButton from '../atoms/DeleteButton';
 import CreateButton from '../atoms/CreateButton';
-import { Table, Select, Pagination, ErrorMessage, FiltersControl, StatCard, StatisticsContainer } from '../atoms';
+import { Table, Select, Pagination, ErrorMessage, FiltersControl, StatCard, StatisticsContainer, PageContainer, PageHeader, Loader } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './Acquisition.css';
 
@@ -103,10 +104,13 @@ const Acquisition: React.FC = () => {
     setShowProcessModal(true);
   };
 
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const handleDelete = async () => {
     if (!selectedAcquisition) return;
 
     try {
+      setIsDeleting(true);
       // Cancel the acquisition (set status to Cancelled)
       await acquisitionApi.cancelAcquisition(selectedAcquisition.id);
       await loadData();
@@ -114,6 +118,8 @@ const Acquisition: React.FC = () => {
       setSelectedAcquisition(null);
     } catch (err: any) {
       setError(err.response?.data?.message || t('messages.failedToCancel'));
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -178,29 +184,28 @@ const Acquisition: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="acquisition-loading">
-        <div className="loading-spinner"></div>
-        <p>{t('loading')}</p>
-      </div>
+      <PageContainer>
+        <Loader message={t('loading')} />
+      </PageContainer>
     );
   }
 
   return (
-    <div className="acquisition-container">
-      {/* Header */}
-      <div className="acquisition-header">
-        <div className="header-left">
-          <h1>{t('title')}</h1>
-          <p>{t('subtitle')}</p>
-        </div>
-        <CreateButton
-          onClick={handleCreateAcquisition}
-          requiredPermission={Permissions.CreateAcquisition}
-          variant="primary"
-        >
-          {t('createAcquisition')}
-        </CreateButton>
-      </div>
+    <PageContainer>
+      <PageHeader
+        title={t('title')}
+        subtitle={t('subtitle')}
+        icon={Package}
+        actions={
+          <CreateButton
+            onClick={handleCreateAcquisition}
+            requiredPermission={Permissions.CreateAcquisition}
+            variant="primary"
+          >
+            {t('createAcquisition')}
+          </CreateButton>
+        }
+      />
 
       {/* Statistics */}
       {statistics && (
@@ -527,27 +532,13 @@ const Acquisition: React.FC = () => {
       )}
 
       {showDeleteModal && selectedAcquisition && (
-        <div className="modal-backdrop" onClick={() => setShowDeleteModal(false)}>
-          <div className="modal-content delete-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>{t('deleteModal.title')}</h2>
-            <p>{t('deleteModal.confirmation', { title: selectedAcquisition.title })}</p>
-            <p className="warning-text">{t('deleteModal.warning')}</p>
-            <div className="modal-actions">
-              <button 
-                className="cancel-button"
-                onClick={() => setShowDeleteModal(false)}
-              >
-                {t('deleteModal.goBack')}
-              </button>
-              <button 
-                className="delete-button"
-                onClick={handleDelete}
-              >
-                {t('deleteModal.confirm')}
-              </button>
-            </div>
-          </div>
-        </div>
+        <DeleteAcquisition
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleDelete}
+          acquisition={selectedAcquisition}
+          isDeleting={isDeleting}
+        />
       )}
 
       {showReceiveModal && selectedAcquisition && (
@@ -575,7 +566,7 @@ const Acquisition: React.FC = () => {
           acquisition={selectedAcquisition}
         />
       )}
-    </div>
+    </PageContainer>
   );
 };
 

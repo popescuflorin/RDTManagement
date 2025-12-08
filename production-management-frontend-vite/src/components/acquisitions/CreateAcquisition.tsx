@@ -3,8 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { acquisitionApi, inventoryApi, supplierApi, transportApi, userApi } from '../../services/api';
 import type { RawMaterial, CreateAcquisitionRequest, Supplier, CreateSupplierRequest, Transport, CreateTransportRequest, User } from '../../types';
 import { AcquisitionType, MaterialType } from '../../types';
-import { X, Plus, Trash2, Building2, FileText, Truck, Package, UserCircle } from 'lucide-react';
-import './CreateAcquisition.css';
+import { Plus, Trash2, Building2, FileText, Truck, Package, UserCircle } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, ErrorMessage, DropdownMenu } from '../atoms';
+import type { DropdownMenuItem } from '../atoms';
 
 interface CreateAcquisitionProps {
   isOpen: boolean;
@@ -435,9 +436,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
     transport.carName.toLowerCase().includes(transportSearchTerm.toLowerCase())
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     if (!title.trim()) {
       setError(t('form.messages.titleRequired'));
       return;
@@ -494,6 +493,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
       };
 
       await acquisitionApi.createAcquisition(createRequest);
+      resetForm();
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -508,39 +508,36 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
     onClose();
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    // Prevent closing on backdrop click - only allow closing via buttons
-    e.stopPropagation();
-  };
-
   if (!isOpen) return null;
 
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal-content create-acquisition-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{t('form.createTitle')}</h2>
-          <button className="close-button" onClick={handleClose}>
-            <X size={24} />
-          </button>
-        </div>
-
-        <form onSubmit={handleSubmit} className="acquisition-form">
-          {/* Error Message */}
-          {error && (
-            <div className="error-message">
-              {error}
-              <button onClick={() => setError(null)}>×</button>
-            </div>
-          )}
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={t('form.createTitle')}
+      titleIcon={FileText}
+      submitText={isLoading ? t('form.buttons.creating') : t('form.buttons.create')}
+      cancelText={t('form.buttons.cancel')}
+      submitVariant="primary"
+      isSubmitting={isLoading}
+      onSubmit={handleSubmit}
+      maxWidth="900px"
+      closeOnBackdropClick={false}
+    >
+      <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+        {error && (
+          <ErrorMessage
+            message={error}
+            onDismiss={() => setError(null)}
+          />
+        )}
 
           {/* Basic Information */}
-          <div className="form-section">
-            <h3><FileText size={20} />{t('form.sections.information')}</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="title">{t('form.fields.details')} *</label>
-                <input
+          <FormSection title={t('form.sections.information')} titleIcon={FileText}>
+            <FormRow>
+              <FormGroup>
+                <Label htmlFor="title">{t('form.fields.details')} *</Label>
+                <Input
                   type="text"
                   id="title"
                   value={title}
@@ -548,26 +545,28 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                   required
                   placeholder={t('form.placeholders.enterTitle')}
                 />
-              </div>
-              <div className="form-group">
-                <label htmlFor="type">{t('form.fields.type')}</label>
-                <select
+              </FormGroup>
+              <FormGroup>
+                <Label htmlFor="type">{t('form.fields.type')}</Label>
+                <Select
                   id="type"
-                  value={acquisitionType}
+                  value={acquisitionType.toString()}
                   onChange={(e) => setAcquisitionType(Number(e.target.value) as AcquisitionType)}
                 >
-                  <option value={AcquisitionType.RawMaterials}>{t('type.rawMaterials')}</option>
-                  <option value={AcquisitionType.RecyclableMaterials}>{t('type.recyclableMaterials')}</option>
-                </select>
-              </div>
-            </div>
+                  <option value={AcquisitionType.RawMaterials.toString()}>{t('type.rawMaterials')}</option>
+                  <option value={AcquisitionType.RecyclableMaterials.toString()}>{t('type.recyclableMaterials')}</option>
+                </Select>
+              </FormGroup>
+            </FormRow>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="assignedUser"><UserCircle size={16} style={{display: 'inline', marginRight: '4px'}} /> {t('form.fields.assignedUser')}</label>
-                <select
+            <FormRow>
+              <FormGroup>
+                <Label htmlFor="assignedUser">
+                  <UserCircle size={16} style={{display: 'inline', marginRight: '4px'}} /> {t('form.fields.assignedUser')}
+                </Label>
+                <Select
                   id="assignedUser"
-                  value={selectedAssignedUserId || ''}
+                  value={selectedAssignedUserId?.toString() || ''}
                   onChange={(e) => setSelectedAssignedUserId(e.target.value ? parseInt(e.target.value) : null)}
                 >
                   {users.map((user) => (
@@ -575,138 +574,122 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                       {user.firstName} {user.lastName} ({user.username})
                     </option>
                   ))}
-                </select>
-              </div>
-            </div>
+                </Select>
+              </FormGroup>
+            </FormRow>
 
-            <div className="form-group">
-              <label htmlFor="description">{t('form.fields.description')}</label>
-              <textarea
+            <FormGroup>
+              <Label htmlFor="description">{t('form.fields.description')}</Label>
+              <Textarea
                 id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder={t('form.placeholders.enterDescription')}
                 rows={3}
               />
-            </div>
+            </FormGroup>
 
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="dueDate">{t('form.fields.dueDate')}</label>
-                <input
+            <FormRow>
+              <FormGroup>
+                <Label htmlFor="dueDate">{t('form.fields.dueDate')}</Label>
+                <Input
                   type="date"
                   id="dueDate"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
                   placeholder={t('form.placeholders.selectDueDate')}
                 />
-              </div>
-              <div className="form-group">
-                <label htmlFor="notes">{t('form.fields.notes')}</label>
-                <input
+              </FormGroup>
+              <FormGroup>
+                <Label htmlFor="notes">{t('form.fields.notes')}</Label>
+                <Input
                   type="text"
                   id="notes"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
                   placeholder={t('form.placeholders.additionalNotes')}
                 />
-              </div>
-            </div>
-          </div>
+              </FormGroup>
+            </FormRow>
+          </FormSection>
 
           {/* Transport Details Section */}
-          <div className="form-section">
-            <h3><Truck size={20} /> {t('form.sections.transportDetails')}</h3>
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="transportCarName">{t('form.fields.carName')}</label>
-                  <div className="material-search-container">
-                    <input
-                      type="text"
-                      id="transportCarName"
-                      value={transportSearchTerm}
-                      onChange={(e) => handleTransportSearchChange(e.target.value)}
-                      onFocus={handleTransportInputFocus}
-                      placeholder={t('form.placeholders.searchOrEnterCar')}
-                    />
-                    {showTransportDropdown && (
-                      <div className="material-dropdown">
-                        {filteredTransports.length > 0 ? (
-                          filteredTransports.map((transport) => (
-                            <div
-                              key={transport.id}
-                              className="material-option"
-                              onClick={() => handleTransportSelect(transport)}
-                            >
-                              <div>
-                                <strong>{transport.carName}</strong>
-                                {transport.numberPlate && <small> - {transport.numberPlate}</small>}
-                                <small> | {transport.phoneNumber}</small>
-                              </div>
-                            </div>
-                          ))
-                        ) : transportSearchTerm ? (
-                          <div className="material-option material-option-create">
-                            <div>
-                              <strong>{t('form.options.createNewTransport')}</strong> {transportSearchTerm}
-                              <small>{t('form.options.enterPhoneToCreate')}</small>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="material-option">
-                            <div>
-                              <small>{t('form.options.startTypingTransport')}</small>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="transportNumberPlate">{t('form.fields.numberPlate')}</label>
-                  <input
+          <FormSection title={t('form.sections.transportDetails')} titleIcon={Truck}>
+            <FormRow>
+              <FormGroup>
+                <Label htmlFor="transportCarName">{t('form.fields.carName')}</Label>
+                <div className="material-search-container">
+                  <Input
                     type="text"
-                    id="transportNumberPlate"
-                    value={transportNumberPlate}
-                    onChange={(e) => setTransportNumberPlate(e.target.value)}
-                    placeholder={t('form.placeholders.enterNumberPlate')}
+                    id="transportCarName"
+                    value={transportSearchTerm}
+                    onChange={(e) => handleTransportSearchChange(e.target.value)}
+                    onFocus={handleTransportInputFocus}
+                    placeholder={t('form.placeholders.searchOrEnterCar')}
+                  />
+                  <DropdownMenu<Transport>
+                    isOpen={showTransportDropdown}
+                    items={filteredTransports.map(transport => ({
+                      id: transport.id,
+                      data: transport,
+                      label: `${transport.carName}${transport.numberPlate ? ` - ${transport.numberPlate}` : ''}`,
+                      detail: transport.phoneNumber
+                    }))}
+                    onItemClick={(item) => handleTransportSelect(item.data)}
+                    emptyMessage={t('form.options.startTypingTransport')}
+                    searchTerm={transportSearchTerm}
+                    createNewMessage={`${t('form.options.createNewTransport')} {searchTerm}`}
+                    createNewDetail={t('form.options.enterPhoneToCreate')}
+                    onCreateNew={() => {
+                      // This will be handled by the form when user enters phone number
+                      setShowTransportDropdown(false);
+                    }}
                   />
                 </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="transportPhoneNumber">{t('form.fields.phoneNumber')}</label>
-                  <input
-                    type="tel"
-                    id="transportPhoneNumber"
-                    value={transportPhoneNumber}
-                    onChange={(e) => setTransportPhoneNumber(e.target.value)}
-                    placeholder={t('form.placeholders.enterPhoneNumber')}
-                  />
-                </div>
-                <div className="form-group">
-                  <label htmlFor="transportDate">{t('form.fields.transportDate')}</label>
-                  <input
-                    type="date"
-                    id="transportDate"
-                    value={transportDate}
-                    onChange={(e) => setTransportDate(e.target.value)}
-                    placeholder={t('form.placeholders.selectTransportDate')}
-                  />
-                </div>
-              </div>
-          </div>
+              </FormGroup>
+              <FormGroup>
+                <Label htmlFor="transportNumberPlate">{t('form.fields.numberPlate')}</Label>
+                <Input
+                  type="text"
+                  id="transportNumberPlate"
+                  value={transportNumberPlate}
+                  onChange={(e) => setTransportNumberPlate(e.target.value)}
+                  placeholder={t('form.placeholders.enterNumberPlate')}
+                />
+              </FormGroup>
+            </FormRow>
+            <FormRow>
+              <FormGroup>
+                <Label htmlFor="transportPhoneNumber">{t('form.fields.phoneNumber')}</Label>
+                <Input
+                  type="tel"
+                  id="transportPhoneNumber"
+                  value={transportPhoneNumber}
+                  onChange={(e) => setTransportPhoneNumber(e.target.value)}
+                  placeholder={t('form.placeholders.enterPhoneNumber')}
+                />
+              </FormGroup>
+              <FormGroup>
+                <Label htmlFor="transportDate">{t('form.fields.transportDate')}</Label>
+                <Input
+                  type="date"
+                  id="transportDate"
+                  value={transportDate}
+                  onChange={(e) => setTransportDate(e.target.value)}
+                  placeholder={t('form.placeholders.selectTransportDate')}
+                />
+              </FormGroup>
+            </FormRow>
+          </FormSection>
 
           {/* Supplier Section */}
-          <div className="form-section">
-            <h3><Building2 size={20} /> {t('form.sections.supplier')}</h3>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="supplier">{t('form.sections.supplier')}</label>
-                <select
+          <FormSection title={t('form.sections.supplier')} titleIcon={Building2}>
+            <FormRow>
+              <FormGroup>
+                <Label htmlFor="supplier">{t('form.sections.supplier')}</Label>
+                <Select
                   id="supplier"
-                  value={selectedSupplierId || 'none'}
+                  value={selectedSupplierId?.toString() || 'none'}
                   onChange={(e) => handleSupplierChange(e.target.value)}
                 >
                   <option value="none">{t('form.options.noSupplier')}</option>
@@ -716,103 +699,103 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                     </option>
                   ))}
                   <option value="new">+ {t('form.options.createNewSupplier')}</option>
-                </select>
-              </div>
-              <div className="form-group">
-                <label htmlFor="supplierContact">{t('form.fields.supplierContact')}</label>
-                <input
+                </Select>
+              </FormGroup>
+              <FormGroup>
+                <Label htmlFor="supplierContact">{t('form.fields.supplierContact')}</Label>
+                <Input
                   type="text"
                   id="supplierContact"
                   value={supplierContact}
                   onChange={(e) => setSupplierContact(e.target.value)}
                   placeholder={t('form.placeholders.contactInformation')}
                 />
-              </div>
-            </div>
+              </FormGroup>
+            </FormRow>
 
             {/* Create New Supplier Form */}
             {showCreateSupplier && (
               <div className="supplier-creation-form">
                 <h4>{t('form.labels.createNewSupplier')}</h4>
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="supplierName">{t('form.fields.supplierName')} *</label>
-                    <input
+                <FormRow>
+                  <FormGroup>
+                    <Label htmlFor="supplierName">{t('form.fields.supplierName')} *</Label>
+                    <Input
                       type="text"
                       id="supplierName"
                       value={newSupplier.name || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, name: e.target.value })}
                       placeholder={t('form.placeholders.enterSupplierName')}
                     />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="supplierContactPerson">{t('form.fields.contactPerson')}</label>
-                    <input
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="supplierContactPerson">{t('form.fields.contactPerson')}</Label>
+                    <Input
                       type="text"
                       id="supplierContactPerson"
                       value={newSupplier.contactPerson || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, contactPerson: e.target.value })}
                       placeholder={t('form.placeholders.contactPersonName')}
                     />
-                  </div>
-                </div>
+                  </FormGroup>
+                </FormRow>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="supplierPhone">{t('form.fields.phone')}</label>
-                    <input
+                <FormRow>
+                  <FormGroup>
+                    <Label htmlFor="supplierPhone">{t('form.fields.phone')}</Label>
+                    <Input
                       type="text"
                       id="supplierPhone"
                       value={newSupplier.phone || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, phone: e.target.value })}
                       placeholder={t('form.placeholders.phoneNumber')}
                     />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="supplierEmail">{t('form.fields.email')}</label>
-                    <input
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="supplierEmail">{t('form.fields.email')}</Label>
+                    <Input
                       type="email"
                       id="supplierEmail"
                       value={newSupplier.email || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, email: e.target.value })}
                       placeholder={t('form.placeholders.emailAddress')}
                     />
-                  </div>
-                </div>
+                  </FormGroup>
+                </FormRow>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="supplierAddress">{t('form.fields.address')}</label>
-                    <input
+                <FormRow>
+                  <FormGroup>
+                    <Label htmlFor="supplierAddress">{t('form.fields.address')}</Label>
+                    <Input
                       type="text"
                       id="supplierAddress"
                       value={newSupplier.address || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, address: e.target.value })}
                       placeholder={t('form.placeholders.streetAddress')}
                     />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="supplierCity">{t('form.fields.city')}</label>
-                    <input
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="supplierCity">{t('form.fields.city')}</Label>
+                    <Input
                       type="text"
                       id="supplierCity"
                       value={newSupplier.city || ''}
                       onChange={(e) => setNewSupplier({ ...newSupplier, city: e.target.value })}
                       placeholder={t('form.placeholders.city')}
                     />
-                  </div>
-                </div>
+                  </FormGroup>
+                </FormRow>
 
-                <div className="form-group">
-                  <label htmlFor="supplierCountry">{t('form.fields.country')}</label>
-                  <input
+                <FormGroup>
+                  <Label htmlFor="supplierCountry">{t('form.fields.country')}</Label>
+                  <Input
                     type="text"
                     id="supplierCountry"
                     value={newSupplier.country || ''}
                     onChange={(e) => setNewSupplier({ ...newSupplier, country: e.target.value })}
                     placeholder={t('form.placeholders.country')}
                   />
-                </div>
+                </FormGroup>
 
                 <div className="form-actions">
                   <button
@@ -833,38 +816,37 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                 </div>
               </div>
             )}
-          </div>
+          </FormSection>
 
           {/* Materials Section */}
-          <div className="form-section">
+          <FormSection title={t('form.sections.materials')} titleIcon={Package}>
             <div className="section-header">
-              <h3><Package size={20} /> {t('form.sections.materials')}</h3>
+              <div></div>
               <button
                 type="button"
-                className="add-item-button"
+                className="btn btn-md btn-primary"
                 onClick={() => setShowAddItemForm(!showAddItemForm)}
               >
                 <Plus size={20} />
                 {t('form.buttons.addMaterial')}
               </button>
             </div>
-
             {/* Material Error Message */}
             {materialError && (
-              <div className="error-message">
-                {materialError}
-                <button onClick={() => setMaterialError(null)}>×</button>
-              </div>
+              <ErrorMessage
+                message={materialError}
+                onDismiss={() => setMaterialError(null)}
+              />
             )}
 
             {/* Add Item Form */}
             {showAddItemForm && (
               <div className="add-item-form">
-                <div className="form-row">
-                  <div className="form-group material-search-group">
-                    <label htmlFor="materialSearch">{t('form.fields.materialName')} *</label>
+                <FormRow>
+                  <FormGroup className="material-search-group">
+                    <Label htmlFor="materialSearch">{t('form.fields.materialName')} *</Label>
                     <div className="material-search-container">
-                      <input
+                      <Input
                         type="text"
                         id="materialSearch"
                         value={materialSearchTerm}
@@ -873,36 +855,22 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                         placeholder={t('form.placeholders.searchOrCreateMaterial')}
                         className="material-search-input"
                       />
-                      {showMaterialDropdown && (
-                        <div className="material-dropdown">
-                          {filteredMaterials.length > 0 ? (
-                            filteredMaterials.map(material => (
-                              <div
-                                key={material.id}
-                                className="material-option"
-                                onClick={() => handleMaterialSelect(material)}
-                              >
-                                <div className="material-option-main">
-                                  <span className="material-name">{material.name}</span>
-                                  <span className="material-color">({material.color})</span>
-                                </div>
-                                <div className="material-option-details">
-                                  {material.quantity} {material.quantityType} {t('common:labels.available')}
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <div className="material-option no-results">
-                              {t('form.messages.noMaterialsFound')}
-                            </div>
-                          )}
-                        </div>
-                      )}
+                      <DropdownMenu<RawMaterial>
+                        isOpen={showMaterialDropdown}
+                        items={filteredMaterials.map(material => ({
+                          id: material.id,
+                          data: material,
+                          label: `${material.name} (${material.color})`,
+                          detail: `${material.quantity} ${material.quantityType} ${t('common:labels.available')}`
+                        }))}
+                        onItemClick={(item) => handleMaterialSelect(item.data)}
+                        emptyMessage={t('form.messages.noMaterialsFound')}
+                      />
                     </div>
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="itemColor">{t('form.fields.color')} *</label>
-                    <input
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="itemColor">{t('form.fields.color')} *</Label>
+                    <Input
                       type="text"
                       id="itemColor"
                       value={newItem.color || ''}
@@ -911,13 +879,13 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                       disabled={!newItem.isNew}
                       className={!newItem.isNew ? 'disabled-field' : ''}
                     />
-                  </div>
-                </div>
+                  </FormGroup>
+                </FormRow>
 
-                <div className="form-row">
-                  <div className="form-group">
-                    <label htmlFor="itemQuantity">{t('form.fields.quantity')} *</label>
-                    <input
+                <FormRow>
+                  <FormGroup>
+                    <Label htmlFor="itemQuantity">{t('form.fields.quantity')} *</Label>
+                    <Input
                       type="number"
                       id="itemQuantity"
                       value={newItem.quantity || ''}
@@ -927,10 +895,10 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                       step="0.01"
                       placeholder="0"
                     />
-                  </div>
-                  <div className="form-group">
-                    <label htmlFor="itemUnit">{t('form.fields.unitOfMeasure')} *</label>
-                    <input
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="itemUnit">{t('form.fields.unitOfMeasure')} *</Label>
+                    <Input
                       type="text"
                       id="itemUnit"
                       value={newItem.unitOfMeasure || ''}
@@ -939,12 +907,12 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                       disabled={!newItem.isNew}
                       className={!newItem.isNew ? 'disabled-field' : ''}
                     />
-                  </div>
-                </div>
+                  </FormGroup>
+                </FormRow>
 
-                <div className="form-group">
-                  <label htmlFor="itemDescription">{t('form.fields.itemDescription')}</label>
-                  <textarea
+                <FormGroup>
+                  <Label htmlFor="itemDescription">{t('form.fields.itemDescription')}</Label>
+                  <Textarea
                     id="itemDescription"
                     value={newItem.description || ''}
                     onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
@@ -953,24 +921,24 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                     disabled={!newItem.isNew}
                     className={!newItem.isNew ? 'disabled-field' : ''}
                   />
-                </div>
+                </FormGroup>
 
-                <div className="form-actions">
+                <FormRow>
                   <button
                     type="button"
-                    className="save-item-button"
+                    className="btn btn-md btn-primary"
                     onClick={handleAddNewMaterial}
                   >
                     {t('form.buttons.addMaterial')}
                   </button>
                   <button
                     type="button"
-                    className="cancel-button"
+                    className="btn btn-md btn-secondary"
                     onClick={() => setShowAddItemForm(false)}
                   >
                     {t('form.buttons.cancel')}
                   </button>
-                </div>
+                </FormRow>
               </div>
             )}
 
@@ -990,10 +958,10 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                         )}
                       </div>
                       <div className="item-details">
-                        <div className="form-row">
-                          <div className="form-group">
-                            <label>{t('form.itemCard.quantity')}</label>
-                            <input
+                        <FormRow>
+                          <FormGroup>
+                            <Label>{t('form.itemCard.quantity')}</Label>
+                            <Input
                               type="number"
                               value={item.quantity}
                               onChange={(e) => handleUpdateItem(item.id, { quantity: parseFloat(e.target.value) || 0 })}
@@ -1001,22 +969,22 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                               min="0"
                               step="0.01"
                             />
-                          </div>
-                          <div className="form-group">
-                            <label>{t('form.itemCard.unit')}</label>
-                            <input
+                          </FormGroup>
+                          <FormGroup>
+                            <Label>{t('form.itemCard.unit')}</Label>
+                            <Input
                               type="text"
                               value={item.unitOfMeasure}
                               onChange={(e) => handleUpdateItem(item.id, { unitOfMeasure: e.target.value })}
                               disabled={true}
                               className={!item.isNew ? 'disabled-field' : ''}
                             />
-                          </div>
-                        </div>
-                        <div className="form-row">
-                          <div className="form-group">
-                            <label>{t('form.itemCard.color')}</label>
-                            <input
+                          </FormGroup>
+                        </FormRow>
+                        <FormRow>
+                          <FormGroup>
+                            <Label>{t('form.itemCard.color')}</Label>
+                            <Input
                               type="text"
                               value={item.color}
                               onChange={(e) => handleUpdateItem(item.id, { color: e.target.value })}
@@ -1024,11 +992,11 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                               disabled={true}
                               className={!item.isNew ? 'disabled-field' : ''}
                             />
-                          </div>
-                        </div>
-                        <div className="form-group">
-                          <label>{t('form.fields.itemDescription')}</label>
-                          <textarea
+                          </FormGroup>
+                        </FormRow>
+                        <FormGroup>
+                          <Label>{t('form.fields.itemDescription')}</Label>
+                          <Textarea
                             value={item.description}
                             onChange={(e) => handleUpdateItem(item.id, { description: e.target.value })}
                             placeholder={t('form.placeholders.materialDescription')}
@@ -1036,14 +1004,14 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                             disabled={true}
                             className={!item.isNew ? 'disabled-field' : ''}
                           />
-                        </div>
+                        </FormGroup>
                         <div className="item-total">
                           {t('form.itemCard.quantity')}: {item.quantity} {item.unitOfMeasure}
                         </div>
                       </div>
                       <button
                         type="button"
-                        className="remove-item-button"
+                        className="btn btn-md btn-danger"
                         onClick={() => handleRemoveItem(item.id)}
                       >
                         <Trash2 size={16} />
@@ -1062,29 +1030,10 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                 </strong>
               </div>
             )}
-          </div>
-
-          {/* Form Actions */}
-          <div className="form-actions">
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={handleClose}
-            >
-              {t('form.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isLoading || !title.trim() || items.length === 0}
-            >
-              {isLoading ? t('form.buttons.creating') : t('form.buttons.create')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
-};
+          </FormSection>
+        </Form>
+      </Modal>
+    );
+  };
 
 export default CreateAcquisition;

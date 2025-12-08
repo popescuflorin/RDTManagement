@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from 'lucide-react';
-import { Modal } from '../atoms';
+import { Modal, ViewValue, ViewContent } from '../atoms';
 import type { Client } from '../../types';
 
 interface DeleteClientProps {
@@ -38,24 +38,10 @@ const DeleteClient: React.FC<DeleteClientProps> = ({
       isSubmitting={isDeleting}
       showCancel={true}
     >
-      <div style={{ padding: 'var(--space-md) 0' }}>
-        <p style={{ 
-          marginBottom: 'var(--space-lg)', 
-          fontSize: 'var(--text-base)',
-          color: 'var(--text-primary)',
-          lineHeight: 'var(--line-height-relaxed)'
-        }}>
-          {t('deleteModal.confirmation', { name: client.name })}
-        </p>
-        <p style={{ 
-          margin: 0,
-          fontSize: 'var(--text-sm)',
-          color: 'var(--text-secondary)',
-          lineHeight: 'var(--line-height-relaxed)'
-        }}>
-          {t('deleteModal.warning')}
-        </p>
-      </div>
+      <ViewContent>
+        <ViewValue>{t('deleteModal.confirmation', { name: client.name })}</ViewValue>
+        <ViewValue>{t('deleteModal.warning')}</ViewValue>
+      </ViewContent>
     </Modal>
   );
 };

@@ -10,6 +10,10 @@ export interface ViewValueProps {
    * Additional CSS classes
    */
   className?: string;
+  /**
+   * Inline styles
+   */
+  style?: React.CSSProperties;
 }
 
 /**
@@ -18,10 +22,11 @@ export interface ViewValueProps {
  */
 const ViewValue: React.FC<ViewValueProps> = ({
   children,
-  className = ''
+  className = '',
+  style
 }) => {
   return (
-    <div className={`view-value ${className}`.trim()}>
+    <div className={`view-value ${className}`.trim()} style={style}>
       {children}
     </div>
   );

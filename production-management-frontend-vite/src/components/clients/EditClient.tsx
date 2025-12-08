@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { clientApi } from '../../services/api';
 import type { Client, UpdateClientRequest } from '../../types';
 import { UserCircle } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Checkbox } from '../atoms';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Checkbox, ErrorMessage } from '../atoms';
 
 interface EditClientProps {
   isOpen: boolean;
@@ -109,10 +109,10 @@ const EditClient: React.FC<EditClientProps> = ({
     >
       <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
         {error && (
-          <div className="error-message">
-            {error}
-            <button type="button" onClick={() => setError(null)}>×</button>
-          </div>
+          <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
         )}
 
         <FormSection>

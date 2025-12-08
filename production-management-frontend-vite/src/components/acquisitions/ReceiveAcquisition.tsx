@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { acquisitionApi } from '../../services/api';
 import type { Acquisition, ReceiveAcquisitionRequest } from '../../types';
 import { AcquisitionType } from '../../types';
-import { X, Package, FileText, Truck, Building2, UserCircle } from 'lucide-react';
-import './CreateAcquisition.css';
+import { Package, FileText, Truck, Building2, UserCircle } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, ErrorMessage, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
 
 interface ReceiveAcquisitionProps {
   isOpen: boolean;
@@ -69,9 +69,7 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
     ));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     // Validate that all received quantities are valid
     const hasInvalidQuantity = items.some(item => item.receivedQuantity < 0);
     if (hasInvalidQuantity) {
@@ -105,10 +103,6 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
     onClose();
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-  };
-
   if (!isOpen) return null;
 
   const getTypeLabel = (type: AcquisitionType) => {
@@ -130,71 +124,76 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
   };
 
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal-content create-acquisition-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{getModalTitle()}</h2>
-          <button className="close-button" onClick={handleClose}>
-            <X size={24} />
-          </button>
-        </div>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={getModalTitle()}
+      titleIcon={Package}
+      submitText={isLoading ? t('receive.buttons.processing') : getSubmitButtonLabel()}
+      cancelText={t('receive.buttons.cancel')}
+      submitVariant="primary"
+      isSubmitting={isLoading}
+      onSubmit={handleSubmit}
+      maxWidth="900px"
+      closeOnBackdropClick={false}
+    >
+      <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+        {error && (
+          <ErrorMessage
+            message={error}
+            onDismiss={() => setError(null)}
+          />
+        )}
 
-        <form onSubmit={handleSubmit} className="acquisition-form">
-          {/* Error Message */}
-          {error && (
-            <div className="error-message">
-              {error}
-              <button type="button" onClick={() => setError(null)}>×</button>
-            </div>
-          )}
-
-          {/* Info Message for Recyclable Materials */}
-          {acquisition.type === AcquisitionType.RecyclableMaterials && (
-            <div className="info-message">
-              <strong>{t('common:labels.notes', { defaultValue: 'Note' })}:</strong> {t('receive.messages.recyclableMaterialsNote')}
-            </div>
-          )}
-
-          {/* Acquisition Details - Compact Summary */}
-          <div className="form-section">
-            <h3><FileText size={20} /> {t('receive.sections.acquisitionDetails')}</h3>
-            <div className="acquisition-summary">
-              <div className="summary-row">
-                <span className="summary-label">{t('view.labels.title')}:</span>
-                <span className="summary-value">{acquisition.title}</span>
-              </div>
-              <div className="summary-row">
-                <span className="summary-label">{t('view.labels.type')}:</span>
-                <span className="summary-value">{getTypeLabel(acquisition.type)}</span>
-              </div>
-              {acquisition.description && (
-                <div className="summary-row">
-                  <span className="summary-label">{t('view.labels.description')}:</span>
-                  <span className="summary-value">{acquisition.description}</span>
-                </div>
-              )}
-              <div className="summary-row">
-                <span className="summary-label"><UserCircle size={14} style={{display: 'inline', marginRight: '4px'}} />{t('view.labels.assignedTo')}:</span>
-                <span className="summary-value">{acquisition.assignedToUserName || t('view.labels.unassigned')}</span>
-              </div>
-              <div className="summary-row">
-                <span className="summary-label">{t('view.labels.createdBy')}:</span>
-                <span className="summary-value">{acquisition.createdByUserName} {t('view.labels.on')} {new Date(acquisition.createdAt).toLocaleDateString()}</span>
-              </div>
-              {acquisition.dueDate && (
-                <div className="summary-row">
-                  <span className="summary-label">{t('view.labels.dueDate')}:</span>
-                  <span className="summary-value">{new Date(acquisition.dueDate).toLocaleDateString()}</span>
-                </div>
-              )}
-              {acquisition.notes && (
-                <div className="summary-row">
-                  <span className="summary-label">{t('view.labels.notes')}:</span>
-                  <span className="summary-value">{acquisition.notes}</span>
-                </div>
-              )}
-            </div>
+        {/* Info Message for Recyclable Materials */}
+        {acquisition.type === AcquisitionType.RecyclableMaterials && (
+          <div className="info-message">
+            <strong>{t('common:labels.notes', { defaultValue: 'Note' })}:</strong> {t('receive.messages.recyclableMaterialsNote')}
           </div>
+        )}
+
+        {/* Acquisition Details - Compact Summary */}
+        <ViewSection title={t('receive.sections.acquisitionDetails')} titleIcon={FileText}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('view.labels.title')}</ViewLabel>
+              <ViewValue>{acquisition.title}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('view.labels.type')}</ViewLabel>
+              <ViewValue>{getTypeLabel(acquisition.type)}</ViewValue>
+            </ViewItem>
+            {acquisition.description && (
+              <ViewItem>
+                <ViewLabel>{t('view.labels.description')}</ViewLabel>
+                <ViewValue>{acquisition.description}</ViewValue>
+              </ViewItem>
+            )}
+            <ViewItem>
+              <ViewLabel>
+                <UserCircle size={14} style={{display: 'inline', marginRight: '4px'}} />
+                {t('view.labels.assignedTo')}
+              </ViewLabel>
+              <ViewValue>{acquisition.assignedToUserName || t('view.labels.unassigned')}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('view.labels.createdBy')}</ViewLabel>
+              <ViewValue>{acquisition.createdByUserName} {t('view.labels.on')} {new Date(acquisition.createdAt).toLocaleDateString()}</ViewValue>
+            </ViewItem>
+            {acquisition.dueDate && (
+              <ViewItem>
+                <ViewLabel>{t('view.labels.dueDate')}</ViewLabel>
+                <ViewValue>{new Date(acquisition.dueDate).toLocaleDateString()}</ViewValue>
+              </ViewItem>
+            )}
+            {acquisition.notes && (
+              <ViewItem>
+                <ViewLabel>{t('view.labels.notes')}</ViewLabel>
+                <ViewValue>{acquisition.notes}</ViewValue>
+              </ViewItem>
+            )}
+          </ViewGrid>
+        </ViewSection>
 
           {/* Transport & Supplier Details - Compact */}
           {(acquisition.transportCarName || acquisition.supplierName) && (
@@ -259,97 +258,77 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
             </div>
           )}
 
-          {/* Materials - With Received Quantity */}
-          <div className="form-section">
-            <h3><Package size={20} /> {t('receive.sections.materialsToReceive')}</h3>
-            <div className="received-items">
-              {items.map((item, index) => (
-                <div key={item.id} className="item-card">
-                  <div className="item-info">
-                    <div className="item-name">{item.name}</div>
-                    <div className="item-color">{t('form.itemCard.color')}: {item.color}</div>
-                  </div>
-                  <div className="item-details">
-                    <div className="form-row">
-                      <div className="form-group">
-                        <label>{t('receive.labels.orderedQuantity')}</label>
-                        <input
-                          type="number"
-                          value={item.orderedQuantity}
-                          disabled
-                          className="disabled-field"
-                        />
-                      </div>
-                      <div className="form-group">
-                        <label>{t('receive.labels.receivedQuantity')} *</label>
-                        <input
-                          type="number"
-                          value={item.receivedQuantity}
-                          onChange={(e) => handleUpdateReceivedQuantity(index, parseFloat(e.target.value) || 0)}
-                          onWheel={handleWheel}
-                          min="0"
-                          step="0.01"
-                          placeholder={t('receive.labels.enterReceivedQuantity')}
-                        />
-                      </div>
-                    </div>
-                    <div className="form-row">
-                      <div className="form-group">
-                        <label>{t('receive.labels.unitOfMeasure')}</label>
-                        <input
-                          type="text"
-                          value={item.unitOfMeasure}
-                          disabled
-                          className="disabled-field"
-                        />
-                      </div>
-                    </div>
-                    <div className="item-summary">
-                      <div className={`quantity-status ${item.receivedQuantity === item.orderedQuantity ? 'complete' : item.receivedQuantity > item.orderedQuantity ? 'excess' : 'partial'}`}>
-                        {item.receivedQuantity === item.orderedQuantity && t('receive.labels.complete')}
-                        {item.receivedQuantity > item.orderedQuantity && t('receive.labels.excessReceived')}
-                        {item.receivedQuantity < item.orderedQuantity && t('receive.labels.partialDelivery')}
-                      </div>
+        {/* Materials - With Received Quantity */}
+        <FormSection title={t('receive.sections.materialsToReceive')} titleIcon={Package}>
+          <div className="received-items">
+            {items.map((item, index) => (
+              <div key={item.id} className="item-card">
+                <div className="item-info">
+                  <div className="item-name">{item.name}</div>
+                  <div className="item-color">{t('form.itemCard.color')}: {item.color}</div>
+                </div>
+                <div className="item-details">
+                  <FormRow>
+                    <FormGroup>
+                      <Label>{t('receive.labels.orderedQuantity')}</Label>
+                      <Input
+                        type="number"
+                        value={item.orderedQuantity}
+                        disabled
+                        className="disabled-field"
+                      />
+                    </FormGroup>
+                    <FormGroup>
+                      <Label>{t('receive.labels.receivedQuantity')} *</Label>
+                      <Input
+                        type="number"
+                        value={item.receivedQuantity}
+                        onChange={(e) => handleUpdateReceivedQuantity(index, parseFloat(e.target.value) || 0)}
+                        onWheel={handleWheel}
+                        min="0"
+                        step="0.01"
+                        placeholder={t('receive.labels.enterReceivedQuantity')}
+                      />
+                    </FormGroup>
+                  </FormRow>
+                  <FormRow>
+                    <FormGroup>
+                      <Label>{t('receive.labels.unitOfMeasure')}</Label>
+                      <Input
+                        type="text"
+                        value={item.unitOfMeasure}
+                        disabled
+                        className="disabled-field"
+                      />
+                    </FormGroup>
+                  </FormRow>
+                  <div className="item-summary">
+                    <div className={`quantity-status ${item.receivedQuantity === item.orderedQuantity ? 'complete' : item.receivedQuantity > item.orderedQuantity ? 'excess' : 'partial'}`}>
+                      {item.receivedQuantity === item.orderedQuantity && t('receive.labels.complete')}
+                      {item.receivedQuantity > item.orderedQuantity && t('receive.labels.excessReceived')}
+                      {item.receivedQuantity < item.orderedQuantity && t('receive.labels.partialDelivery')}
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
-
-            {/* Reception Summary */}
-            <div className="reception-summary">
-              <div className="summary-item">
-                <strong>{t('receive.labels.totalItems')}:</strong> {items.length}
               </div>
-              <div className="summary-item">
-                <strong>{t('receive.labels.totalOrdered')}:</strong> {items.reduce((sum, item) => sum + item.orderedQuantity, 0).toFixed(2)} {t('receive.labels.units')}
-              </div>
-              <div className="summary-item">
-                <strong>{t('receive.labels.totalReceiving')}:</strong> {items.reduce((sum, item) => sum + item.receivedQuantity, 0).toFixed(2)} {t('receive.labels.units')}
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* Form Actions */}
-          <div className="form-actions">
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={handleClose}
-            >
-              {t('receive.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isLoading}
-            >
-              {isLoading ? t('receive.buttons.processing') : getSubmitButtonLabel()}
-            </button>
+          {/* Reception Summary */}
+          <div className="reception-summary">
+            <div className="summary-item">
+              <strong>{t('receive.labels.totalItems')}:</strong> {items.length}
+            </div>
+            <div className="summary-item">
+              <strong>{t('receive.labels.totalOrdered')}:</strong> {items.reduce((sum, item) => sum + item.orderedQuantity, 0).toFixed(2)} {t('receive.labels.units')}
+            </div>
+            <div className="summary-item">
+              <strong>{t('receive.labels.totalReceiving')}:</strong> {items.reduce((sum, item) => sum + item.receivedQuantity, 0).toFixed(2)} {t('receive.labels.units')}
+            </div>
           </div>
-        </form>
-      </div>
-    </div>
+        </FormSection>
+      </Form>
+    </Modal>
   );
 };
 

@@ -3,8 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { acquisitionApi, inventoryApi } from '../../services/api';
 import type { Acquisition, RawMaterial } from '../../types';
 import { AcquisitionType, MaterialType } from '../../types';
-import { X, Package, FileText, Truck, Building2, Plus, Trash2 } from 'lucide-react';
-import './CreateAcquisition.css';
+import { Package, FileText, Truck, Building2, Plus, Trash2 } from 'lucide-react';
+import { Modal, Form, FormRow, FormGroup, Label, Input, Select, ErrorMessage, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
 
 interface ProcessAcquisitionProps {
   isOpen: boolean;
@@ -129,9 +129,7 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     // Validation
     if (processedMaterials.length === 0) {
       setProcessingError(t('process.messages.pleaseAddAtLeastOne'));
@@ -151,8 +149,6 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
       setError(null);
       setProcessingError(null);
 
-      // TODO: Create API endpoint for processing recyclables
-      // For now, we'll need to create this endpoint in the backend
       const processRequest = {
         acquisitionId: acquisition.id,
         materials: processedMaterials.map(m => ({
@@ -166,7 +162,6 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
         }))
       };
 
-      // This endpoint needs to be created
       await acquisitionApi.processAcquisition(acquisition.id, processRequest);
       
       onSuccess();
@@ -180,10 +175,6 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
 
   const handleClose = () => {
     onClose();
-  };
-
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
   };
 
   if (!isOpen) return null;
@@ -203,109 +194,111 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
   };
 
   return (
-    <div className="modal-backdrop" onClick={handleBackdropClick}>
-      <div className="modal-content create-acquisition-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
-          <h2>{t('process.title')}</h2>
-          <button className="close-button" onClick={handleClose}>
-            <X size={24} />
-          </button>
+    <Modal
+      isOpen={isOpen}
+      onClose={handleClose}
+      title={t('process.title')}
+      titleIcon={Package}
+      submitText={isLoading ? t('process.buttons.processing') : t('process.buttons.completeProcessing')}
+      cancelText={t('process.buttons.cancel')}
+      submitVariant="primary"
+      isSubmitting={isLoading}
+      onSubmit={handleSubmit}
+      maxWidth="900px"
+      closeOnBackdropClick={false}
+    >
+      <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+        {error && (
+          <ErrorMessage
+            message={error}
+            onDismiss={() => setError(null)}
+          />
+        )}
+
+        {/* Info Message */}
+        <div className="info-message">
+          <strong>{t('process.messages.processingInstructionsLabel', { defaultValue: 'Processing Instructions' })}:</strong> {t('process.messages.processingInstructions')}
         </div>
 
-        <form onSubmit={handleSubmit} className="acquisition-form">
-          {/* Error Message */}
-          {error && (
-            <div className="error-message">
-              {error}
-              <button type="button" onClick={() => setError(null)}>×</button>
-            </div>
-          )}
+        {/* Acquisition Details - Compact Summary */}
+        <ViewSection title={t('process.sections.acquisitionDetails')} titleIcon={FileText}>
+          <ViewGrid>
+            <ViewItem>
+              <ViewLabel>{t('view.labels.title')}</ViewLabel>
+              <ViewValue>{acquisition.title}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('view.labels.type')}</ViewLabel>
+              <ViewValue>{getTypeLabel(acquisition.type)}</ViewValue>
+            </ViewItem>
+            {acquisition.description && (
+              <ViewItem>
+                <ViewLabel>{t('view.labels.description')}</ViewLabel>
+                <ViewValue>{acquisition.description}</ViewValue>
+              </ViewItem>
+            )}
+            <ViewItem>
+              <ViewLabel>{t('process.labels.assignedTo')}</ViewLabel>
+              <ViewValue>{acquisition.assignedToUserName || t('view.labels.unassigned')}</ViewValue>
+            </ViewItem>
+            <ViewItem>
+              <ViewLabel>{t('process.labels.receivedBy')}</ViewLabel>
+              <ViewValue>
+                {acquisition.receivedByUserName || t('process.labels.na')} 
+                {acquisition.receivedAt ? ` ${t('view.labels.on')} ${new Date(acquisition.receivedAt).toLocaleDateString()}` : ''}
+              </ViewValue>
+            </ViewItem>
+          </ViewGrid>
+        </ViewSection>
 
-          {/* Info Message */}
-          <div className="info-message">
-            <strong>{t('process.messages.processingInstructionsLabel', { defaultValue: 'Processing Instructions' })}:</strong> {t('process.messages.processingInstructions')}
-          </div>
-
-          {/* Acquisition Details - Compact Summary */}
-          <div className="form-section">
-            <h3><FileText size={20} /> {t('process.sections.acquisitionDetails')}</h3>
-            <div className="acquisition-summary">
-              <div className="summary-row">
-                <span className="summary-label">{t('view.labels.title')}:</span>
-                <span className="summary-value">{acquisition.title}</span>
-              </div>
-              <div className="summary-row">
-                <span className="summary-label">{t('view.labels.type')}:</span>
-                <span className="summary-value">{getTypeLabel(acquisition.type)}</span>
-              </div>
-              {acquisition.description && (
-                <div className="summary-row">
-                  <span className="summary-label">{t('view.labels.description')}:</span>
-                  <span className="summary-value">{acquisition.description}</span>
+        {/* Transport & Supplier Details */}
+        {(acquisition.transportCarName || acquisition.supplierName) && (
+          <ViewSection>
+            <div className="details-grid">
+              {/* Transport Details */}
+              {acquisition.transportCarName && (
+                <div className="details-column">
+                  <h4><Truck size={18} /> {t('view.sections.transport')}</h4>
+                  <ViewGrid>
+                    <ViewItem>
+                      <ViewLabel>{t('view.labels.vehicle')}</ViewLabel>
+                      <ViewValue>{acquisition.transportCarName}</ViewValue>
+                    </ViewItem>
+                    <ViewItem>
+                      <ViewLabel>{t('view.labels.numberPlate')}</ViewLabel>
+                      <ViewValue>{acquisition.transportNumberPlate || t('view.labels.notSet')}</ViewValue>
+                    </ViewItem>
+                    {acquisition.transportPhoneNumber && (
+                      <ViewItem>
+                        <ViewLabel>{t('view.labels.phone')}</ViewLabel>
+                        <ViewValue>{acquisition.transportPhoneNumber}</ViewValue>
+                      </ViewItem>
+                    )}
+                  </ViewGrid>
                 </div>
               )}
-              <div className="summary-row">
-                <span className="summary-label">{t('process.labels.assignedTo')}:</span>
-                <span className="summary-value">{acquisition.assignedToUserName || t('view.labels.unassigned')}</span>
-              </div>
-              <div className="summary-row">
-                <span className="summary-label">{t('process.labels.receivedBy')}:</span>
-                <span className="summary-value">
-                  {acquisition.receivedByUserName || t('process.labels.na')} 
-                  {acquisition.receivedAt ? ` ${t('view.labels.on')} ${new Date(acquisition.receivedAt).toLocaleDateString()}` : ''}
-                </span>
-              </div>
-            </div>
-          </div>
 
-          {/* Transport & Supplier Details */}
-          {(acquisition.transportCarName || acquisition.supplierName) && (
-            <div className="form-section">
-              <div className="details-grid">
-                {/* Transport Details */}
-                {acquisition.transportCarName && (
-                  <div className="details-column">
-                    <h4><Truck size={18} /> {t('view.sections.transport')}</h4>
-                    <div className="acquisition-summary">
-                      <div className="summary-row">
-                        <span className="summary-label">{t('view.labels.vehicle')}:</span>
-                        <span className="summary-value">{acquisition.transportCarName}</span>
-                      </div>
-                      <div className="summary-row">
-                        <span className="summary-label">{t('view.labels.numberPlate')}:</span>
-                        <span className="summary-value">{acquisition.transportNumberPlate || t('view.labels.notSet')}</span>
-                      </div>
-                      {acquisition.transportPhoneNumber && (
-                        <div className="summary-row">
-                          <span className="summary-label">{t('view.labels.phone')}:</span>
-                          <span className="summary-value">{acquisition.transportPhoneNumber}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-
-                {/* Supplier Details */}
-                {acquisition.supplierName && (
-                  <div className="details-column">
-                    <h4><Building2 size={18} /> {t('view.sections.supplier')}</h4>
-                    <div className="acquisition-summary">
-                      <div className="summary-row">
-                        <span className="summary-label">{t('view.labels.name')}:</span>
-                        <span className="summary-value">{acquisition.supplierName}</span>
-                      </div>
-                      {acquisition.supplierContact && (
-                        <div className="summary-row">
-                          <span className="summary-label">{t('view.labels.contact')}:</span>
-                          <span className="summary-value">{acquisition.supplierContact}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
+              {/* Supplier Details */}
+              {acquisition.supplierName && (
+                <div className="details-column">
+                  <h4><Building2 size={18} /> {t('view.sections.supplier')}</h4>
+                  <ViewGrid>
+                    <ViewItem>
+                      <ViewLabel>{t('view.labels.name')}</ViewLabel>
+                      <ViewValue>{acquisition.supplierName}</ViewValue>
+                    </ViewItem>
+                    {acquisition.supplierContact && (
+                      <ViewItem>
+                        <ViewLabel>{t('view.labels.contact')}</ViewLabel>
+                        <ViewValue>{acquisition.supplierContact}</ViewValue>
+                      </ViewItem>
+                    )}
+                  </ViewGrid>
+                </div>
+              )}
             </div>
-          )}
+          </ViewSection>
+        )}
 
           {/* Recyclable Materials & Processing */}
           <div className="form-section">
@@ -343,11 +336,11 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                     <div className="processed-materials-list">
                       {itemProcessedMaterials.map((material) => (
                         <div key={material.id} className="processed-material-item">
-                          <div className="form-row">
-                            <div className="form-group">
-                              <label>{t('process.labels.selectRawMaterialOrCreate')}</label>
-                              <select
-                                value={material.rawMaterialId || ''}
+                          <FormRow>
+                            <FormGroup>
+                              <Label>{t('process.labels.selectRawMaterialOrCreate')}</Label>
+                              <Select
+                                value={material.rawMaterialId?.toString() || ''}
                                 onChange={(e) => {
                                   const value = e.target.value;
                                   if (value === 'new') {
@@ -372,11 +365,11 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                                     </option>
                                   ))}
                                 </optgroup>
-                              </select>
-                            </div>
-                            <div className="form-group">
-                              <label>{t('process.labels.quantity')}</label>
-                              <input
+                              </Select>
+                            </FormGroup>
+                            <FormGroup>
+                              <Label>{t('process.labels.quantity')}</Label>
+                              <Input
                                 type="number"
                                 value={material.quantity}
                                 onChange={(e) => handleUpdateProcessedMaterial(material.id, { quantity: parseFloat(e.target.value) || 0 })}
@@ -385,54 +378,54 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
                                 step="0.01"
                                 required
                               />
-                            </div>
-                          </div>
+                            </FormGroup>
+                          </FormRow>
 
                           {material.isNew && (
                             <>
-                              <div className="form-row">
-                                <div className="form-group">
-                                  <label>{t('process.labels.materialName')}</label>
-                                  <input
+                              <FormRow>
+                                <FormGroup>
+                                  <Label>{t('process.labels.materialName')}</Label>
+                                  <Input
                                     type="text"
                                     value={material.name}
                                     onChange={(e) => handleUpdateProcessedMaterial(material.id, { name: e.target.value })}
                                     placeholder={t('process.labels.enterMaterialName')}
                                     required
                                   />
-                                </div>
-                                <div className="form-group">
-                                  <label>{t('process.labels.color')}</label>
-                                  <input
+                                </FormGroup>
+                                <FormGroup>
+                                  <Label>{t('process.labels.color')}</Label>
+                                  <Input
                                     type="text"
                                     value={material.color}
                                     onChange={(e) => handleUpdateProcessedMaterial(material.id, { color: e.target.value })}
                                     placeholder={t('process.labels.enterColor')}
                                     required
                                   />
-                                </div>
-                              </div>
-                              <div className="form-row">
-                                <div className="form-group">
-                                  <label>{t('process.labels.unitOfMeasure')}</label>
-                                  <input
+                                </FormGroup>
+                              </FormRow>
+                              <FormRow>
+                                <FormGroup>
+                                  <Label>{t('process.labels.unitOfMeasure')}</Label>
+                                  <Input
                                     type="text"
                                     value={material.unitOfMeasure}
                                     onChange={(e) => handleUpdateProcessedMaterial(material.id, { unitOfMeasure: e.target.value })}
                                     placeholder={t('form.placeholders.unitExample')}
                                     required
                                   />
-                                </div>
-                                <div className="form-group">
-                                  <label>{t('process.labels.descriptionOptional')}</label>
-                                  <input
+                                </FormGroup>
+                                <FormGroup>
+                                  <Label>{t('process.labels.descriptionOptional')}</Label>
+                                  <Input
                                     type="text"
                                     value={material.description}
                                     onChange={(e) => handleUpdateProcessedMaterial(material.id, { description: e.target.value })}
                                     placeholder={t('process.labels.enterDescription')}
                                   />
-                                </div>
-                              </div>
+                                </FormGroup>
+                              </FormRow>
                             </>
                           )}
 
@@ -467,26 +460,8 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
             })}
           </div>
 
-          {/* Submit Button */}
-          <div className="form-actions">
-            <button
-              type="button"
-              className="cancel-button"
-              onClick={handleClose}
-            >
-              {t('process.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isLoading || processedMaterials.length === 0}
-            >
-              {isLoading ? t('process.buttons.processing') : t('process.buttons.completeProcessing')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+      </Form>
+    </Modal>
   );
 };
 
