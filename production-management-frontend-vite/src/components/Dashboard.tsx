@@ -25,7 +25,7 @@ import Orders from './orders/Orders';
 import Transports from './transports/Transports';
 import Clients from './clients/Clients';
 import Suppliers from './suppliers/Suppliers';
-import { CreateButton, Loader, ErrorMessage, StatCard, StatisticsContainer, Button } from './atoms';
+import { Loader, ErrorMessage, StatCard, StatisticsContainer, Button } from './atoms';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -207,7 +207,6 @@ const Dashboard: React.FC = () => {
     );
   };
 
-  const isAdmin = user?.role === 'Admin';
 
   if (isLoading) {
     return (
@@ -246,22 +245,32 @@ const Dashboard: React.FC = () => {
             >
               {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
-            <h1>{getPageTitle(currentPage)}</h1>
+            <div className="page-title-section">
+              <h1>{getPageTitle(currentPage)}</h1>
+              <p className="page-subtitle">{t('header.pageSubtitle', { ns: 'dashboard', defaultValue: 'Manage your operations' })}</p>
+            </div>
           </div>
-          <div className="user-info">
-            <span>{t('header.welcome', { ns: 'dashboard', firstName: user?.firstName, lastName: user?.lastName, role: user?.role })}</span>
-            {isAdmin && currentPage === 'dashboard' && (
-              <CreateButton
-                onClick={() => setShowRegisterModal(true)}
-                variant="primary"
-              >
-                {t('header.createUser', { ns: 'dashboard' })}
-              </CreateButton>
-            )}
-            <Button onClick={handleLogout} variant="danger">
-              <LogOut size={16} />
-              {t('header.logout', { ns: 'dashboard' })}
-            </Button>
+          <div className="header-right">
+            <div className="user-profile-section">
+              <div className="user-profile">
+                <div className="user-avatar-wrapper">
+                  <div className="user-avatar">
+                    {user?.firstName?.charAt(0)}{user?.lastName?.charAt(0)}
+                  </div>
+                  <div className="status-indicator"></div>
+                </div>
+                <div className="user-details">
+                  <div className="user-name">{user?.firstName} {user?.lastName}</div>
+                  <div className="user-role-badge">
+                    <UserCheck size={12} />
+                    {user?.role}
+                  </div>
+                </div>
+              </div>
+              <Button onClick={handleLogout} variant="danger" size="sm" className="logout-btn">
+                <LogOut size={16} />
+              </Button>
+            </div>
           </div>
         </div>
         
