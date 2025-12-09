@@ -5,7 +5,6 @@ import type { RawMaterial, CreateAcquisitionRequest, Supplier, CreateSupplierReq
 import { AcquisitionType, MaterialType } from '../../types';
 import { Plus, Trash2, Building2, FileText, Truck, Package, UserCircle } from 'lucide-react';
 import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, ErrorMessage, DropdownMenu } from '../atoms';
-import type { DropdownMenuItem } from '../atoms';
 
 interface CreateAcquisitionProps {
   isOpen: boolean;

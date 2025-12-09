@@ -2,8 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { rolePermissionApi } from '../../services/api';
 import type { PermissionInfo, CreateRoleRequest, RoleDto } from '../../types';
-import { Check, X, Plus } from 'lucide-react';
-import './CreateRole.css';
+import { Check, Shield } from 'lucide-react';
+import { Modal, Form, FormSection, FormGroup, Label, Input, Textarea, Loader, ErrorMessage } from '../atoms';
 
 interface CreateRoleProps {
   onClose: () => void;
@@ -172,117 +172,85 @@ const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
     }
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleSubmit = () => {
+    handleSave();
   };
 
   return (
-    <div className="create-role-overlay" onClick={handleBackdropClick}>
-      <div className="create-role-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="create-role-header">
-          <div className="header-content">
-            <Plus size={24} />
-            <h2>{t('createRole.title')}</h2>
-          </div>
-          <button className="close-button" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('createRole.title')}
+      titleIcon={Shield}
+      onSubmit={handleSubmit}
+      submitText={isSaving ? t('createRole.buttons.creating') : t('createRole.buttons.createRole')}
+      cancelText={t('createRole.buttons.cancel')}
+      isSubmitting={isSaving || isLoading || !roleName.trim()}
+    >
+      <Form onSubmit={handleSubmit}>
+        {error && <ErrorMessage message={error} />}
 
-        <div className="create-role-content">
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+        {isLoading ? (
+          <Loader message={t('createRole.labels.loadingPermissions')} />
+        ) : (
+          <>
+            <FormSection title={t('createRole.sections.roleInfo', { defaultValue: 'Role Information' })}>
+              <FormGroup>
+                <Label htmlFor="roleName" required>{t('createRole.fields.roleName')}</Label>
+                <Input
+                  id="roleName"
+                  type="text"
+                  value={roleName}
+                  onChange={(e) => setRoleName(e.target.value)}
+                  placeholder={t('createRole.placeholders.roleName')}
+                  maxLength={50}
+                  disabled={isSaving}
+                  required
+                />
+              </FormGroup>
 
-          {isLoading ? (
-            <div className="loading-state">
-              <p>{t('createRole.labels.loadingPermissions')}</p>
-            </div>
-          ) : (
-            <>
-              {/* Role Details */}
-              <div className="role-details-section">
-                <div className="form-group">
-                  <label htmlFor="roleName">
-                    {t('createRole.fields.roleName')} <span className="required">*</span>
-                  </label>
-                  <input
-                    id="roleName"
-                    type="text"
-                    value={roleName}
-                    onChange={(e) => setRoleName(e.target.value)}
-                    placeholder={t('createRole.placeholders.roleName')}
-                    maxLength={50}
-                    disabled={isSaving}
-                  />
-                </div>
+              <FormGroup>
+                <Label htmlFor="description">{t('createRole.fields.description')}</Label>
+                <Textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={t('createRole.placeholders.description')}
+                  rows={3}
+                  maxLength={500}
+                  disabled={isSaving}
+                />
+              </FormGroup>
+            </FormSection>
 
-                <div className="form-group">
-                  <label htmlFor="description">{t('createRole.fields.description')}</label>
-                  <textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder={t('createRole.placeholders.description')}
-                    rows={3}
-                    maxLength={500}
-                    disabled={isSaving}
-                  />
-                </div>
+            <FormSection title={t('createRole.labels.assignPermissions')}>
+              <div className="permissions-summary">
+                <p>
+                  {t('createRole.labels.selected')} <strong>{selectedPermissions.length}</strong> {t('createRole.labels.of')}{' '}
+                  <strong>{Object.values(allPermissions).flat().length}</strong> {t('createRole.labels.permissions')}
+                </p>
               </div>
 
-              {/* Permissions Selection */}
-              <div className="permissions-selection-section">
-                <h3>{t('createRole.labels.assignPermissions')}</h3>
-                <div className="permissions-summary">
-                  <p>
-                    {t('createRole.labels.selected')} <strong>{selectedPermissions.length}</strong> {t('createRole.labels.of')}{' '}
-                    <strong>{Object.values(allPermissions).flat().length}</strong> {t('createRole.labels.permissions')}
-                  </p>
-                </div>
-
-                <div className="permissions-grid">
-                  {Object.entries(allPermissions).map(([category, permissions]) => (
-                    <PermissionCategory
-                      key={category}
-                      category={category}
-                      permissions={permissions}
-                      selectedPermissions={selectedPermissions}
-                      isFullySelected={isCategoryFullySelected(category)}
-                      isPartiallySelected={isCategoryPartiallySelected(category)}
-                      onCategoryToggle={() => handleCategoryToggle(category)}
-                      onPermissionToggle={handlePermissionToggle}
-                      disabled={isSaving}
-                    />
-                  ))}
-                </div>
+              <div className="permissions-grid">
+                {Object.entries(allPermissions).map(([category, permissions]) => (
+                  <PermissionCategory
+                    key={category}
+                    category={category}
+                    permissions={permissions}
+                    selectedPermissions={selectedPermissions}
+                    isFullySelected={isCategoryFullySelected(category)}
+                    isPartiallySelected={isCategoryPartiallySelected(category)}
+                    onCategoryToggle={() => handleCategoryToggle(category)}
+                    onPermissionToggle={handlePermissionToggle}
+                    disabled={isSaving}
+                  />
+                ))}
               </div>
-            </>
-          )}
-        </div>
-
-        <div className="create-role-actions">
-          <button
-            type="button"
-            onClick={onClose}
-            className="cancel-button"
-            disabled={isSaving}
-          >
-            {t('createRole.buttons.cancel')}
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            className="save-button"
-            disabled={isSaving || isLoading || !roleName.trim()}
-          >
-            {isSaving ? t('createRole.buttons.creating') : t('createRole.buttons.createRole')}
-          </button>
-        </div>
-      </div>
-    </div>
+            </FormSection>
+          </>
+        )}
+      </Form>
+    </Modal>
   );
 };
 

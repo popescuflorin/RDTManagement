@@ -25,7 +25,7 @@ import Orders from './orders/Orders';
 import Transports from './transports/Transports';
 import Clients from './clients/Clients';
 import Suppliers from './suppliers/Suppliers';
-import CreateButton from './atoms/CreateButton';
+import { CreateButton, Loader, ErrorMessage, StatCard, StatisticsContainer, Button } from './atoms';
 import './Dashboard.css';
 
 const Dashboard: React.FC = () => {
@@ -146,29 +146,24 @@ const Dashboard: React.FC = () => {
           </p>
         </div>
 
-        <div className="stats-grid">
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Users size={24} />
-            </div>
-            <h3>{t('content.totalUsers', { ns: 'dashboard' })}</h3>
-            <div className="stat-value">{dashboardData?.totalUsers}</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <UserCheck size={24} />
-            </div>
-            <h3>{t('content.activeUsers', { ns: 'dashboard' })}</h3>
-            <div className="stat-value">{dashboardData?.activeUsers}</div>
-          </div>
-          <div className="stat-card">
-            <div className="stat-icon">
-              <Activity size={24} />
-            </div>
-            <h3>{t('content.systemStatus', { ns: 'dashboard' })}</h3>
-            <div className="stat-value status-ok">{dashboardData?.systemStatus}</div>
-          </div>
-        </div>
+        <StatisticsContainer>
+          <StatCard
+            icon={Users}
+            label={t('content.totalUsers', { ns: 'dashboard' })}
+            value={dashboardData?.totalUsers?.toString() || '0'}
+          />
+          <StatCard
+            icon={UserCheck}
+            label={t('content.activeUsers', { ns: 'dashboard' })}
+            value={dashboardData?.activeUsers?.toString() || '0'}
+          />
+          <StatCard
+            icon={Activity}
+            label={t('content.systemStatus', { ns: 'dashboard' })}
+            value={dashboardData?.systemStatus || 'OK'}
+            variant="warning"
+          />
+        </StatisticsContainer>
 
         <div className="activity-section">
           <h3>{t('content.recentActivity', { ns: 'dashboard' })}</h3>
@@ -217,7 +212,7 @@ const Dashboard: React.FC = () => {
   if (isLoading) {
     return (
       <div className="dashboard-container">
-        <div className="loading">{t('loading.loadingDashboard', { ns: 'dashboard' })}</div>
+        <Loader message={t('loading.loadingDashboard', { ns: 'dashboard' })} />
       </div>
     );
   }
@@ -225,7 +220,7 @@ const Dashboard: React.FC = () => {
   if (error) {
     return (
       <div className="dashboard-container">
-        <div className="error">{t('error.error', { ns: 'dashboard', error })}</div>
+        <ErrorMessage message={t('error.error', { ns: 'dashboard', error })} />
       </div>
     );
   }
@@ -263,10 +258,10 @@ const Dashboard: React.FC = () => {
                 {t('header.createUser', { ns: 'dashboard' })}
               </CreateButton>
             )}
-            <button onClick={handleLogout} className="btn btn-danger">
+            <Button onClick={handleLogout} variant="danger">
               <LogOut size={16} />
               {t('header.logout', { ns: 'dashboard' })}
-            </button>
+            </Button>
           </div>
         </div>
         

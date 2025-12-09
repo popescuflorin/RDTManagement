@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { userApi } from '../../services/api';
 import type { User } from '../../types';
-import './ActivateUser.css';
+import { Modal, ViewContent, ViewValue, ErrorMessage } from '../atoms';
+import { UserCheck } from 'lucide-react';
 
 interface ActivateUserProps {
   user: User;
@@ -42,65 +43,50 @@ const ActivateUser: React.FC<ActivateUserProps> = ({ user, onClose, onUserActiva
   };
 
   return (
-    <div className="activate-user-overlay">
-      <div className="activate-user-modal">
-        <div className="activate-user-header">
-          <div className="success-icon">✓</div>
-          <h2>{t('activateUser.title')}</h2>
-        </div>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('activateUser.title')}
+      titleIcon={UserCheck}
+      onSubmit={handleActivate}
+      submitText={isLoading ? t('activateUser.buttons.activating') : t('activateUser.buttons.activateUser')}
+      cancelText={t('activateUser.buttons.cancel')}
+      isSubmitting={isLoading}
+    >
+      <ViewContent>
+        {error && <ErrorMessage message={error} />}
 
-        <div className="activate-user-content">
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+        <ViewValue style={{ marginBottom: 'var(--space-lg)', fontSize: 'var(--text-base)' }}>
+          {t('activateUser.confirmation')}
+        </ViewValue>
 
-          <p className="confirmation-text">
-            {t('activateUser.confirmation')}
-          </p>
-
-          <div className="user-details">
-            <div className="user-avatar">
-              {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-            </div>
-            <div className="user-info">
-              <div className="user-name">{user.firstName} {user.lastName}</div>
-              <div className="user-email">{user.email}</div>
-              <div className="user-role">{t('activateUser.labels.role')} {user.role}</div>
-            </div>
+        <div className="user-details">
+          <div className="user-avatar">
+            {user.firstName.charAt(0)}{user.lastName.charAt(0)}
           </div>
-
-          <div className="info-text">
-            <strong>{t('activateUser.info.title')}</strong>
-            <ul>
-              <li>{t('activateUser.info.restoreAccess')}</li>
-              <li>{t('activateUser.info.allowLogin')}</li>
-              <li>{t('activateUser.info.enablePermissions')}</li>
-            </ul>
+          <div className="user-info">
+            <ViewValue style={{ fontWeight: 600, marginBottom: 'var(--space-xs)' }}>
+              {user.firstName} {user.lastName}
+            </ViewValue>
+            <ViewValue style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-xs)' }}>
+              {user.email}
+            </ViewValue>
+            <ViewValue style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+              {t('activateUser.labels.role')} {user.role}
+            </ViewValue>
           </div>
         </div>
 
-        <div className="activate-user-actions">
-          <button
-            type="button"
-            onClick={onClose}
-            className="cancel-button"
-            disabled={isLoading}
-          >
-            {t('activateUser.buttons.cancel')}
-          </button>
-          <button
-            type="button"
-            onClick={handleActivate}
-            className="activate-button"
-            disabled={isLoading}
-          >
-            {isLoading ? t('activateUser.buttons.activating') : t('activateUser.buttons.activateUser')}
-          </button>
-        </div>
-      </div>
-    </div>
+        <ViewValue style={{ marginTop: 'var(--space-lg)' }}>
+          <strong>{t('activateUser.info.title')}</strong>
+          <ul style={{ marginTop: 'var(--space-sm)', paddingLeft: 'var(--space-lg)' }}>
+            <li>{t('activateUser.info.restoreAccess')}</li>
+            <li>{t('activateUser.info.allowLogin')}</li>
+            <li>{t('activateUser.info.enablePermissions')}</li>
+          </ul>
+        </ViewValue>
+      </ViewContent>
+    </Modal>
   );
 };
 

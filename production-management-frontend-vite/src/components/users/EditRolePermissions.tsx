@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { rolePermissionApi } from '../../services/api';
 import type { PermissionInfo } from '../../types';
-import { Shield, Check, X } from 'lucide-react';
-import './EditRolePermissions.css';
+import { Shield, Check} from 'lucide-react';
+import { Modal, Form, FormSection, Loader, ErrorMessage } from '../atoms';
 
 interface EditRolePermissionsProps {
   role: string;
@@ -99,36 +99,28 @@ const EditRolePermissions: React.FC<EditRolePermissionsProps> = ({ role, onClose
     }
   };
 
-  const handleBackdropClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleSubmit = () => {
+    handleSave();
   };
 
   return (
-    <div className="edit-role-permissions-overlay" onClick={handleBackdropClick}>
-      <div className="edit-role-permissions-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="edit-role-permissions-header">
-          <div className="header-content">
-            <Shield size={24} />
-            <h2>{t('editRolePermissions.title', { role })}</h2>
-          </div>
-          <button className="close-button" onClick={onClose}>
-            <X size={24} />
-          </button>
-        </div>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('editRolePermissions.title', { role })}
+      titleIcon={Shield}
+      onSubmit={handleSubmit}
+      submitText={isSaving ? t('editRolePermissions.buttons.saving') : t('editRolePermissions.buttons.saveChanges')}
+      cancelText={t('editRolePermissions.buttons.cancel')}
+      isSubmitting={isSaving || isLoading}
+    >
+      <Form onSubmit={handleSubmit}>
+        {error && <ErrorMessage message={error} />}
 
-        <div className="edit-role-permissions-content">
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-
-          {isLoading ? (
-            <div className="loading-state">
-              <p>{t('editRolePermissions.labels.loadingPermissions')}</p>
-            </div>
-          ) : (
-            <>
+        {isLoading ? (
+          <Loader message={t('editRolePermissions.labels.loadingPermissions')} />
+        ) : (
+            <FormSection title={t('editRolePermissions.labels.managePermissions', { defaultValue: 'Manage Permissions' })}>
               <div className="permissions-summary">
                 <p>
                   {t('editRolePermissions.labels.selected')} <strong>{selectedPermissions.length}</strong> {t('editRolePermissions.labels.of')}{' '}
@@ -176,30 +168,10 @@ const EditRolePermissions: React.FC<EditRolePermissionsProps> = ({ role, onClose
                   </div>
                 ))}
               </div>
-            </>
+            </FormSection>
           )}
-        </div>
-
-        <div className="edit-role-permissions-actions">
-          <button
-            type="button"
-            onClick={onClose}
-            className="cancel-button"
-            disabled={isSaving}
-          >
-            {t('editRolePermissions.buttons.cancel')}
-          </button>
-          <button
-            type="button"
-            onClick={handleSave}
-            className="save-button"
-            disabled={isSaving || isLoading}
-          >
-            {isSaving ? t('editRolePermissions.buttons.saving') : t('editRolePermissions.buttons.savePermissions')}
-          </button>
-        </div>
-      </div>
-    </div>
+      </Form>
+    </Modal>
   );
 };
 

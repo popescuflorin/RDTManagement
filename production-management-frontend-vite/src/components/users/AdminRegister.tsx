@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AdminRegisterRequest, User, RoleDto } from '../../types';
 import { authApi, rolePermissionApi } from '../../services/api';
-import './AdminRegister.css';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Select, Checkbox, ErrorMessage } from '../atoms';
+import { UserPlus } from 'lucide-react';
 
 interface AdminRegisterProps {
   onClose: () => void;
@@ -52,8 +53,7 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
 
@@ -69,24 +69,24 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
   };
 
   return (
-    <div className="admin-register-overlay">
-      <div className="admin-register-modal">
-        <div className="admin-register-header">
-          <h2>{t('adminRegister.title')}</h2>
-          <button className="close-button" onClick={onClose}>×</button>
-        </div>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('adminRegister.title')}
+      titleIcon={UserPlus}
+      onSubmit={handleSubmit}
+      submitText={isLoading ? t('adminRegister.buttons.creating') : isLoadingRoles ? t('adminRegister.buttons.loading') : t('adminRegister.buttons.createUser')}
+      cancelText={t('adminRegister.buttons.cancel')}
+      isSubmitting={isLoading || isLoadingRoles}
+    >
+      <Form onSubmit={handleSubmit}>
+        {error && <ErrorMessage message={error} />}
 
-        <form onSubmit={handleSubmit} className="admin-register-form">
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="firstName">{t('adminRegister.fields.firstName')}</label>
-              <input
+        <FormSection title={t('adminRegister.sections.personalInfo', { defaultValue: 'Personal Information' })}>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="firstName">{t('adminRegister.fields.firstName')}</Label>
+              <Input
                 type="text"
                 id="firstName"
                 name="firstName"
@@ -94,12 +94,13 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
                 onChange={handleChange}
                 required
                 placeholder={t('adminRegister.placeholders.firstName')}
+                disabled={isLoading}
               />
-            </div>
+            </FormGroup>
 
-            <div className="form-group">
-              <label htmlFor="lastName">{t('adminRegister.fields.lastName')}</label>
-              <input
+            <FormGroup>
+              <Label htmlFor="lastName">{t('adminRegister.fields.lastName')}</Label>
+              <Input
                 type="text"
                 id="lastName"
                 name="lastName"
@@ -107,13 +108,16 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
                 onChange={handleChange}
                 required
                 placeholder={t('adminRegister.placeholders.lastName')}
+                disabled={isLoading}
               />
-            </div>
-          </div>
+            </FormGroup>
+          </FormRow>
+        </FormSection>
 
-          <div className="form-group">
-            <label htmlFor="username">{t('adminRegister.fields.username')}</label>
-            <input
+        <FormSection title={t('adminRegister.sections.accountDetails', { defaultValue: 'Account Details' })}>
+          <FormGroup>
+            <Label htmlFor="username">{t('adminRegister.fields.username')}</Label>
+            <Input
               type="text"
               id="username"
               name="username"
@@ -121,12 +125,13 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
               onChange={handleChange}
               required
               placeholder={t('adminRegister.placeholders.username')}
+              disabled={isLoading}
             />
-          </div>
+          </FormGroup>
 
-          <div className="form-group">
-            <label htmlFor="email">{t('adminRegister.fields.email')}</label>
-            <input
+          <FormGroup>
+            <Label htmlFor="email">{t('adminRegister.fields.email')}</Label>
+            <Input
               type="email"
               id="email"
               name="email"
@@ -134,12 +139,13 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
               onChange={handleChange}
               required
               placeholder={t('adminRegister.placeholders.email')}
+              disabled={isLoading}
             />
-          </div>
+          </FormGroup>
 
-          <div className="form-group">
-            <label htmlFor="password">{t('adminRegister.fields.password')}</label>
-            <input
+          <FormGroup>
+            <Label htmlFor="password">{t('adminRegister.fields.password')}</Label>
+            <Input
               type="password"
               id="password"
               name="password"
@@ -148,12 +154,13 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
               required
               placeholder={t('adminRegister.placeholders.password')}
               minLength={6}
+              disabled={isLoading}
             />
-          </div>
+          </FormGroup>
 
-          <div className="form-group">
-            <label htmlFor="role">{t('adminRegister.fields.role')}</label>
-            <select
+          <FormGroup>
+            <Label htmlFor="role">{t('adminRegister.fields.role')}</Label>
+            <Select
               id="role"
               name="role"
               value={formData.role}
@@ -176,46 +183,20 @@ const AdminRegister: React.FC<AdminRegisterProps> = ({ onClose, onUserCreated })
                   ))}
                 </>
               )}
-            </select>
-          </div>
+            </Select>
+          </FormGroup>
 
-          <div className="form-group checkbox-group">
-            <div className="checkbox-wrapper">
-              <input
-                type="checkbox"
-                id="receiveEmails"
-                name="receiveEmails"
-                checked={formData.receiveEmails}
-                onChange={handleChange}
-                disabled={isLoading}
-                className="checkbox-input"
-              />
-              <label htmlFor="receiveEmails" className="checkbox-label-wrapper">
-                <span className="checkbox-main-label">
-                  {t('adminRegister.labels.enableEmailNotifications')}
-                </span>
-                <span className="checkbox-description">
-                  {t('adminRegister.labels.emailNotificationsDescription')}
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <div className="form-actions">
-            <button type="button" className="cancel-button" onClick={onClose} disabled={isLoading}>
-              {t('adminRegister.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isLoading || isLoadingRoles}
-            >
-              {isLoading ? t('adminRegister.buttons.creating') : isLoadingRoles ? t('adminRegister.buttons.loading') : t('adminRegister.buttons.createUser')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          <Checkbox
+            id="receiveEmails"
+            name="receiveEmails"
+            checked={formData.receiveEmails}
+            onChange={handleChange}
+            disabled={isLoading}
+            label={t('adminRegister.labels.enableEmailNotifications')}
+          />
+        </FormSection>
+      </Form>
+    </Modal>
   );
 };
 

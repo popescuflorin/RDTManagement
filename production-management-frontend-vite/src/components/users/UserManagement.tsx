@@ -2,10 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { 
   Users, 
-  UserPlus, 
-  Search, 
-  AlertTriangle, 
-  Loader2,
   RotateCcw,
   UserCheck,
   Shield
@@ -18,10 +14,7 @@ import DeleteConfirmation from './DeleteConfirmation';
 import ActivateUser from './ActivateUser';
 import EditRolePermissions from './EditRolePermissions';
 import CreateRole from './CreateRole';
-import EditButton from '../atoms/EditButton';
-import DeleteButton from '../atoms/DeleteButton';
-import CreateButton from '../atoms/CreateButton';
-import { Table } from '../atoms';
+import { EditButton, DeleteButton, CreateButton, Table, PageContainer, PageHeader, Loader, ErrorMessage, SearchInput, Button } from '../atoms';
 import type { TableColumn } from '../atoms';
 import './UserManagement.css';
 
@@ -192,56 +185,50 @@ const UserManagement: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="user-management-container">
-        <div className="loading-state">
-          <Loader2 size={32} className="animate-spin" />
-          <p>{t('userManagement.loading.loadingUsers')}</p>
-        </div>
-      </div>
+      <PageContainer>
+        <Loader message={t('userManagement.loading.loadingUsers')} />
+      </PageContainer>
     );
   }
 
   if (error) {
     return (
-      <div className="user-management-container">
-        <div className="error-state">
-          <AlertTriangle size={32} className="error-icon" />
-          <p>{error}</p>
-          <button onClick={loadUsers} className="btn btn-primary">
+      <PageContainer>
+        <ErrorMessage message={error} />
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: 'var(--space-lg)' }}>
+          <Button onClick={loadUsers} variant="primary">
             <RotateCcw size={16} />
             {t('userManagement.buttons.tryAgain')}
-          </button>
+          </Button>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="user-management-container">
-      <div className="user-management-header">
-        <div className="header-left">
-          <h1>{t('userManagement.title')}</h1>
-          <p>{t('userManagement.subtitle')}</p>
-        </div>
-        <div className="header-right">
-          {activeTab === 'users' && (
-            <CreateButton
-              onClick={() => setShowAddModal(true)}
-              variant="primary"
-            >
-              {t('userManagement.buttons.addNewUser')}
-            </CreateButton>
-          )}
-          {activeTab === 'roles' && (
-            <CreateButton
-              onClick={handleCreateRole}
-              variant="success"
-            >
-              {t('userManagement.buttons.createNewRole')}
-            </CreateButton>
-          )}
-        </div>
-      </div>
+    <PageContainer>
+      <PageHeader 
+        title={t('userManagement.title')}
+        subtitle={t('userManagement.subtitle')}
+        icon={Users}
+        actions={
+        activeTab === 'users' ? (
+          <CreateButton
+            onClick={() => setShowAddModal(true)}
+            variant="primary"
+          >
+            {t('userManagement.buttons.addNewUser')}
+          </CreateButton>
+        ) : (
+          <CreateButton
+            onClick={handleCreateRole}
+            variant="success"
+          >
+            {t('userManagement.buttons.createNewRole')}
+          </CreateButton>
+        )}
+        >
+      </PageHeader>
 
       {/* Tab Navigation */}
       <div className="tab-navigation">
@@ -264,16 +251,11 @@ const UserManagement: React.FC = () => {
       {activeTab === 'users' && (
         <>
           <div className="user-management-controls">
-        <div className="search-container">
-          <Search size={16} className="search-icon" />
-          <input
-            type="text"
-            placeholder={t('userManagement.search.placeholder')}
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="search-input"
-          />
-        </div>
+        <SearchInput
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          placeholder={t('userManagement.search.placeholder')}
+        />
         <div className="users-count">
           <span className="count-badge">{filteredUsers.length}</span>
           {filteredUsers.length == 1 ? t('userManagement.search.usersFound', { count: filteredUsers.length }) : t('userManagement.search.usersFound_plural', { count: filteredUsers.length })}
@@ -394,13 +376,14 @@ const UserManagement: React.FC = () => {
                         onClick={() => handleDeleteUser(user)}
                       />
                     ) : (
-                      <button 
-                        className="btn btn-sm btn-success" 
+                      <Button 
+                        variant="success"
+                        size="sm"
                         title={t('userManagement.tooltips.activateUser')}
                         onClick={() => handleActivateUser(user)}
                       >
                         <UserCheck size={16} />
-                      </button>
+                      </Button>
                     )}
                   </div>
                 ),
@@ -425,10 +408,7 @@ const UserManagement: React.FC = () => {
       {activeTab === 'roles' && (
         <div className="roles-container">
           {isLoadingRoles ? (
-            <div className="loading-state">
-              <Loader2 size={32} className="animate-spin" />
-              <p>{t('userManagement.loading.loadingRoles')}</p>
-            </div>
+            <Loader message={t('userManagement.loading.loadingRoles')} />
           ) : (
             <div className="roles-table-container">
               {roles.length === 0 && !isLoadingRoles ? (
@@ -552,7 +532,7 @@ const UserManagement: React.FC = () => {
           onRoleCreated={handleRoleCreated}
         />
       )}
-    </div>
+    </PageContainer>
   );
 };
 

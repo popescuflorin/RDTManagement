@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next';
 import { orderApi, inventoryApi, transportApi, clientApi, userApi } from '../../services/api';
 import type { RawMaterial, UpdateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest, Order, User } from '../../types';
 import { MaterialType } from '../../types';
-import { Plus, UserCircle, Truck, Package, FileText } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, DeleteButton, DropdownMenu } from '../atoms';
-import type { DropdownMenuItem } from '../atoms';
+import { Trash2, UserCircle, Truck, Package, FileText } from 'lucide-react';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, DropdownMenu, Button, ErrorMessage, Table, ViewValue } from '../atoms';
+import type { TableColumn } from '../atoms';
 
 interface EditOrderProps {
   isOpen: boolean;
@@ -232,6 +232,10 @@ const EditOrder: React.FC<EditOrderProps> = ({
     setItems(items.map((item, i) => 
       i === index ? updatedItem : item
     ));
+  };
+
+  const handleUpdateItemQuantity = (index: number, quantity: number) => {
+    handleUpdateItem(index, { quantity });
   };
 
   const handleRemoveItem = (index: number) => {
@@ -468,10 +472,10 @@ const EditOrder: React.FC<EditOrderProps> = ({
     >
       <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
         {error && (
-          <div className="error-message">
-            {error}
-            <button type="button" onClick={() => setError(null)}>×</button>
-          </div>
+          <ErrorMessage
+            message={error}
+            onDismiss={() => setError(null)}
+          />
         )}
 
         <FormSection title={t('common:labels.information', { defaultValue: 'Information' })} titleIcon={FileText}>
@@ -695,23 +699,22 @@ const EditOrder: React.FC<EditOrderProps> = ({
                 />
               </FormGroup>
 
-              <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)' }}>
-                <button
+              <FormRow>
+                <Button
                   type="button"
-                  className="btn btn-primary"
+                  variant="primary"
                   onClick={handleCreateClient}
                 >
-                  <UserCircle size={16} style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'middle' }} />
                   {t('form.createClient', { defaultValue: 'Create Client' })}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className="btn btn-secondary"
+                  variant="secondary"
                   onClick={() => setShowCreateClient(false)}
                 >
                   {t('common:buttons.cancel', { defaultValue: 'Cancel' })}
-                </button>
-              </div>
+                </Button>
+              </FormRow>
             </div>
           )}
         </FormSection>
@@ -743,7 +746,6 @@ const EditOrder: React.FC<EditOrderProps> = ({
                   createNewMessage={`${t('transport.createNew', { defaultValue: 'Create New' })}: {searchTerm}`}
                   createNewDetail={t('transport.enterPhoneNumber', { defaultValue: 'Enter phone number' })}
                   onCreateNew={() => {
-                    setShowNewTransportForm(true);
                     setShowTransportDropdown(false);
                   }}
                 />
@@ -771,14 +773,14 @@ const EditOrder: React.FC<EditOrderProps> = ({
                 placeholder={t('transport.phoneNumberPlaceholder', { defaultValue: 'Phone number' })}
               />
               {transportSearchTerm.trim() && !selectedTransportId && transportPhoneNumber.trim() && (
-                <button
+                <Button
                   type="button"
-                  className="btn btn-primary"
+                  variant="primary"
                   onClick={handleCreateNewTransport}
                   style={{ marginTop: 'var(--space-sm)' }}
                 >
                   {t('form.createNewTransport', { defaultValue: 'Create New Transport' })}
-                </button>
+                </Button>
               )}
             </FormGroup>
           </FormRow>
@@ -807,15 +809,14 @@ const EditOrder: React.FC<EditOrderProps> = ({
 
         <FormSection title={t('form.products', { defaultValue: 'Products' })} titleIcon={Package}>
           {!showAddItemForm ? (
-            <button
+            <Button
               type="button"
-              className="btn btn-secondary"
+              variant="secondary"
               onClick={() => setShowAddItemForm(true)}
               disabled={isLoading}
             >
-              <Plus size={16} style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'middle' }} />
               {t('form.addProduct', { defaultValue: 'Add Product' })}
-            </button>
+            </Button>
           ) : (
             <div className="add-item-form" style={{ 
               padding: 'var(--space-lg)', 
@@ -862,86 +863,129 @@ const EditOrder: React.FC<EditOrderProps> = ({
                     placeholder="0"
                   />
                 </FormGroup>
-                <div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--space-sm)' }}>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={handleAddItem}
-                  >
-                    {t('form.addProduct', { defaultValue: 'Add Product' })}
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => {
-                      setShowAddItemForm(false);
-                      setMaterialSearchTerm('');
-                      setNewItem({ rawMaterialId: 0, quantity: 1 });
-                    }}
-                  >
-                    {t('common:buttons.cancel', { defaultValue: 'Cancel' })}
-                  </button>
-                </div>
+              </FormRow>
+              <FormRow>
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={handleAddItem}
+                >
+                  {t('form.addProduct', { defaultValue: 'Add Product' })}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setShowAddItemForm(false);
+                    setMaterialSearchTerm('');
+                    setNewItem({ rawMaterialId: 0, quantity: 1 });
+                  }}
+                >
+                  {t('common:buttons.cancel', { defaultValue: 'Cancel' })}
+                </Button>
               </FormRow>
             </div>
           )}
 
-            {/* Selected Items */}
             {items.length > 0 && (
-              <div className="selected-items">
-                <h4>{t('form.selectedProducts')} ({items.length})</h4>
-                <div className="items-list">
-                  {items.map((item, index) => (
-                    <div key={index} className="item-card">
-                      <div className="item-info">
-                        <div className="item-name">{item.materialName}</div>
-                        <div className="item-color">{t('form.color')}: {item.materialColor}</div>
-                      </div>
-                      <div className="item-details">
-                        <FormRow>
-                          <FormGroup>
-                            <Label htmlFor={`item-quantity-${index}`}>{t('form.itemQuantity')}</Label>
-                            <Input
-                              type="number"
-                              id={`item-quantity-${index}`}
-                              value={item.quantity}
-                              onChange={(e) => handleUpdateItem(index, { quantity: parseFloat(e.target.value) || 0 })}
-                              onWheel={handleWheel}
-                              min="0"
-                              step="0.01"
-                            />
-                          </FormGroup>
-                          <FormGroup>
-                            <Label htmlFor={`item-unit-${index}`}>{t('form.unit', { defaultValue: 'Unit' })}</Label>
-                            <Input
-                              type="text"
-                              id={`item-unit-${index}`}
-                              value={item.quantityType}
-                              disabled
-                            />
-                          </FormGroup>
-                        </FormRow>
-                        <div className="item-total">
-                          {t('form.unitPrice')}: ${item.unitPrice.toFixed(2)} | {t('form.totalPrice')}: ${item.totalPrice.toFixed(2)}
+              <>
+                <Table
+                  columns={[
+                    {
+                      key: 'materialName',
+                      label: t('form.product'),
+                      cellClassName: 'order-item-name'
+                    },
+                    {
+                      key: 'materialColor',
+                      label: t('form.color'),
+                      cellClassName: 'order-item-color'
+                    },
+                    {
+                      key: 'quantity',
+                      label: t('form.itemQuantity'),
+                      render: (_, item, index) => (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <Input
+                            type="number"
+                            value={item.quantity}
+                            onChange={(e) => handleUpdateItemQuantity(index, parseFloat(e.target.value) || 0)}
+                            onWheel={handleWheel}
+                            min="0.01"
+                            step="0.01"
+                            disabled={isLoading}
+                            style={{ width: '100px' }}
+                          />
+                          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+                            {item.quantityType}
+                          </span>
                         </div>
-                      </div>
-                      <DeleteButton
-                        title={t('form.removeItem', { defaultValue: 'Remove Item' })}
-                        onClick={() => handleRemoveItem(index)}
-                      />
-                    </div>
-                  ))}
+                      ),
+                      cellClassName: 'order-item-quantity'
+                    },
+                    {
+                      key: 'unitPrice',
+                      label: t('form.unitPrice'),
+                      align: 'right',
+                      render: (_, item) => `$${item.unitPrice.toFixed(2)}`,
+                      cellClassName: 'order-item-unit-price'
+                    },
+                    {
+                      key: 'totalPrice',
+                      label: t('form.totalPrice'),
+                      align: 'right',
+                      render: (_, item) => (
+                        <span style={{ fontWeight: 600, color: 'var(--primary-600)' }}>
+                          ${item.totalPrice.toFixed(2)}
+                        </span>
+                      ),
+                      cellClassName: 'order-item-total-price'
+                    },
+                    {
+                      key: 'actions',
+                      label: t('common:labels.actions'),
+                      align: 'center',
+                      render: (_, _item, index) => (
+                        <Button
+                          type="button"
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleRemoveItem(index)}
+                          disabled={isLoading}
+                        >
+                          <Trash2 size={14} />
+                        </Button>
+                      ),
+                      cellClassName: 'order-item-actions'
+                    }
+                  ] as TableColumn<OrderItem>[]}
+                  data={items}
+                  getRowKey={(_, index) => index.toString()}
+                  showContainer={false}
+                  tableClassName="order-items-table"
+                />
+                <div style={{ 
+                  marginTop: 'var(--space-lg)', 
+                  padding: 'var(--space-md)', 
+                  display: 'flex', 
+                  justifyContent: 'flex-end',
+                  alignItems: 'center',
+                  gap: 'var(--space-md)',
+                  borderTop: '1px solid var(--border)',
+                  backgroundColor: 'var(--background-secondary)'
+                }}>
+                  <ViewValue style={{ fontWeight: 600, fontSize: 'var(--text-base)' }}>
+                    {t('form.totalValue')}:
+                  </ViewValue>
+                  <ViewValue style={{ 
+                    fontWeight: 700, 
+                    fontSize: 'var(--text-lg)',
+                    color: 'var(--primary-600)' 
+                  }}>
+                    ${totalValue.toFixed(2)}
+                  </ViewValue>
                 </div>
-              </div>
-            )}
-
-            {/* Items Summary */}
-            {items.length > 0 && (
-              <div className="total-cost">
-                <strong>
-                  {t('form.totalItems')}: {items.length} | {t('form.totalValue')}: ${totalValue.toFixed(2)}
-                </strong>
-              </div>
+              </>
             )}
         </FormSection>
 

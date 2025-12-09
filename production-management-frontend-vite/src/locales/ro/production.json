@@ -226,7 +226,7 @@
       "insufficient": "⚠ Insuficient"
     },
     "buttons": {
-      "add": "+ Adaugă",
+      "add": "Adaugă",
       "remove": "Elimină",
       "cancel": "Anulează",
       "createProductionPlan": "Creează Plan de Producție",
@@ -290,7 +290,7 @@
       "selectedRecyclables": "Reciclabile Selectate:"
     },
     "buttons": {
-      "add": "+ Adaugă",
+      "add": "Adaugă",
       "remove": "Elimină",
       "cancel": "Anulează",
       "createRecyclablesPlan": "Creează Plan Reciclabile",

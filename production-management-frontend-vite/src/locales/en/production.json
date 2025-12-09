@@ -226,7 +226,7 @@
       "insufficient": "⚠ Insufficient"
     },
     "buttons": {
-      "add": "+ Add",
+      "add": "Add",
       "remove": "Remove",
       "cancel": "Cancel",
       "createProductionPlan": "Create Production Plan",
@@ -290,7 +290,7 @@
       "selectedRecyclables": "Selected Recyclables:"
     },
     "buttons": {
-      "add": "+ Add",
+      "add": "Add",
       "remove": "Remove",
       "cancel": "Cancel",
       "createRecyclablesPlan": "Create Recyclables Plan",

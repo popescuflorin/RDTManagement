@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { userApi } from '../../services/api';
 import type { User, AdminUpdateUserRequest } from '../../types';
-import './EditUser.css';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Select, Checkbox, ErrorMessage } from '../atoms';
+import { Edit } from 'lucide-react';
 
 interface EditUserProps {
   user: User;
@@ -32,8 +33,7 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsLoading(true);
     setError(null);
 
@@ -51,24 +51,24 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
   };
 
   return (
-    <div className="edit-user-overlay">
-      <div className="edit-user-modal">
-        <div className="edit-user-header">
-          <h2>{t('editUser.title')}</h2>
-          <button className="close-button" onClick={onClose}>×</button>
-        </div>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('editUser.title')}
+      titleIcon={Edit}
+      onSubmit={handleSubmit}
+      submitText={isLoading ? t('editUser.buttons.updating') : t('editUser.buttons.updateUser')}
+      cancelText={t('editUser.buttons.cancel')}
+      isSubmitting={isLoading}
+    >
+      <Form onSubmit={handleSubmit}>
+        {error && <ErrorMessage message={error} />}
 
-        <form onSubmit={handleSubmit} className="edit-user-form">
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="firstName">{t('editUser.fields.firstName')}</label>
-              <input
+        <FormSection title={t('editUser.sections.personalInfo', { defaultValue: 'Personal Information' })}>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="firstName">{t('editUser.fields.firstName')}</Label>
+              <Input
                 type="text"
                 id="firstName"
                 name="firstName"
@@ -77,10 +77,10 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
                 required
                 disabled={isLoading}
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="lastName">{t('editUser.fields.lastName')}</label>
-              <input
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="lastName">{t('editUser.fields.lastName')}</Label>
+              <Input
                 type="text"
                 id="lastName"
                 name="lastName"
@@ -89,13 +89,15 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
                 required
                 disabled={isLoading}
               />
-            </div>
-          </div>
+            </FormGroup>
+          </FormRow>
+        </FormSection>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="username">{t('editUser.fields.username')}</label>
-              <input
+        <FormSection title={t('editUser.sections.accountDetails', { defaultValue: 'Account Details' })}>
+          <FormRow>
+            <FormGroup>
+              <Label htmlFor="username">{t('editUser.fields.username')}</Label>
+              <Input
                 type="text"
                 id="username"
                 name="username"
@@ -104,10 +106,10 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
                 required
                 disabled={isLoading}
               />
-            </div>
-            <div className="form-group">
-              <label htmlFor="email">{t('editUser.fields.email')}</label>
-              <input
+            </FormGroup>
+            <FormGroup>
+              <Label htmlFor="email">{t('editUser.fields.email')}</Label>
+              <Input
                 type="email"
                 id="email"
                 name="email"
@@ -116,70 +118,37 @@ const EditUser: React.FC<EditUserProps> = ({ user, onClose, onUserUpdated }) => 
                 required
                 disabled={isLoading}
               />
-            </div>
-          </div>
+            </FormGroup>
+          </FormRow>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="role">{t('editUser.fields.role')}</label>
-              <select
-                id="role"
-                name="role"
-                value={formData.role}
-                onChange={handleInputChange}
-                required
-                disabled={isLoading}
-              >
-                <option value="">{t('editUser.labels.selectRole')}</option>
-                <option value="Admin">{t('editUser.roleOptions.admin')}</option>
-                <option value="Manager">{t('editUser.roleOptions.manager')}</option>
-                <option value="User">{t('editUser.roleOptions.user')}</option>
-              </select>
-            </div>
-          </div>
-
-          <div className="form-group checkbox-group">
-            <div className="checkbox-wrapper">
-              <input
-                type="checkbox"
-                id="receiveEmails"
-                name="receiveEmails"
-                checked={formData.receiveEmails}
-                onChange={handleInputChange}
-                disabled={isLoading}
-                className="checkbox-input"
-              />
-              <label htmlFor="receiveEmails" className="checkbox-label-wrapper">
-                <span className="checkbox-main-label">
-                  {t('editUser.labels.enableEmailNotifications')}
-                </span>
-                <span className="checkbox-description">
-                  {t('editUser.labels.emailNotificationsDescription')}
-                </span>
-              </label>
-            </div>
-          </div>
-
-          <div className="form-actions">
-            <button
-              type="button"
-              onClick={onClose}
-              className="cancel-button"
+          <FormGroup>
+            <Label htmlFor="role">{t('editUser.fields.role')}</Label>
+            <Select
+              id="role"
+              name="role"
+              value={formData.role}
+              onChange={handleInputChange}
+              required
               disabled={isLoading}
             >
-              {t('editUser.buttons.cancel')}
-            </button>
-            <button
-              type="submit"
-              className="submit-button"
-              disabled={isLoading}
-            >
-              {isLoading ? t('editUser.buttons.updating') : t('editUser.buttons.updateUser')}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+              <option value="">{t('editUser.labels.selectRole')}</option>
+              <option value="Admin">{t('editUser.roleOptions.admin')}</option>
+              <option value="Manager">{t('editUser.roleOptions.manager')}</option>
+              <option value="User">{t('editUser.roleOptions.user')}</option>
+            </Select>
+          </FormGroup>
+
+          <Checkbox
+            id="receiveEmails"
+            name="receiveEmails"
+            checked={formData.receiveEmails}
+            onChange={handleInputChange}
+            disabled={isLoading}
+            label={t('editUser.labels.enableEmailNotifications')}
+          />
+        </FormSection>
+      </Form>
+    </Modal>
   );
 };
 

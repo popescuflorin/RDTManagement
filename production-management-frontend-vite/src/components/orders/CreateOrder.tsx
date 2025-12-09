@@ -4,8 +4,8 @@ import { orderApi, inventoryApi, transportApi, clientApi, userApi } from '../../
 import type { RawMaterial, CreateOrderRequest, Transport, CreateTransportRequest, Client, CreateClientRequest, User } from '../../types';
 import { MaterialType } from '../../types';
 import { Plus, Trash2, UserCircle, Truck, Package } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, Table, ErrorMessage, DropdownMenu } from '../atoms';
-import type { TableColumn, DropdownMenuItem } from '../atoms';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, Table, ErrorMessage, DropdownMenu, Button, ViewValue } from '../atoms';
+import type { TableColumn } from '../atoms';
 
 interface CreateOrderProps {
   isOpen: boolean;
@@ -433,10 +433,10 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
     >
       <Form onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
         {error && (
-          <div className="error-message">
-            {error}
-            <button type="button" onClick={() => setError(null)}>×</button>
-          </div>
+          <ErrorMessage
+          message={error}
+          onDismiss={() => setError(null)}
+        />
         )}
 
         <FormSection title={t('client', { defaultValue: 'Client' })} titleIcon={UserCircle}>
@@ -603,23 +603,22 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                 />
               </FormGroup>
 
-              <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)' }}>
-                <button
+              <FormRow>
+                <Button
                   type="button"
-                  className="btn btn-primary"
+                  variant="primary"
                   onClick={handleCreateClient}
                 >
-                  <UserCircle size={16} style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'middle' }} />
                   {t('form.createClient', { defaultValue: 'Create Client' })}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className="btn btn-secondary"
+                  variant="secondary"
                   onClick={() => setShowCreateClient(false)}
                 >
                   {t('common:buttons.cancel', { defaultValue: 'Cancel' })}
-                </button>
-              </div>
+                </Button>
+              </FormRow>
             </div>
           )}
         </FormSection>
@@ -774,19 +773,18 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                 </FormGroup>
               </FormRow>
 
-              <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)' }}>
-                <button
+              <FormRow>
+                <Button
                   type="button"
-                  className="btn btn-primary"
+                  variant="primary"
                   onClick={handleCreateNewTransport}
                   disabled={isLoading || !newTransportData.carName.trim() || !newTransportData.phoneNumber.trim()}
                 >
-                  <Plus size={16} style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'middle' }} />
                   {t('form.createNewTransport', { defaultValue: 'Create New Transport' })}
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
-                  className="btn btn-secondary"
+                  variant="secondary"
                   onClick={() => {
                     setShowNewTransportForm(false);
                     setNewTransportData({
@@ -797,8 +795,8 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                   disabled={isLoading}
                 >
                   {t('common:buttons.cancel', { defaultValue: 'Cancel' })}
-                </button>
-              </div>
+                </Button>
+              </FormRow>
             </div>
           )}
         </FormSection>
@@ -861,15 +859,14 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
             />
           )}
           {!showAddItemForm ? (
-            <button
+            <Button
               type="button"
-              className="btn btn-secondary"
+              variant="secondary"
               onClick={() => setShowAddItemForm(true)}
               disabled={isLoading}
             >
-              <Plus size={16} style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'middle' }} />
               {t('form.addProduct', { defaultValue: 'Add Product' })}
-            </button>
+            </Button>
           ) : (
             <div className="add-item-form" style={{ 
               padding: 'var(--space-lg)', 
@@ -917,30 +914,29 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                     disabled={isLoading}
                   />
                 </FormGroup>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', justifyContent: 'center' }}>
-                  <button
-                    type="button"
-                    className="btn btn-primary"
-                    onClick={handleAddItem}
-                    disabled={isLoading}
-                  >
-                    <Plus size={16} style={{ display: 'inline-block', marginRight: '8px', verticalAlign: 'middle' }} />
-                    {t('common:buttons.add', { defaultValue: 'Add' })}
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => {
-                      setShowAddItemForm(false);
-                      setMaterialSearchTerm('');
-                      setNewItem({ rawMaterialId: 0, quantity: 1 });
-                      setItemError(null);
-                    }}
-                    disabled={isLoading}
-                  >
-                    {t('common:buttons.cancel', { defaultValue: 'Cancel' })}
-                  </button>
-                </div>
+              </FormRow>
+              <FormRow>
+                <Button
+                  type="button"
+                  variant="primary"
+                  onClick={handleAddItem}
+                  disabled={isLoading}
+                >
+                  {t('common:buttons.add', { defaultValue: 'Add' })}
+                </Button>
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => {
+                    setShowAddItemForm(false);
+                    setMaterialSearchTerm('');
+                    setNewItem({ rawMaterialId: 0, quantity: 1 });
+                    setItemError(null);
+                  }}
+                  disabled={isLoading}
+                >
+                  {t('common:buttons.cancel', { defaultValue: 'Cancel' })}
+                </Button>
               </FormRow>
             </div>
           )}
@@ -1004,15 +1000,15 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                       label: t('common:labels.actions'),
                       align: 'center',
                       render: (_, item) => (
-                        <button
+                        <Button
                           type="button"
-                          className="btn btn-sm btn-danger"
+                          variant="danger"
+                          size="sm"
                           onClick={() => handleRemoveItem(item.id)}
                           disabled={isLoading}
-                          style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                         >
                           <Trash2 size={14} />
-                        </button>
+                        </Button>
                       ),
                       cellClassName: 'order-item-actions'
                     }
@@ -1032,16 +1028,16 @@ const CreateOrder: React.FC<CreateOrderProps> = ({
                   borderTop: '1px solid var(--border)',
                   backgroundColor: 'var(--background-secondary)'
                 }}>
-                  <span style={{ fontWeight: 600, fontSize: 'var(--text-base)' }}>
+                  <ViewValue style={{ fontWeight: 600, fontSize: 'var(--text-base)' }}>
                     {t('form.totalValue')}:
-                  </span>
-                  <span style={{ 
+                  </ViewValue>
+                  <ViewValue style={{ 
                     fontWeight: 700, 
                     fontSize: 'var(--text-lg)',
                     color: 'var(--primary-600)' 
                   }}>
                     ${totalValue.toFixed(2)}
-                  </span>
+                  </ViewValue>
                 </div>
               </>
             )}

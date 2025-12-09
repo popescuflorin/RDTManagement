@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { AlertTriangle } from 'lucide-react';
-import { Modal } from '../atoms';
+import { Modal, ViewContent, ViewValue } from '../atoms';
 import type { Order } from '../../types';
 
 interface CancelOrderModalProps {
@@ -38,30 +38,20 @@ const CancelOrderModal: React.FC<CancelOrderModalProps> = ({
       isSubmitting={isLoading}
       showCancel={true}
     >
-      <div style={{ padding: 'var(--space-md) 0' }}>
-        <p style={{ 
-          marginBottom: 'var(--space-lg)', 
-          fontSize: 'var(--text-base)',
-          color: 'var(--text-primary)',
-          lineHeight: 'var(--line-height-relaxed)'
-        }}>
+      <ViewContent>
+        <ViewValue style={{ marginBottom: 'var(--space-lg)', fontSize: 'var(--text-base)' }}>
           {t('view.cancelOrderConfirmation', { 
             defaultValue: 'Are you sure you want to cancel order #{{orderId}} for {{clientName}}?',
             orderId: order.id,
             clientName: order.clientName
           })}
-        </p>
-        <p style={{ 
-          margin: 0,
-          fontSize: 'var(--text-sm)',
-          color: 'var(--text-secondary)',
-          lineHeight: 'var(--line-height-relaxed)'
-        }}>
+        </ViewValue>
+        <ViewValue style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
           {t('view.cancelOrderWarning', { 
             defaultValue: 'This will mark the order as cancelled and it cannot be modified.'
           })}
-        </p>
-      </div>
+        </ViewValue>
+      </ViewContent>
     </Modal>
   );
 };

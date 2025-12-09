@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { userApi } from '../../services/api';
 import type { User } from '../../types';
-import './DeleteConfirmation.css';
+import { Modal, ViewContent, ViewValue, ErrorMessage } from '../atoms';
+import { AlertTriangle } from 'lucide-react';
 
 interface DeleteConfirmationProps {
   user: User;
@@ -33,66 +34,51 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({ user, onClose, 
   };
 
   return (
-    <div className="delete-confirmation-overlay">
-      <div className="delete-confirmation-modal">
-        <div className="delete-confirmation-header">
-          <div className="warning-icon">⚠️</div>
-          <h2>{t('deleteConfirmation.title')}</h2>
-        </div>
+    <Modal
+      isOpen={true}
+      onClose={onClose}
+      title={t('deleteConfirmation.title')}
+      titleIcon={AlertTriangle}
+      onSubmit={handleDelete}
+      submitText={isLoading ? t('deleteConfirmation.buttons.deactivating') : t('deleteConfirmation.buttons.deactivateUser')}
+      cancelText={t('deleteConfirmation.buttons.cancel')}
+      isSubmitting={isLoading}
+    >
+      <ViewContent>
+        {error && <ErrorMessage message={error} />}
 
-        <div className="delete-confirmation-content">
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
+        <ViewValue style={{ marginBottom: 'var(--space-lg)', fontSize: 'var(--text-base)' }}>
+          {t('deleteConfirmation.confirmation')}
+        </ViewValue>
 
-          <p className="confirmation-text">
-            {t('deleteConfirmation.confirmation')}
-          </p>
-
-          <div className="user-details">
-            <div className="user-avatar">
-              {user.firstName.charAt(0)}{user.lastName.charAt(0)}
-            </div>
-            <div className="user-info">
-              <div className="user-name">{user.firstName} {user.lastName}</div>
-              <div className="user-email">{user.email}</div>
-              <div className="user-role">{t('deleteConfirmation.labels.role')} {user.role}</div>
-            </div>
+        <div className="user-details">
+          <div className="user-avatar">
+            {user.firstName.charAt(0)}{user.lastName.charAt(0)}
           </div>
-
-          <div className="warning-text">
-            <strong>{t('deleteConfirmation.warning.title')}</strong> {t('deleteConfirmation.warning.deactivatingWill')}
-            <ul>
-              <li>{t('deleteConfirmation.warning.blockAccess')}</li>
-              <li>{t('deleteConfirmation.warning.preventLogin')}</li>
-              <li>{t('deleteConfirmation.warning.keepData')}</li>
-              <li>{t('deleteConfirmation.warning.canReactivate')}</li>
-            </ul>
+          <div className="user-info">
+            <ViewValue style={{ fontWeight: 600, marginBottom: 'var(--space-xs)' }}>
+              {user.firstName} {user.lastName}
+            </ViewValue>
+            <ViewValue style={{ color: 'var(--text-secondary)', marginBottom: 'var(--space-xs)' }}>
+              {user.email}
+            </ViewValue>
+            <ViewValue style={{ fontSize: 'var(--text-sm)', color: 'var(--text-secondary)' }}>
+              {t('deleteConfirmation.labels.role')} {user.role}
+            </ViewValue>
           </div>
         </div>
 
-        <div className="delete-confirmation-actions">
-          <button
-            type="button"
-            onClick={onClose}
-            className="cancel-button"
-            disabled={isLoading}
-          >
-            {t('deleteConfirmation.buttons.cancel')}
-          </button>
-          <button
-            type="button"
-            onClick={handleDelete}
-            className="delete-button"
-            disabled={isLoading}
-          >
-            {isLoading ? t('deleteConfirmation.buttons.deactivating') : t('deleteConfirmation.buttons.deactivateUser')}
-          </button>
-        </div>
-      </div>
-    </div>
+        <ViewValue style={{ marginTop: 'var(--space-lg)' }}>
+          <strong>{t('deleteConfirmation.warning.title')}</strong> {t('deleteConfirmation.warning.deactivatingWill')}
+          <ul style={{ marginTop: 'var(--space-sm)', paddingLeft: 'var(--space-lg)' }}>
+            <li>{t('deleteConfirmation.warning.blockAccess')}</li>
+            <li>{t('deleteConfirmation.warning.preventLogin')}</li>
+            <li>{t('deleteConfirmation.warning.keepData')}</li>
+            <li>{t('deleteConfirmation.warning.canReactivate')}</li>
+          </ul>
+        </ViewValue>
+      </ViewContent>
+    </Modal>
   );
 };
 
