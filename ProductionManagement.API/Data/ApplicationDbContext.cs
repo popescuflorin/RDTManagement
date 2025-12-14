@@ -137,7 +137,7 @@ namespace ProductionManagement.API.Data
                     .OnDelete(DeleteBehavior.Restrict);
 
                 entity.HasOne(e => e.Supplier)
-                    .WithMany()
+                    .WithMany(s => s.Acquisitions)
                     .HasForeignKey(e => e.SupplierId)
                     .OnDelete(DeleteBehavior.Restrict);
 

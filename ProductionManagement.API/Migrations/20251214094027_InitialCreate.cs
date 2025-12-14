@@ -150,6 +150,7 @@ namespace ProductionManagement.API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     CarName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    NumberPlate = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -235,43 +236,6 @@ namespace ProductionManagement.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Orders",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    Notes = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
-                    Status = table.Column<int>(type: "int", nullable: false),
-                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    ExpectedDeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    DeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TransportId = table.Column<int>(type: "int", nullable: true),
-                    TransportDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    TransportNotes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
-                    CreatedByUserName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Orders", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Orders_Clients_ClientId",
-                        column: x => x.ClientId,
-                        principalTable: "Clients",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Orders_Transports_TransportId",
-                        column: x => x.TransportId,
-                        principalTable: "Transports",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Acquisitions",
                 columns: table => new
                 {
@@ -297,8 +261,7 @@ namespace ProductionManagement.API.Migrations
                     TransportNotes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
                     TotalEstimatedCost = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     TotalActualCost = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false),
-                    SupplierId1 = table.Column<int>(type: "int", nullable: true)
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -309,11 +272,6 @@ namespace ProductionManagement.API.Migrations
                         principalTable: "Suppliers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Acquisitions_Suppliers_SupplierId1",
-                        column: x => x.SupplierId1,
-                        principalTable: "Suppliers",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Acquisitions_Transports_TransportId",
                         column: x => x.TransportId,
@@ -338,6 +296,50 @@ namespace ProductionManagement.API.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Orders",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: true),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ExpectedDeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeliveryDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TransportId = table.Column<int>(type: "int", nullable: true),
+                    TransportDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    TransportNotes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
+                    AssignedToUserId = table.Column<int>(type: "int", nullable: true),
+                    CreatedByUserName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Orders", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Orders_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Orders_Transports_TransportId",
+                        column: x => x.TransportId,
+                        principalTable: "Transports",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_Orders_Users_AssignedToUserId",
+                        column: x => x.AssignedToUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -394,6 +396,59 @@ namespace ProductionManagement.API.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "RecyclableProductionPlans",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TargetRawMaterialId = table.Column<int>(type: "int", nullable: false),
+                    QuantityToProduce = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    Status = table.Column<int>(type: "int", nullable: false),
+                    CreatedByUserId = table.Column<int>(type: "int", nullable: false),
+                    StartedByUserId = table.Column<int>(type: "int", nullable: true),
+                    CompletedByUserId = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    PlannedStartDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    StartedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CompletedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    EstimatedCost = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ActualCost = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
+                    EstimatedProductionTimeMinutes = table.Column<int>(type: "int", nullable: false),
+                    ActualProductionTimeMinutes = table.Column<int>(type: "int", nullable: true),
+                    Notes = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RecyclableProductionPlans", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RecyclableProductionPlans_RawMaterials_TargetRawMaterialId",
+                        column: x => x.TargetRawMaterialId,
+                        principalTable: "RawMaterials",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RecyclableProductionPlans_Users_CompletedByUserId",
+                        column: x => x.CompletedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RecyclableProductionPlans_Users_CreatedByUserId",
+                        column: x => x.CreatedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RecyclableProductionPlans_Users_StartedByUserId",
+                        column: x => x.StartedByUserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductTemplateMaterials",
                 columns: table => new
                 {
@@ -414,38 +469,6 @@ namespace ProductionManagement.API.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ProductTemplateMaterials_RawMaterials_RawMaterialId",
-                        column: x => x.RawMaterialId,
-                        principalTable: "RawMaterials",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "OrderMaterials",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    OrderId = table.Column<int>(type: "int", nullable: false),
-                    RawMaterialId = table.Column<int>(type: "int", nullable: false),
-                    Quantity = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    MaterialName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
-                    MaterialColor = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    QuantityType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderMaterials", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_OrderMaterials_Orders_OrderId",
-                        column: x => x.OrderId,
-                        principalTable: "Orders",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_OrderMaterials_RawMaterials_RawMaterialId",
                         column: x => x.RawMaterialId,
                         principalTable: "RawMaterials",
                         principalColumn: "Id",
@@ -493,7 +516,8 @@ namespace ProductionManagement.API.Migrations
                     RawMaterialId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
                     Color = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Quantity = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    OrderedQuantity = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ReceivedQuantity = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     QuantityType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     ActualUnitCost = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true),
                     Notes = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: true),
@@ -512,6 +536,38 @@ namespace ProductionManagement.API.Migrations
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_AcquisitionItems_RawMaterials_RawMaterialId",
+                        column: x => x.RawMaterialId,
+                        principalTable: "RawMaterials",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "OrderMaterials",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    RawMaterialId = table.Column<int>(type: "int", nullable: false),
+                    Quantity = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    MaterialName = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
+                    MaterialColor = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    QuantityType = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    UnitPrice = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderMaterials", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_OrderMaterials_Orders_OrderId",
+                        column: x => x.OrderId,
+                        principalTable: "Orders",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_OrderMaterials_RawMaterials_RawMaterialId",
                         column: x => x.RawMaterialId,
                         principalTable: "RawMaterials",
                         principalColumn: "Id",
@@ -546,6 +602,34 @@ namespace ProductionManagement.API.Migrations
                         principalTable: "RawMaterials",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RecyclablePlanMaterials",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    RecyclableProductionPlanId = table.Column<int>(type: "int", nullable: false),
+                    RawMaterialId = table.Column<int>(type: "int", nullable: false),
+                    RequiredQuantity = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
+                    ActualQuantityUsed = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RecyclablePlanMaterials", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RecyclablePlanMaterials_RawMaterials_RawMaterialId",
+                        column: x => x.RawMaterialId,
+                        principalTable: "RawMaterials",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                    table.ForeignKey(
+                        name: "FK_RecyclablePlanMaterials_RecyclableProductionPlans_RecyclableProductionPlanId",
+                        column: x => x.RecyclableProductionPlanId,
+                        principalTable: "RecyclableProductionPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -599,113 +683,143 @@ namespace ProductionManagement.API.Migrations
                 columns: new[] { "Id", "CreatedAt", "CreatedByUserId", "Permission", "Role" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.ViewTab", "Admin" },
-                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Create", "Admin" },
-                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.View", "Admin" },
-                    { 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Edit", "Admin" },
-                    { 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Cancel", "Admin" },
-                    { 6, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Receive", "Admin" },
-                    { 7, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Process", "Admin" },
-                    { 8, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.ViewTab", "Admin" },
-                    { 9, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Add", "Admin" },
-                    { 10, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Edit", "Admin" },
-                    { 11, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.View", "Admin" },
-                    { 12, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Deactivate", "Admin" },
-                    { 13, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Activate", "Admin" },
-                    { 14, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.ViewTab", "Admin" },
-                    { 15, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Create", "Admin" },
-                    { 16, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Edit", "Admin" },
-                    { 17, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.View", "Admin" },
-                    { 18, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Cancel", "Admin" },
-                    { 19, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Execute", "Admin" },
-                    { 20, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Receive", "Admin" },
-                    { 21, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.ViewTab", "Admin" },
-                    { 22, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Create", "Admin" },
-                    { 23, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Edit", "Admin" },
-                    { 24, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.View", "Admin" },
-                    { 25, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Cancel", "Admin" },
-                    { 26, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Process", "Admin" },
-                    { 27, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.ViewTab", "Admin" },
-                    { 28, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.Create", "Admin" },
-                    { 29, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.Edit", "Admin" },
-                    { 30, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.View", "Admin" },
-                    { 31, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.Deactivate", "Admin" },
-                    { 32, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.Activate", "Admin" },
-                    { 33, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Roles.ViewTab", "Admin" },
-                    { 34, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Roles.ManagePermissions", "Admin" },
-                    { 35, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.ViewTab", "Manager" },
-                    { 36, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Create", "Manager" },
-                    { 37, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.View", "Manager" },
-                    { 38, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Edit", "Manager" },
-                    { 39, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Cancel", "Manager" },
-                    { 40, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Receive", "Manager" },
-                    { 41, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Process", "Manager" },
-                    { 42, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.ViewTab", "Manager" },
-                    { 43, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Add", "Manager" },
-                    { 44, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Edit", "Manager" },
-                    { 45, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.View", "Manager" },
-                    { 46, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Deactivate", "Manager" },
-                    { 47, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Activate", "Manager" },
-                    { 48, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.ViewTab", "Manager" },
-                    { 49, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Create", "Manager" },
-                    { 50, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Edit", "Manager" },
-                    { 51, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.View", "Manager" },
-                    { 52, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Cancel", "Manager" },
-                    { 53, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Execute", "Manager" },
-                    { 54, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Receive", "Manager" },
-                    { 55, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.ViewTab", "Manager" },
-                    { 56, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Create", "Manager" },
-                    { 57, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Edit", "Manager" },
-                    { 58, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.View", "Manager" },
-                    { 59, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Cancel", "Manager" },
-                    { 60, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Process", "Manager" },
-                    { 61, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.ViewTab", "User" },
-                    { 62, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.View", "User" },
-                    { 63, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.ViewTab", "User" },
-                    { 64, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.View", "User" },
-                    { 65, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.ViewTab", "User" },
-                    { 66, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.View", "User" },
-                    { 67, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.ViewTab", "User" },
-                    { 68, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.View", "User" },
-                    { 69, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.ViewTab", "Supervisor" },
-                    { 70, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Create", "Supervisor" },
-                    { 71, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.View", "Supervisor" },
-                    { 72, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Edit", "Supervisor" },
-                    { 73, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Cancel", "Supervisor" },
-                    { 74, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Receive", "Supervisor" },
-                    { 75, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Process", "Supervisor" },
-                    { 76, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.ViewTab", "Supervisor" },
-                    { 77, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Add", "Supervisor" },
-                    { 78, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Edit", "Supervisor" },
-                    { 79, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.View", "Supervisor" },
-                    { 80, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Deactivate", "Supervisor" },
-                    { 81, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Activate", "Supervisor" },
-                    { 82, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.ViewTab", "Supervisor" },
-                    { 83, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Create", "Supervisor" },
-                    { 84, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Edit", "Supervisor" },
-                    { 85, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.View", "Supervisor" },
-                    { 86, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Cancel", "Supervisor" },
-                    { 87, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Execute", "Supervisor" },
-                    { 88, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Receive", "Supervisor" },
-                    { 89, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.ViewTab", "Supervisor" },
-                    { 90, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Create", "Supervisor" },
-                    { 91, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Edit", "Supervisor" },
-                    { 92, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.View", "Supervisor" },
-                    { 93, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Cancel", "Supervisor" },
-                    { 94, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Process", "Supervisor" },
-                    { 95, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.ViewTab", "Warehouse Operator" },
-                    { 96, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Create", "Warehouse Operator" },
-                    { 97, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.View", "Warehouse Operator" },
-                    { 98, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Edit", "Warehouse Operator" },
-                    { 99, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Cancel", "Warehouse Operator" },
-                    { 100, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Receive", "Warehouse Operator" },
-                    { 101, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Process", "Warehouse Operator" },
-                    { 102, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.ViewTab", "Warehouse Operator" },
-                    { 103, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Add", "Warehouse Operator" },
-                    { 104, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Edit", "Warehouse Operator" },
-                    { 105, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.View", "Warehouse Operator" },
-                    { 106, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Deactivate", "Warehouse Operator" },
-                    { 107, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Activate", "Warehouse Operator" }
+                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.ViewTab", "ADMIN" },
+                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Create", "ADMIN" },
+                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.View", "ADMIN" },
+                    { 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Edit", "ADMIN" },
+                    { 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Cancel", "ADMIN" },
+                    { 6, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Receive", "ADMIN" },
+                    { 7, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Process", "ADMIN" },
+                    { 8, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.ViewTab", "ADMIN" },
+                    { 9, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Add", "ADMIN" },
+                    { 10, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Edit", "ADMIN" },
+                    { 11, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.View", "ADMIN" },
+                    { 12, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Deactivate", "ADMIN" },
+                    { 13, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Activate", "ADMIN" },
+                    { 14, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.ViewTab", "ADMIN" },
+                    { 15, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Create", "ADMIN" },
+                    { 16, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Edit", "ADMIN" },
+                    { 17, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.View", "ADMIN" },
+                    { 18, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Cancel", "ADMIN" },
+                    { 19, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Execute", "ADMIN" },
+                    { 20, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Receive", "ADMIN" },
+                    { 21, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.ViewTab", "ADMIN" },
+                    { 22, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Create", "ADMIN" },
+                    { 23, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Edit", "ADMIN" },
+                    { 24, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.View", "ADMIN" },
+                    { 25, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Cancel", "ADMIN" },
+                    { 26, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Process", "ADMIN" },
+                    { 27, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.ViewTab", "ADMIN" },
+                    { 28, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.Create", "ADMIN" },
+                    { 29, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.Edit", "ADMIN" },
+                    { 30, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.View", "ADMIN" },
+                    { 31, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.Deactivate", "ADMIN" },
+                    { 32, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Users.Activate", "ADMIN" },
+                    { 33, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Transports.ViewTab", "ADMIN" },
+                    { 34, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Transports.Create", "ADMIN" },
+                    { 35, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Transports.View", "ADMIN" },
+                    { 36, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Transports.Edit", "ADMIN" },
+                    { 37, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Transports.Delete", "ADMIN" },
+                    { 38, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Clients.ViewTab", "ADMIN" },
+                    { 39, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Clients.Create", "ADMIN" },
+                    { 40, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Clients.View", "ADMIN" },
+                    { 41, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Clients.Edit", "ADMIN" },
+                    { 42, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Clients.Delete", "ADMIN" },
+                    { 43, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Suppliers.ViewTab", "ADMIN" },
+                    { 44, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Suppliers.Create", "ADMIN" },
+                    { 45, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Suppliers.View", "ADMIN" },
+                    { 46, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Suppliers.Edit", "ADMIN" },
+                    { 47, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Suppliers.Delete", "ADMIN" },
+                    { 48, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Roles.ViewTab", "ADMIN" },
+                    { 49, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Roles.ManagePermissions", "ADMIN" },
+                    { 50, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.ViewTab", "AGENT TEREN" },
+                    { 51, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.View", "AGENT TEREN" },
+                    { 52, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.ViewTab", "AGENT TEREN" },
+                    { 53, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.View", "AGENT TEREN" },
+                    { 54, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.ViewTab", "AGENT TEREN" },
+                    { 55, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.View", "AGENT TEREN" },
+                    { 56, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.ViewTab", "AGENT TEREN" },
+                    { 57, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.View", "AGENT TEREN" },
+                    { 58, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.ViewTab", "COORDONATOR VANZARI" },
+                    { 59, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Create", "COORDONATOR VANZARI" },
+                    { 60, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.View", "COORDONATOR VANZARI" },
+                    { 61, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Edit", "COORDONATOR VANZARI" },
+                    { 62, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Cancel", "COORDONATOR VANZARI" },
+                    { 63, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Receive", "COORDONATOR VANZARI" },
+                    { 64, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Process", "COORDONATOR VANZARI" },
+                    { 65, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.ViewTab", "COORDONATOR VANZARI" },
+                    { 66, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Add", "COORDONATOR VANZARI" },
+                    { 67, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Edit", "COORDONATOR VANZARI" },
+                    { 68, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.View", "COORDONATOR VANZARI" },
+                    { 69, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Deactivate", "COORDONATOR VANZARI" },
+                    { 70, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Activate", "COORDONATOR VANZARI" },
+                    { 71, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.ViewTab", "COORDONATOR VANZARI" },
+                    { 72, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Create", "COORDONATOR VANZARI" },
+                    { 73, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Edit", "COORDONATOR VANZARI" },
+                    { 74, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.View", "COORDONATOR VANZARI" },
+                    { 75, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Cancel", "COORDONATOR VANZARI" },
+                    { 76, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Execute", "COORDONATOR VANZARI" },
+                    { 77, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Receive", "COORDONATOR VANZARI" },
+                    { 78, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.ViewTab", "COORDONATOR VANZARI" },
+                    { 79, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Create", "COORDONATOR VANZARI" },
+                    { 80, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Edit", "COORDONATOR VANZARI" },
+                    { 81, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.View", "COORDONATOR VANZARI" },
+                    { 82, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Cancel", "COORDONATOR VANZARI" },
+                    { 83, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Process", "COORDONATOR VANZARI" },
+                    { 84, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Transports.ViewTab", "COORDONATOR VANZARI" },
+                    { 85, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Transports.Create", "COORDONATOR VANZARI" },
+                    { 86, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Transports.View", "COORDONATOR VANZARI" },
+                    { 87, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Transports.Edit", "COORDONATOR VANZARI" },
+                    { 88, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Transports.Delete", "COORDONATOR VANZARI" },
+                    { 89, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Clients.ViewTab", "COORDONATOR VANZARI" },
+                    { 90, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Clients.Create", "COORDONATOR VANZARI" },
+                    { 91, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Clients.View", "COORDONATOR VANZARI" },
+                    { 92, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Clients.Edit", "COORDONATOR VANZARI" },
+                    { 93, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Clients.Delete", "COORDONATOR VANZARI" },
+                    { 94, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Suppliers.ViewTab", "COORDONATOR VANZARI" },
+                    { 95, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Suppliers.Create", "COORDONATOR VANZARI" },
+                    { 96, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Suppliers.View", "COORDONATOR VANZARI" },
+                    { 97, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Suppliers.Edit", "COORDONATOR VANZARI" },
+                    { 98, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Suppliers.Delete", "COORDONATOR VANZARI" },
+                    { 99, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.ViewTab", "ACHIZITIONER" },
+                    { 100, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Create", "ACHIZITIONER" },
+                    { 101, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.View", "ACHIZITIONER" },
+                    { 102, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Edit", "ACHIZITIONER" },
+                    { 103, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Cancel", "ACHIZITIONER" },
+                    { 104, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Receive", "ACHIZITIONER" },
+                    { 105, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Process", "ACHIZITIONER" },
+                    { 106, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.ViewTab", "ACHIZITIONER" },
+                    { 107, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Add", "ACHIZITIONER" },
+                    { 108, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Edit", "ACHIZITIONER" },
+                    { 109, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.View", "ACHIZITIONER" },
+                    { 110, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Deactivate", "ACHIZITIONER" },
+                    { 111, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Activate", "ACHIZITIONER" },
+                    { 112, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.ViewTab", "ACHIZITIONER" },
+                    { 113, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Create", "ACHIZITIONER" },
+                    { 114, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Edit", "ACHIZITIONER" },
+                    { 115, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.View", "ACHIZITIONER" },
+                    { 116, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Cancel", "ACHIZITIONER" },
+                    { 117, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Execute", "ACHIZITIONER" },
+                    { 118, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Production.Receive", "ACHIZITIONER" },
+                    { 119, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.ViewTab", "ACHIZITIONER" },
+                    { 120, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Create", "ACHIZITIONER" },
+                    { 121, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Edit", "ACHIZITIONER" },
+                    { 122, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.View", "ACHIZITIONER" },
+                    { 123, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Cancel", "ACHIZITIONER" },
+                    { 124, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Orders.Process", "ACHIZITIONER" },
+                    { 125, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.ViewTab", "MAGAZIONER" },
+                    { 126, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Create", "MAGAZIONER" },
+                    { 127, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.View", "MAGAZIONER" },
+                    { 128, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Edit", "MAGAZIONER" },
+                    { 129, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Cancel", "MAGAZIONER" },
+                    { 130, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Receive", "MAGAZIONER" },
+                    { 131, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Acquisitions.Process", "MAGAZIONER" },
+                    { 132, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.ViewTab", "MAGAZIONER" },
+                    { 133, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Add", "MAGAZIONER" },
+                    { 134, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Edit", "MAGAZIONER" },
+                    { 135, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.View", "MAGAZIONER" },
+                    { 136, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Deactivate", "MAGAZIONER" },
+                    { 137, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Inventory.Activate", "MAGAZIONER" }
                 });
 
             migrationBuilder.InsertData(
@@ -713,17 +827,17 @@ namespace ProductionManagement.API.Migrations
                 columns: new[] { "Id", "CreatedAt", "CreatedByUserId", "Description", "IsSystemRole", "Name" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Full system access with all permissions", true, "Admin" },
-                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Manage operations without user administration", true, "Manager" },
-                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Basic access with view-only permissions", true, "User" },
-                    { 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Supervise production and inventory, limited administrative access", false, "Supervisor" },
-                    { 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Manage inventory and acquisitions only", false, "Warehouse Operator" }
+                    { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Full system access with all permissions", true, "ADMIN" },
+                    { 2, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Basic access with view-only permissions", true, "AGENT TEREN" },
+                    { 3, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Manage operations without user administration", true, "COORDONATOR VANZARI" },
+                    { 4, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Supervise production and inventory, limited administrative access", false, "ACHIZITIONER" },
+                    { 5, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "System", "Manage inventory and acquisitions only", false, "MAGAZIONER" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "Email", "FirstName", "IsActive", "LastLoginAt", "LastName", "PasswordHash", "ReceiveEmails", "Role", "Username" },
-                values: new object[] { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@productionmanagement.com", "Admin", true, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "User", "JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=", true, "Admin", "admin" });
+                values: new object[] { 1, new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc), "admin@productionmanagement.com", "Admin", true, new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "User", "JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=", true, "ADMIN", "admin" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AcquisitionHistories_AcquisitionId",
@@ -766,11 +880,6 @@ namespace ProductionManagement.API.Migrations
                 column: "SupplierId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Acquisitions_SupplierId1",
-                table: "Acquisitions",
-                column: "SupplierId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Acquisitions_TransportId",
                 table: "Acquisitions",
                 column: "TransportId");
@@ -784,6 +893,11 @@ namespace ProductionManagement.API.Migrations
                 name: "IX_OrderMaterials_RawMaterialId",
                 table: "OrderMaterials",
                 column: "RawMaterialId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Orders_AssignedToUserId",
+                table: "Orders",
+                column: "AssignedToUserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Orders_ClientId",
@@ -867,6 +981,36 @@ namespace ProductionManagement.API.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_RecyclablePlanMaterials_RawMaterialId",
+                table: "RecyclablePlanMaterials",
+                column: "RawMaterialId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecyclablePlanMaterials_RecyclableProductionPlanId",
+                table: "RecyclablePlanMaterials",
+                column: "RecyclableProductionPlanId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecyclableProductionPlans_CompletedByUserId",
+                table: "RecyclableProductionPlans",
+                column: "CompletedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecyclableProductionPlans_CreatedByUserId",
+                table: "RecyclableProductionPlans",
+                column: "CreatedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecyclableProductionPlans_StartedByUserId",
+                table: "RecyclableProductionPlans",
+                column: "StartedByUserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RecyclableProductionPlans_TargetRawMaterialId",
+                table: "RecyclableProductionPlans",
+                column: "TargetRawMaterialId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RolePermissions_Role_Permission",
                 table: "RolePermissions",
                 columns: new[] { "Role", "Permission" },
@@ -913,6 +1057,9 @@ namespace ProductionManagement.API.Migrations
                 name: "ProductTemplateMaterials");
 
             migrationBuilder.DropTable(
+                name: "RecyclablePlanMaterials");
+
+            migrationBuilder.DropTable(
                 name: "RolePermissions");
 
             migrationBuilder.DropTable(
@@ -932,6 +1079,9 @@ namespace ProductionManagement.API.Migrations
 
             migrationBuilder.DropTable(
                 name: "ProductTemplates");
+
+            migrationBuilder.DropTable(
+                name: "RecyclableProductionPlans");
 
             migrationBuilder.DropTable(
                 name: "Clients");

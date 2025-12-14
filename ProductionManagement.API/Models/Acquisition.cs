@@ -52,8 +52,7 @@ namespace ProductionManagement.API.Models
         [StringLength(100)]
         public string? SupplierContact { get; set; }
 
-        // Navigation property
-        [ForeignKey("SupplierId")]
+        // Navigation property (configured in ApplicationDbContext)
         public virtual Supplier? Supplier { get; set; }
 
         [StringLength(500)]

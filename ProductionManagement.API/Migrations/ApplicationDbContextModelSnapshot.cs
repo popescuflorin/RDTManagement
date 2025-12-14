@@ -70,9 +70,6 @@ namespace ProductionManagement.API.Migrations
                     b.Property<int?>("SupplierId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("SupplierId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("SupplierName")
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
@@ -115,8 +112,6 @@ namespace ProductionManagement.API.Migrations
                     b.HasIndex("ReceivedByUserId");
 
                     b.HasIndex("SupplierId");
-
-                    b.HasIndex("SupplierId1");
 
                     b.HasIndex("TransportId");
 
@@ -953,25 +948,25 @@ namespace ProductionManagement.API.Migrations
                             CreatedByUserId = "System",
                             Description = "Full system access with all permissions",
                             IsSystemRole = true,
-                            Name = "Admin"
+                            Name = "ADMIN"
                         },
                         new
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Description = "Manage operations without user administration",
+                            Description = "Basic access with view-only permissions",
                             IsSystemRole = true,
-                            Name = "Manager"
+                            Name = "AGENT TEREN"
                         },
                         new
                         {
                             Id = 3,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Description = "Basic access with view-only permissions",
+                            Description = "Manage operations without user administration",
                             IsSystemRole = true,
-                            Name = "User"
+                            Name = "COORDONATOR VANZARI"
                         },
                         new
                         {
@@ -980,7 +975,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedByUserId = "System",
                             Description = "Supervise production and inventory, limited administrative access",
                             IsSystemRole = false,
-                            Name = "Supervisor"
+                            Name = "ACHIZITIONER"
                         },
                         new
                         {
@@ -989,7 +984,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedByUserId = "System",
                             Description = "Manage inventory and acquisitions only",
                             IsSystemRole = false,
-                            Name = "Warehouse Operator"
+                            Name = "MAGAZIONER"
                         });
                 });
 
@@ -1032,7 +1027,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.ViewTab",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1040,7 +1035,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Create",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1048,7 +1043,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.View",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1056,7 +1051,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Edit",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1064,7 +1059,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Cancel",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1072,7 +1067,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Receive",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1080,7 +1075,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Process",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1088,7 +1083,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.ViewTab",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1096,7 +1091,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Add",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1104,7 +1099,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Edit",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1112,7 +1107,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.View",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1120,7 +1115,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Deactivate",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1128,7 +1123,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Activate",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1136,7 +1131,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.ViewTab",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1144,7 +1139,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.Create",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1152,7 +1147,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.Edit",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1160,7 +1155,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.View",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1168,7 +1163,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.Cancel",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1176,7 +1171,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.Execute",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1184,7 +1179,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.Receive",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1192,7 +1187,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.ViewTab",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1200,7 +1195,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.Create",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1208,7 +1203,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.Edit",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1216,7 +1211,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.View",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1224,7 +1219,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.Cancel",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1232,7 +1227,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.Process",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1240,7 +1235,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Users.ViewTab",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1248,7 +1243,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Users.Create",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1256,7 +1251,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Users.Edit",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1264,7 +1259,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Users.View",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1272,7 +1267,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Users.Deactivate",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1280,7 +1275,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Users.Activate",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1288,7 +1283,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Transports.ViewTab",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1296,7 +1291,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Transports.Create",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1304,7 +1299,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Transports.View",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1312,7 +1307,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Transports.Edit",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1320,7 +1315,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Transports.Delete",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1328,7 +1323,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Clients.ViewTab",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1336,7 +1331,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Clients.Create",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1344,7 +1339,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Clients.View",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1352,7 +1347,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Clients.Edit",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1360,7 +1355,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Clients.Delete",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1368,7 +1363,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Suppliers.ViewTab",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1376,7 +1371,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Suppliers.Create",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1384,7 +1379,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Suppliers.View",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1392,7 +1387,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Suppliers.Edit",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1400,7 +1395,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Suppliers.Delete",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1408,7 +1403,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Roles.ViewTab",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1416,7 +1411,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Roles.ManagePermissions",
-                            Role = "Admin"
+                            Role = "ADMIN"
                         },
                         new
                         {
@@ -1424,391 +1419,391 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.ViewTab",
-                            Role = "Manager"
+                            Role = "AGENT TEREN"
                         },
                         new
                         {
                             Id = 51,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Acquisitions.Create",
-                            Role = "Manager"
+                            Permission = "Acquisitions.View",
+                            Role = "AGENT TEREN"
                         },
                         new
                         {
                             Id = 52,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Acquisitions.View",
-                            Role = "Manager"
+                            Permission = "Inventory.ViewTab",
+                            Role = "AGENT TEREN"
                         },
                         new
                         {
                             Id = 53,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Acquisitions.Edit",
-                            Role = "Manager"
+                            Permission = "Inventory.View",
+                            Role = "AGENT TEREN"
                         },
                         new
                         {
                             Id = 54,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Acquisitions.Cancel",
-                            Role = "Manager"
+                            Permission = "Production.ViewTab",
+                            Role = "AGENT TEREN"
                         },
                         new
                         {
                             Id = 55,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Acquisitions.Receive",
-                            Role = "Manager"
+                            Permission = "Production.View",
+                            Role = "AGENT TEREN"
                         },
                         new
                         {
                             Id = 56,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Acquisitions.Process",
-                            Role = "Manager"
+                            Permission = "Orders.ViewTab",
+                            Role = "AGENT TEREN"
                         },
                         new
                         {
                             Id = 57,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Inventory.ViewTab",
-                            Role = "Manager"
+                            Permission = "Orders.View",
+                            Role = "AGENT TEREN"
                         },
                         new
                         {
                             Id = 58,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Inventory.Add",
-                            Role = "Manager"
+                            Permission = "Acquisitions.ViewTab",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 59,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Inventory.Edit",
-                            Role = "Manager"
+                            Permission = "Acquisitions.Create",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 60,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Inventory.View",
-                            Role = "Manager"
+                            Permission = "Acquisitions.View",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 61,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Inventory.Deactivate",
-                            Role = "Manager"
+                            Permission = "Acquisitions.Edit",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 62,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Inventory.Activate",
-                            Role = "Manager"
+                            Permission = "Acquisitions.Cancel",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 63,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Production.ViewTab",
-                            Role = "Manager"
+                            Permission = "Acquisitions.Receive",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 64,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Production.Create",
-                            Role = "Manager"
+                            Permission = "Acquisitions.Process",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 65,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Production.Edit",
-                            Role = "Manager"
+                            Permission = "Inventory.ViewTab",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 66,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Production.View",
-                            Role = "Manager"
+                            Permission = "Inventory.Add",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 67,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Production.Cancel",
-                            Role = "Manager"
+                            Permission = "Inventory.Edit",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 68,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Production.Execute",
-                            Role = "Manager"
+                            Permission = "Inventory.View",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 69,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Production.Receive",
-                            Role = "Manager"
+                            Permission = "Inventory.Deactivate",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 70,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Orders.ViewTab",
-                            Role = "Manager"
+                            Permission = "Inventory.Activate",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 71,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Orders.Create",
-                            Role = "Manager"
+                            Permission = "Production.ViewTab",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 72,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Orders.Edit",
-                            Role = "Manager"
+                            Permission = "Production.Create",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 73,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Orders.View",
-                            Role = "Manager"
+                            Permission = "Production.Edit",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 74,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Orders.Cancel",
-                            Role = "Manager"
+                            Permission = "Production.View",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 75,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Orders.Process",
-                            Role = "Manager"
+                            Permission = "Production.Cancel",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 76,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Transports.ViewTab",
-                            Role = "Manager"
+                            Permission = "Production.Execute",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 77,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Transports.Create",
-                            Role = "Manager"
+                            Permission = "Production.Receive",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 78,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Transports.View",
-                            Role = "Manager"
+                            Permission = "Orders.ViewTab",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 79,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Transports.Edit",
-                            Role = "Manager"
+                            Permission = "Orders.Create",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 80,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Transports.Delete",
-                            Role = "Manager"
+                            Permission = "Orders.Edit",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 81,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Clients.ViewTab",
-                            Role = "Manager"
+                            Permission = "Orders.View",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 82,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Clients.Create",
-                            Role = "Manager"
+                            Permission = "Orders.Cancel",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 83,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Clients.View",
-                            Role = "Manager"
+                            Permission = "Orders.Process",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 84,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Clients.Edit",
-                            Role = "Manager"
+                            Permission = "Transports.ViewTab",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 85,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Clients.Delete",
-                            Role = "Manager"
+                            Permission = "Transports.Create",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 86,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Suppliers.ViewTab",
-                            Role = "Manager"
+                            Permission = "Transports.View",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 87,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Suppliers.Create",
-                            Role = "Manager"
+                            Permission = "Transports.Edit",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 88,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Suppliers.View",
-                            Role = "Manager"
+                            Permission = "Transports.Delete",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 89,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Suppliers.Edit",
-                            Role = "Manager"
+                            Permission = "Clients.ViewTab",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 90,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Suppliers.Delete",
-                            Role = "Manager"
+                            Permission = "Clients.Create",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 91,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Acquisitions.ViewTab",
-                            Role = "User"
+                            Permission = "Clients.View",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 92,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Acquisitions.View",
-                            Role = "User"
+                            Permission = "Clients.Edit",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 93,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Inventory.ViewTab",
-                            Role = "User"
+                            Permission = "Clients.Delete",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 94,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Inventory.View",
-                            Role = "User"
+                            Permission = "Suppliers.ViewTab",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 95,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Production.ViewTab",
-                            Role = "User"
+                            Permission = "Suppliers.Create",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 96,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Production.View",
-                            Role = "User"
+                            Permission = "Suppliers.View",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 97,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Orders.ViewTab",
-                            Role = "User"
+                            Permission = "Suppliers.Edit",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
                             Id = 98,
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
-                            Permission = "Orders.View",
-                            Role = "User"
+                            Permission = "Suppliers.Delete",
+                            Role = "COORDONATOR VANZARI"
                         },
                         new
                         {
@@ -1816,7 +1811,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.ViewTab",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1824,7 +1819,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Create",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1832,7 +1827,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.View",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1840,7 +1835,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Edit",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1848,7 +1843,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Cancel",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1856,7 +1851,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Receive",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1864,7 +1859,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Process",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1872,7 +1867,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.ViewTab",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1880,7 +1875,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Add",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1888,7 +1883,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Edit",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1896,7 +1891,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.View",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1904,7 +1899,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Deactivate",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1912,7 +1907,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Activate",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1920,7 +1915,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.ViewTab",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1928,7 +1923,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.Create",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1936,7 +1931,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.Edit",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1944,7 +1939,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.View",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1952,7 +1947,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.Cancel",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1960,7 +1955,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.Execute",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1968,7 +1963,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Production.Receive",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1976,7 +1971,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.ViewTab",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1984,7 +1979,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.Create",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -1992,7 +1987,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.Edit",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -2000,7 +1995,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.View",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -2008,7 +2003,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.Cancel",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -2016,7 +2011,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Orders.Process",
-                            Role = "Supervisor"
+                            Role = "ACHIZITIONER"
                         },
                         new
                         {
@@ -2024,7 +2019,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.ViewTab",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2032,7 +2027,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Create",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2040,7 +2035,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.View",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2048,7 +2043,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Edit",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2056,7 +2051,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Cancel",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2064,7 +2059,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Receive",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2072,7 +2067,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Acquisitions.Process",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2080,7 +2075,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.ViewTab",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2088,7 +2083,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Add",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2096,7 +2091,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Edit",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2104,7 +2099,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.View",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2112,7 +2107,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Deactivate",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         },
                         new
                         {
@@ -2120,7 +2115,7 @@ namespace ProductionManagement.API.Migrations
                             CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             CreatedByUserId = "System",
                             Permission = "Inventory.Activate",
-                            Role = "Warehouse Operator"
+                            Role = "MAGAZIONER"
                         });
                 });
 
@@ -2309,7 +2304,7 @@ namespace ProductionManagement.API.Migrations
                             LastName = "User",
                             PasswordHash = "JAvlGPq9JyTdtvBO6x2llnRI1+gxwIyPqCKAn3THIKk=",
                             ReceiveEmails = true,
-                            Role = "Admin",
+                            Role = "ADMIN",
                             Username = "admin"
                         });
                 });
@@ -2333,13 +2328,9 @@ namespace ProductionManagement.API.Migrations
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("ProductionManagement.API.Models.Supplier", "Supplier")
-                        .WithMany()
+                        .WithMany("Acquisitions")
                         .HasForeignKey("SupplierId")
                         .OnDelete(DeleteBehavior.Restrict);
-
-                    b.HasOne("ProductionManagement.API.Models.Supplier", null)
-                        .WithMany("Acquisitions")
-                        .HasForeignKey("SupplierId1");
 
                     b.HasOne("ProductionManagement.API.Models.Transport", "Transport")
                         .WithMany("Acquisitions")
