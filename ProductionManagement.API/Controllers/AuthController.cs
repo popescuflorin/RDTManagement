@@ -132,7 +132,7 @@ namespace ProductionManagement.API.Controllers
         }
 
         [HttpPost("admin/register")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "ADMIN")]
         public async Task<ActionResult<UserInfo>> AdminRegister(AdminRegisterRequest request)
         {
             if (await _userRepository.UsernameExistsAsync(request.Username))

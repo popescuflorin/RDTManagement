@@ -9,7 +9,7 @@ namespace ProductionManagement.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "ADMIN")]
     public class RolePermissionController : ControllerBase
     {
         private readonly IRolePermissionRepository _rolePermissionRepository;
@@ -217,38 +217,38 @@ namespace ProductionManagement.API.Controllers
                 await _rolePermissionRepository.DeleteAsync(perm);
             }
 
-            // Admin gets all permissions
+            // ADMIN gets all permissions
             var allPermissions = Permissions.GetAllPermissions();
             foreach (var permission in allPermissions)
             {
                 await _rolePermissionRepository.AddAsync(new RolePermission
                 {
-                    Role = "Admin",
+                    Role = "ADMIN",
                     Permission = permission,
                     CreatedAt = DateTime.UtcNow,
                     CreatedByUserId = "System"
                 });
             }
 
-            // Manager gets most permissions except user management
-            var managerPermissions = allPermissions.Where(p => 
+            // COORDONATOR VANZARI gets most permissions except user management
+            var coordonatorPermissions = allPermissions.Where(p => 
                 !p.StartsWith("Users.") && 
                 !p.StartsWith("Roles.") &&
                 p != Permissions.ManageRolePermissions
             ).ToList();
-            foreach (var permission in managerPermissions)
+            foreach (var permission in coordonatorPermissions)
             {
                 await _rolePermissionRepository.AddAsync(new RolePermission
                 {
-                    Role = "Manager",
+                    Role = "COORDONATOR VANZARI",
                     Permission = permission,
                     CreatedAt = DateTime.UtcNow,
                     CreatedByUserId = "System"
                 });
             }
 
-            // User gets basic view permissions
-            var userPermissions = new List<string>
+            // AGENT TEREN gets basic view permissions
+            var agentTerenPermissions = new List<string>
             {
                 Permissions.ViewAcquisitionsTab,
                 Permissions.ViewAcquisition,
@@ -259,11 +259,11 @@ namespace ProductionManagement.API.Controllers
                 Permissions.ViewOrdersTab,
                 Permissions.ViewOrder
             };
-            foreach (var permission in userPermissions)
+            foreach (var permission in agentTerenPermissions)
             {
                 await _rolePermissionRepository.AddAsync(new RolePermission
                 {
-                    Role = "User",
+                    Role = "AGENT TEREN",
                     Permission = permission,
                     CreatedAt = DateTime.UtcNow,
                     CreatedByUserId = "System"
