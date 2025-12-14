@@ -61,9 +61,11 @@ try {
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "The following roles have been seeded with permissions:" -ForegroundColor White
-    Write-Host "  • Admin - All permissions (full system access)" -ForegroundColor White
-    Write-Host "  • Manager - Most permissions (except user/role management)" -ForegroundColor White
-    Write-Host "  • User - Basic view-only permissions" -ForegroundColor White
+    Write-Host "  • ADMIN - All permissions (full system access)" -ForegroundColor White
+    Write-Host "  • COORDONATOR VANZARI - Most permissions (except user/role management)" -ForegroundColor White
+    Write-Host "  • AGENT TEREN - Basic view-only permissions" -ForegroundColor White
+    Write-Host "  • ACHIZITIONER - Production, Inventory, Orders and Acquisitions" -ForegroundColor White
+    Write-Host "  • MAGAZIONER - Inventory and Acquisitions only" -ForegroundColor White
     Write-Host ""
 
 } catch {

@@ -6,7 +6,7 @@ This folder contains utility scripts for managing the Production Management syst
 
 ### SeedRolePermissions.ps1
 
-Seeds the default role permissions for all system roles (Admin, Manager, User).
+Seeds the default role permissions for all system roles (ADMIN, COORDONATOR VANZARI, AGENT TEREN, ACHIZITIONER, MAGAZIONER).
 
 **Usage:**
 ```powershell
@@ -18,9 +18,11 @@ cd Scripts
 - Logs in as admin user
 - Calls the `/api/rolepermission/seed` endpoint
 - Seeds permissions for:
-  - **Admin**: All permissions (full system access)
-  - **Manager**: Most permissions except user and role management
-  - **User**: Basic view-only permissions
+  - **ADMIN**: All permissions (full system access)
+  - **COORDONATOR VANZARI**: Most permissions except user and role management
+  - **AGENT TEREN**: Basic view-only permissions
+  - **ACHIZITIONER**: Production, Inventory, Orders and Acquisitions
+  - **MAGAZIONER**: Inventory and Acquisitions only
 
 **Prerequisites:**
 - API must be running on `http://localhost:5000`
@@ -36,8 +38,8 @@ cd Scripts
 ## Automatic Seeding
 
 The database seed method in `ApplicationDbContext.cs` automatically creates:
-- Default system roles (Admin, Manager, User)
-- Example custom roles (Supervisor, Warehouse Operator)
+- Default system roles (ADMIN, COORDONATOR VANZARI, AGENT TEREN)
+- Custom roles (ACHIZITIONER, MAGAZIONER)
 - All role permissions for all roles
 
 This runs automatically when creating a **new database** from scratch using:
@@ -50,6 +52,6 @@ dotnet ef database update
 
 - The PowerShell script is provided as a manual alternative when you need to re-seed permissions without recreating the database
 - Custom roles created through the UI will retain their permissions
-- System roles (Admin, Manager, User) cannot be deleted but their permissions can be modified
+- System roles (ADMIN, COORDONATOR VANZARI, AGENT TEREN) cannot be deleted but their permissions can be modified
 - The seeding process will clear existing permissions and recreate them
 

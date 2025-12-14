@@ -428,7 +428,7 @@ namespace ProductionManagement.API.Data
                 new Role
                 {
                     Id = 1,
-                    Name = "Admin",
+                    Name = "ADMIN",
                     Description = "Full system access with all permissions",
                     IsSystemRole = true,
                     CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
@@ -437,8 +437,8 @@ namespace ProductionManagement.API.Data
                 new Role
                 {
                     Id = 2,
-                    Name = "Manager",
-                    Description = "Manage operations without user administration",
+                    Name = "AGENT TEREN",
+                    Description = "Basic access with view-only permissions",
                     IsSystemRole = true,
                     CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     CreatedByUserId = "System"
@@ -446,17 +446,16 @@ namespace ProductionManagement.API.Data
                 new Role
                 {
                     Id = 3,
-                    Name = "User",
-                    Description = "Basic access with view-only permissions",
+                    Name = "COORDONATOR VANZARI",
+                    Description = "Manage operations without user administration",
                     IsSystemRole = true,
                     CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     CreatedByUserId = "System"
                 },
-                // Custom role examples
                 new Role
                 {
                     Id = 4,
-                    Name = "Supervisor",
+                    Name = "ACHIZITIONER",
                     Description = "Supervise production and inventory, limited administrative access",
                     IsSystemRole = false,
                     CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
@@ -465,7 +464,7 @@ namespace ProductionManagement.API.Data
                 new Role
                 {
                     Id = 5,
-                    Name = "Warehouse Operator",
+                    Name = "MAGAZIONER",
                     Description = "Manage inventory and acquisitions only",
                     IsSystemRole = false,
                     CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
@@ -482,7 +481,7 @@ namespace ProductionManagement.API.Data
                     Email = "admin@productionmanagement.com",
                     FirstName = "Admin",
                     LastName = "User",
-                    Role = "Admin",
+                    Role = "ADMIN",
                     PasswordHash = HashPassword("admin123"),
                     CreatedAt = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc),
                     IsActive = true
@@ -545,40 +544,22 @@ namespace ProductionManagement.API.Data
             int permissionId = 1;
             var seedDate = new DateTime(2024, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-            // Admin - All permissions
+            // ADMIN - All permissions
             var allPermissions = Permissions.GetAllPermissions();
             foreach (var permission in allPermissions)
             {
                 rolePermissions.Add(new RolePermission
                 {
                     Id = permissionId++,
-                    Role = "Admin",
+                    Role = "ADMIN",
                     Permission = permission,
                     CreatedAt = seedDate,
                     CreatedByUserId = "System"
                 });
             }
 
-            // Manager - Most permissions except user/role management
-            var managerPermissions = allPermissions.Where(p =>
-                !p.StartsWith("Users.") &&
-                !p.StartsWith("Roles.") &&
-                p != Permissions.ManageRolePermissions
-            ).ToList();
-            foreach (var permission in managerPermissions)
-            {
-                rolePermissions.Add(new RolePermission
-                {
-                    Id = permissionId++,
-                    Role = "Manager",
-                    Permission = permission,
-                    CreatedAt = seedDate,
-                    CreatedByUserId = "System"
-                });
-            }
-
-            // User - Basic view permissions
-            var userPermissions = new List<string>
+            // AGENT TEREN - Basic view permissions
+            var agentTerenPermissions = new List<string>
             {
                 Permissions.ViewAcquisitionsTab,
                 Permissions.ViewAcquisition,
@@ -589,48 +570,66 @@ namespace ProductionManagement.API.Data
                 Permissions.ViewOrdersTab,
                 Permissions.ViewOrder
             };
-            foreach (var permission in userPermissions)
+            foreach (var permission in agentTerenPermissions)
             {
                 rolePermissions.Add(new RolePermission
                 {
                     Id = permissionId++,
-                    Role = "User",
+                    Role = "AGENT TEREN",
                     Permission = permission,
                     CreatedAt = seedDate,
                     CreatedByUserId = "System"
                 });
             }
 
-            // Supervisor - Production, Inventory, and Orders (full access)
-            var supervisorPermissions = allPermissions.Where(p =>
+            // COORDONATOR VANZARI - Most permissions except user/role management
+            var coordonatorVanzariPermissions = allPermissions.Where(p =>
+                !p.StartsWith("Users.") &&
+                !p.StartsWith("Roles.") &&
+                p != Permissions.ManageRolePermissions
+            ).ToList();
+            foreach (var permission in coordonatorVanzariPermissions)
+            {
+                rolePermissions.Add(new RolePermission
+                {
+                    Id = permissionId++,
+                    Role = "COORDONATOR VANZARI",
+                    Permission = permission,
+                    CreatedAt = seedDate,
+                    CreatedByUserId = "System"
+                });
+            }
+
+            // ACHIZITIONER - Production, Inventory, and Orders (full access)
+            var achizitionerPermissions = allPermissions.Where(p =>
                 p.StartsWith("Production.") ||
                 p.StartsWith("Inventory.") ||
                 p.StartsWith("Orders.") ||
                 p.StartsWith("Acquisitions.")
             ).ToList();
-            foreach (var permission in supervisorPermissions)
+            foreach (var permission in achizitionerPermissions)
             {
                 rolePermissions.Add(new RolePermission
                 {
                     Id = permissionId++,
-                    Role = "Supervisor",
+                    Role = "ACHIZITIONER",
                     Permission = permission,
                     CreatedAt = seedDate,
                     CreatedByUserId = "System"
                 });
             }
 
-            // Warehouse Operator - Inventory and Acquisitions only
-            var warehousePermissions = allPermissions.Where(p =>
+            // MAGAZIONER - Inventory and Acquisitions only
+            var magazionerPermissions = allPermissions.Where(p =>
                 p.StartsWith("Inventory.") ||
                 p.StartsWith("Acquisitions.")
             ).ToList();
-            foreach (var permission in warehousePermissions)
+            foreach (var permission in magazionerPermissions)
             {
                 rolePermissions.Add(new RolePermission
                 {
                     Id = permissionId++,
-                    Role = "Warehouse Operator",
+                    Role = "MAGAZIONER",
                     Permission = permission,
                     CreatedAt = seedDate,
                     CreatedByUserId = "System"

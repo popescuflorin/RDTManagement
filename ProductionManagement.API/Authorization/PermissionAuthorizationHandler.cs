@@ -26,8 +26,8 @@ namespace ProductionManagement.API.Authorization
 
             var userRole = roleClaim.Value;
 
-            // Admin always has all permissions
-            if (userRole == "Admin")
+            // ADMIN always has all permissions
+            if (userRole == "ADMIN")
             {
                 context.Succeed(requirement);
                 return;
