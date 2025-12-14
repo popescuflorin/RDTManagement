@@ -110,6 +110,7 @@
   "edit": {
     "title": "Editează Material",
     "currentMaterial": "Material Actual:",
+    "materialDetails": "Detalii Material:",
     "fields": {
       "currentQuantity": "Cantitate Actuală",
       "lastUpdated": "Ultima Actualizare"
@@ -130,6 +131,7 @@
   "view": {
     "title": "Vizualizează Material",
     "materialInformation": "Informații Material:",
+    "materialDetails": "Detalii Material:",
     "fields": {
       "materialName": "Nume Material",
       "color": "Culoare",

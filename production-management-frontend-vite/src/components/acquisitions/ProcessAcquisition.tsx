@@ -4,7 +4,7 @@ import { acquisitionApi, inventoryApi } from '../../services/api';
 import type { Acquisition, RawMaterial } from '../../types';
 import { AcquisitionType, MaterialType } from '../../types';
 import { Package, FileText, Truck, Building2, Plus, Trash2 } from 'lucide-react';
-import { Modal, Form, FormRow, FormGroup, Label, Input, Select, ErrorMessage, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue } from '../atoms';
+import { Modal, Form, FormRow, FormGroup, Label, Input, Select, ErrorMessage, ViewSection, ViewGrid, ViewItem, ViewLabel, ViewValue, Button, FormSection } from '../atoms';
 
 interface ProcessAcquisitionProps {
   isOpen: boolean;
@@ -216,7 +216,14 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
         )}
 
         {/* Info Message */}
-        <div className="info-message">
+        <div style={{ 
+          padding: 'var(--space-md)', 
+          backgroundColor: 'var(--info-50)', 
+          border: '1px solid var(--info-200)',
+          borderRadius: 'var(--radius-md)',
+          marginBottom: 'var(--space-lg)',
+          color: 'var(--info-700)'
+        }}>
           <strong>{t('process.messages.processingInstructionsLabel', { defaultValue: 'Processing Instructions' })}:</strong> {t('process.messages.processingInstructions')}
         </div>
 
@@ -253,212 +260,271 @@ const ProcessAcquisition: React.FC<ProcessAcquisitionProps> = ({
 
         {/* Transport & Supplier Details */}
         {(acquisition.transportCarName || acquisition.supplierName) && (
-          <ViewSection>
-            <div className="details-grid">
-              {/* Transport Details */}
-              {acquisition.transportCarName && (
-                <div className="details-column">
-                  <h4><Truck size={18} /> {t('view.sections.transport')}</h4>
-                  <ViewGrid>
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+            gap: 'var(--space-xl)',
+            marginBottom: 'var(--space-xl)'
+          }}>
+            {/* Transport Details */}
+            {acquisition.transportCarName && (
+              <ViewSection title={t('view.sections.transport')} titleIcon={Truck}>
+                <ViewGrid>
+                  <ViewItem>
+                    <ViewLabel>{t('view.labels.vehicle')}</ViewLabel>
+                    <ViewValue>{acquisition.transportCarName}</ViewValue>
+                  </ViewItem>
+                  <ViewItem>
+                    <ViewLabel>{t('view.labels.numberPlate')}</ViewLabel>
+                    <ViewValue>{acquisition.transportNumberPlate || t('view.labels.notSet')}</ViewValue>
+                  </ViewItem>
+                  {acquisition.transportPhoneNumber && (
                     <ViewItem>
-                      <ViewLabel>{t('view.labels.vehicle')}</ViewLabel>
-                      <ViewValue>{acquisition.transportCarName}</ViewValue>
+                      <ViewLabel>{t('view.labels.phone')}</ViewLabel>
+                      <ViewValue>{acquisition.transportPhoneNumber}</ViewValue>
                     </ViewItem>
-                    <ViewItem>
-                      <ViewLabel>{t('view.labels.numberPlate')}</ViewLabel>
-                      <ViewValue>{acquisition.transportNumberPlate || t('view.labels.notSet')}</ViewValue>
-                    </ViewItem>
-                    {acquisition.transportPhoneNumber && (
-                      <ViewItem>
-                        <ViewLabel>{t('view.labels.phone')}</ViewLabel>
-                        <ViewValue>{acquisition.transportPhoneNumber}</ViewValue>
-                      </ViewItem>
-                    )}
-                  </ViewGrid>
-                </div>
-              )}
+                  )}
+                </ViewGrid>
+              </ViewSection>
+            )}
 
-              {/* Supplier Details */}
-              {acquisition.supplierName && (
-                <div className="details-column">
-                  <h4><Building2 size={18} /> {t('view.sections.supplier')}</h4>
-                  <ViewGrid>
+            {/* Supplier Details */}
+            {acquisition.supplierName && (
+              <ViewSection title={t('view.sections.supplier')} titleIcon={Building2}>
+                <ViewGrid>
+                  <ViewItem>
+                    <ViewLabel>{t('view.labels.name')}</ViewLabel>
+                    <ViewValue>{acquisition.supplierName}</ViewValue>
+                  </ViewItem>
+                  {acquisition.supplierContact && (
                     <ViewItem>
-                      <ViewLabel>{t('view.labels.name')}</ViewLabel>
-                      <ViewValue>{acquisition.supplierName}</ViewValue>
+                      <ViewLabel>{t('view.labels.contact')}</ViewLabel>
+                      <ViewValue>{acquisition.supplierContact}</ViewValue>
                     </ViewItem>
-                    {acquisition.supplierContact && (
-                      <ViewItem>
-                        <ViewLabel>{t('view.labels.contact')}</ViewLabel>
-                        <ViewValue>{acquisition.supplierContact}</ViewValue>
-                      </ViewItem>
-                    )}
-                  </ViewGrid>
-                </div>
-              )}
-            </div>
-          </ViewSection>
+                  )}
+                </ViewGrid>
+              </ViewSection>
+            )}
+          </div>
         )}
 
-          {/* Recyclable Materials & Processing */}
-          <div className="form-section">
-            <h3><Package size={20} /> {t('process.sections.processRecyclableMaterials')}</h3>
-
-            {/* Processing Error Message */}
-            {processingError && (
-              <div className="error-message">
-                {processingError}
-                <button onClick={() => setProcessingError(null)}>×</button>
-              </div>
-            )}
+        {/* Recyclable Materials & Processing */}
+        <FormSection title={t('process.sections.processRecyclableMaterials')} titleIcon={Package}>
+          {/* Processing Error Message */}
+          {processingError && (
+            <ErrorMessage
+              message={processingError}
+              onDismiss={() => setProcessingError(null)}
+            />
+          )}
+          
+          {recyclableItems.map((item) => {
+            const remainingQty = getRemainingQuantity(item);
+            const itemProcessedMaterials = processedMaterials.filter(m => m.recyclableItemId === item.id);
             
-            {recyclableItems.map((item) => {
-              const remainingQty = getRemainingQuantity(item);
-              const itemProcessedMaterials = processedMaterials.filter(m => m.recyclableItemId === item.id);
-              
-              return (
-                <div key={item.id} className="recyclable-item-card">
-                  <div className="recyclable-header">
-                    <div className="recyclable-info">
-                      <h4>{item.name}</h4>
-                      <p>{t('process.labels.color')}: {item.color} | {t('process.labels.available')}: <strong>{item.quantity} {item.unitOfMeasure}</strong></p>
-                    </div>
-                    <div className="remaining-quantity">
-                      <span className={remainingQty === 0 ? 'fully-processed' : remainingQty < 0 ? 'over-processed' : ''}>
-                        {t('process.labels.remaining')}: <strong>{remainingQty} {item.unitOfMeasure}</strong>
-                        {remainingQty < 0 && <span style={{ marginLeft: '8px', fontSize: '0.85em', color: 'var(--warning-700)' }}>{t('process.labels.overProcessingAllowed')}</span>}
-                      </span>
-                    </div>
+            return (
+              <div key={item.id} style={{ 
+                marginBottom: 'var(--space-xl)',
+                padding: 'var(--space-lg)', 
+                border: '1px solid var(--border)', 
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--surface)'
+              }}>
+                <div style={{ 
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                  marginBottom: 'var(--space-lg)',
+                  paddingBottom: 'var(--space-md)',
+                  borderBottom: '1px solid var(--border)'
+                }}>
+                  <div>
+                    <h4 style={{ 
+                      margin: 0,
+                      marginBottom: 'var(--space-xs)',
+                      fontSize: 'var(--text-lg)',
+                      fontWeight: 600,
+                      color: 'var(--text-primary)'
+                    }}>
+                      {item.name}
+                    </h4>
+                    <p style={{ 
+                      margin: 0,
+                      fontSize: 'var(--text-sm)',
+                      color: 'var(--text-secondary)'
+                    }}>
+                      {t('process.labels.color')}: {item.color} | {t('process.labels.available')}: <strong>{item.quantity} {item.unitOfMeasure}</strong>
+                    </p>
                   </div>
-
-                  {/* Processed Materials from this Recyclable */}
-                  {itemProcessedMaterials.length > 0 && (
-                    <div className="processed-materials-list">
-                      {itemProcessedMaterials.map((material) => (
-                        <div key={material.id} className="processed-material-item">
-                          <FormRow>
-                            <FormGroup>
-                              <Label>{t('process.labels.selectRawMaterialOrCreate')}</Label>
-                              <Select
-                                value={material.rawMaterialId?.toString() || ''}
-                                onChange={(e) => {
-                                  const value = e.target.value;
-                                  if (value === 'new') {
-                                    handleUpdateProcessedMaterial(material.id, {
-                                      rawMaterialId: null,
-                                      name: '',
-                                      color: '',
-                                      description: '',
-                                      isNew: true
-                                    });
-                                  } else if (value) {
-                                    handleSelectExistingRawMaterial(material.id, parseInt(value));
-                                  }
-                                }}
-                              >
-                                <option value="">{t('process.labels.selectOrCreateNew')}</option>
-                                <option value="new">{t('process.labels.createNewRawMaterial')}</option>
-                                <optgroup label={t('process.labels.existingRawMaterials')}>
-                                  {availableRawMaterials.map(rm => (
-                                    <option key={rm.id} value={rm.id}>
-                                      {rm.name} ({rm.color})
-                                    </option>
-                                  ))}
-                                </optgroup>
-                              </Select>
-                            </FormGroup>
-                            <FormGroup>
-                              <Label>{t('process.labels.quantity')}</Label>
-                              <Input
-                                type="number"
-                                value={material.quantity}
-                                onChange={(e) => handleUpdateProcessedMaterial(material.id, { quantity: parseFloat(e.target.value) || 0 })}
-                                onWheel={handleWheel}
-                                min="0"
-                                step="0.01"
-                                required
-                              />
-                            </FormGroup>
-                          </FormRow>
-
-                          {material.isNew && (
-                            <>
-                              <FormRow>
-                                <FormGroup>
-                                  <Label>{t('process.labels.materialName')}</Label>
-                                  <Input
-                                    type="text"
-                                    value={material.name}
-                                    onChange={(e) => handleUpdateProcessedMaterial(material.id, { name: e.target.value })}
-                                    placeholder={t('process.labels.enterMaterialName')}
-                                    required
-                                  />
-                                </FormGroup>
-                                <FormGroup>
-                                  <Label>{t('process.labels.color')}</Label>
-                                  <Input
-                                    type="text"
-                                    value={material.color}
-                                    onChange={(e) => handleUpdateProcessedMaterial(material.id, { color: e.target.value })}
-                                    placeholder={t('process.labels.enterColor')}
-                                    required
-                                  />
-                                </FormGroup>
-                              </FormRow>
-                              <FormRow>
-                                <FormGroup>
-                                  <Label>{t('process.labels.unitOfMeasure')}</Label>
-                                  <Input
-                                    type="text"
-                                    value={material.unitOfMeasure}
-                                    onChange={(e) => handleUpdateProcessedMaterial(material.id, { unitOfMeasure: e.target.value })}
-                                    placeholder={t('form.placeholders.unitExample')}
-                                    required
-                                  />
-                                </FormGroup>
-                                <FormGroup>
-                                  <Label>{t('process.labels.descriptionOptional')}</Label>
-                                  <Input
-                                    type="text"
-                                    value={material.description}
-                                    onChange={(e) => handleUpdateProcessedMaterial(material.id, { description: e.target.value })}
-                                    placeholder={t('process.labels.enterDescription')}
-                                  />
-                                </FormGroup>
-                              </FormRow>
-                            </>
-                          )}
-
-                          {!material.isNew && material.rawMaterialId && (
-                            <div className="selected-material-info">
-                              <p><strong>{t('process.labels.selected')}:</strong> {material.name} ({material.color}) - {material.unitOfMeasure}</p>
-                            </div>
-                          )}
-
-                          <button
-                            type="button"
-                            className="remove-material-button"
-                            onClick={() => handleRemoveProcessedMaterial(material.id)}
-                          >
-                            <Trash2 size={16} /> {t('process.labels.remove')}
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Add Processed Material Button */}
-                  <button
-                    type="button"
-                    className="add-processed-material-button"
-                    onClick={() => handleAddProcessedMaterial(item)}
-                  >
-                    <Plus size={16} /> {t('process.labels.addProcessedMaterial')}
-                  </button>
+                  <div style={{
+                    padding: 'var(--space-sm) var(--space-md)',
+                    backgroundColor: remainingQty === 0 ? 'var(--success-50)' : remainingQty < 0 ? 'var(--warning-50)' : 'var(--info-50)',
+                    border: `1px solid ${remainingQty === 0 ? 'var(--success-200)' : remainingQty < 0 ? 'var(--warning-200)' : 'var(--info-200)'}`,
+                    borderRadius: 'var(--radius-md)',
+                    textAlign: 'right'
+                  }}>
+                    <span style={{ 
+                      fontSize: 'var(--text-sm)',
+                      color: remainingQty === 0 ? 'var(--success-700)' : remainingQty < 0 ? 'var(--warning-700)' : 'var(--info-700)'
+                    }}>
+                      {t('process.labels.remaining')}: <strong>{remainingQty} {item.unitOfMeasure}</strong>
+                      {remainingQty < 0 && <span style={{ marginLeft: '8px', fontSize: '0.85em' }}>{t('process.labels.overProcessingAllowed')}</span>}
+                    </span>
+                  </div>
                 </div>
-              );
-            })}
-          </div>
+
+                {/* Processed Materials from this Recyclable */}
+                {itemProcessedMaterials.length > 0 && (
+                  <div style={{ 
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-md)',
+                    marginBottom: 'var(--space-md)'
+                  }}>
+                    {itemProcessedMaterials.map((material) => (
+                      <div key={material.id} style={{ 
+                        padding: 'var(--space-md)', 
+                        border: '1px solid var(--border)', 
+                        borderRadius: 'var(--radius-md)',
+                        backgroundColor: 'var(--background-secondary)'
+                      }}>
+                        <FormRow>
+                          <FormGroup>
+                            <Label>{t('process.labels.selectRawMaterialOrCreate')}</Label>
+                            <Select
+                              value={material.rawMaterialId?.toString() || ''}
+                              onChange={(e) => {
+                                const value = e.target.value;
+                                if (value === 'new') {
+                                  handleUpdateProcessedMaterial(material.id, {
+                                    rawMaterialId: null,
+                                    name: '',
+                                    color: '',
+                                    description: '',
+                                    isNew: true
+                                  });
+                                } else if (value) {
+                                  handleSelectExistingRawMaterial(material.id, parseInt(value));
+                                }
+                              }}
+                            >
+                              <option value="">{t('process.labels.selectOrCreateNew')}</option>
+                              <option value="new">{t('process.labels.createNewRawMaterial')}</option>
+                              <optgroup label={t('process.labels.existingRawMaterials')}>
+                                {availableRawMaterials.map(rm => (
+                                  <option key={rm.id} value={rm.id}>
+                                    {rm.name} ({rm.color})
+                                  </option>
+                                ))}
+                              </optgroup>
+                            </Select>
+                          </FormGroup>
+                          <FormGroup>
+                            <Label>{t('process.labels.quantity')}</Label>
+                            <Input
+                              type="number"
+                              value={material.quantity}
+                              onChange={(e) => handleUpdateProcessedMaterial(material.id, { quantity: parseFloat(e.target.value) || 0 })}
+                              onWheel={handleWheel}
+                              min="0"
+                              step="0.01"
+                              required
+                            />
+                          </FormGroup>
+                        </FormRow>
+
+                        {material.isNew && (
+                          <>
+                            <FormRow>
+                              <FormGroup>
+                                <Label>{t('process.labels.materialName')}</Label>
+                                <Input
+                                  type="text"
+                                  value={material.name}
+                                  onChange={(e) => handleUpdateProcessedMaterial(material.id, { name: e.target.value })}
+                                  placeholder={t('process.labels.enterMaterialName')}
+                                  required
+                                />
+                              </FormGroup>
+                              <FormGroup>
+                                <Label>{t('process.labels.color')}</Label>
+                                <Input
+                                  type="text"
+                                  value={material.color}
+                                  onChange={(e) => handleUpdateProcessedMaterial(material.id, { color: e.target.value })}
+                                  placeholder={t('process.labels.enterColor')}
+                                  required
+                                />
+                              </FormGroup>
+                            </FormRow>
+                            <FormRow>
+                              <FormGroup>
+                                <Label>{t('process.labels.unitOfMeasure')}</Label>
+                                <Input
+                                  type="text"
+                                  value={material.unitOfMeasure}
+                                  onChange={(e) => handleUpdateProcessedMaterial(material.id, { unitOfMeasure: e.target.value })}
+                                  placeholder={t('form.placeholders.unitExample')}
+                                  required
+                                />
+                              </FormGroup>
+                              <FormGroup>
+                                <Label>{t('process.labels.descriptionOptional')}</Label>
+                                <Input
+                                  type="text"
+                                  value={material.description}
+                                  onChange={(e) => handleUpdateProcessedMaterial(material.id, { description: e.target.value })}
+                                  placeholder={t('process.labels.enterDescription')}
+                                />
+                              </FormGroup>
+                            </FormRow>
+                          </>
+                        )}
+
+                        {!material.isNew && material.rawMaterialId && (
+                          <div style={{ 
+                            padding: 'var(--space-sm)', 
+                            backgroundColor: 'var(--success-50)',
+                            border: '1px solid var(--success-200)',
+                            borderRadius: 'var(--radius-sm)',
+                            marginTop: 'var(--space-md)'
+                          }}>
+                            <p style={{ 
+                              margin: 0,
+                              fontSize: 'var(--text-sm)',
+                              color: 'var(--success-700)'
+                            }}>
+                              <strong>{t('process.labels.selected')}:</strong> {material.name} ({material.color}) - {material.unitOfMeasure}
+                            </p>
+                          </div>
+                        )}
+
+                        <Button
+                          type="button"
+                          variant="danger"
+                          size="sm"
+                          onClick={() => handleRemoveProcessedMaterial(material.id)}
+                          style={{ marginTop: 'var(--space-md)' }}
+                        >
+                          <Trash2 size={16} /> {t('process.labels.remove')}
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* Add Processed Material Button */}
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => handleAddProcessedMaterial(item)}
+                >
+                  <Plus size={16} /> {t('process.labels.addProcessedMaterial')}
+                </Button>
+              </div>
+            );
+          })}
+        </FormSection>
 
       </Form>
     </Modal>

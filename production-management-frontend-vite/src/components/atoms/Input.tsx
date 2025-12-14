@@ -34,16 +34,36 @@ const Input = ({
   error = false,
   errorMessage,
   className = '',
+  onClick,
+  onFocus,
   ...restProps
 }: InputProps) => {
   // Explicitly exclude children and dangerouslySetInnerHTML from restProps
   const { children, dangerouslySetInnerHTML, ...inputProps } = restProps as any;
+  
+  // Handle click for number inputs - select all text
+  const handleClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    if (type === 'number') {
+      e.currentTarget.select();
+    }
+    onClick?.(e);
+  };
+
+  // Handle focus for number inputs - select all text
+  const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (type === 'number') {
+      e.currentTarget.select();
+    }
+    onFocus?.(e);
+  };
   
   return (
     <div className="form-input-wrapper">
       <input
         type={type}
         className={`form-input form-input-${size} ${error ? 'form-input-error' : ''} ${className}`.trim()}
+        onClick={handleClick}
+        onFocus={handleFocus}
         {...inputProps}
       />
       {error && errorMessage && (

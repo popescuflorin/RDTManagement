@@ -40,38 +40,122 @@ const PermissionCategory: React.FC<PermissionCategoryProps> = ({
   }, [isPartiallySelected]);
 
   return (
-    <div className="permission-category">
-      <div className="category-header">
-        <label className="category-checkbox">
+    <div style={{ 
+      marginBottom: 'var(--space-lg)',
+      padding: 'var(--space-md)', 
+      border: '1px solid var(--border)', 
+      borderRadius: 'var(--radius-md)',
+      backgroundColor: 'var(--surface)'
+    }}>
+      <div style={{ 
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 'var(--space-md)',
+        paddingBottom: 'var(--space-sm)',
+        borderBottom: '1px solid var(--border)'
+      }}>
+        <label style={{ 
+          display: 'flex',
+          alignItems: 'center',
+          gap: 'var(--space-sm)',
+          cursor: disabled ? 'not-allowed' : 'pointer',
+          opacity: disabled ? 0.6 : 1
+        }}>
           <input
             ref={checkboxRef}
             type="checkbox"
             checked={isFullySelected}
             onChange={onCategoryToggle}
             disabled={disabled}
+            style={{ 
+              width: '18px',
+              height: '18px',
+              cursor: disabled ? 'not-allowed' : 'pointer'
+            }}
           />
-          <h4>{category}</h4>
+          <h4 style={{ 
+            margin: 0,
+            fontSize: 'var(--text-base)',
+            fontWeight: 600,
+            color: 'var(--text-primary)'
+          }}>
+            {category}
+          </h4>
         </label>
-        <span className="category-count">
+        <span style={{ 
+          fontSize: 'var(--text-sm)',
+          color: 'var(--text-secondary)',
+          fontWeight: 500
+        }}>
           {permissions.filter(p => selectedPermissions.includes(p.key)).length} / {permissions.length}
         </span>
       </div>
 
-      <div className="permissions-list">
+      <div style={{ 
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--space-xs)'
+      }}>
         {permissions.map((permission) => (
-          <label key={permission.key} className="permission-item">
+          <label 
+            key={permission.key} 
+            style={{ 
+              display: 'flex',
+              alignItems: 'flex-start',
+              gap: 'var(--space-sm)',
+              padding: 'var(--space-sm)',
+              borderRadius: 'var(--radius-sm)',
+              cursor: disabled ? 'not-allowed' : 'pointer',
+              backgroundColor: selectedPermissions.includes(permission.key) ? 'var(--primary-50)' : 'transparent',
+              border: `1px solid ${selectedPermissions.includes(permission.key) ? 'var(--primary-200)' : 'transparent'}`,
+              transition: 'all var(--transition-fast)',
+              opacity: disabled ? 0.6 : 1
+            }}
+            onMouseEnter={(e) => {
+              if (!disabled) {
+                e.currentTarget.style.backgroundColor = selectedPermissions.includes(permission.key) ? 'var(--primary-100)' : 'var(--surface-hover)';
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = selectedPermissions.includes(permission.key) ? 'var(--primary-50)' : 'transparent';
+            }}
+          >
             <input
               type="checkbox"
               checked={selectedPermissions.includes(permission.key)}
               onChange={() => onPermissionToggle(permission.key)}
               disabled={disabled}
+              style={{ 
+                width: '16px',
+                height: '16px',
+                marginTop: '2px',
+                cursor: disabled ? 'not-allowed' : 'pointer'
+              }}
             />
-            <div className="permission-details">
-              <div className="permission-name">{permission.name}</div>
-              <div className="permission-description">{permission.description}</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ 
+                fontSize: 'var(--text-sm)',
+                fontWeight: 500,
+                color: 'var(--text-primary)',
+                marginBottom: '2px'
+              }}>
+                {permission.name}
+              </div>
+              <div style={{ 
+                fontSize: 'var(--text-xs)',
+                color: 'var(--text-secondary)',
+                lineHeight: 1.4
+              }}>
+                {permission.description}
+              </div>
             </div>
             {selectedPermissions.includes(permission.key) && (
-              <Check size={16} className="check-icon" />
+              <Check size={16} style={{ 
+                color: 'var(--primary-600)',
+                flexShrink: 0,
+                marginTop: '2px'
+              }} />
             )}
           </label>
         ))}
@@ -224,14 +308,28 @@ const CreateRole: React.FC<CreateRoleProps> = ({ onClose, onRoleCreated }) => {
             </FormSection>
 
             <FormSection title={t('createRole.labels.assignPermissions')}>
-              <div className="permissions-summary">
-                <p>
+              <div style={{ 
+                padding: 'var(--space-md)', 
+                backgroundColor: 'var(--info-50)', 
+                border: '1px solid var(--info-200)',
+                borderRadius: 'var(--radius-md)',
+                marginBottom: 'var(--space-lg)'
+              }}>
+                <p style={{ 
+                  margin: 0,
+                  fontSize: 'var(--text-sm)',
+                  color: 'var(--info-700)'
+                }}>
                   {t('createRole.labels.selected')} <strong>{selectedPermissions.length}</strong> {t('createRole.labels.of')}{' '}
                   <strong>{Object.values(allPermissions).flat().length}</strong> {t('createRole.labels.permissions')}
                 </p>
               </div>
 
-              <div className="permissions-grid">
+              <div style={{ 
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+                gap: 'var(--space-lg)'
+              }}>
                 {Object.entries(allPermissions).map(([category, permissions]) => (
                   <PermissionCategory
                     key={category}

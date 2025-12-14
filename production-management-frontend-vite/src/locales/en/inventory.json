@@ -130,6 +130,7 @@
   "view": {
     "title": "View Material",
     "materialInformation": "Material Information:",
+    "materialDetails": "Material Details:",
     "fields": {
       "materialName": "Material Name",
       "color": "Color",

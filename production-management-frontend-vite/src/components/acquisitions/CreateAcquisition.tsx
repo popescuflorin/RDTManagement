@@ -4,7 +4,7 @@ import { acquisitionApi, inventoryApi, supplierApi, transportApi, userApi } from
 import type { RawMaterial, CreateAcquisitionRequest, Supplier, CreateSupplierRequest, Transport, CreateTransportRequest, User } from '../../types';
 import { AcquisitionType, MaterialType } from '../../types';
 import { Plus, Trash2, Building2, FileText, Truck, Package, UserCircle } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, ErrorMessage, DropdownMenu } from '../atoms';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, ErrorMessage, DropdownMenu, Button } from '../atoms';
 
 interface CreateAcquisitionProps {
   isOpen: boolean;
@@ -617,7 +617,7 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
             <FormRow>
               <FormGroup>
                 <Label htmlFor="transportCarName">{t('form.fields.carName')}</Label>
-                <div className="material-search-container">
+                <div className="material-search-container" style={{ position: 'relative' }}>
                   <Input
                     type="text"
                     id="transportCarName"
@@ -796,40 +796,39 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                   />
                 </FormGroup>
 
-                <div className="form-actions">
-                  <button
+                <FormRow>
+                  <Button
                     type="button"
-                    className="save-item-button"
+                    variant="primary"
                     onClick={handleCreateSupplier}
                   >
                     <Building2 size={16} />
                      {t('form.labels.createNewSupplier')}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
-                    className="cancel-button"
+                    variant="secondary"
                     onClick={() => setShowCreateSupplier(false)}
                   >
                     {t('form.buttons.cancel')}
-                  </button>
-                </div>
+                  </Button>
+                </FormRow>
               </div>
             )}
           </FormSection>
 
           {/* Materials Section */}
           <FormSection title={t('form.sections.materials')} titleIcon={Package}>
-            <div className="section-header">
-              <div></div>
-              <button
+            {!showAddItemForm ? (
+              <Button
                 type="button"
-                className="btn btn-md btn-primary"
-                onClick={() => setShowAddItemForm(!showAddItemForm)}
+                variant="secondary"
+                onClick={() => setShowAddItemForm(true)}
               >
                 <Plus size={20} />
                 {t('form.buttons.addMaterial')}
-              </button>
-            </div>
+              </Button>
+            ) : null}
             {/* Material Error Message */}
             {materialError && (
               <ErrorMessage
@@ -840,11 +839,16 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
 
             {/* Add Item Form */}
             {showAddItemForm && (
-              <div className="add-item-form">
+              <div className="add-item-form" style={{ 
+                padding: 'var(--space-lg)', 
+                border: '1px solid var(--border)', 
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--background-secondary)'
+              }}>
                 <FormRow>
                   <FormGroup className="material-search-group">
                     <Label htmlFor="materialSearch">{t('form.fields.materialName')} *</Label>
-                    <div className="material-search-container">
+                    <div className="material-search-container" style={{ position: 'relative' }}>
                       <Input
                         type="text"
                         id="materialSearch"
@@ -923,20 +927,20 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                 </FormGroup>
 
                 <FormRow>
-                  <button
+                  <Button
                     type="button"
-                    className="btn btn-md btn-primary"
+                    variant="primary"
                     onClick={handleAddNewMaterial}
                   >
                     {t('form.buttons.addMaterial')}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
-                    className="btn btn-md btn-secondary"
+                    variant="secondary"
                     onClick={() => setShowAddItemForm(false)}
                   >
                     {t('form.buttons.cancel')}
-                  </button>
+                  </Button>
                 </FormRow>
               </div>
             )}
@@ -944,19 +948,50 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
 
             {/* Selected Items */}
             {items.length > 0 && (
-              <div className="selected-items">
-                <h4>{t('form.labels.selectedMaterials')} ({items.length})</h4>
-                <div className="items-list">
+              <div style={{ marginTop: 'var(--space-lg)' }}>
+                <h4 style={{ marginBottom: 'var(--space-md)' }}>
+                  {t('form.labels.selectedMaterials')} ({items.length})
+                </h4>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: 'var(--space-md)' 
+                }}>
                   {items.map((item) => (
-                    <div key={item.id} className="item-card">
-                      <div className="item-info">
-                        <div className="item-name">{item.name}</div>
-                        <div className="item-color">{t('form.itemCard.color')}: {item.color}</div>
+                    <div key={item.id} style={{ 
+                      padding: 'var(--space-lg)', 
+                      border: '1px solid var(--border)', 
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: 'var(--surface)',
+                      display: 'flex',
+                      gap: 'var(--space-md)',
+                      alignItems: 'flex-start'
+                    }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ 
+                          fontWeight: 600, 
+                          fontSize: 'var(--text-base)', 
+                          marginBottom: 'var(--space-xs)' 
+                        }}>
+                          {item.name}
+                        </div>
+                        <div style={{ 
+                          fontSize: 'var(--text-sm)', 
+                          color: 'var(--text-secondary)',
+                          marginBottom: 'var(--space-xs)' 
+                        }}>
+                          {t('form.itemCard.color')}: {item.color}
+                        </div>
                         {item.description && (
-                          <div className="item-description">{item.description}</div>
+                          <div style={{ 
+                            fontSize: 'var(--text-sm)', 
+                            color: 'var(--text-secondary)' 
+                          }}>
+                            {item.description}
+                          </div>
                         )}
                       </div>
-                      <div className="item-details">
+                      <div style={{ flex: 2 }}>
                         <FormRow>
                           <FormGroup>
                             <Label>{t('form.itemCard.quantity')}</Label>
@@ -976,45 +1011,52 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
                               value={item.unitOfMeasure}
                               onChange={(e) => handleUpdateItem(item.id, { unitOfMeasure: e.target.value })}
                               disabled={true}
-                              className={!item.isNew ? 'disabled-field' : ''}
-                            />
-                          </FormGroup>
-                        </FormRow>
-                        <FormRow>
-                          <FormGroup>
-                            <Label>{t('form.itemCard.color')}</Label>
-                            <Input
-                              type="text"
-                              value={item.color}
-                              onChange={(e) => handleUpdateItem(item.id, { color: e.target.value })}
-                              placeholder={t('form.placeholders.enterColor')}
-                              disabled={true}
-                              className={!item.isNew ? 'disabled-field' : ''}
-                            />
-                          </FormGroup>
-                        </FormRow>
+                            className={!item.isNew ? 'disabled-field' : ''}
+                          />
+                        </FormGroup>
+                      </FormRow>
+                      <FormRow>
                         <FormGroup>
-                          <Label>{t('form.fields.itemDescription')}</Label>
-                          <Textarea
-                            value={item.description}
-                            onChange={(e) => handleUpdateItem(item.id, { description: e.target.value })}
-                            placeholder={t('form.placeholders.materialDescription')}
-                            rows={2}
+                          <Label>{t('form.itemCard.color')}</Label>
+                          <Input
+                            type="text"
+                            value={item.color}
+                            onChange={(e) => handleUpdateItem(item.id, { color: e.target.value })}
+                            placeholder={t('form.placeholders.enterColor')}
                             disabled={true}
                             className={!item.isNew ? 'disabled-field' : ''}
                           />
                         </FormGroup>
-                        <div className="item-total">
-                          {t('form.itemCard.quantity')}: {item.quantity} {item.unitOfMeasure}
-                        </div>
+                      </FormRow>
+                      <FormGroup>
+                        <Label>{t('form.fields.itemDescription')}</Label>
+                        <Textarea
+                          value={item.description}
+                          onChange={(e) => handleUpdateItem(item.id, { description: e.target.value })}
+                          placeholder={t('form.placeholders.materialDescription')}
+                          rows={2}
+                          disabled={true}
+                          className={!item.isNew ? 'disabled-field' : ''}
+                        />
+                      </FormGroup>
+                      <div style={{ 
+                        marginTop: 'var(--space-md)', 
+                        padding: 'var(--space-sm)', 
+                        backgroundColor: 'var(--background-secondary)', 
+                        borderRadius: 'var(--radius-sm)',
+                        fontWeight: 600
+                      }}>
+                        {t('form.itemCard.quantity')}: {item.quantity} {item.unitOfMeasure}
                       </div>
-                      <button
-                        type="button"
-                        className="btn btn-md btn-danger"
-                        onClick={() => handleRemoveItem(item.id)}
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      size="sm"
+                      onClick={() => handleRemoveItem(item.id)}
+                    >
+                      <Trash2 size={16} />
+                    </Button>
                     </div>
                   ))}
                 </div>
@@ -1023,7 +1065,14 @@ const CreateAcquisition: React.FC<CreateAcquisitionProps> = ({
 
             {/* Items Summary */}
             {items.length > 0 && (
-              <div className="total-cost">
+              <div style={{ 
+                marginTop: 'var(--space-lg)', 
+                padding: 'var(--space-md)', 
+                display: 'flex', 
+                justifyContent: 'flex-end',
+                borderTop: '1px solid var(--border)',
+                backgroundColor: 'var(--background-secondary)'
+              }}>
                 <strong>
                   {t('form.labels.totalItems')}: {items.length} {t('form.labels.materialsSelected')}
                 </strong>

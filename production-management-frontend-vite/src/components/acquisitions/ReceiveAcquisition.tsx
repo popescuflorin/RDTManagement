@@ -147,7 +147,14 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
 
         {/* Info Message for Recyclable Materials */}
         {acquisition.type === AcquisitionType.RecyclableMaterials && (
-          <div className="info-message">
+          <div style={{ 
+            padding: 'var(--space-md)', 
+            backgroundColor: 'var(--info-50)', 
+            border: '1px solid var(--info-200)',
+            borderRadius: 'var(--radius-md)',
+            marginBottom: 'var(--space-lg)',
+            color: 'var(--info-700)'
+          }}>
             <strong>{t('common:labels.notes', { defaultValue: 'Note' })}:</strong> {t('receive.messages.recyclableMaterialsNote')}
           </div>
         )}
@@ -195,118 +202,151 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
           </ViewGrid>
         </ViewSection>
 
-          {/* Transport & Supplier Details - Compact */}
-          {(acquisition.transportCarName || acquisition.supplierName) && (
-            <div className="form-section">
-              <div className="details-grid">
-                {/* Transport Details */}
-                {acquisition.transportCarName && (
-                  <div className="details-column">
-                    <h4><Truck size={18} /> {t('view.sections.transport')}</h4>
-                    <div className="acquisition-summary">
-                      <div className="summary-row">
-                        <span className="summary-label">{t('view.labels.vehicle')}:</span>
-                        <span className="summary-value">{acquisition.transportCarName}</span>
-                      </div>
-                      {acquisition.transportNumberPlate && (
-                        <div className="summary-row">
-                          <span className="summary-label">{t('view.labels.numberPlate')}:</span>
-                          <span className="summary-value">{acquisition.transportNumberPlate}</span>
-                        </div>
-                      )}
-                      {acquisition.transportPhoneNumber && (
-                        <div className="summary-row">
-                          <span className="summary-label">{t('view.labels.phone')}:</span>
-                          <span className="summary-value">{acquisition.transportPhoneNumber}</span>
-                        </div>
-                      )}
-                      {acquisition.transportDate && (
-                        <div className="summary-row">
-                          <span className="summary-label">{t('view.labels.date')}:</span>
-                          <span className="summary-value">{new Date(acquisition.transportDate).toLocaleDateString()}</span>
-                        </div>
-                      )}
-                      {acquisition.transportNotes && (
-                        <div className="summary-row">
-                          <span className="summary-label">{t('view.labels.transportNotes')}:</span>
-                          <span className="summary-value">{acquisition.transportNotes}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
+        {/* Transport & Supplier Details - Compact */}
+        {(acquisition.transportCarName || acquisition.supplierName) && (
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', 
+            gap: 'var(--space-xl)',
+            marginBottom: 'var(--space-xl)'
+          }}>
+            {/* Transport Details */}
+            {acquisition.transportCarName && (
+              <ViewSection title={t('view.sections.transport')} titleIcon={Truck}>
+                <ViewGrid>
+                  <ViewItem>
+                    <ViewLabel>{t('view.labels.vehicle')}</ViewLabel>
+                    <ViewValue>{acquisition.transportCarName}</ViewValue>
+                  </ViewItem>
+                  {acquisition.transportNumberPlate && (
+                    <ViewItem>
+                      <ViewLabel>{t('view.labels.numberPlate')}</ViewLabel>
+                      <ViewValue>{acquisition.transportNumberPlate}</ViewValue>
+                    </ViewItem>
+                  )}
+                  {acquisition.transportPhoneNumber && (
+                    <ViewItem>
+                      <ViewLabel>{t('view.labels.phone')}</ViewLabel>
+                      <ViewValue>{acquisition.transportPhoneNumber}</ViewValue>
+                    </ViewItem>
+                  )}
+                  {acquisition.transportDate && (
+                    <ViewItem>
+                      <ViewLabel>{t('view.labels.date')}</ViewLabel>
+                      <ViewValue>{new Date(acquisition.transportDate).toLocaleDateString()}</ViewValue>
+                    </ViewItem>
+                  )}
+                  {acquisition.transportNotes && (
+                    <ViewItem>
+                      <ViewLabel>{t('view.labels.transportNotes')}</ViewLabel>
+                      <ViewValue>{acquisition.transportNotes}</ViewValue>
+                    </ViewItem>
+                  )}
+                </ViewGrid>
+              </ViewSection>
+            )}
 
-                {/* Supplier Details */}
-                {acquisition.supplierName && (
-                  <div className="details-column">
-                    <h4><Building2 size={18} /> {t('view.sections.supplier')}</h4>
-                    <div className="acquisition-summary">
-                      <div className="summary-row">
-                        <span className="summary-label">{t('view.labels.name')}:</span>
-                        <span className="summary-value">{acquisition.supplierName}</span>
-                      </div>
-                      {acquisition.supplierContact && (
-                        <div className="summary-row">
-                          <span className="summary-label">{t('view.labels.contact')}:</span>
-                          <span className="summary-value">{acquisition.supplierContact}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          )}
+            {/* Supplier Details */}
+            {acquisition.supplierName && (
+              <ViewSection title={t('view.sections.supplier')} titleIcon={Building2}>
+                <ViewGrid>
+                  <ViewItem>
+                    <ViewLabel>{t('view.labels.name')}</ViewLabel>
+                    <ViewValue>{acquisition.supplierName}</ViewValue>
+                  </ViewItem>
+                  {acquisition.supplierContact && (
+                    <ViewItem>
+                      <ViewLabel>{t('view.labels.contact')}</ViewLabel>
+                      <ViewValue>{acquisition.supplierContact}</ViewValue>
+                    </ViewItem>
+                  )}
+                </ViewGrid>
+              </ViewSection>
+            )}
+          </div>
+        )}
 
         {/* Materials - With Received Quantity */}
         <FormSection title={t('receive.sections.materialsToReceive')} titleIcon={Package}>
-          <div className="received-items">
+          <div style={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            gap: 'var(--space-md)' 
+          }}>
             {items.map((item, index) => (
-              <div key={item.id} className="item-card">
-                <div className="item-info">
-                  <div className="item-name">{item.name}</div>
-                  <div className="item-color">{t('form.itemCard.color')}: {item.color}</div>
-                </div>
-                <div className="item-details">
-                  <FormRow>
-                    <FormGroup>
-                      <Label>{t('receive.labels.orderedQuantity')}</Label>
-                      <Input
-                        type="number"
-                        value={item.orderedQuantity}
-                        disabled
-                        className="disabled-field"
-                      />
-                    </FormGroup>
-                    <FormGroup>
-                      <Label>{t('receive.labels.receivedQuantity')} *</Label>
-                      <Input
-                        type="number"
-                        value={item.receivedQuantity}
-                        onChange={(e) => handleUpdateReceivedQuantity(index, parseFloat(e.target.value) || 0)}
-                        onWheel={handleWheel}
-                        min="0"
-                        step="0.01"
-                        placeholder={t('receive.labels.enterReceivedQuantity')}
-                      />
-                    </FormGroup>
-                  </FormRow>
-                  <FormRow>
-                    <FormGroup>
-                      <Label>{t('receive.labels.unitOfMeasure')}</Label>
-                      <Input
-                        type="text"
-                        value={item.unitOfMeasure}
-                        disabled
-                        className="disabled-field"
-                      />
-                    </FormGroup>
-                  </FormRow>
-                  <div className="item-summary">
-                    <div className={`quantity-status ${item.receivedQuantity === item.orderedQuantity ? 'complete' : item.receivedQuantity > item.orderedQuantity ? 'excess' : 'partial'}`}>
-                      {item.receivedQuantity === item.orderedQuantity && t('receive.labels.complete')}
-                      {item.receivedQuantity > item.orderedQuantity && t('receive.labels.excessReceived')}
-                      {item.receivedQuantity < item.orderedQuantity && t('receive.labels.partialDelivery')}
+              <div key={item.id} style={{ 
+                padding: 'var(--space-lg)', 
+                border: '1px solid var(--border)', 
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--surface)'
+              }}>
+                <div style={{ 
+                  display: 'flex',
+                  gap: 'var(--space-md)',
+                  alignItems: 'flex-start'
+                }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ 
+                      fontWeight: 600, 
+                      fontSize: 'var(--text-base)', 
+                      marginBottom: 'var(--space-xs)' 
+                    }}>
+                      {item.name}
+                    </div>
+                    <div style={{ 
+                      fontSize: 'var(--text-sm)', 
+                      color: 'var(--text-secondary)' 
+                    }}>
+                      {t('form.itemCard.color')}: {item.color}
+                    </div>
+                  </div>
+                  <div style={{ flex: 2 }}>
+                    <FormRow>
+                      <FormGroup>
+                        <Label>{t('receive.labels.orderedQuantity')}</Label>
+                        <Input
+                          type="number"
+                          value={item.orderedQuantity}
+                          disabled
+                          className="disabled-field"
+                        />
+                      </FormGroup>
+                      <FormGroup>
+                        <Label>{t('receive.labels.receivedQuantity')} *</Label>
+                        <Input
+                          type="number"
+                          value={item.receivedQuantity}
+                          onChange={(e) => handleUpdateReceivedQuantity(index, parseFloat(e.target.value) || 0)}
+                          onWheel={handleWheel}
+                          min="0"
+                          step="0.01"
+                          placeholder={t('receive.labels.enterReceivedQuantity')}
+                        />
+                      </FormGroup>
+                    </FormRow>
+                    <FormRow>
+                      <FormGroup>
+                        <Label>{t('receive.labels.unitOfMeasure')}</Label>
+                        <Input
+                          type="text"
+                          value={item.unitOfMeasure}
+                          disabled
+                          className="disabled-field"
+                        />
+                      </FormGroup>
+                    </FormRow>
+                    <div style={{ 
+                      marginTop: 'var(--space-md)', 
+                      padding: 'var(--space-sm)', 
+                      borderRadius: 'var(--radius-sm)',
+                      textAlign: 'center',
+                      fontWeight: 600
+                    }}>
+                      <div className={`quantity-status ${item.receivedQuantity === item.orderedQuantity ? 'complete' : item.receivedQuantity > item.orderedQuantity ? 'excess' : 'partial'}`}>
+                        {item.receivedQuantity === item.orderedQuantity && t('receive.labels.complete')}
+                        {item.receivedQuantity > item.orderedQuantity && t('receive.labels.excessReceived')}
+                        {item.receivedQuantity < item.orderedQuantity && t('receive.labels.partialDelivery')}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -315,14 +355,23 @@ const ReceiveAcquisition: React.FC<ReceiveAcquisitionProps> = ({
           </div>
 
           {/* Reception Summary */}
-          <div className="reception-summary">
-            <div className="summary-item">
+          <div style={{ 
+            marginTop: 'var(--space-lg)', 
+            padding: 'var(--space-md)', 
+            display: 'flex',
+            gap: 'var(--space-xl)',
+            flexWrap: 'wrap',
+            borderTop: '1px solid var(--border)',
+            backgroundColor: 'var(--background-secondary)',
+            borderRadius: 'var(--radius-md)'
+          }}>
+            <div>
               <strong>{t('receive.labels.totalItems')}:</strong> {items.length}
             </div>
-            <div className="summary-item">
+            <div>
               <strong>{t('receive.labels.totalOrdered')}:</strong> {items.reduce((sum, item) => sum + item.orderedQuantity, 0).toFixed(2)} {t('receive.labels.units')}
             </div>
-            <div className="summary-item">
+            <div>
               <strong>{t('receive.labels.totalReceiving')}:</strong> {items.reduce((sum, item) => sum + item.receivedQuantity, 0).toFixed(2)} {t('receive.labels.units')}
             </div>
           </div>

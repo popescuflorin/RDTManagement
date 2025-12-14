@@ -4,7 +4,7 @@ import { acquisitionApi, inventoryApi, supplierApi, transportApi, userApi } from
 import type { RawMaterial, UpdateAcquisitionRequest, Supplier, CreateSupplierRequest, Transport, CreateTransportRequest, User, Acquisition } from '../../types';
 import { AcquisitionType, MaterialType } from '../../types';
 import { Plus, Trash2, Building2, FileText, Truck, Package, UserCircle } from 'lucide-react';
-import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, ErrorMessage, DropdownMenu } from '../atoms';
+import { Modal, Form, FormSection, FormRow, FormGroup, Label, Input, Textarea, Select, ErrorMessage, DropdownMenu, Button } from '../atoms';
 
 interface EditAcquisitionProps {
   isOpen: boolean;
@@ -539,18 +539,18 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
 
           {/* Transport Details Section */}
           <FormSection title={t('form.sections.transportDetails')} titleIcon={Truck}>
-              <div className="form-row">
-                <div className="form-group">
-                  <label htmlFor="transportCarName">{t('form.fields.carName')}</label>
-                  <div className="material-search-container">
-                    <input
-                      type="text"
-                      id="transportCarName"
-                      value={transportSearchTerm}
-                      onChange={(e) => handleTransportSearchChange(e.target.value)}
-                      onFocus={handleTransportInputFocus}
-                      placeholder={t('form.placeholders.searchOrEnterCar')}
-                    />
+            <FormRow>
+              <FormGroup>
+                <Label htmlFor="transportCarName">{t('form.fields.carName')}</Label>
+                <div className="material-search-container" style={{ position: 'relative' }}>
+                  <Input
+                    type="text"
+                    id="transportCarName"
+                    value={transportSearchTerm}
+                    onChange={(e) => handleTransportSearchChange(e.target.value)}
+                    onFocus={handleTransportInputFocus}
+                    placeholder={t('form.placeholders.searchOrEnterCar')}
+                  />
                   <DropdownMenu<Transport>
                     isOpen={showTransportDropdown}
                     items={filteredTransports.map(transport => ({
@@ -568,21 +568,19 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                       setShowTransportDropdown(false);
                     }}
                   />
-                  </div>
                 </div>
-                </div>
-          </FormSection>
-          <FormGroup>
-            <Label htmlFor="transportNumberPlate">{t('form.fields.numberPlate')}</Label>
-            <Input
-              type="text"
-              id="transportNumberPlate"
-              value={transportNumberPlate}
-              onChange={(e) => setTransportNumberPlate(e.target.value)}
-              placeholder={t('form.placeholders.enterNumberPlate')}
-            />
-          </FormGroup>
-          <FormGroup>
+              </FormGroup>
+              <FormGroup>
+                <Label htmlFor="transportNumberPlate">{t('form.fields.numberPlate')}</Label>
+                <Input
+                  type="text"
+                  id="transportNumberPlate"
+                  value={transportNumberPlate}
+                  onChange={(e) => setTransportNumberPlate(e.target.value)}
+                  placeholder={t('form.placeholders.enterNumberPlate')}
+                />
+              </FormGroup>
+            </FormRow>
             <FormRow>
               <FormGroup>
                 <Label htmlFor="transportPhoneNumber">{t('form.fields.phoneNumber')}</Label>
@@ -617,7 +615,7 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                 />
               </FormGroup>
             </FormRow>
-          </FormGroup>
+          </FormSection>
 
           {/* Supplier Section */}
           <FormSection title={t('form.sections.supplier')} titleIcon={Building2}>
@@ -734,40 +732,39 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                   />
                 </FormGroup>
 
-                <div className="form-actions">
-                  <button
+                <FormRow>
+                  <Button
                     type="button"
-                    className="save-item-button"
+                    variant="primary"
                     onClick={handleCreateSupplier}
                   >
                     <Building2 size={16} />
                      {t('form.labels.createNewSupplier')}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
-                    className="cancel-button"
+                    variant="secondary"
                     onClick={() => setShowCreateSupplier(false)}
                   >
                     {t('form.buttons.cancel')}
-                  </button>
-                </div>
+                  </Button>
+                </FormRow>
               </div>
             )}
           </FormSection>
 
           {/* Materials Section */}
           <FormSection title={t('form.sections.materials')} titleIcon={Package}>
-            <div className="section-header">
-              <div></div>
-              <button
+            {!showAddItemForm ? (
+              <Button
                 type="button"
-                className="add-item-button"
-                onClick={() => setShowAddItemForm(!showAddItemForm)}
+                variant="secondary"
+                onClick={() => setShowAddItemForm(true)}
               >
                 <Plus size={20} />
                 {t('form.buttons.addMaterial')}
-              </button>
-            </div>
+              </Button>
+            ) : null}
 
             {/* Material Error Message */}
             {materialError && (
@@ -779,12 +776,17 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
 
             {/* Add Item Form */}
             {showAddItemForm && (
-              <div className="add-item-form">
-                <div className="form-row">
-                  <div className="form-group material-search-group">
-                    <label htmlFor="materialSearch">{t('form.fields.materialName')} *</label>
-                    <div className="material-search-container">
-                      <input
+              <div className="add-item-form" style={{ 
+                padding: 'var(--space-lg)', 
+                border: '1px solid var(--border)', 
+                borderRadius: 'var(--radius-md)',
+                backgroundColor: 'var(--background-secondary)'
+              }}>
+                <FormRow>
+                  <FormGroup className="material-search-group">
+                    <Label htmlFor="materialSearch">{t('form.fields.materialName')} *</Label>
+                    <div className="material-search-container" style={{ position: 'relative' }}>
+                      <Input
                         type="text"
                         id="materialSearch"
                         value={materialSearchTerm}
@@ -805,7 +807,7 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                         emptyMessage={t('form.messages.noMaterialsFound')}
                       />
                     </div>
-                  </div>
+                  </FormGroup>
                   <FormGroup>
                     <Label htmlFor="itemColor">{t('form.fields.color')} *</Label>
                     <Input
@@ -818,6 +820,7 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                       className={!newItem.isNew ? 'disabled-field' : ''}
                     />
                   </FormGroup>
+                </FormRow>
 
                 <FormRow>
                   <FormGroup>
@@ -860,45 +863,75 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                   />
                 </FormGroup>
 
-                <div className="form-actions">
-                  <button
+                <FormRow>
+                  <Button
                     type="button"
-                    className="save-item-button"
+                    variant="primary"
                     onClick={handleAddNewMaterial}
                   >
                     {t('form.buttons.addMaterial')}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
                     type="button"
-                    className="cancel-button"
+                    variant="secondary"
                     onClick={() => setShowAddItemForm(false)}
                   >
                     {t('form.buttons.cancel')}
-                  </button>
-                </div>
-              </div>
+                  </Button>
+                </FormRow>
               </div>
             )}
 
             {/* Selected Items */}
             {items.length > 0 && (
-              <div className="selected-items">
-                <h4>{t('form.labels.selectedMaterials')} ({items.length})</h4>
-                <div className="items-list">
+              <div style={{ marginTop: 'var(--space-lg)' }}>
+                <h4 style={{ marginBottom: 'var(--space-md)' }}>
+                  {t('form.labels.selectedMaterials')} ({items.length})
+                </h4>
+                <div style={{ 
+                  display: 'flex', 
+                  flexDirection: 'column', 
+                  gap: 'var(--space-md)' 
+                }}>
                   {items.map((item, index) => (
-                    <div key={index} className="item-card">
-                      <div className="item-info">
-                        <div className="item-name">{item.name}</div>
-                        <div className="item-color">{t('form.itemCard.color')}: {item.color}</div>
+                    <div key={index} style={{ 
+                      padding: 'var(--space-lg)', 
+                      border: '1px solid var(--border)', 
+                      borderRadius: 'var(--radius-md)',
+                      backgroundColor: 'var(--surface)',
+                      display: 'flex',
+                      gap: 'var(--space-md)',
+                      alignItems: 'flex-start'
+                    }}>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ 
+                          fontWeight: 600, 
+                          fontSize: 'var(--text-base)', 
+                          marginBottom: 'var(--space-xs)' 
+                        }}>
+                          {item.name}
+                        </div>
+                        <div style={{ 
+                          fontSize: 'var(--text-sm)', 
+                          color: 'var(--text-secondary)',
+                          marginBottom: 'var(--space-xs)' 
+                        }}>
+                          {t('form.itemCard.color')}: {item.color}
+                        </div>
                         {item.description && (
-                          <div className="item-description">{item.description}</div>
+                          <div style={{ 
+                            fontSize: 'var(--text-sm)', 
+                            color: 'var(--text-secondary)' 
+                          }}>
+                            {item.description}
+                          </div>
                         )}
                       </div>
-                      <div className="item-details">
-                        <div className="form-row">
-                          <div className="form-group">
-                            <label>{t('form.itemCard.quantity')}</label>
-                            <input
+                      <div style={{ flex: 2 }}>
+                        <FormRow>
+                          <FormGroup>
+                            <Label>{t('form.itemCard.quantity')}</Label>
+                            <Input
                               type="number"
                               value={item.quantity}
                               onChange={(e) => handleUpdateItem(index, { quantity: parseFloat(e.target.value) || 0 })}
@@ -906,22 +939,22 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                               min="0"
                               step="0.01"
                             />
-                          </div>
-                          <div className="form-group">
-                            <label>{t('form.itemCard.unit')}</label>
-                            <input
+                          </FormGroup>
+                          <FormGroup>
+                            <Label>{t('form.itemCard.unit')}</Label>
+                            <Input
                               type="text"
                               value={item.unitOfMeasure}
                               onChange={(e) => handleUpdateItem(index, { unitOfMeasure: e.target.value })}
                               disabled={true}
                               className="disabled-field"
                             />
-                          </div>
-                        </div>
-                        <div className="form-row">
-                          <div className="form-group">
-                            <label>{t('form.itemCard.color')}</label>
-                            <input
+                          </FormGroup>
+                        </FormRow>
+                        <FormRow>
+                          <FormGroup>
+                            <Label>{t('form.itemCard.color')}</Label>
+                            <Input
                               type="text"
                               value={item.color}
                               onChange={(e) => handleUpdateItem(index, { color: e.target.value })}
@@ -929,11 +962,11 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                               disabled={true}
                               className="disabled-field"
                             />
-                          </div>
-                        </div>
-                        <div className="form-group">
-                          <label>{t('form.fields.itemDescription')}</label>
-                          <textarea
+                          </FormGroup>
+                        </FormRow>
+                        <FormGroup>
+                          <Label>{t('form.fields.itemDescription')}</Label>
+                          <Textarea
                             value={item.description}
                             onChange={(e) => handleUpdateItem(index, { description: e.target.value })}
                             placeholder={t('form.placeholders.materialDescription')}
@@ -941,18 +974,25 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
                             disabled={true}
                             className="disabled-field"
                           />
-                        </div>
-                        <div className="item-total">
+                        </FormGroup>
+                        <div style={{ 
+                          marginTop: 'var(--space-md)', 
+                          padding: 'var(--space-sm)', 
+                          backgroundColor: 'var(--background-secondary)', 
+                          borderRadius: 'var(--radius-sm)',
+                          fontWeight: 600
+                        }}>
                           {t('form.itemCard.quantity')}: {item.quantity} {item.unitOfMeasure}
                         </div>
                       </div>
-                      <button
+                      <Button
                         type="button"
-                        className="remove-item-button"
+                        variant="danger"
+                        size="sm"
                         onClick={() => handleRemoveItem(index)}
                       >
                         <Trash2 size={16} />
-                      </button>
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -961,7 +1001,14 @@ const EditAcquisition: React.FC<EditAcquisitionProps> = ({
 
             {/* Items Summary */}
             {items.length > 0 && (
-              <div className="total-cost">
+              <div style={{ 
+                marginTop: 'var(--space-lg)', 
+                padding: 'var(--space-md)', 
+                display: 'flex', 
+                justifyContent: 'flex-end',
+                borderTop: '1px solid var(--border)',
+                backgroundColor: 'var(--background-secondary)'
+              }}>
                 <strong>
                   {t('form.labels.totalItems')}: {items.length} {t('form.labels.materialsSelected')}
                 </strong>
