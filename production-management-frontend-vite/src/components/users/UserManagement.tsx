@@ -174,9 +174,9 @@ const UserManagement: React.FC = () => {
     switch (role.toLowerCase()) {
       case 'admin':
         return 'role-badge role-admin';
-      case 'manager':
+      case 'agent teren':
         return 'role-badge role-manager';
-      case 'user':
+      case 'coordonator vanzari':
         return 'role-badge role-user';
       default:
         return 'role-badge role-default';
